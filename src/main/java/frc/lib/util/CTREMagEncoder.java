@@ -1,4 +1,4 @@
-package frc.robot.lib.util;
+package frc.lib.util;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;

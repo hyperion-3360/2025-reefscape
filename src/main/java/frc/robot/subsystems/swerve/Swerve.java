@@ -2,8 +2,13 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.kauailabs.navx.frc.AHRS;
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,10 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,14 +29,14 @@ import frc.robot.Constants;
 public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
-  private final AHRS m_gyro;
+  private final Pigeon2 m_gyro;
   private final Field2d m_field2d;
   public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
 
   public Swerve() {
     // TODO get good port
-    m_gyro = new AHRS(SPI.Port.kMXP);
+    m_gyro = new Pigeon2(0);
     m_field2d = new Field2d();
     m_gyro.reset();
     mSwerveMods =
@@ -80,25 +82,37 @@ public class Swerve extends SubsystemBase {
   }
 
   private void configurePathPlanner() {
+    // TODO make actual configs for autobuilder
+    // try catch to remove parsing error
+    try {
+      AutoBuilder.configure(
+          this::getPose,
+          this::setPose,
+          this::getSpeeds,
+          (ChassisSpeeds, feedForward) -> {
+            return;
+          },
+          Constants.AutoConstants.kPathFollowController,
+          RobotConfig.fromGUISettings(),
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::setPose,
-        this::getSpeeds,
-        this::driveRobotRelative,
-        Constants.AutoConstants.kHolonomicPathFollowerConfig,
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this);
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
@@ -241,7 +255,7 @@ public class Swerve extends SubsystemBase {
           //          new SysIdRoutine.Config(null, null, null, ModifiedSignalLogger.logState()),
           new SysIdRoutine.Config(null, null, null, null),
           new SysIdRoutine.Mechanism(
-              (Measure<Voltage> volts) -> drive(volts.in(Volts)), null, this));
+              (volts) -> drive(volts.in(Volts)), null, this));
 
   public Command runDriveQuasiTest(Direction direction) {
     return m_driveSysIdRoutine.quasistatic(direction);

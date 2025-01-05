@@ -104,14 +104,14 @@ public class SwerveModule {
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         Conversions.RPSToMPS(
-            mDriveMotor.getVelocity().getValue(), Constants.Swerve.wheelCircumference),
-        Rotation2d.fromRotations(mAngleMotor.getPosition().getValue()));
+            mDriveMotor.getVelocity().getValueAsDouble(), Constants.Swerve.wheelCircumference),
+        Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble()));
   }
 
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(
         Conversions.rotationsToMeters(
-            mDriveMotor.getPosition().getValue(), Constants.Swerve.wheelCircumference),
-        Rotation2d.fromRotations(mAngleMotor.getPosition().getValue()));
+            mDriveMotor.getPosition().getValueAsDouble(), Constants.Swerve.wheelCircumference),
+        Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble()));
   }
 }

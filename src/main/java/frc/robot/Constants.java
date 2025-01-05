@@ -7,11 +7,12 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.controllers.PathFollowingController;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSTalonFXSwerveConstants;
@@ -151,14 +152,27 @@ public final class Constants {
   }
 
   public static class AutoConstants {
-    public static final HolonomicPathFollowerConfig kHolonomicPathFollowerConfig =
-        new HolonomicPathFollowerConfig(
-            new PIDConstants(10, 0, 0),
-            new PIDConstants(10, 0, 0),
-            Swerve.maxSpeed,
-            Math.sqrt(
-                (Swerve.trackWidth / 2.0 * Swerve.trackWidth / 2.0)
-                    + (Swerve.wheelBase / 2.0 * Swerve.wheelBase / 2.0)),
-            new ReplanningConfig());
-  }
+    public static final PathFollowingController kPathFollowController = new PathFollowingController() 
+    {
+
+      @Override
+      public ChassisSpeeds calculateRobotRelativeSpeeds(Pose2d currentPose,
+          PathPlannerTrajectoryState targetState) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'calculateRobotRelativeSpeeds'");
+      }
+
+      @Override
+      public void reset(Pose2d currentPose, ChassisSpeeds currentSpeeds) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'reset'");
+      }
+
+      @Override
+      public boolean isHolonomic() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isHolonomic'");
+      }
+    };
+}
 }
