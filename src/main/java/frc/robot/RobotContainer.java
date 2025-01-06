@@ -7,9 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Auto.Pathfinding;
 import frc.robot.subsystems.swerve.CTREConfigs;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class RobotContainer {
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
+  public static final Swerve m_swerve = new Swerve();
 
   public RobotContainer() {
     configureBindings();
