@@ -87,7 +87,6 @@ public class Pathfinding {
     }).findFirst().get();
 
       this.xy_coordinates = pose.getTranslation();
-      System.out.println(pose.getTranslation());
       this.angle = pose.getRotation();
       this.conditions = removeCondition;
       this.event = event;
@@ -184,7 +183,6 @@ public class Pathfinding {
             .sorted((p1, p2) -> p1.rewardFunction(p1).compareTo(p2.rewardFunction(p2)))
             .collect(Collectors.toList());
     Pathfinding.filtered_pois = filtered_pois;
-    System.out.println(Pathfinding.filtered_pois.get(0));
     // uses the coordinates and angle of the first point
     return new Pose2d(filtered_pois.get(0).getCoordinates(), filtered_pois.get(0).getAngle());
   }

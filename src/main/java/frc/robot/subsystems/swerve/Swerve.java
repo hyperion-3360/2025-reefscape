@@ -87,9 +87,7 @@ public class Swerve extends SubsystemBase {
           this::getPose,
           this::setPose,
           this::getSpeeds,
-          (ChassisSpeeds, feedForward) -> {
-            return;
-          },
+          this::driveRobotRelative,
           Constants.AutoConstants.kPathFollowController,
           RobotConfig.fromGUISettings(),
           () -> {
