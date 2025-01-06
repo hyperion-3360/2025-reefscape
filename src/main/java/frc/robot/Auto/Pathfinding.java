@@ -13,6 +13,7 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -21,16 +22,16 @@ import java.util.stream.Collectors;
 /** Pathfinding */
 public class Pathfinding {
   public enum POI {
-    ALGAECORALSTANDS(Constants.AlgaeCoralStand.kStands, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kIntakeCoral,() -> true),
-    BRANCHES(Constants.Pegs.kPegs, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootCoralL4,() -> true),
-    PROCESSOR(10.0,5.3, 180.0, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootingProcessor,() -> true),
-    NET(10.0,5.3, 180.0, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootNet,() -> true);
+    ALGAECORALSTANDS(Constants.AlgaeCoralStand.kStands, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kIntakeCoral,() -> !Constants.Conditions.hasAlgae() && !Constants.Conditions.hasCoral()),
+    BRANCHES(Constants.Pegs.kPegs, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootCoralL4,() -> Constants.Conditions.hasCoral()),
+    PROCESSOR(10.0,5.3, 180.0, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootingProcessor,() -> Constants.Conditions.hasAlgae()),
+    NET(10.0,5.3, 180.0, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootNet,() -> Constants.Conditions.hasAlgae());
 
     private Rotation2d angle;
     private Translation2d xy_coordinates;
     private Supplier<Command> event;
     private BooleanSupplier[] conditions;
-    private List<Pose2d> positionsList;
+    private ArrayList<Pose2d> positionsList = new ArrayList<>();
     private int priority;
 
     /**
@@ -76,7 +77,7 @@ public class Pathfinding {
         this.positionsList.add(coordinate);
       }
       // gets the closest peg from the robot
-      Pose2d pose = positionsList.stream().sorted((pose1, pose2) ->{ 
+      Pose2d pose = positionsList.parallelStream().sorted((pose1, pose2) ->{ 
         if (pose1.getTranslation().getDistance(RobotContainer.m_swerve.getPose().getTranslation()) 
             > 
             pose2.getTranslation().getDistance(RobotContainer.m_swerve.getPose().getTranslation())) {
@@ -86,6 +87,7 @@ public class Pathfinding {
     }).findFirst().get();
 
       this.xy_coordinates = pose.getTranslation();
+      System.out.println(pose.getTranslation());
       this.angle = pose.getRotation();
       this.conditions = removeCondition;
       this.event = event;
@@ -133,9 +135,8 @@ public class Pathfinding {
      *
      * @param poi the poi to which we want to estimate the reward
      * @return the reward in points per meter or another similar unit which must involve points
-     * @throws Exception in case the poi isn't recognized
           */
-         public Double rewardFunction(POI poi) throws Exception {
+         public Double rewardFunction(POI poi){
           double actionTime = 0.0;
   
         switch (poi) {
@@ -153,17 +154,17 @@ public class Pathfinding {
             break;
 
             default:
-            throw new Exception("poi wasn't recgnized by the switch case");
+            break;
         }
-      double timeLeft = DriverStation.isFMSAttached() ? DriverStation.getMatchTime() - 145 : DriverStation.getMatchTime(); // gets time left in auto no matter 
+      double timeLeft = DriverStation.isFMSAttached() ? DriverStation.getMatchTime() - 145 : 15 - DriverStation.getMatchTime(); // gets time left in auto no matter 
       double timeDelta = timeLeft - actionTime;
       double distanceRobotToPoint = poi.getCoordinates().getDistance(RobotContainer.m_swerve.getPose().getTranslation());
-      double pointRatio = poi.getPriority()/(distanceRobotToPoint * timeDelta);
+      double pointRatio = (poi.getPriority() * timeDelta)/distanceRobotToPoint;
       return pointRatio;
     }
   }
 
-  private static ArrayList<POI> poiList = new ArrayList<>();
+  private static LinkedList<POI> poiList = new LinkedList<>();
   private static List<POI> filtered_pois;
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
@@ -178,19 +179,12 @@ public class Pathfinding {
 
     // filters raw poi data and collects the result into a list of pois sorted from most profitable
     // point to least
-      filtered_pois =
-        raw_poi.stream()
+     List<POI> filtered_pois = raw_poi.stream()
             .filter(offending_poi -> offending_poi.getConditionStatus() == true)
-            .sorted((p1, p2) -> {
-              try {
-                return p1.rewardFunction(p1).compareTo(p2.rewardFunction(p2));
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-              return 0;
-            })
+            .sorted((p1, p2) -> p1.rewardFunction(p1).compareTo(p2.rewardFunction(p2)))
             .collect(Collectors.toList());
-
+    Pathfinding.filtered_pois = filtered_pois;
+    System.out.println(Pathfinding.filtered_pois.get(0));
     // uses the coordinates and angle of the first point
     return new Pose2d(filtered_pois.get(0).getCoordinates(), filtered_pois.get(0).getAngle());
   }
@@ -203,7 +197,7 @@ public class Pathfinding {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding(POI[] poi) {
-    if (poiList.isEmpty() || poiList == null) {
+    if (poiList.isEmpty()) {
       for (POI poiArrayElement : poi) {
         poiList.add(poiArrayElement);
       }
@@ -219,7 +213,7 @@ public class Pathfinding {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
-    if (poiList.isEmpty() || poiList == null) {
+    if (poiList.isEmpty()) {
       for (POI poiArrayElement : POI.values()) {
         poiList.add(poiArrayElement);
       }
