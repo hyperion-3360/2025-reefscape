@@ -9,21 +9,26 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /** Pathfinding */
 public class Pathfinding {
   public enum POI {
-    Note1(10.0, 3.0, 0.0, () -> ConditionBuilder.exampleCondition()),
-    Note2(3.0, 3.0, 0.0, () -> false);
+    ALGAECORALSTAND(10.0,5.3, 180.0, null ,() -> true),
+    BRANCHES(10.0,5.3, 180.0, null ,() -> true), //will add coordinate array later
+    PROCESSOR(10.0,5.3, 180.0, null ,() -> true),
+    NET(10.0,5.3, 180.0, null ,() -> true);
 
     private double x_coordinates;
     private double y_coordinates;
     private Rotation2d angle;
     private Translation2d xy_coordinates;
+    private Supplier<Commands> events;
     private BooleanSupplier[] conditions;
 
     /**
@@ -39,7 +44,7 @@ public class Pathfinding {
         double x_coordinates,
         double y_coordinates,
         double angle,
-        Command[] events,
+        Supplier<Commands> events,
         BooleanSupplier... removeCondition) {
       this.conditions = removeCondition;
       this.x_coordinates = x_coordinates;
@@ -56,12 +61,24 @@ public class Pathfinding {
      * @param events
      * @param removeCondition the condition to which we remove the poi from a list
      */
-    private POI(Translation2d xy_coordinates, double angle, Command[] event, BooleanSupplier... removeCondition) {
+    private POI(Translation2d xy_coordinates, double angle, Supplier<Commands> event, BooleanSupplier... removeCondition) {
       this.conditions = removeCondition;
       this.angle = new Rotation2d(angle);
       this.xy_coordinates = xy_coordinates;
     }
-
+/**
+     * constructor overwritting the other one to allow input of a Translation2d object
+     *
+     * @param xy_coordinates the x and y position of the poi in (x,y)
+     * @param angle the angel the robot should facing once reaching the poi
+     * @param events
+     * @param removeCondition the condition to which we remove the poi from a list
+     */
+    private POI(Translation2d[] xy_coordinates, double angle, Supplier<Commands> event, BooleanSupplier... removeCondition) {
+    for (Translation2d coordinateInstance : xy_coordinates) {
+      
+    }
+    }
     /**
      * @return the angle we want the robot to face when reaching this point
      */
