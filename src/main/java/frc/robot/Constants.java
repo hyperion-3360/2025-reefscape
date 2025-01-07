@@ -7,12 +7,13 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSTalonFXSwerveConstants;
@@ -151,29 +152,24 @@ public final class Constants {
   }
 
   public static class AutoConstants {
+    // config the configs for the robot so that the robot may have configs.
+    // I got forced to write this boilerplate... I'm sorry.
+   private static RobotConfig configConfigs() {
+    RobotConfig kConfig = null;
+    try{
+      kConfig = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return kConfig;
+  }
+ public static final RobotConfig kRobotConfig = configConfigs();
+
     public static final PathFollowingController kPathFollowController =
-        new PathFollowingController() {
-
-          @Override
-          public ChassisSpeeds calculateRobotRelativeSpeeds(
-              Pose2d currentPose, PathPlannerTrajectoryState targetState) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException(
-                "Unimplemented method 'calculateRobotRelativeSpeeds'");
-          }
-
-          @Override
-          public void reset(Pose2d currentPose, ChassisSpeeds currentSpeeds) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'reset'");
-          }
-
-          @Override
-          public boolean isHolonomic() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'isHolonomic'");
-          }
-        };
+        new PPHolonomicDriveController(
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            );
   }
 
   public static final class Conditions {

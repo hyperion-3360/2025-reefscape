@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,8 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
-import java.io.IOException;
-import org.json.simple.parser.ParseException;
 
 public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
@@ -82,14 +79,13 @@ public class Swerve extends SubsystemBase {
   private void configurePathPlanner() {
     // TODO make actual configs for autobuilder
     // try catch to remove parsing error
-    try {
       AutoBuilder.configure(
           this::getPose,
           this::setPose,
           this::getSpeeds,
           this::driveRobotRelative,
           Constants.AutoConstants.kPathFollowController,
-          RobotConfig.fromGUISettings(),
+          Constants.AutoConstants.kRobotConfig,
           () -> {
             // Boolean supplier that controls when the path will be mirrored for the red alliance
             // This will flip the path being followed to the red side of the field.
@@ -102,13 +98,6 @@ public class Swerve extends SubsystemBase {
             return false;
           },
           this);
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
   }
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
