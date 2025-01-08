@@ -190,27 +190,29 @@ public final class Constants {
     }
  }
  public static final class AlgaeCoralStand {
+  // TODO add actual values not approximates using pathplanner
   public static final Pose2d[] kStands = {
-    new Pose2d(3, 5, new Rotation2d(0)),
-    new Pose2d(3, 4, new Rotation2d(0)),
-    new Pose2d(3, 3, new Rotation2d(0)),
+    new Pose2d(1.225, 5.855, new Rotation2d(-180)),
+    new Pose2d(1.225, 4.025, new Rotation2d(-180)),
+    new Pose2d(1.225, 2.195, new Rotation2d(-180)),
   };
  }
  public static class Pegs {
   public static final Pose2d[] kPegs = 
   {
-    new Pose2d(1, 0, new Rotation2d(0)),
-    new Pose2d(2, 0, new Rotation2d(0)),
-    new Pose2d(3, 0, new Rotation2d(0)),
-    new Pose2d(4, 1, new Rotation2d(0)),
-    new Pose2d(4, 2, new Rotation2d(0)),
-    new Pose2d(4, 3, new Rotation2d(0)),
-    new Pose2d(4, 4, new Rotation2d(0)),
-    new Pose2d(5, 0, new Rotation2d(0)),
-    new Pose2d(6, 0, new Rotation2d(0)),
-    new Pose2d(7, 0, new Rotation2d(0)),
-    new Pose2d(8, 0, new Rotation2d(0)),
-    new Pose2d(9, 0, new Rotation2d(0)),
+    // TODO add actual values not approximates using pathplanner
+    new Pose2d(3.945, 5.275, new Rotation2d(20)),
+    new Pose2d(3.655, 5.100, new Rotation2d(20)),
+    new Pose2d(3.135, 4.175, new Rotation2d(180)),
+    new Pose2d(3.135, 3.850, new Rotation2d(180)),
+    new Pose2d(3.635, 2.960, new Rotation2d(300)),
+    new Pose2d(3.925, 2.790, new Rotation2d(300)),
+    new Pose2d(5.000, 2.780, new Rotation2d(-60)),
+    new Pose2d(5.290, 2.925, new Rotation2d(-60)),
+    new Pose2d(5.845, 4.175, new Rotation2d(-180)),
+    new Pose2d(5.845, 3.850, new Rotation2d(-180)),
+    new Pose2d(5.325, 5.075, new Rotation2d(300)),
+    new Pose2d(5.035, 5.250, new Rotation2d(300)),
   };
  }
  public static class Priorities {
