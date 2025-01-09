@@ -154,21 +154,22 @@ public final class Constants {
   public static class AutoConstants {
     // config the configs for the robot so that the robot may have configs.
     // I got forced to write this boilerplate... I'm sorry.
-   private static RobotConfig configConfigs() {
-    RobotConfig kConfig = null;
-    try{
-      kConfig = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      e.printStackTrace();
+    private static RobotConfig configConfigs() {
+      RobotConfig kConfig = null;
+      try {
+        kConfig = RobotConfig.fromGUISettings();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      return kConfig;
     }
-    return kConfig;
-  }
- public static final RobotConfig kRobotConfig = configConfigs();
+
+    public static final RobotConfig kRobotConfig = configConfigs();
 
     public static final PathFollowingController kPathFollowController =
         new PPHolonomicDriveController(
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             );
   }
 
@@ -177,10 +178,11 @@ public final class Constants {
     public static boolean hasAlgae() {
       boolean hasAlgae = false;
       if (hasAlgae == true) {
-      return true;
+        return true;
       }
       return true;
     }
+
     public static boolean hasCoral() {
       boolean hasCoral = false;
       if (hasCoral == true) {
@@ -188,46 +190,49 @@ public final class Constants {
       }
       return true;
     }
- }
- public static final class AlgaeCoralStand {
-  // TODO add actual values not approximates using pathplanner
-  public static final Pose2d[] kStands = {
-    new Pose2d(1.225, 5.855, new Rotation2d(-180)),
-    new Pose2d(1.225, 4.025, new Rotation2d(-180)),
-    new Pose2d(1.225, 2.195, new Rotation2d(-180)),
-  };
- }
- public static class Pegs {
-  public static final Pose2d[] kPegs = 
-  {
+  }
+
+  public static final class AlgaeCoralStand {
     // TODO add actual values not approximates using pathplanner
-    new Pose2d(3.945, 5.275, new Rotation2d(20)),
-    new Pose2d(3.655, 5.100, new Rotation2d(20)),
-    new Pose2d(3.135, 4.175, new Rotation2d(180)),
-    new Pose2d(3.135, 3.850, new Rotation2d(180)),
-    new Pose2d(3.635, 2.960, new Rotation2d(300)),
-    new Pose2d(3.925, 2.790, new Rotation2d(300)),
-    new Pose2d(5.000, 2.780, new Rotation2d(-60)),
-    new Pose2d(5.290, 2.925, new Rotation2d(-60)),
-    new Pose2d(5.845, 4.175, new Rotation2d(-180)),
-    new Pose2d(5.845, 3.850, new Rotation2d(-180)),
-    new Pose2d(5.325, 5.075, new Rotation2d(300)),
-    new Pose2d(5.035, 5.250, new Rotation2d(300)),
-  };
- }
- public static class Priorities {
-  // TODO add actual priorities
-  public static final int kShootCoralL4 = 7;
-  public static final int kShootNet = 1;
-  public static final int kIntakeCoral = 5;
-  public static final int kShootingProcessor = 2;
- }
- public static class TimeToAction {
-  // TODO add actual time
-  public static final double kShootCoralL1 = 1;
-  public static final double kShootCoralL4 = 3;
-  public static final double kShootAlgaeProcessor = 4;
-  public static final double kIntakeCoral = 2;
-  public static final double kShootNet = 6;
- }
+    public static final Pose2d[] kStands = {
+      new Pose2d(1.225, 5.855, new Rotation2d(-180)),
+      new Pose2d(1.225, 4.025, new Rotation2d(-180)),
+      new Pose2d(1.225, 2.195, new Rotation2d(-180)),
+    };
+  }
+
+  public static class Pegs {
+    public static final Pose2d[] kPegs = {
+      // TODO add actual values not approximates using pathplanner
+      new Pose2d(3.945, 5.275, new Rotation2d(20)),
+      new Pose2d(3.655, 5.100, new Rotation2d(20)),
+      new Pose2d(3.135, 4.175, new Rotation2d(180)),
+      new Pose2d(3.135, 3.850, new Rotation2d(180)),
+      new Pose2d(3.635, 2.960, new Rotation2d(300)),
+      new Pose2d(3.925, 2.790, new Rotation2d(300)),
+      new Pose2d(5.000, 2.780, new Rotation2d(-60)),
+      new Pose2d(5.290, 2.925, new Rotation2d(-60)),
+      new Pose2d(5.845, 4.175, new Rotation2d(-180)),
+      new Pose2d(5.845, 3.850, new Rotation2d(-180)),
+      new Pose2d(5.325, 5.075, new Rotation2d(300)),
+      new Pose2d(5.035, 5.250, new Rotation2d(300)),
+    };
+  }
+
+  public static class Priorities {
+    // TODO add actual priorities
+    public static final int kShootCoralL4 = 7;
+    public static final int kShootNet = 1;
+    public static final int kIntakeCoral = 5;
+    public static final int kShootingProcessor = 2;
+  }
+
+  public static class TimeToAction {
+    // TODO add actual time
+    public static final double kShootCoralL1 = 1;
+    public static final double kShootCoralL4 = 3;
+    public static final double kShootAlgaeProcessor = 4;
+    public static final double kIntakeCoral = 2;
+    public static final double kShootNet = 6;
+  }
 }

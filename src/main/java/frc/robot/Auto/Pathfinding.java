@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,10 +21,30 @@ import java.util.stream.Collectors;
 /** Pathfinding */
 public class Pathfinding {
   public enum POI {
-    ALGAECORALSTANDS(Constants.AlgaeCoralStand.kStands, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kIntakeCoral,() -> !Constants.Conditions.hasAlgae() && !Constants.Conditions.hasCoral()),
-    BRANCHES(Constants.Pegs.kPegs, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootCoralL4,() -> Constants.Conditions.hasCoral()),
-    PROCESSOR(10.0,5.3, 180.0, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootingProcessor,() -> Constants.Conditions.hasAlgae()),
-    NET(10.0,5.3, 180.0, () -> Commands.runOnce(() -> System.out.println("Hello World")),Constants.Priorities.kShootNet,() -> Constants.Conditions.hasAlgae());
+    ALGAECORALSTANDS(
+        Constants.AlgaeCoralStand.kStands,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kIntakeCoral,
+        () -> !Constants.Conditions.hasAlgae() && !Constants.Conditions.hasCoral()),
+    BRANCHES(
+        Constants.Pegs.kPegs,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kShootCoralL4,
+        () -> Constants.Conditions.hasCoral()),
+    PROCESSOR(
+        10.0,
+        5.3,
+        180.0,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kShootingProcessor,
+        () -> Constants.Conditions.hasAlgae()),
+    NET(
+        10.0,
+        5.3,
+        180.0,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kShootNet,
+        () -> Constants.Conditions.hasAlgae());
 
     private Rotation2d angle;
     private Translation2d xy_coordinates;
@@ -65,26 +84,43 @@ public class Pathfinding {
      * @param event the sequence we want the robot to perform when arriving on point
      * @param removeCondition the condition to which we remove the poi from a list
      */
-    private POI(Translation2d xy_coordinates, double angle, Supplier<Command> event, int priority, BooleanSupplier... removeCondition) {
+    private POI(
+        Translation2d xy_coordinates,
+        double angle,
+        Supplier<Command> event,
+        int priority,
+        BooleanSupplier... removeCondition) {
       this.xy_coordinates = xy_coordinates;
       this.angle = new Rotation2d(angle);
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
     }
-    private POI(Pose2d[] xyThetacoordinates, Supplier<Command> event, int priority, BooleanSupplier... removeCondition) {
+
+    private POI(
+        Pose2d[] xyThetacoordinates,
+        Supplier<Command> event,
+        int priority,
+        BooleanSupplier... removeCondition) {
       for (Pose2d coordinate : xyThetacoordinates) {
         this.positionsList.add(coordinate);
       }
       // gets the closest peg from the robot
-      Pose2d pose = positionsList.parallelStream().sorted((pose1, pose2) ->{ 
-        if (pose1.getTranslation().getDistance(RobotContainer.m_swerve.getPose().getTranslation()) 
-            > 
-            pose2.getTranslation().getDistance(RobotContainer.m_swerve.getPose().getTranslation())) {
-          return 1;
-        }
-        else return 0;
-    }).findFirst().get();
+      Pose2d pose =
+          positionsList.parallelStream()
+              .sorted(
+                  (pose1, pose2) -> {
+                    if (pose1
+                            .getTranslation()
+                            .getDistance(RobotContainer.m_swerve.getPose().getTranslation())
+                        > pose2
+                            .getTranslation()
+                            .getDistance(RobotContainer.m_swerve.getPose().getTranslation())) {
+                      return 1;
+                    } else return 0;
+                  })
+              .findFirst()
+              .get();
 
       this.xy_coordinates = pose.getTranslation();
       this.angle = pose.getRotation();
@@ -92,6 +128,7 @@ public class Pathfinding {
       this.event = event;
       this.priority = priority;
     }
+
     /**
      * @return the angle we want the robot to face when reaching this point
      */
@@ -134,31 +171,35 @@ public class Pathfinding {
      *
      * @param poi the poi to which we want to estimate the reward
      * @return the reward in points per meter or another similar unit which must involve points
-          */
-         public Double rewardFunction(POI poi){
-          double actionTime = 0.0;
-  
-        switch (poi) {
-          case ALGAECORALSTANDS:
-            actionTime = Constants.TimeToAction.kIntakeCoral;
-            break;
-            case BRANCHES:
-            actionTime = Constants.TimeToAction.kShootCoralL4;
-            break;
-            case PROCESSOR:
-            actionTime = Constants.TimeToAction.kShootAlgaeProcessor;
-            break;
-            case NET:
-            actionTime = Constants.TimeToAction.kShootNet;
-            break;
+     */
+    public Double rewardFunction(POI poi) {
+      double actionTime = 0.0;
 
-            default:
-            break;
-        }
-      double timeLeft = DriverStation.isFMSAttached() ? DriverStation.getMatchTime() - 145 : 15 - DriverStation.getMatchTime(); // gets time left in auto no matter 
+      switch (poi) {
+        case ALGAECORALSTANDS:
+          actionTime = Constants.TimeToAction.kIntakeCoral;
+          break;
+        case BRANCHES:
+          actionTime = Constants.TimeToAction.kShootCoralL4;
+          break;
+        case PROCESSOR:
+          actionTime = Constants.TimeToAction.kShootAlgaeProcessor;
+          break;
+        case NET:
+          actionTime = Constants.TimeToAction.kShootNet;
+          break;
+
+        default:
+          break;
+      }
+      double timeLeft =
+          DriverStation.isFMSAttached()
+              ? DriverStation.getMatchTime() - 145
+              : 15 - DriverStation.getMatchTime(); // gets time left in auto no matter
       double timeDelta = timeLeft - actionTime;
-      double distanceRobotToPoint = poi.getCoordinates().getDistance(RobotContainer.m_swerve.getPose().getTranslation());
-      double pointRatio = (poi.getPriority() * timeDelta)/distanceRobotToPoint;
+      double distanceRobotToPoint =
+          poi.getCoordinates().getDistance(RobotContainer.m_swerve.getPose().getTranslation());
+      double pointRatio = (poi.getPriority() * timeDelta) / distanceRobotToPoint;
       return pointRatio;
     }
   }
@@ -178,7 +219,8 @@ public class Pathfinding {
 
     // filters raw poi data and collects the result into a list of pois sorted from most profitable
     // point to least
-     List<POI> filtered_pois = raw_poi.stream()
+    List<POI> filtered_pois =
+        raw_poi.stream()
             .filter(offending_poi -> offending_poi.getConditionStatus() == true)
             .sorted((p1, p2) -> p1.rewardFunction(p1).compareTo(p2.rewardFunction(p2)))
             .collect(Collectors.toList());
@@ -201,8 +243,9 @@ public class Pathfinding {
       }
     }
     return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
-    .andThen(filtered_pois.get(0).getEvent())
-    .repeatedly().until(() -> DriverStation.isTeleop());
+        .andThen(filtered_pois.get(0).getEvent())
+        .repeatedly()
+        .until(() -> DriverStation.isTeleop());
   }
 
   /**
@@ -218,6 +261,7 @@ public class Pathfinding {
     }
     return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
         .andThen(filtered_pois.get(0).getEvent())
-        .repeatedly().until(() -> DriverStation.isTeleop());
+        .repeatedly()
+        .until(() -> DriverStation.isTeleop());
   }
 }
