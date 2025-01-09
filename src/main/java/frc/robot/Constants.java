@@ -18,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
+
 /** Add your docs here. */
 public final class Constants {
 
@@ -28,7 +29,7 @@ public final class Constants {
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
             COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.driveRatios.X1_10);
 
-    // coming from datasheet using typical values
+    // coming from datasheet using typical values adding something
     // https://store.ctr-electronics.com/content/user-manual/Magnetic%20Encoder%20User%27s%20Guide.pdf
     public static final double kPwmPeriod = 1.0 / 244.0;
     public static final double dutyCycleMin = 1e-6 / kPwmPeriod;
