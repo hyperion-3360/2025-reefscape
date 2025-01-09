@@ -235,4 +235,79 @@ public final class Constants {
     public static final double kIntakeCoral = 2;
     public static final double kShootNet = 6;
   }
+  public static class ElevatorHeight {
+    // TODO: modify heights for elevator L = level
+    // in inches
+    public static final double kL1Height = 0.0;
+    public static final double kL2Height = 0.0;
+    public static final double kL3Height = 0.0;
+    public static final double kL4Height = 0.0;
+
+    public static final double kAlgaeLow = 0.0;
+    public static final double kAlgaeHigh = 0.0;
+
+    public static final double kHandoffHeight = 0.0;
+    public static final double kBaseHeight = 0.0;
+  }
+  public static class CoralIntakeVariables {
+    // TODO: modify angles and speeds
+
+    // elbow angles in º
+    public static final double kL1Angle = 0.0;
+    public static final double kHandoffAngle = 0.0;
+    public static final double kIntakeAngle = 0.0;
+
+    // wrist angles in º
+    public static final double kShootAngle = 0.0;
+    public static final double kNormalAngle = 0.0;
+
+    // wheel speeds
+    public static final double kIntakeSpeed = 0.0;
+    public static final double kShootSpeed = 0.0;
+    public static final double kStopSpeed = 0.0;
+  }
+  public static class AlgaeIntakeVariables {
+    // TODO: modify angles and wheel speeds
+
+    // in º
+    public static final double kStartingAngle = 0.0;
+    public static final double kFloorIntakeAngle = 0.0;
+    public static final double kProcessorAngle = 0.0;
+    // auto intake bcuz of the little tower thing
+    public static final double kAutoIntakeAngle = 0.0;
+
+    // wheel speeds
+    public static final double kIntakeSpeed = 0.0;
+    public static final double kProcessorSpeed = 0.0;
+    public static final double kStopSpeed = 0.0;
+  }
+  public static class CoralShooterSpeeds {
+    // TODO: modify speeds
+    // not sure if we'll need different speeds but :
+    public static final double kIntakeSpeed = 0.0;
+    public static final double kShootSpeed = 0.0;
+  }
+  public static class SubsystemInfo {
+    // TODO: change ids to right ones and change names to more accurate, and add sensors and
+    // encoders
+    // motor ids
+    public static final int kCoralIntakeMotorWristID = 0;
+    public static final int kCoralIntakeMotorElbowID = 0;
+    public static final int kAlgaeIntakeShooterMotorID = 0;
+    public static final int kAlgaeIntakeArmMotorID = 0;
+    public static final int kCoralShooterMotorID = 0;
+    public static final int kElevatorMotorID = 0;
+    public static final int kFlickerMotorID = 0;
+    // not sure about the left and right, hasnt been cadded yet but they planned 2
+    public static final int kClimberMotorLeftID = 0;
+    public static final int kClimberMotorRightID = 0;
+    // sensor ids
+    public static final int kCoralIntakeLimitSwitchID = 0;
+    public static final int kCoralShooterBeambreakID = 0;
+    public static final int kAlgaeIntakeLimitSwitchID = 0;
+
+    public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
+    // no clue if this is a good value but it should be fine to start
+    public static final double kElevatorMotorCurrentLimit = 10.0;
+  }
 }
