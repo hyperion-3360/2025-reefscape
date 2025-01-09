@@ -28,7 +28,7 @@ public final class Constants {
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
             COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.driveRatios.X1_10);
 
-    // coming from datasheet using typical values adding something else
+    // coming from datasheet using typical values
     // https://store.ctr-electronics.com/content/user-manual/Magnetic%20Encoder%20User%27s%20Guide.pdf
     public static final double kPwmPeriod = 1.0 / 244.0;
     public static final double dutyCycleMin = 1e-6 / kPwmPeriod;
