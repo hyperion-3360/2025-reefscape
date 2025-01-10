@@ -5,13 +5,16 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-public class CoralIntake extends SubsystemBase {
-  /** Creates a new CoralIntake. */
-  public CoralIntake() {}
+/**2 neo one controls elevation and one closes pinchers **/
+public class CoralClaw extends SubsystemBase {
+  //pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple = new CANSparkMax(kidexemple);
+  public CoralClaw() {}
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+  }
+
+  public void intake(){
+
   }
 }

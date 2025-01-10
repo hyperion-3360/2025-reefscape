@@ -4,14 +4,17 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+/** 1 falcon and 1 neo 550 (mini-neo) falcon winch and unwinch mini neo closes claws**/
 public class Climber extends SubsystemBase {
-  /** Creates a new Climber. */
   public Climber() {}
+  //pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple = new CANSparkMax(kidexemple);
+  //pour les falcons utilise talon ex: private WPI_TalonSRX m_exemple = new WPI_TalonSRX(kidexemple);
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
   }
+
 }
