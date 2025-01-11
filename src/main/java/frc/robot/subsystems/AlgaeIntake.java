@@ -6,18 +6,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/**3 neos 550 (mini-neo) one to go up and down and two to intake**/
+/** 3 neos 550 (mini-neo) one to go up and down and two to intake* */
 public class AlgaeIntake extends SubsystemBase {
-  public AlgaeIntake() {  //pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple = new CANSparkMax(kidexemple);
-
+  public
+  AlgaeIntake() { // pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple =
+    // new CANSparkMax(kidexemple);
   }
 
   @Override
-  public void periodic() {
+  public void periodic() {}
 
-  }
-
-  public void intake(){
-
-  }
+  public void intake() {}
 }

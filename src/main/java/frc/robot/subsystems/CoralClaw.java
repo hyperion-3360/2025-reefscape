@@ -5,16 +5,15 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-/**2 neo one controls elevation and one closes pinchers **/
+
+/** 2 neo one controls elevation and one closes pinchers * */
 public class CoralClaw extends SubsystemBase {
-  //pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple = new CANSparkMax(kidexemple);
+  // pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple = new
+  // CANSparkMax(kidexemple);
   public CoralClaw() {}
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 
-  public void intake(){
-
-  }
+  public void intake() {}
 }

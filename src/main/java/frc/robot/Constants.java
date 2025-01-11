@@ -235,6 +235,7 @@ public final class Constants {
     public static final double kIntakeCoral = 2;
     public static final double kShootNet = 6;
   }
+
   public static class ElevatorHeight {
     // TODO: modify heights for elevator L = level
     // in inches
@@ -249,6 +250,7 @@ public final class Constants {
     public static final double kHandoffHeight = 0.0;
     public static final double kBaseHeight = 0.0;
   }
+
   public static class CoralIntakeVariables {
     // TODO: modify angles and speeds
 
@@ -266,6 +268,7 @@ public final class Constants {
     public static final double kShootSpeed = 0.0;
     public static final double kStopSpeed = 0.0;
   }
+
   public static class AlgaeIntakeVariables {
     // TODO: modify angles and wheel speeds
 
@@ -281,12 +284,14 @@ public final class Constants {
     public static final double kProcessorSpeed = 0.0;
     public static final double kStopSpeed = 0.0;
   }
+
   public static class CoralShooterSpeeds {
     // TODO: modify speeds
     // not sure if we'll need different speeds but :
     public static final double kIntakeSpeed = 0.0;
     public static final double kShootSpeed = 0.0;
   }
+
   public static class SubsystemInfo {
     // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders

@@ -48,8 +48,8 @@ public class IntakeCmd extends Command {
     currentIntakeType = type;
 
     switch (currentIntakeType) {
-        // the lack of break is INTENTIONAL :
-        // it is because in both cases i want the same result :)
+      // the lack of break is INTENTIONAL :
+      // it is because in both cases i want the same result :)
       case AlgaeAuto:
       case AlgaeGround:
         this.subsystem = RobotContainer.m_algaeIntake;
@@ -81,11 +81,10 @@ public class IntakeCmd extends Command {
         break;
 
       case AlgaeGround:
-        /**
-         * this should : 1. runOnce place the algae intake in teleop intake lvl | 2. lift the
-         * elevator to leave space for the algae to go in (not sure, we'll see when the robot is
-         * built)
-         */
+      /**
+       * this should : 1. runOnce place the algae intake in teleop intake lvl | 2. lift the elevator
+       * to leave space for the algae to go in (not sure, we'll see when the robot is built)
+       */
       case CoralAuto:
 
         /**

@@ -4,11 +4,9 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -32,15 +30,15 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
 
     // motor configs
-    //TODO: modify this according to needs
+    // TODO: modify this according to needs
     m_elevatorMotorConfig.MotorOutput.Inverted = Constants.SubsystemInfo.kElevatorMotorInversion;
     m_elevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     m_elevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    m_elevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.SubsystemInfo.kElevatorMotorCurrentLimit;
+    m_elevatorMotorConfig.CurrentLimits.SupplyCurrentLimit =
+        Constants.SubsystemInfo.kElevatorMotorCurrentLimit;
 
     // m_elevatorMotorConfig.ClosedLoopRamps = ; might need, but just a pid should be fine
-
 
     m_elevatorMotor.getConfigurator().apply(m_elevatorMotorConfig);
   }
