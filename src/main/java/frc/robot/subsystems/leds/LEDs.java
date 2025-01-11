@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDs extends SubsystemBase {
@@ -31,10 +30,8 @@ public class LEDs extends SubsystemBase {
    * (could potentially be remade to work with moving patterns) 
    */
   // spotless:on
-  public Command setStillPattern(LEDPattern pattern) {
-    return runOnce(() -> {
-      pattern.atBrightness(Percent.of(SmartDashboard.getNumber(getName(), brightnessPercent))).applyTo(m_ledBuffer);
-    });
+  public void setStillPattern(LEDPattern pattern) {
+    pattern.atBrightness(Percent.of(SmartDashboard.getNumber(getName(), brightnessPercent))).applyTo(m_ledBuffer);
   }
 
   @Override
