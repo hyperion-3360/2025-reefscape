@@ -5,6 +5,7 @@
 package frc.robot.subsystems.leds;
 
 import static edu.wpi.first.units.Units.Percent;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -16,8 +17,9 @@ public class LEDs extends SubsystemBase {
 
   AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
   AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
+
   /** This variable should be able to be changed in smart dashboard */
-  double brightnessPercent = 0.0; 
+  double brightnessPercent = 0.0;
 
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
@@ -32,7 +34,9 @@ public class LEDs extends SubsystemBase {
    */
   // spotless:on
   public void setStillPattern(LEDPattern pattern) {
-    pattern.atBrightness(Percent.of(SmartDashboard.getNumber(getName(), brightnessPercent))).applyTo(m_ledBuffer);
+    pattern
+        .atBrightness(Percent.of(SmartDashboard.getNumber(getName(), brightnessPercent)))
+        .applyTo(m_ledBuffer);
   }
 
   @Override
