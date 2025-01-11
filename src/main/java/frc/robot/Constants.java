@@ -292,6 +292,12 @@ public final class Constants {
     public static final double kShootSpeed = 0.0;
   }
 
+  public static class LEDConstants {
+    // TODO: update port when robot is built
+    public static final int kLEDPWMPort = 6;
+    public static final int kLEDLength = 60;
+  }
+
   public static class SubsystemInfo {
     // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders
