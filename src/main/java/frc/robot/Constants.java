@@ -249,6 +249,7 @@ public final class Constants {
     public static final double kHandoffHeight = 0.0;
     public static final double kBaseHeight = 0.0;
   }
+
   public static class CoralIntakeVariables {
     // TODO: modify angles and speeds
 
@@ -296,7 +297,8 @@ public final class Constants {
     public static final int kAlgaeIntakeShooterMotorID = 0;
     public static final int kAlgaeIntakeArmMotorID = 0;
     public static final int kCoralShooterMotorID = 0;
-    public static final int kElevatorMotorID = 0;
+    public static final int kRightElevatorMotorID = 0;
+    public static final int kLeftElevatorMotorID = 0;
     public static final int kFlickerMotorID = 0;
     // not sure about the left and right, hasnt been cadded yet but they planned 2
     public static final int kClimberMotorLeftID = 0;
@@ -306,7 +308,8 @@ public final class Constants {
     public static final int kCoralShooterBeambreakID = 0;
     public static final int kAlgaeIntakeLimitSwitchID = 0;
 
-    public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue kRightElevatorMotorInversion = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue kLeftElevatorMotorInversion = InvertedValue.CounterClockwise_Positive;
     // no clue if this is a good value but it should be fine to start
     public static final double kElevatorMotorCurrentLimit = 10.0;
   }

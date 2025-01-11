@@ -25,24 +25,29 @@ public class Elevator extends SubsystemBase {
 
   private PIDController m_pid = new PIDController(kP, kI, kD);
 
-  private TalonFXConfiguration m_elevatorMotorConfig = new TalonFXConfiguration();
-  private TalonFX m_elevatorMotor = new TalonFX(Constants.SubsystemInfo.kElevatorMotorID);
+  private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
+  private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
+  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID);
+  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID);
 
   /** Creates a new Elevator. */
   public Elevator() {
 
     // motor configs
     //TODO: modify this according to needs
-    m_elevatorMotorConfig.MotorOutput.Inverted = Constants.SubsystemInfo.kElevatorMotorInversion;
-    m_elevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    m_rightMotorConfig.MotorOutput.Inverted = Constants.SubsystemInfo.kRightElevatorMotorInversion;
+    m_leftMotorConfig.MotorOutput.Inverted = Constants.SubsystemInfo.kLeftElevatorMotorInversion;
+    m_rightMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    m_leftMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    m_elevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    m_elevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.SubsystemInfo.kElevatorMotorCurrentLimit;
+    m_rightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_rightMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.SubsystemInfo.kElevatorMotorCurrentLimit;
 
     // m_elevatorMotorConfig.ClosedLoopRamps = ; might need, but just a pid should be fine
 
 
-    m_elevatorMotor.getConfigurator().apply(m_elevatorMotorConfig);
+    m_rightElevatorMotor.getConfigurator().apply(m_rightMotorConfig);
+    m_rightElevatorMotor.getConfigurator().apply(m_leftMotorConfig);
   }
 
   @Override
