@@ -10,11 +10,12 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
 
-  AddressableLED m_led = new AddressableLED(6);
-  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(60);
+  AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
+  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
   /** This variable should be able to be changed in smart dashboard */
   double brightnessPercent = 0.0; 
 
