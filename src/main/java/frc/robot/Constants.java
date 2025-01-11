@@ -318,7 +318,8 @@ public final class Constants {
     public static final int kCoralIntakeMotorElbowID = 0;
     public static final int kAlgaeIntakeShooterMotorID = 0;
     public static final int kAlgaeIntakeArmMotorID = 0;
-    public static final int kCoralShooterMotorID = 0;
+    public static final int kCoralShooterTalonID = 0;
+    public static final int kCoralShooterServoID = 0;
     public static final int kElevatorMotorID = 0;
     public static final int kFlickerMotorID = 0;
     public static final int kClimberMotorID = 0;
