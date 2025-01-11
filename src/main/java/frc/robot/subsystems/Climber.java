@@ -6,7 +6,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** 1 falcon and 1 neo 550 (mini-neo) falcon winch and unwinch mini neo closes claws* */
+/** 1 falcon winch and unwinch mini neo closes claws* */
+// La classe devrait avoir un option pour seulement s'activer a 30sec de la fin du jeu,
+// pour eviter un mouvement par accident du pilot
 public class Climber extends SubsystemBase {
   public Climber() {}
 
