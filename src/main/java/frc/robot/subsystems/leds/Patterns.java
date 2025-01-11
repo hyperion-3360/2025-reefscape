@@ -7,14 +7,20 @@ package frc.robot.subsystems.leds;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
-/** All the patterns for the LEDs (currently untested) */
+/** All the patterns for the LEDs (some are currently untested) */
 public class Patterns {
+  /** Solid colors */
   public class solids {
+    // TODO: Check which colors drive team wants
+    // TODO: Remove unused colors
     LEDPattern orange = LEDPattern.solid(Color.kOrangeRed);
     LEDPattern white = LEDPattern.solid(Color.kWhite);
     LEDPattern blue = LEDPattern.solid(Color.kBlue);
     LEDPattern green = LEDPattern.solid(Color.kLime);
     LEDPattern yellow = LEDPattern.solid(Color.kYellow);
     LEDPattern purple = LEDPattern.solid(Color.kPurple);
+    LEDPattern red = LEDPattern.solid(Color.kRed);
+    LEDPattern cyan = LEDPattern.solid(Color.kCyan);
+    LEDPattern off = LEDPattern.solid(Color.kBlack);
   }
 }
