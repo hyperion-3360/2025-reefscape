@@ -6,4 +6,6 @@
 |Intake elevator     |3             |2 BAG, 1 Falcon |The BAGs intake coral and shoots on the reef's poles. The Falcon controls the flicker and the flicker prevent the coral from falling and flicks the algae.|
 |Elevator            |1             |1 Falcon, 1 TF sensor  |The Falcon controls the elevation of the elevator. The TF sensors is there to ensure zeroing.                       |
 |Climber             |1             |1 Falcon               |The Falcon controls the winching and unwinching of the hand.|
-|Shooter             |1             |1 Falcon               |The Falcon controls the intaking and shooting of the shooter.                                                       |
+|Shooter             |1             |1 Falcon               |The Falcon controls the intaking and shooting of the shooter.     
+
+test                                                  |
