@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -31,6 +30,11 @@ public class Pathfinding {
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         () -> Constants.Conditions.hasCoral()),
+    FEEDERS(
+        Constants.Feeders.kFeeders,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kShootCoralL4,
+        () -> Constants.Conditions.hasCoral()),
     PROCESSOR(
         10.0,
         5.3,
@@ -39,8 +43,8 @@ public class Pathfinding {
         Constants.Priorities.kShootingProcessor,
         () -> Constants.Conditions.hasAlgae()),
     NET(
-        10.0,
-        5.3,
+        7.734,
+        4,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
@@ -204,7 +208,7 @@ public class Pathfinding {
     }
   }
 
-  private static LinkedList<POI> poiList = new LinkedList<>();
+  protected static List<POI> poiList = new ArrayList<>();
   private static List<POI> filtered_pois;
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
