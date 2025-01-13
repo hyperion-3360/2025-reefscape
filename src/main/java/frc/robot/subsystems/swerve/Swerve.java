@@ -2,8 +2,9 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,14 +25,14 @@ import frc.robot.Constants;
 public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
-  private final Pigeon2 m_gyro;
+  private final AHRS m_gyro;
   private final Field2d m_field2d;
   public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
 
   public Swerve() {
     // TODO get good port
-    m_gyro = new Pigeon2(0);
+    m_gyro = new AHRS(NavXComType.kMXP_SPI);
     m_field2d = new Field2d();
     m_gyro.reset();
     mSwerveMods =
