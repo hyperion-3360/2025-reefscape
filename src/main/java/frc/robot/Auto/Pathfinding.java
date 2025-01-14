@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /** Pathfinding */
-public class Pathfinding extends SubsystemBase {
+public class Pathfinding extends Command {
   // #region POI enum logic
   public enum POI {
     ALGAECORALSTANDS(
@@ -369,14 +369,14 @@ public class Pathfinding extends SubsystemBase {
     POIRemover.onChange(
         (poi) -> {
           chosenPath =
-              chosenPath.replace(" " + poi.toString(), ""); // deletes the coordinate we don't want
+              chosenPath.replace(poi.toString(), "").strip(); // deletes the coordinate we don't want
           pathEntry.setString(chosenPath);
           System.out.println(chosenPath + "\t" + poi.toString() + " has been removed");
         });
   }
 
   @Override
-  public void periodic() {
+  public void execute() {
     logicHandler();
   }
 
