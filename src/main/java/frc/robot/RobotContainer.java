@@ -41,7 +41,7 @@ public class RobotContainer {
   public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
   public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
   public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
-  public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
+  // public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
   public static final ShootCmd CORAL_SHOOT_L1 = new ShootCmd(ShootType.CoralL1);
   public static final ShootCmd CORAL_SHOOT_L2 = new ShootCmd(ShootType.CoralL2);
   public static final ShootCmd CORAL_SHOOT_L3 = new ShootCmd(ShootType.CoralL3);

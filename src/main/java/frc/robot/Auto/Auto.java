@@ -14,7 +14,6 @@ public class Auto {
 
   /** this is where you initalize the widgets you want to use in auto mode */
   private Auto() {
-    PathfindingShuffleBoard.makeChooserWidget();
-    PathfindingShuffleBoard.createPOIListWidget();
+    Pathfinding.makeChooserWidget();
   }
 }
