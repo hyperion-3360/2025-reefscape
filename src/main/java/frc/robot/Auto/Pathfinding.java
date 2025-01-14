@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -228,13 +228,19 @@ public class Pathfinding extends Command {
     NINTHUTO(POI.ALGAECORALSTANDS, POI.BRANCHES);
 
     private POI[] desiredPOIs;
+    private List<POI> POIlist = new ArrayList<>();
 
     private CustomAuto(POI... poi) {
       this.desiredPOIs = poi;
     }
 
-    public POI[] getPOIs() {
-      return desiredPOIs;
+    public List<POI> getPOIs() {
+      // clears the old POI list to accept new ones
+      POIlist.clear();
+      for (POI poi : desiredPOIs) {
+        POIlist.add(poi);
+      }
+      return POIlist;
     }
   }
 
@@ -251,13 +257,9 @@ public class Pathfinding extends Command {
       Shuffleboard.getTab(tabName).add("path", chosenPath).getEntry();
 
   protected static List<POI> poiList = new ArrayList<>();
-  private static List<POI> filtered_pois;
+  private static List<POI> filtered_pois; // this is a collection of sorted poilist POI
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
-
-  //  static List<POI> lastAutoChooserSelection = autoChooser.getSelected();
-  //  static POI lastPOIAdderSelection = POIAdder.getSelected();
-  //  static POI lastPOIRemoverSelection = POIRemover.getSelected();
 
   // #endregion
   /**
@@ -281,8 +283,13 @@ public class Pathfinding extends Command {
   }
 
   // #region Pathfinding Shuffleboard implementation
-  /** creates the chooser widget for the autonomous mode */
+  /** creates the chooser widget for the autonomous mode acts for the Pathfinding class */
   public static void makeChooserWidget() {
+    // adds the POIs in the enum
+    for (POI poi : POI.values()) {
+      poiList.add(poi);
+    }
+
     for (CustomAuto autos : CustomAuto.values()) {
       createWidgetList(autos);
     }
@@ -299,18 +306,12 @@ public class Pathfinding extends Command {
   }
 
   private static void createWidgetList(CustomAuto auto) {
-    poiList.clear(); // makes sure we have a clean list
-    // adds the POIs in the enum
-    for (POI poi : POI.values()) {
-      poiList.add(poi);
-    }
 
-    POI[] POIsToAdd = auto.getPOIs();
     autoChooser.addOption(
         auto.toString(), // gives the name
         // converts the POIs array into a list
         poiList.stream()
-            .filter((poi) -> poi.toString() != POIsToAdd.toString()) // removes irrelevant POIs
+            .filter((poi) -> auto.getPOIs().contains(poi)) // removes irrelevant POIs
             .collect(Collectors.toList()));
   }
 
@@ -329,21 +330,27 @@ public class Pathfinding extends Command {
    * @return an array of POIs we want to visit
    */
   private static POI[] tokenReader(String inputPOI) {
-    // TODO replace this insanity with something better that costs less memory and running time
-    String readChars = "";
     ArrayList<POI> readPOIs = new ArrayList<>();
-    // checks which POI has been inputed once reaching a whitespace
-    for (char character : inputPOI.toCharArray()) {
-      readChars += character;
-      if (character == ' ') {
-        for (POI poi : POI.values()) {
-          if (readChars
-              .replaceAll("\s", "")
-              .equals(poi.toString())) // removes the withespaces in the string
-          {
-            readPOIs.add(poi);
-          }
+    // gives back the tokens to be read
+    StringTokenizer token = new StringTokenizer(inputPOI);
+    // verifies if a token matches a value in the enum
+    while (token.hasMoreTokens()) {
+      boolean foundToken = false;
+      String currentString = token.nextToken();
+      for (POI poi : POI.values()) {
+        if (currentString.equals(poi.toString())) // removes the withespaces in the string
+        {
+          foundToken = true;
+          readPOIs.add(poi);
+          break;
         }
+      }
+      // checks if one of the POIs were not recognized
+      try {
+        assert foundToken == true;
+      } catch (AssertionError e) {
+        e.printStackTrace();
+        System.out.println("error in POI reading no POI matched the value" + currentString);
       }
     }
     return (POI[]) readPOIs.toArray();
@@ -358,23 +365,26 @@ public class Pathfinding extends Command {
             chosenPath += " " + poi.toString();
           }
           chosenPath = chosenPath.strip(); // removes the trailing whitespace at the beginning
-          System.out.println(chosenPath);
         });
     POIAdder.onChange(
         (poi) -> {
-          chosenPath = chosenPath.concat(" " + poi.toString()); // adds the coordinates we want
-          pathEntry.setString(chosenPath);
-          System.out.println(chosenPath + "\t" + poi.toString() + " has been added");
+          // checks if the poi is already contained within the chosenPath
+          if (!chosenPath.contains(poi.toString())) {
+            chosenPath = chosenPath.concat(" " + poi.toString()); // adds the coordinates we want
+            pathEntry.setString(chosenPath);
+          }
         });
     POIRemover.onChange(
         (poi) -> {
           chosenPath =
-              chosenPath.replace(poi.toString(), "").strip(); // deletes the coordinate we don't want
+              chosenPath
+                  .replace(poi.toString(), "")
+                  .strip(); // deletes the coordinate we don't want
           pathEntry.setString(chosenPath);
-          System.out.println(chosenPath + "\t" + poi.toString() + " has been removed");
         });
   }
 
+  // adds the logicHandler to the execute loop
   @Override
   public void execute() {
     logicHandler();
@@ -388,10 +398,10 @@ public class Pathfinding extends Command {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
-    if (poiList.isEmpty()) {
-      for (POI poiArrayElement : tokenReader(chosenPath)) {
-        poiList.add(poiArrayElement);
-      }
+    // once we have the POIs we want, we replace the old list and add them
+    poiList.clear();
+    for (POI poiArrayElement : tokenReader(chosenPath)) {
+      poiList.add(poiArrayElement);
     }
 
     return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
