@@ -17,8 +17,11 @@ public class Shooter extends SubsystemBase {
   private Servo m_coralBlocker = new Servo(Constants.SubsystemInfo.kCoralShooterServoID);
   /** 1 TalonFX controlling 2 BAGs and 1 Servo */
   public Shooter() {
-    // trying to config the motor (i have no clue how to use talon srx)
-    // crazy
+    // Config (directly on the srx because srxconfig object is kinda limited)
+    m_shooter.configFactoryDefault();
+    m_shooter.setNeutralMode(Constants.CoralShooterConfig.kCoralShooterNeutralMode);
+    m_shooter.configContinuousCurrentLimit(Constants.CoralShooterConfig.kCoralShooterCurrentLimit);
+    m_shooter.enableCurrentLimit(true);
     
   }
 

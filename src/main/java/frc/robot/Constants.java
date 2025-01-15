@@ -303,9 +303,9 @@ public final class Constants {
   public static class CoralShooterConfig {
     // TODO: figure out what im supposed to do for config
     // neutral mode
-    public static final NeutralMode coralShooterNeutralMode = NeutralMode.Brake;
+    public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     // TODO: find current limit (currently placeholder)
-    public static final double coralShooterCurrentLimit = 0.0; 
+    public static final int kCoralShooterCurrentLimit = 0; 
   }
 
   public static class LEDConstants {
