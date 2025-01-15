@@ -218,6 +218,13 @@ public final class Constants {
     };
   }
 
+  public static class Feeders {
+    public static final Pose2d[] kFeeders = {
+      new Pose2d(0.8382, 0.635, new Rotation2d(54)),
+      new Pose2d(0.8382, 7.3914, new Rotation2d(306)),
+    };
+  }
+
   public static class Priorities {
     // TODO add actual priorities
     public static final int kShootCoralL4 = 7;

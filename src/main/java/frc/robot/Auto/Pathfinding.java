@@ -6,20 +6,25 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /** Pathfinding */
-public class Pathfinding {
+public class Pathfinding extends Command {
+  // #region POI enum logic
   public enum POI {
     ALGAECORALSTANDS(
         Constants.AlgaeCoralStand.kStands,
@@ -31,6 +36,11 @@ public class Pathfinding {
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         () -> Constants.Conditions.hasCoral()),
+    FEEDERS(
+        Constants.Feeders.kFeeders,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kShootCoralL4,
+        () -> Constants.Conditions.hasCoral()),
     PROCESSOR(
         10.0,
         5.3,
@@ -39,8 +49,8 @@ public class Pathfinding {
         Constants.Priorities.kShootingProcessor,
         () -> Constants.Conditions.hasAlgae()),
     NET(
-        10.0,
-        5.3,
+        7.734,
+        4,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
@@ -204,11 +214,54 @@ public class Pathfinding {
     }
   }
 
-  private static LinkedList<POI> poiList = new LinkedList<>();
-  private static List<POI> filtered_pois;
+  // #endregion
+
+  enum CustomAuto {
+    FIRSTAUTO(POI.FEEDERS, POI.BRANCHES),
+    SECONDAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    THIRDAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    FOURTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    FIFTHAUTO(POI.PROCESSOR, POI.BRANCHES),
+    SIXTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    SEVENTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    EIGHTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    NINTHUTO(POI.ALGAECORALSTANDS, POI.BRANCHES);
+
+    private POI[] desiredPOIs;
+    private List<POI> POIlist = new ArrayList<>();
+
+    private CustomAuto(POI... poi) {
+      this.desiredPOIs = poi;
+    }
+
+    public List<POI> getPOIs() {
+      // clears the old POI list to accept new ones
+      POIlist.clear();
+      for (POI poi : desiredPOIs) {
+        POIlist.add(poi);
+      }
+      return POIlist;
+    }
+  }
+
+  // #region variable declaration
+  private static SendableChooser<List<POI>> autoChooser = new SendableChooser<>();
+  private static SendableChooser<POI> POIAdder = new SendableChooser<>();
+  private static SendableChooser<POI> POIRemover = new SendableChooser<>();
+  private static String tabName = "Auto";
+  // private static ShuffleboardLayout autoLayout =
+  //  Shuffleboard.getTab(tabName).getLayout("AutoChooser", BuiltInLayouts.kList);
+  private static String chosenPath = "";
+  // private static GenericEntry pathEntry = autoLayout.add("path", chosenPath).getEntry();
+  private static GenericEntry pathEntry =
+      Shuffleboard.getTab(tabName).add("path", chosenPath).getEntry();
+
+  protected static List<POI> poiList = new ArrayList<>();
+  private static List<POI> filtered_pois; // this is a collection of sorted poilist POI
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
+  // #endregion
   /**
    * filters a raw poi array and returns a pose2d object of the most advantageous point
    *
@@ -229,24 +282,115 @@ public class Pathfinding {
     return new Pose2d(filtered_pois.get(0).getCoordinates(), filtered_pois.get(0).getAngle());
   }
 
+  // #region Pathfinding Shuffleboard implementation
+  /** creates the chooser widget for the autonomous mode acts for the Pathfinding class */
+  public static void makeChooserWidget() {
+    // adds the POIs in the enum
+    for (POI poi : POI.values()) {
+      poiList.add(poi);
+    }
+
+    for (CustomAuto autos : CustomAuto.values()) {
+      createWidgetList(autos);
+    }
+    createPOIListWidget();
+    autoChooser.setDefaultOption(
+        "Full Auto (every coordinates)", poiList); // if no options are chosen put every coordinates
+    // autoLayout.add(autoChooser);
+    // autoLayout.add(POIAdder); // adder
+    // autoLayout.add(POIRemover); // remover
+    SmartDashboard.putData(POIAdder);
+    SmartDashboard.putData(POIRemover);
+    SmartDashboard.putData(autoChooser);
+    logicHandler();
+  }
+
+  private static void createWidgetList(CustomAuto auto) {
+
+    autoChooser.addOption(
+        auto.toString(), // gives the name
+        // converts the POIs array into a list
+        poiList.stream()
+            .filter((poi) -> auto.getPOIs().contains(poi)) // removes irrelevant POIs
+            .collect(Collectors.toList()));
+  }
+
+  private static void createPOIListWidget() {
+    for (POI poi : POI.values()) {
+      POIAdder.addOption(poi.toString(), poi);
+      POIRemover.addOption(poi.toString(), poi);
+    }
+  }
+
   /**
-   * executes the pathfinding command meaning that the robot should go to all chosen POIs
+   * this method reads a string returned by the shuffleboard auto chooser and returns the pois that
+   * are contained withing that string
    *
-   * @param poi a list of POIs that the robot should go through if conditions apply this param is
-   *     there in case we want to prefilter pois we don't want
-   * @return the command to pathfind to a specified point
+   * @param inputPOI the string returned by the shuffleboard auto chooser
+   * @return an array of POIs we want to visit
    */
-  public static Command doPathfinding(POI[] poi) {
-    if (poiList.isEmpty()) {
-      for (POI poiArrayElement : poi) {
-        poiList.add(poiArrayElement);
+  private static POI[] tokenReader(String inputPOI) {
+    ArrayList<POI> readPOIs = new ArrayList<>();
+    // gives back the tokens to be read
+    StringTokenizer token = new StringTokenizer(inputPOI);
+    // verifies if a token matches a value in the enum
+    while (token.hasMoreTokens()) {
+      boolean foundToken = false;
+      String currentString = token.nextToken();
+      for (POI poi : POI.values()) {
+        if (currentString.equals(poi.toString())) // removes the withespaces in the string
+        {
+          foundToken = true;
+          readPOIs.add(poi);
+          break;
+        }
+      }
+      // checks if one of the POIs were not recognized
+      try {
+        assert foundToken == true;
+      } catch (AssertionError e) {
+        e.printStackTrace();
+        System.out.println("error in POI reading no POI matched the value" + currentString);
       }
     }
-    return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
-        .andThen(filtered_pois.get(0).getEvent())
-        .repeatedly()
-        .until(() -> DriverStation.isTeleop());
+    return (POI[]) readPOIs.toArray();
   }
+
+  private static void logicHandler() {
+    // plays the logic while the driverStation is disabled
+    autoChooser.onChange(
+        (auto) -> {
+          chosenPath = "";
+          for (POI poi : auto) {
+            chosenPath += " " + poi.toString();
+          }
+          chosenPath = chosenPath.strip(); // removes the trailing whitespace at the beginning
+        });
+    POIAdder.onChange(
+        (poi) -> {
+          // checks if the poi is already contained within the chosenPath
+          if (!chosenPath.contains(poi.toString())) {
+            chosenPath = chosenPath.concat(" " + poi.toString()); // adds the coordinates we want
+            pathEntry.setString(chosenPath);
+          }
+        });
+    POIRemover.onChange(
+        (poi) -> {
+          chosenPath =
+              chosenPath
+                  .replace(poi.toString(), "")
+                  .strip(); // deletes the coordinate we don't want
+          pathEntry.setString(chosenPath);
+        });
+  }
+
+  // adds the logicHandler to the execute loop
+  @Override
+  public void execute() {
+    logicHandler();
+  }
+
+  // #endregion
 
   /**
    * executes the pathfinding command meaning that the robot should go to all chosen POIs
@@ -254,11 +398,12 @@ public class Pathfinding {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
-    if (poiList.isEmpty()) {
-      for (POI poiArrayElement : POI.values()) {
-        poiList.add(poiArrayElement);
-      }
+    // once we have the POIs we want, we replace the old list and add them
+    poiList.clear();
+    for (POI poiArrayElement : tokenReader(chosenPath)) {
+      poiList.add(poiArrayElement);
     }
+
     return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
         .andThen(filtered_pois.get(0).getEvent())
         .repeatedly()
