@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -293,19 +292,19 @@ public final class Constants {
     public static final double kStopSpeed = 0.0;
   }
 
-  public static class CoralShooterSpeeds {
-    // TODO: modify speeds
-    // not sure if we'll need different speeds but :
-    public static final double kIntakeSpeed = 0.0;
+  public static class CoralShooterVariables {
+    // TODO: Find actual speed
     public static final double kShootSpeed = 0.0;
-  }
+    public static final double kIntakeSpeed = 0.0;
 
-  public static class CoralShooterConfig {
-    // TODO: figure out what im supposed to do for config
-    // neutral mode
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
-    // TODO: find current limit (currently placeholder)
-    public static final int kCoralShooterCurrentLimit = 0; 
+    public static final int kCoralShooterCurrentLimit = 10;
+    public static final double kCoralShooterRamprate = 0.0;
+
+    // TODO: Find angles
+    // angles in º
+    public static final double kCoralShooterClosed = 0.0;
+    public static final double kCoralShooterOpen = 0.0;
   }
 
   public static class LEDConstants {
