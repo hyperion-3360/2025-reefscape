@@ -13,6 +13,7 @@ import frc.lib.util.CTREMagEncoder;
 import frc.lib.util.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 public class SwerveModule {
   public int moduleNumber;
@@ -43,10 +44,10 @@ public class SwerveModule {
     // RobotContainer.ctreConfigs.dutyCycleRangeMax);
     /* Angle Motor Config */
     mAngleMotor = new TalonFX(moduleConstants.angleMotorID, "CANivore_3360");
-    // mAngleMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveAngleFXConfig);
+    mAngleMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveAngleFXConfig);
     /* Drive Motor Config */
     mDriveMotor = new TalonFX(moduleConstants.driveMotorID, "CANivore_3360");
-    // mDriveMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveDriveFXConfig);
+    mDriveMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveDriveFXConfig);
     mDriveMotor.getConfigurator().setPosition(0.0);
   }
 

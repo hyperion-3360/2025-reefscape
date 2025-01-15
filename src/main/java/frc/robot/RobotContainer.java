@@ -28,8 +28,8 @@ public class RobotContainer {
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
 
   // subsystem declarations
-  public static final Swerve m_swerve = new Swerve();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
+  public static final Swerve m_swerve = new Swerve();
   public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
@@ -41,6 +41,8 @@ public class RobotContainer {
   public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
   public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
   public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
+  // TODO implement coral feeder in IntakeCmd because this crashes sim and is not supported in
+  // switch case
   // public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
   public static final ShootCmd CORAL_SHOOT_L1 = new ShootCmd(ShootType.CoralL1);
   public static final ShootCmd CORAL_SHOOT_L2 = new ShootCmd(ShootType.CoralL2);
