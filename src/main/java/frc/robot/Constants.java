@@ -204,19 +204,14 @@ public final class Constants {
     public static final Pose2d[] kPegs = {
       new Pose2d(3.9314751317, 3.2240855, new Rotation2d(240)),
       new Pose2d(3.657607315, 3.861435, new Rotation2d(240)),
-
       new Pose2d(4.6632495, 3.861435, new Rotation2d(180)),
       new Pose2d(4.6632495, 4.190365, new Rotation2d(180)),
-
       new Pose2d(4.2163368683, 4.6632495, new Rotation2d(300)),
       new Pose2d(3.9314751317, 4.8277145, new Rotation2d(300)),
-
       new Pose2d(5.0471708683, 4.8277145, new Rotation2d(60)),
       new Pose2d(4.7623091317, 4.6632495, new Rotation2d(60)),
-
       new Pose2d(5.321046, 4.190365, new Rotation2d(-180)),
       new Pose2d(5.321046, 3.861435, new Rotation2d(-180)),
-
       new Pose2d(4.7623, 3.4901, new Rotation2d(300)),
       new Pose2d(5.0471, 3.2240, new Rotation2d(300)),
     };
