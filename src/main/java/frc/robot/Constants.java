@@ -299,7 +299,7 @@ public final class Constants {
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     public static final int kCoralShooterCurrentLimit = 10;
-    public static final double kCoralShooterRamprate = 0.0;
+    public static final double kCoralShooterRamprate = 0.5;
 
     // TODO: Find angles
     // angles in º
