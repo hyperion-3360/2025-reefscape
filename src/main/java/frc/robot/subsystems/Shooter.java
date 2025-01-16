@@ -20,6 +20,7 @@ public class Shooter extends SubsystemBase {
   public boolean getShooterIR = m_shooterIR.get();
   public double CoralShooterSpeed = m_shooter.get();
   public double TestSpeed = 0.0;
+  public double SpeedTestTime = 0.0;
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
   public Shooter() {
@@ -36,6 +37,7 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
     SmartDashboard.putNumber("Coral shooter speed", CoralShooterSpeed);
     SmartDashboard.putNumber("Shooter test speed", TestSpeed);
+    SmartDashboard.putNumber("Shooter test time", SpeedTestTime);
   }
 
   public void shoot() {
@@ -56,7 +58,7 @@ public class Shooter extends SubsystemBase {
 
   public void testSpeed() {
     m_shooter.set(SmartDashboard.getNumber(getName(), CoralShooterSpeed));
-    Wait.waitSecs(1);
+    Wait.waitSecs(SmartDashboard.getNumber(getName(), SpeedTestTime));
     stop();
   }
 
