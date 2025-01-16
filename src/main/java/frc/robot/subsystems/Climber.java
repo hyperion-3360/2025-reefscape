@@ -4,19 +4,81 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+// import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.SubsystemInfo;
 
-/** 1 falcon winch and unwinch mini neo closes claws* */
+/** 1 falcon winch and unwinch* */
 // La classe devrait avoir un option pour seulement s'activer a 30sec de la fin du jeu,
 // pour eviter un mouvement par accident du pilot
 public class Climber extends SubsystemBase {
-  public Climber() {}
 
-  // pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple = new
-  // CANSparkMax(kidexemple);
+  private static double kDt = 0.02;
+  private static double kMaxVelocity = 1.75;
+  private static double kMaxAcceleration = 0.75;
+  private static double kP = 1.3;
+  private static double kI = 0.0;
+  private static double kD = 0.7;
+  private static double kS = 1.1;
+  private static double kG = 1.2;
+  private static double kV = 1.3;
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+  private TalonFX m_climberMotor = new TalonFX(SubsystemInfo.kClimberMotorID);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+  private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV);
+
+  private static double GrabPosition = 30;
+  private static double LiftPosition = 0;
+  private double m_climberTarget = LiftPosition;
+
+  public enum climberAction {
+    GRAB,
+    LIFT
+  }
+
+  public Climber() {
+    // How do you fully reset a motor to ensure start position?
+    m_climberMotor.set(0);
+  }
+
+  // create falcons motor control
+  // need function to move with grab/lift
   // pour les falcons utilise talon ex: private WPI_TalonSRX m_exemple = new
   // WPI_TalonSRX(kidexemple);
+  public void move(climberAction action) {
+    // Take a direction from climberAction enum
+    // if needed to block operation before end of game since climber only works once
+    // if (DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30)
+    switch (action) {
+      case GRAB:
+        // Set Falcon to go down
+        m_climberTarget = GrabPosition;
+        break;
+
+      case LIFT:
+        // set Falcon to go up
+        m_climberTarget = LiftPosition;
+        break;
+    }
+  }
+
+  public void stop() {
+    // stops the motors
+    m_climberMotor.stopMotor();
+  }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    m_climberMotor.set(
+        m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(), m_climberTarget)
+            + m_feedforward.calculate(
+                m_climberMotor.getPosition().getValueAsDouble(),
+                m_climberMotor.getVelocity().getValueAsDouble()));
+  }
 }

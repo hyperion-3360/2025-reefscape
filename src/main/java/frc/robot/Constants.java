@@ -304,6 +304,12 @@ public final class Constants {
     public static final int kLEDLength = 60;
   }
 
+  public static class ClimberState {
+    // Constant for climber possible positions
+    public static final int kGrab = 0;
+    public static final int kLift = 1;
+  }
+
   public static class SubsystemInfo {
     // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders
@@ -315,9 +321,7 @@ public final class Constants {
     public static final int kCoralShooterMotorID = 0;
     public static final int kElevatorMotorID = 0;
     public static final int kFlickerMotorID = 0;
-    // not sure about the left and right, hasnt been cadded yet but they planned 2
-    public static final int kClimberMotorLeftID = 0;
-    public static final int kClimberMotorRightID = 0;
+    public static final int kClimberMotorID = 0;
     // sensor ids
     public static final int kCoralIntakeLimitSwitchID = 0;
     public static final int kCoralShooterBeambreakID = 0;

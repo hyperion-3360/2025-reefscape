@@ -53,6 +53,8 @@ public class RobotContainer {
   public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
   public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
 
+  // TODO: Need a command to Grab and Lift for the climber?
+
   public RobotContainer() {
     configureBindings();
     Auto.initAutoWidget();
