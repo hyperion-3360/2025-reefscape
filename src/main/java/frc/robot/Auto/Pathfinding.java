@@ -279,7 +279,16 @@ public class Pathfinding extends Command {
             .collect(Collectors.toList());
     Pathfinding.filtered_pois = filtered_pois;
     // uses the coordinates and angle of the first point
-    return new Pose2d(filtered_pois.get(0).getCoordinates(), filtered_pois.get(0).getAngle());
+    return robotSizeRecoil(filtered_pois.get(0));
+  }
+
+  private static Pose2d robotSizeRecoil(POI poiToPathfind) {
+    double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
+    double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
+    Pose2d currentPose = new Pose2d(poiToPathfind.getCoordinates(), poiToPathfind.getAngle());
+    Translation2d widthToBacktrack = new Translation2d(robotLengthPlusBuffer, robotWidthPlusBuffer);
+    return new Pose2d(
+        currentPose.getTranslation().minus(widthToBacktrack), poiToPathfind.getAngle());
   }
 
   // #region Pathfinding Shuffleboard implementation
