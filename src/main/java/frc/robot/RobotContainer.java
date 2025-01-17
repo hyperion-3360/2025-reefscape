@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
+import frc.robot.Auto.Pathfinding;
+import frc.robot.commands.ClimberCmd;
+import frc.robot.commands.ClimberCmd.ClimberType;
 import frc.robot.commands.IntakeCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.ShootCmd;
@@ -28,8 +31,9 @@ public class RobotContainer {
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
 
   // subsystem declarations
+  public static final Vision m_vision = new Vision();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
-  public static final Swerve m_swerve = new Swerve();
+  public static final Swerve m_swerve = new Swerve(m_vision);
   public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
@@ -52,8 +56,8 @@ public class RobotContainer {
   public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
   public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
   public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
-
-  // TODO: Need a command to Grab and Lift for the climber?
+  public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB);
+  public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT);
 
   public RobotContainer() {
     configureBindings();

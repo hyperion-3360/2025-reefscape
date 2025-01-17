@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -23,6 +24,8 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
 
   public static final class Swerve {
+    public static final double robotLength = Units.inchesToMeters(32.5);
+    public static final double robotWidth = Units.inchesToMeters(32.5);
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
@@ -202,19 +205,18 @@ public final class Constants {
 
   public static class Pegs {
     public static final Pose2d[] kPegs = {
-      // TODO add actual values not approximates using pathplanner
-      new Pose2d(3.945, 5.275, new Rotation2d(20)),
-      new Pose2d(3.655, 5.100, new Rotation2d(20)),
-      new Pose2d(3.135, 4.175, new Rotation2d(180)),
-      new Pose2d(3.135, 3.850, new Rotation2d(180)),
-      new Pose2d(3.635, 2.960, new Rotation2d(300)),
-      new Pose2d(3.925, 2.790, new Rotation2d(300)),
-      new Pose2d(5.000, 2.780, new Rotation2d(-60)),
-      new Pose2d(5.290, 2.925, new Rotation2d(-60)),
-      new Pose2d(5.845, 4.175, new Rotation2d(-180)),
-      new Pose2d(5.845, 3.850, new Rotation2d(-180)),
-      new Pose2d(5.325, 5.075, new Rotation2d(300)),
-      new Pose2d(5.035, 5.250, new Rotation2d(300)),
+      new Pose2d(3.9314751317, 3.2240855, new Rotation2d(240)),
+      new Pose2d(3.657607315, 3.861435, new Rotation2d(240)),
+      new Pose2d(4.6632495, 3.861435, new Rotation2d(180)),
+      new Pose2d(4.6632495, 4.190365, new Rotation2d(180)),
+      new Pose2d(4.2163368683, 4.6632495, new Rotation2d(300)),
+      new Pose2d(3.9314751317, 4.8277145, new Rotation2d(300)),
+      new Pose2d(5.0471708683, 4.8277145, new Rotation2d(60)),
+      new Pose2d(4.7623091317, 4.6632495, new Rotation2d(60)),
+      new Pose2d(5.321046, 4.190365, new Rotation2d(-180)),
+      new Pose2d(5.321046, 3.861435, new Rotation2d(-180)),
+      new Pose2d(4.7623, 3.4901, new Rotation2d(300)),
+      new Pose2d(5.0471, 3.2240, new Rotation2d(300)),
     };
   }
 
@@ -276,11 +278,19 @@ public final class Constants {
     public static final double kStopSpeed = 0.0;
   }
 
-  public static class CoralShooterSpeeds {
-    // TODO: modify speeds
-    // not sure if we'll need different speeds but :
-    public static final double kIntakeSpeed = 0.0;
+  public static class CoralShooterVariables {
+    // TODO: Find actual speed
     public static final double kShootSpeed = 0.0;
+    public static final double kIntakeSpeed = 0.0;
+
+    public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
+    public static final int kCoralShooterCurrentLimit = 10;
+    public static final double kCoralShooterRamprate = 0.5;
+
+    // TODO: Find angles
+    // angles in º
+    public static final double kCoralShooterClosed = 0.0;
+    public static final double kCoralShooterOpen = 0.0;
   }
 
   public static class LEDConstants {
@@ -295,6 +305,23 @@ public final class Constants {
     public static final int kLift = 1;
   }
 
+  public enum climberAction {
+    GRAB,
+    LIFT
+  }
+
+  public static class ClimberConstants {
+    public static final double kDt = 0.02;
+    public static final double kMaxVelocity = 1.75;
+    public static final double kMaxAcceleration = 0.75;
+    public static final double kP = 1.3;
+    public static final double kI = 0.0;
+    public static final double kD = 0.7;
+    public static final double kS = 1.1;
+    public static final double kG = 1.2;
+    public static final double kV = 1.3;
+  }
+
   public static class SubsystemInfo {
     // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders
@@ -303,7 +330,8 @@ public final class Constants {
     public static final int kCoralIntakeMotorElbowID = 0;
     public static final int kAlgaeIntakeShooterMotorID = 0;
     public static final int kAlgaeIntakeArmMotorID = 0;
-    public static final int kCoralShooterMotorID = 0;
+    public static final int kCoralShooterTalonID = 0;
+    public static final int kCoralShooterServoID = 0;
     public static final int kElevatorMotorID = 0;
     public static final int kFlickerMotorID = 0;
     public static final int kClimberMotorID = 0;

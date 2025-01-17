@@ -10,37 +10,32 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 // import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.SubsystemInfo;
+import frc.robot.Constants.climberAction;
 
 /** 1 falcon winch and unwinch* */
 // La classe devrait avoir un option pour seulement s'activer a 30sec de la fin du jeu,
 // pour eviter un mouvement par accident du pilot
 public class Climber extends SubsystemBase {
 
-  private static double kDt = 0.02;
-  private static double kMaxVelocity = 1.75;
-  private static double kMaxAcceleration = 0.75;
-  private static double kP = 1.3;
-  private static double kI = 0.0;
-  private static double kD = 0.7;
-  private static double kS = 1.1;
-  private static double kG = 1.2;
-  private static double kV = 1.3;
   private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+      new TrapezoidProfile.Constraints(
+          ClimberConstants.kMaxVelocity, ClimberConstants.kMaxAcceleration);
   private TalonFX m_climberMotor = new TalonFX(SubsystemInfo.kClimberMotorID);
   private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV);
+      new ProfiledPIDController(
+          ClimberConstants.kP,
+          ClimberConstants.kI,
+          ClimberConstants.kD,
+          m_constraints,
+          ClimberConstants.kDt);
+  private final ArmFeedforward m_feedforward =
+      new ArmFeedforward(ClimberConstants.kS, ClimberConstants.kG, ClimberConstants.kV);
 
   private static double GrabPosition = 30;
   private static double LiftPosition = 0;
   private double m_climberTarget = LiftPosition;
-
-  public enum climberAction {
-    GRAB,
-    LIFT
-  }
 
   public Climber() {
     // How do you fully reset a motor to ensure start position?
@@ -66,6 +61,12 @@ public class Climber extends SubsystemBase {
         m_climberTarget = LiftPosition;
         break;
     }
+    // Make the motor get to the target
+    m_climberMotor.set(
+        m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(), m_climberTarget)
+            + m_feedforward.calculate(
+                m_climberMotor.getPosition().getValueAsDouble(),
+                m_climberMotor.getVelocity().getValueAsDouble()));
   }
 
   public void stop() {
@@ -74,11 +75,5 @@ public class Climber extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    m_climberMotor.set(
-        m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(), m_climberTarget)
-            + m_feedforward.calculate(
-                m_climberMotor.getPosition().getValueAsDouble(),
-                m_climberMotor.getVelocity().getValueAsDouble()));
-  }
+  public void periodic() {}
 }
