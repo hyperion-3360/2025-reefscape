@@ -8,5 +8,3 @@
 |Shooter             |3             |2 Bag(same CAN), 1 servo|The Bags controls the intaking and shooting of the shooter. and the servo is a fail-safe    |
 |dumper              |2             |2 servos               | control the dump
    
-
-test                                                  |
