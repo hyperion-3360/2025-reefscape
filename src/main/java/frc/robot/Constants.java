@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -290,11 +291,19 @@ public final class Constants {
     public static final double kStopSpeed = 0.0;
   }
 
-  public static class CoralShooterSpeeds {
-    // TODO: modify speeds
-    // not sure if we'll need different speeds but :
-    public static final double kIntakeSpeed = 0.0;
+  public static class CoralShooterVariables {
+    // TODO: Find actual speed
     public static final double kShootSpeed = 0.0;
+    public static final double kIntakeSpeed = 0.0;
+
+    public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
+    public static final int kCoralShooterCurrentLimit = 10;
+    public static final double kCoralShooterRamprate = 0.5;
+
+    // TODO: Find angles
+    // angles in º
+    public static final double kCoralShooterClosed = 0.0;
+    public static final double kCoralShooterOpen = 0.0;
   }
 
   public static class LEDConstants {
@@ -317,7 +326,8 @@ public final class Constants {
     public static final int kCoralIntakeMotorElbowID = 0;
     public static final int kAlgaeIntakeShooterMotorID = 0;
     public static final int kAlgaeIntakeArmMotorID = 0;
-    public static final int kCoralShooterMotorID = 0;
+    public static final int kCoralShooterTalonID = 0;
+    public static final int kCoralShooterServoID = 0;
     public static final int kElevatorMotorID = 0;
     public static final int kFlickerMotorID = 0;
     public static final int kClimberMotorID = 0;
