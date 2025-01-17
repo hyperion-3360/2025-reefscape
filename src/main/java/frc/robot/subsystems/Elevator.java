@@ -11,20 +11,24 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
 
   public enum desiredHeight {
+    HANDOFF,
+    PROCESSOR,
+    NET,
+    FEEDER,
+    ALGAELOW,
     LOW,
     L1,
     L2,
     L3,
     L4
   }
-
-  private boolean isAtDesiredHeight = false;
 
   // pid values
 
@@ -81,11 +85,17 @@ public class Elevator extends SubsystemBase {
       m_pid.reset();
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
     }
+    if (DriverStation.isEnabled()) {
+      m_rightElevatorMotor.set(m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
+    }
+    SmartDashboard.putNumber("Target", m_elevatorTarget);
+    SmartDashboard.putData("pid", m_pid);
   }
 
   public void SetHeight(desiredHeight height) {
     // add things to move to desired height
     switch (height) {
+
       case LOW:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
 
@@ -104,10 +114,26 @@ public class Elevator extends SubsystemBase {
       case L4:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
         break;
-    }
-  }
 
-  public boolean isAtDesiredHeight() {
-    return isAtDesiredHeight;
+      case PROCESSOR:
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        break;
+
+      case NET:
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        break;
+
+      case HANDOFF:
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        break;
+
+      case ALGAELOW:
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        break;
+
+      case FEEDER:
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        break;
+    }
   }
 }
