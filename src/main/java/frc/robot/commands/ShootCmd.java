@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Elevator.desiredHeight;
 
 // spotless:off
 /**
@@ -128,22 +129,23 @@ public class ShootCmd extends Command {
 
       case CoralL1:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredElevatorHeight);
+        RobotContainer.m_elevator.SetHeight(desiredHeight.LOW);
+        ;
         break;
 
       case CoralL2:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredElevatorHeight);
+        RobotContainer.m_elevator.SetHeight(desiredHeight.LOW);
         break;
 
       case CoralL3:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredElevatorHeight);
+        RobotContainer.m_elevator.SetHeight(desiredHeight.LOW);
         break;
 
       case CoralL4:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredElevatorHeight);
+        RobotContainer.m_elevator.SetHeight(desiredHeight.LOW);
         break;
 
       default:
