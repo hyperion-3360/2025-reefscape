@@ -24,6 +24,8 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
 
   public static final class Swerve {
+    public static final double robotLength = Units.inchesToMeters(32.5);
+    public static final double robotWidth = Units.inchesToMeters(32.5);
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(

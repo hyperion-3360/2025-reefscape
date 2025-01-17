@@ -269,7 +269,6 @@ public class Pathfinding extends Command {
    * @return The {@link Pose2d} of the most advantageous point
    */
   private static Pose2d FilterPOIs(List<POI> raw_poi) {
-
     // filters raw poi data and collects the result into a list of pois sorted from most profitable
     // point to least
     List<POI> filtered_pois =
@@ -278,8 +277,23 @@ public class Pathfinding extends Command {
             .sorted((p1, p2) -> p1.rewardFunction(p1).compareTo(p2.rewardFunction(p2)))
             .collect(Collectors.toList());
     Pathfinding.filtered_pois = filtered_pois;
+
     // uses the coordinates and angle of the first point
-    return new Pose2d(filtered_pois.get(0).getCoordinates(), filtered_pois.get(0).getAngle());
+    return robotSizeRecoil(filtered_pois.get(0));
+  }
+
+  private static Pose2d robotSizeRecoil(POI poiToPathfind) {
+    double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
+    double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
+    double robotHyp = Math.hypot(robotLengthPlusBuffer, robotWidthPlusBuffer);
+
+    // calculates the coordinates to displace the robot actual wanted position relative to the POI
+    Translation2d widthToBacktrack =
+        new Translation2d(
+            poiToPathfind.getCoordinates().getX() + robotHyp * poiToPathfind.getAngle().getSin(),
+            poiToPathfind.getCoordinates().getY() + poiToPathfind.getAngle().getCos() * robotHyp);
+
+    return new Pose2d(widthToBacktrack, poiToPathfind.getAngle());
   }
 
   // #region Pathfinding Shuffleboard implementation
@@ -329,10 +343,20 @@ public class Pathfinding extends Command {
    * @param inputPOI the string returned by the shuffleboard auto chooser
    * @return an array of POIs we want to visit
    */
-  private static POI[] tokenReader(String inputPOI) {
+  private static List<POI> tokenReader(String inputPOI) {
+
+    if (inputPOI.equals("")) {
+      // if the inputPOI is empty get default option
+      autoChooser.getSelected().forEach((poi) -> chosenPath += " " + poi.toString());
+      chosenPath.trim();
+    } else {
+      // this is so that we only use one tokenizer
+      chosenPath = inputPOI;
+    }
+
     ArrayList<POI> readPOIs = new ArrayList<>();
     // gives back the tokens to be read
-    StringTokenizer token = new StringTokenizer(inputPOI);
+    StringTokenizer token = new StringTokenizer(chosenPath);
     // verifies if a token matches a value in the enum
     while (token.hasMoreTokens()) {
       boolean foundToken = false;
@@ -353,7 +377,7 @@ public class Pathfinding extends Command {
         System.out.println("error in POI reading no POI matched the value" + currentString);
       }
     }
-    return (POI[]) readPOIs.toArray();
+    return readPOIs;
   }
 
   private static void logicHandler() {
@@ -399,7 +423,6 @@ public class Pathfinding extends Command {
    */
   public static Command doPathfinding() {
     // once we have the POIs we want, we replace the old list and add them
-    poiList.clear();
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
     }
