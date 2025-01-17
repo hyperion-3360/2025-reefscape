@@ -74,7 +74,6 @@ public class IntakeCmd extends Command {
     switch (currentIntakeType) {
       case AlgaeAuto:
 
-      
         /**
          * this should : 1. runOnce place the AlgaeIntake in auto intake lvl | 2. lift the elevator
          * to leave space for the algae to go in (not sure, we'll see when the robot is built)

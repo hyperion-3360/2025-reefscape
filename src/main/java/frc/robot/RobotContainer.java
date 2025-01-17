@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
-import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.ClimberCmd;
 import frc.robot.commands.ClimberCmd.ClimberType;
 import frc.robot.commands.IntakeCmd;

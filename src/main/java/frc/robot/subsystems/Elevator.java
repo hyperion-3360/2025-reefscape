@@ -86,7 +86,8 @@ public class Elevator extends SubsystemBase {
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
     }
     if (DriverStation.isEnabled()) {
-      m_rightElevatorMotor.set(m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
+      m_rightElevatorMotor.set(
+          m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }
     SmartDashboard.putNumber("Target", m_elevatorTarget);
     SmartDashboard.putData("pid", m_pid);
@@ -95,7 +96,6 @@ public class Elevator extends SubsystemBase {
   public void SetHeight(desiredHeight height) {
     // add things to move to desired height
     switch (height) {
-
       case LOW:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
 

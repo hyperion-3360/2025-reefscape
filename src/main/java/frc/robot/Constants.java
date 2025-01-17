@@ -359,6 +359,5 @@ public final class Constants {
     public static final double kElevatorL4 = 0.0;
     public static final double kElevatorL3 = 0.0;
     public static final double kElevatorHandoff = 0.0;
-    
   }
 }
