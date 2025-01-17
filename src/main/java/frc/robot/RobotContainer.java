@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.commands.ClimberCmd;
+import frc.robot.commands.ClimberCmd.ClimberType;
 import frc.robot.commands.IntakeCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.ShootCmd;
@@ -52,8 +54,8 @@ public class RobotContainer {
   public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
   public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
   public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
-
-  // TODO: Need a command to Grab and Lift for the climber?
+  public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB);
+  public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT);
 
   public RobotContainer() {
     configureBindings();
