@@ -61,7 +61,6 @@ public class ClimberCmd extends Command {
     }
 
     addRequirements(subsystem);
-    addRequirements(RobotContainer.m_algaeIntake);
   }
 
   // Called when the command is initially scheduled.
@@ -70,11 +69,7 @@ public class ClimberCmd extends Command {
   public void initialize() {
     switch (currentClimberType) {
       case CLIMBERGRAB:
-
-        /**
-         * this should : 1. runOnce place the AlgaeIntake in auto intake lvl | 2. lift the elevator
-         * to leave space for the algae to go in (not sure, we'll see when the robot is built)
-         */
+        /** this should : 1. runOnce put the climber in grab position */
         break;
 
       case CLIMBERLIFT:
