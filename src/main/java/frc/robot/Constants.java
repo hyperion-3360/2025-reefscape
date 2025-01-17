@@ -244,21 +244,6 @@ public final class Constants {
     public static final double kShootNet = 6;
   }
 
-  public static class ElevatorHeight {
-    // TODO: modify heights for elevator L = level
-    // in inches
-    public static final double kL1Height = 0.0;
-    public static final double kL2Height = 0.0;
-    public static final double kL3Height = 0.0;
-    public static final double kL4Height = 0.0;
-
-    public static final double kAlgaeLow = 0.0;
-    public static final double kAlgaeHigh = 0.0;
-
-    public static final double kHandoffHeight = 0.0;
-    public static final double kBaseHeight = 0.0;
-  }
-
   public static class CoralIntakeVariables {
     // TODO: modify angles and speeds
 
@@ -358,5 +343,22 @@ public final class Constants {
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
     // no clue if this is a good value but it should be fine to start
     public static final double kElevatorMotorCurrentLimit = 10.0;
+    public static final int kRightElevatorMotorID = 0;
+    public static final int kLeftElevatorMotorID = 0;
+    public static final int kElevatorLimitSwitch = 0;
+  }
+
+  public static class ElevatorConstants {
+    public static final double kElevatorMotorCurrentLimit = 10.0; // TO BE TESTED
+    public static final InvertedValue kRightElevatorMotorNotInverted =
+        InvertedValue.Clockwise_Positive;
+    public static final int kFollowerId = 0;
+    public static final double kElevatorDown = 0.0;
+    public static final double kElevatorL1 = 0.0;
+    public static final double kElevatorL2 = 0.0;
+    public static final double kElevatorL4 = 0.0;
+    public static final double kElevatorL3 = 0.0;
+    public static final double kElevatorHandoff = 0.0;
+    
   }
 }
