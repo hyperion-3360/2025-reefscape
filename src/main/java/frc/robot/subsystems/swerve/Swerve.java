@@ -221,9 +221,9 @@ public class Swerve extends SubsystemBase {
 
     m_gyro.getRotation2d();
     // updates the odometry positon
-    var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    //var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
-    m_field2d.setRobotPose(m_odometryPose);
+    //m_field2d.setRobotPose(m_odometryPose);
 
 
     var visionEst = vision.getEstimatedGlobalPose();
@@ -232,6 +232,10 @@ public class Swerve extends SubsystemBase {
 
       poseEstimator.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
     });
+
+    var m_odometryPose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
+
+    m_field2d.setRobotPose(m_odometryPose);
   }
 
   public Command resetOdometryBlueSide() {
