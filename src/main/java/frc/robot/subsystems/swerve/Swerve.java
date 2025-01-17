@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.*;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
+
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
+import frc.robot.Vision;
 
 public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
@@ -29,12 +32,15 @@ public class Swerve extends SubsystemBase {
   private final Field2d m_field2d;
   public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
+  private Vision vision;
+  private final SwerveDrivePoseEstimator poseEstimator;
 
-  public Swerve() {
+  public Swerve(Vision vision) {
     // TODO get good port
     m_gyro = new AHRS(NavXComType.kMXP_SPI);
     m_field2d = new Field2d();
     m_gyro.reset();
+    this.vision = vision;
     mSwerveMods =
         new SwerveModule[] {
           new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -55,6 +61,8 @@ public class Swerve extends SubsystemBase {
             positions,
             new Pose2d(0, 0, new Rotation2d()));
     configurePathPlanner();
+
+    poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getHeading(), positions, getPose());
   }
 
   public void drive(
@@ -213,8 +221,20 @@ public class Swerve extends SubsystemBase {
 
     m_gyro.getRotation2d();
     // updates the odometry positon
-    var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    //var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
+    //m_field2d.setRobotPose(m_odometryPose);
+
+
+    var visionEst = vision.getEstimatedGlobalPose();
+    visionEst.ifPresent( est -> {
+      var estStdDevs = vision.getEstimationStdDevs();
+
+      poseEstimator.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+    });
+
+    var m_odometryPose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
+
     m_field2d.setRobotPose(m_odometryPose);
   }
 

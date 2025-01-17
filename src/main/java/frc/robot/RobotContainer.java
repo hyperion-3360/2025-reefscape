@@ -30,8 +30,9 @@ public class RobotContainer {
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
 
   // subsystem declarations
+  public static final Vision m_vision = new Vision();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
-  public static final Swerve m_swerve = new Swerve();
+  public static final Swerve m_swerve = new Swerve(m_vision);
   public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
