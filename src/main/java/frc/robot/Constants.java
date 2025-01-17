@@ -307,10 +307,17 @@ public final class Constants {
     public static final int kCoralIntakeLimitSwitchID = 0;
     public static final int kCoralShooterBeambreakID = 0;
     public static final int kAlgaeIntakeLimitSwitchID = 0;
+    public static final int kElevatorLimitSwitch = 0;
 
-    public static final InvertedValue kRightElevatorMotorInversion = InvertedValue.Clockwise_Positive;
-    public static final InvertedValue kLeftElevatorMotorInversion = InvertedValue.CounterClockwise_Positive;
-    // no clue if this is a good value but it should be fine to start
-    public static final double kElevatorMotorCurrentLimit = 10.0;
+  }
+  public static class ElevatorConstants{
+    public static final double kElevatorMotorCurrentLimit = 10.0; //TO BE TESTED
+    public static final InvertedValue kRightElevatorMotorNotInverted = InvertedValue.Clockwise_Positive;
+    public static final int kFollowerId = 0;
+    public static final double kElevatorDown = 0.0;
+    public static final double kElevatorL1 = 0.0;
+    public static final double kElevatorL2 = 0.0;
+    public static final double kElevatorL3 = 0.0;
+    public static final double kElevatorL4 = 0.0;
   }
 }

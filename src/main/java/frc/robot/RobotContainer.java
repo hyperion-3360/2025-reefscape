@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.IntakeCmd;
+import frc.robot.commands.MoveToCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.ShootCmd;
 import frc.robot.commands.ShootCmd.ShootType;
@@ -45,12 +46,13 @@ public class RobotContainer {
   public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
   public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
   public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
-
   public RobotContainer() {
     configureBindings();
   }
 
   private void configureBindings() {
+    
+    //m_driverController.a().onTrue()
     /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
