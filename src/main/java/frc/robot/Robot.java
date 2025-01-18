@@ -51,22 +51,29 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.configureBindingsTeleop(); // goes to teleop bindings
   }
 
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear(); // clears all buttons
+  }
 
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.configureBindingsTest(); // goes to test bindings
+
   }
 
   @Override
   public void testPeriodic() {}
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear(); // clears all buttons
+  }
 }

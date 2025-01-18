@@ -99,11 +99,10 @@ public class RobotContainer {
             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
             () -> true));
 
-    configureBindings();
     Auto.initAutoWidget();
   }
 
-  private void configureBindings() {
+  public void configureBindingsTest() {
     /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
@@ -112,6 +111,13 @@ public class RobotContainer {
         .start()
         .and(m_coDriverController.back())
         .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+  }
+
+  public void configureBindingsTeleop() {
+    /**
+     * this is an example of how to assign button :
+     * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
+     */
   }
 
   public Command getAutonomousCommand() {
