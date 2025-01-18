@@ -40,9 +40,12 @@ public class AlgaeIntake extends SubsystemBase {
   private SparkMaxConfig m_intakeRightConfig = new SparkMaxConfig();
   private SparkMaxConfig m_directionConfig = new SparkMaxConfig();
 
-  private SparkMax m_pivotMotor = new SparkMax(0, MotorType.kBrushless);
-  private SparkMax m_intakeLeft = new SparkMax(0, MotorType.kBrushless);
-  private SparkMax m_intakeRight = new SparkMax(0, MotorType.kBrushless);
+  private SparkMax m_pivotMotor =
+      new SparkMax(Constants.SubsystemInfo.kAlgaeArmMotorID, MotorType.kBrushless);
+  private SparkMax m_intakeLeft =
+      new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberLeftMotorID, MotorType.kBrushless);
+  private SparkMax m_intakeRight =
+      new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberRightMotorID, MotorType.kBrushless);
 
   private AbsoluteEncoder m_directionEncoder = m_pivotMotor.getAbsoluteEncoder();
 

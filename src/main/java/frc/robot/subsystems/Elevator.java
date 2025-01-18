@@ -9,7 +9,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,9 +43,6 @@ public class Elevator extends SubsystemBase {
   private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID);
   private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID);
 
-  private DigitalInput m_limitSwitch =
-      new DigitalInput(Constants.SubsystemInfo.kElevatorLimitSwitch);
-
   private double m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
 
   public Elevator() {
@@ -72,13 +68,6 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    m_limitSwitch.get(); // Check limit switch inverted or no
-    if (m_limitSwitch.get()) {
-      m_rightElevatorMotor.setPosition(0.0);
-      m_leftElevatorMotor.setPosition(0.0);
-      m_pid.reset();
-    }
     if (DriverStation.isDisabled()) {
       m_rightElevatorMotor.setPosition(0.0);
       m_leftElevatorMotor.setPosition(0.0);
