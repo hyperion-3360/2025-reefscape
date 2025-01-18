@@ -77,6 +77,7 @@ public class Climber extends SubsystemBase {
                   m_climberMotor.getPosition().getValueAsDouble(),
                   m_climberMotor.getVelocity().getValueAsDouble()));
     }
+    // SmartDashboard.putNumber("ClimbeGrab", GrabPosition);
   }
 
   public Double getGrabTarget() {

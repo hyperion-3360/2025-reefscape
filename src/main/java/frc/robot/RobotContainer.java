@@ -108,6 +108,10 @@ public class RobotContainer {
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
+    m_coDriverController
+        .start()
+        .and(m_coDriverController.back())
+        .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
   }
 
   public Command getAutonomousCommand() {
