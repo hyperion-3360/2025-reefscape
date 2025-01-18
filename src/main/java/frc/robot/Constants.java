@@ -23,6 +23,8 @@ import frc.lib.util.SwerveModuleConstants;
 /** Add your docs here. */
 public final class Constants {
 
+  public static final double stickDeadband = 0.1;
+
   public static final class Swerve {
     public static final double robotLength = Units.inchesToMeters(32.5);
     public static final double robotWidth = Units.inchesToMeters(32.5);

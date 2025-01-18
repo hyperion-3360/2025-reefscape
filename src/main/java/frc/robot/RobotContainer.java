@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -14,6 +17,7 @@ import frc.robot.commands.IntakeCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.ShootCmd;
 import frc.robot.commands.ShootCmd.ShootType;
+import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
@@ -58,7 +62,43 @@ public class RobotContainer {
   public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB, m_climber);
   public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT, m_climber);
 
+  private final int translationAxis = XboxController.Axis.kLeftY.value;
+  private final int strafeAxis = XboxController.Axis.kLeftX.value;
+  private final int rotationAxis = XboxController.Axis.kRightX.value;
+
+  // Slew Rate Limiters to limit acceleration of joystick inputs
+  private final SlewRateLimiter translationLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
+
+  private final double kJoystickDeadband = 0.1;
+
+  /***
+   * conditionJoystick
+   * Condition a joystick axis value given a slewrate limiter and deadband
+   * @param axis axis to condition
+   * @param limiter slewrate limiter (to smooth the rate of changed
+   * @see https://docs.wpilib.org/en/stable/docs/software/advanced-controls/filters/slew-rate-limiter.html)
+   * @param deadband deadband to suppress noise around the 0 of a joystick axis
+   * @see https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/math/MathUtil.html#applyDeadband(double,double)
+   * @return the conditioned value
+   */
+  private double conditionJoystick(int axis, SlewRateLimiter limiter, double deadband) {
+    return -limiter.calculate(
+        MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband));
+  }
+
   public RobotContainer() {
+    m_swerve.resetModulesToAbsolute();
+
+    m_swerve.setDefaultCommand(
+        new TeleopSwerve(
+            m_swerve,
+            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+            () -> true));
+
     configureBindings();
     Auto.initAutoWidget();
   }
