@@ -209,14 +209,7 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     if (m_debug) {
-      for (SwerveModule mod : mSwerveMods) {
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-      }
+      smartdashboardDebug();
       m_debug = false;
     }
 
@@ -270,5 +263,23 @@ public class Swerve extends SubsystemBase {
 
   public Command runDriveDynamTest(SysIdRoutine.Direction direction) {
     return m_driveSysIdRoutine.dynamic(direction);
+  }
+
+  private void smartdashboardDebug() {
+
+    for (SwerveModule mod : mSwerveMods) {
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+    }
+
+    SmartDashboard.putNumber("pose estimate X", poseEstimator.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("pose estimate Y", poseEstimator.getEstimatedPosition().getY());
+    SmartDashboard.putString("est global pose", vision.getEstimatedGlobalPose().toString());
+    SmartDashboard.putBoolean(
+        "est global pose present?", vision.getEstimatedGlobalPose().isPresent());
   }
 }

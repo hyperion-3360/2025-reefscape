@@ -44,23 +44,25 @@ public class RobotContainer {
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
 
-  // command declarations
-  public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
-  public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
-  public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
+  // // command declarations
+  // public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
+  // public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
+  // public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
   // TODO implement coral feeder in IntakeCmd because this crashes sim and is not supported in
   // switch case
   // public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
-  public static final ShootCmd CORAL_SHOOT_L1 = new ShootCmd(ShootType.CoralL1);
-  public static final ShootCmd CORAL_SHOOT_L2 = new ShootCmd(ShootType.CoralL2);
-  public static final ShootCmd CORAL_SHOOT_L3 = new ShootCmd(ShootType.CoralL3);
-  public static final ShootCmd CORAL_SHOOT_L4 = new ShootCmd(ShootType.CoralL4);
-  public static final ShootCmd CORAL_SHOOT_AUTO = new ShootCmd(ShootType.CoralAuto);
-  public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
-  public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
-  public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
-  public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB, m_climber);
-  public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT, m_climber);
+  // public static final ShootCmd CORAL_SHOOT_L1 = new ShootCmd(ShootType.CoralL1);
+  // public static final ShootCmd CORAL_SHOOT_L2 = new ShootCmd(ShootType.CoralL2);
+  // public static final ShootCmd CORAL_SHOOT_L3 = new ShootCmd(ShootType.CoralL3);
+  // public static final ShootCmd CORAL_SHOOT_L4 = new ShootCmd(ShootType.CoralL4);
+  // public static final ShootCmd CORAL_SHOOT_AUTO = new ShootCmd(ShootType.CoralAuto);
+  // public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
+  // public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
+  // public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
+  // public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB,
+  // m_climber);
+  // public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT,
+  // m_climber);
 
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -100,6 +102,16 @@ public class RobotContainer {
             () -> true));
 
     Auto.initAutoWidget();
+
+    m_swerve.resetModulesToAbsolute();
+
+    m_swerve.setDefaultCommand(
+        new TeleopSwerve(
+            m_swerve,
+            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+            () -> true));
   }
 
   public void configureBindingsTest() {
