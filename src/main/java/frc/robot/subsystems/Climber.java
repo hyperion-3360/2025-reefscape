@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 // import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
@@ -61,12 +62,6 @@ public class Climber extends SubsystemBase {
         m_climberTarget = LiftPosition;
         break;
     }
-    // Make the motor get to the target
-    m_climberMotor.set(
-        m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(), m_climberTarget)
-            + m_feedforward.calculate(
-                m_climberMotor.getPosition().getValueAsDouble(),
-                m_climberMotor.getVelocity().getValueAsDouble()));
   }
 
   public void stop() {
@@ -75,5 +70,14 @@ public class Climber extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    if (DriverStation.isEnabled()) {
+      // Make the motor get to the target
+      m_climberMotor.set(
+          m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(), m_climberTarget)
+              + m_feedforward.calculate(
+                  m_climberMotor.getPosition().getValueAsDouble(),
+                  m_climberMotor.getVelocity().getValueAsDouble()));
+    }
+  }
 }
