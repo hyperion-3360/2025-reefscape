@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
-
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -62,7 +61,9 @@ public class Swerve extends SubsystemBase {
             new Pose2d(0, 0, new Rotation2d()));
     configurePathPlanner();
 
-    poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getHeading(), positions, getPose());
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            Constants.Swerve.swerveKinematics, getHeading(), positions, getPose());
   }
 
   public void drive(
@@ -221,17 +222,18 @@ public class Swerve extends SubsystemBase {
 
     m_gyro.getRotation2d();
     // updates the odometry positon
-    //var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    // var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
-    //m_field2d.setRobotPose(m_odometryPose);
-
+    // m_field2d.setRobotPose(m_odometryPose);
 
     var visionEst = vision.getEstimatedGlobalPose();
-    visionEst.ifPresent( est -> {
-      var estStdDevs = vision.getEstimationStdDevs();
+    visionEst.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevs();
 
-      poseEstimator.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-    });
+          poseEstimator.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
 
     var m_odometryPose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
