@@ -42,8 +42,8 @@ public final class Constants {
     public static final int calibrationFreqSamples = 30;
 
     /* Drivetrain Constants */
-    public static final double trackWidth = Units.inchesToMeters(26);
-    public static final double wheelBase = Units.inchesToMeters(24.25);
+    public static final double trackWidth = Units.inchesToMeters(24.75);
+    public static final double wheelBase = Units.inchesToMeters(24.75);
     public static final double wheelCircumference = chosenModule.wheelCircumference;
 
     /* Swerve Kinematics
