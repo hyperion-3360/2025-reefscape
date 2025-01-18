@@ -328,26 +328,26 @@ public final class Constants {
     // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders
     // motor ids
-    public static final int kCoralIntakeMotorWristID = 0;
-    public static final int kCoralIntakeMotorElbowID = 0;
-    public static final int kAlgaeIntakeShooterMotorID = 0;
-    public static final int kAlgaeIntakeArmMotorID = 0;
-    public static final int kCoralShooterTalonID = 0;
-    public static final int kCoralShooterServoID = 0;
-    public static final int kElevatorMotorID = 0;
-    public static final int kFlickerMotorID = 0;
-    public static final int kClimberMotorID = 0;
+    public static final int kCoralIntakeMotorClawID = 13;
+    public static final int kCoralIntakeMotorElbowID = 12;
+    public static final int kAlgaeGrabberLeftMotorID = 15;
+    public static final int kAlgaeGrabberRightMotorID = 16;
+    public static final int kAlgaeArmMotorID = 14;
+    public static final int kCoralShooterTalonID = 17;
+    public static final int kCoralShooterServoID = 0; // TODO: update
+    public static final int kClimberMotorID = 11;
+    public static final int kCoralDumperLeftServoID = 8;
+    public static final int kCoralDumperRightServoID = 9;
+
     // sensor ids
-    public static final int kCoralIntakeLimitSwitchID = 0;
     public static final int kCoralShooterBeambreakID = 0;
-    public static final int kAlgaeIntakeLimitSwitchID = 0;
+    public static final int kElevatorLimitSwitch = 0;
 
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
     // no clue if this is a good value but it should be fine to start
     public static final double kElevatorMotorCurrentLimit = 10.0;
-    public static final int kRightElevatorMotorID = 0;
-    public static final int kLeftElevatorMotorID = 0;
-    public static final int kElevatorLimitSwitch = 0;
+    public static final int kRightElevatorMotorID = 9;
+    public static final int kLeftElevatorMotorID = 10;
   }
 
   public static class ElevatorConstants {
