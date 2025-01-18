@@ -268,14 +268,16 @@ public final class Constants {
     // in º
     public static final double kStartingAngle = 0.0;
     public static final double kFloorIntakeAngle = 0.0;
-    public static final double kProcessorAngle = 0.0;
+    public static final double kNetAngle = 0.0;
     // auto intake bcuz of the little tower thing
     public static final double kAutoIntakeAngle = 0.0;
+    public static final double kCurrentLimit = 6.9;
 
     // wheel speeds
     public static final double kIntakeSpeed = 0.0;
     public static final double kProcessorSpeed = 0.0;
     public static final double kStopSpeed = 0.0;
+    public static final double kNetSpeed = 0.0;
   }
 
   public static class CoralShooterVariables {

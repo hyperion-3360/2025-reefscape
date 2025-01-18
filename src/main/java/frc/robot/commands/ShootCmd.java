@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.AlgaeIntake.shooting;
 import frc.robot.subsystems.Elevator.desiredHeight;
 
 // spotless:off
@@ -111,13 +112,12 @@ public class ShootCmd extends Command {
      */
     switch (currentShootType) {
       case AlgaeProcessor:
-        /** this should probably put the algae intake at the processor height */
+        RobotContainer.m_algaeIntake.shootingSpeed(shooting.PROCESSOR);
         break;
       case AlgaeDitch:
-        /** this should probably put the algae intake at the ditch height */
-        break;
+        RobotContainer.m_algaeIntake.shootingSpeed(shooting.INTAKE);
       case AlgaeNet:
-        /** this should probably put the algae intake at the net height */
+        RobotContainer.m_algaeIntake.shootingSpeed(shooting.NET);
         break;
 
       case CoralAuto:
