@@ -10,7 +10,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.SubsystemInfo;
@@ -81,19 +80,19 @@ public class Climber extends SubsystemBase {
     // SmartDashboard.putNumber("ClimbeGrab", GrabPosition);
   }
 
-  public Double getGrabTarget(){
+  public Double getGrabTarget() {
     return GrabPosition;
   }
 
-  public void setGrabTarget(Double value){
+  public void setGrabTarget(Double value) {
     GrabPosition = value;
   }
 
-  public Double getLiftTarget(){
+  public Double getLiftTarget() {
     return LiftPosition;
   }
 
-  public void setLiftTarget(Double value){
+  public void setLiftTarget(Double value) {
     LiftPosition = value;
   }
 
