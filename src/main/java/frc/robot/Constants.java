@@ -350,7 +350,7 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final double kElevatorMotorCurrentLimit = 10.0; // TO BE TESTED
+    public static final double kElevatorMotorCurrentLimit = 20.0; // TO BE TESTED
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
     public static final int kFollowerId = 0;

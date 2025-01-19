@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -11,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -39,9 +42,9 @@ public class Elevator extends SubsystemBase {
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
-  private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, true);
-  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID);
-  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID);
+  private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, false);
+  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID,"CANivore_3360");
+  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID,"CANivore_3360");
 
   private double m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
 
@@ -124,4 +127,15 @@ public class Elevator extends SubsystemBase {
         break;
     }
   }
+  public Command manualTest(DoubleSupplier up, DoubleSupplier down){
+      return run(() -> 
+      {
+        System.out.println(String.format("%f : %f", up.getAsDouble(), down.getAsDouble()));
+        if( up.getAsDouble() > 0.0 )
+          m_rightElevatorMotor.set(up.getAsDouble());
+        else
+          m_rightElevatorMotor.set(-down.getAsDouble());
+      }
+      );
+    }
 }
