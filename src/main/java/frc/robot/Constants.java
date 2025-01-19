@@ -247,7 +247,6 @@ public final class Constants {
   public static class CoralIntakeVariables {
     // TODO: modify angles and speeds
 
-
     // elbow angles in º
     public static final double kHandoffAngle = 0;
     public static final double kIntakeAngle = 26;

@@ -96,7 +96,8 @@ public class IntakeCmd extends Command {
          * this should : 1. runOnce place the coral intake in intake angles | 2. place the elevator
          * in handoff position
          */
-        Commands.runOnce(() -> RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
+        Commands.runOnce(
+            () -> RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
         break;
       case CoralFeeder:
         /** this should : 1. lift the elevator to feeder height */
@@ -128,12 +129,11 @@ public class IntakeCmd extends Command {
          * isFinished = true
          */
         Commands.sequence(
-          RobotContainer.m_coralClaw.clawCommand(ClawState.OPEN, ClawPosition.INTAKE),
-          Wait.waitUntil(() -> RobotContainer.m_coralClaw.hasCoral()),
-          RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.INTAKE),
-          Wait.waitSecs(2),
-          RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF)
-          );
+            RobotContainer.m_coralClaw.clawCommand(ClawState.OPEN, ClawPosition.INTAKE),
+            Wait.waitUntil(() -> RobotContainer.m_coralClaw.hasCoral()),
+            RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.INTAKE),
+            Wait.waitSecs(2),
+            RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
         break;
       case CoralFeeder:
         /**

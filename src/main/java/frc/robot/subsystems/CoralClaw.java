@@ -7,13 +7,8 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import java.util.function.DoubleSupplier;
 
 /** 2 neo one controls elevation and one closes pinchers * */
 public class CoralClaw extends SubsystemBase {
@@ -37,8 +33,10 @@ public class CoralClaw extends SubsystemBase {
   // pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple =
   // new
   // CANSparkMax(kidexemple);
-  private SparkMax m_ElevationNeo = new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorElbowID, MotorType.kBrushless);
-  private SparkMax m_PinchNeo = new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorClawID, MotorType.kBrushless);
+  private SparkMax m_ElevationNeo =
+      new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorElbowID, MotorType.kBrushless);
+  private SparkMax m_PinchNeo =
+      new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorClawID, MotorType.kBrushless);
   private SparkMaxConfig m_pinchNeoConfig = new SparkMaxConfig();
   private SparkMaxConfig m_elevationNeoConfig = new SparkMaxConfig();
 
@@ -136,17 +134,16 @@ public class CoralClaw extends SubsystemBase {
     SmartDashboard.putNumber("kp", kp);
     SmartDashboard.putNumber("ki", ki);
     SmartDashboard.putNumber("kd", kd);
-    SmartDashboard.putNumber(
-        "ElevationPosition", m_ElevationNeo.getEncoder().getPosition());
+    SmartDashboard.putNumber("ElevationPosition", m_ElevationNeo.getEncoder().getPosition());
     SmartDashboard.putNumber("PinchPosition", m_PinchNeo.getEncoder().getPosition());
     SmartDashboard.putBoolean("beam break", hasCoral());
   }
 
   public Command setSetPoint(DoubleSupplier joystickAxis) {
-   return this.run(() ->  m_ElevationNeo.set(joystickAxis.getAsDouble()));
+    return this.run(() -> m_ElevationNeo.set(joystickAxis.getAsDouble()));
   }
+
   public Command setSetPointClaw(DoubleSupplier joystickAxis) {
-    return this.run(() ->  m_PinchNeo.set(joystickAxis.getAsDouble()));
+    return this.run(() -> m_PinchNeo.set(joystickAxis.getAsDouble()));
   }
 }
-

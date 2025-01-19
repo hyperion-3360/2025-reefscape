@@ -18,9 +18,6 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.CoralClaw.ClawPosition;
-import frc.robot.subsystems.CoralClaw.ClawState;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -58,8 +55,10 @@ public class RobotContainer {
   // public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
   // public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
   // public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
-  // public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB, m_climber);
-  // public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT, m_climber);
+  // public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB,
+  // m_climber);
+  // public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT,
+  // m_climber);
 
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -94,8 +93,6 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-
-
     Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
@@ -110,22 +107,31 @@ public class RobotContainer {
   }
 
   public void configureBindingsTest() {
-    m_driverController.a().whileTrue(m_elevator.manualTest(
-      () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
-      () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+    m_driverController
+        .a()
+        .whileTrue(
+            m_elevator.manualTest(
+                () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
+                () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-      /**
+    /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
-  //   m_coDriverController
-  //       .start()
-  //       .and(m_coDriverController.back())
-  //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
-  m_driverController.x().whileTrue(
-    m_coralClaw.setSetPoint(() -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
-m_driverController.b().whileTrue(
-  m_coralClaw.setSetPointClaw(() -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
+    //   m_coDriverController
+    //       .start()
+    //       .and(m_coDriverController.back())
+    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    m_driverController
+        .x()
+        .whileTrue(
+            m_coralClaw.setSetPoint(
+                () -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
+    m_driverController
+        .b()
+        .whileTrue(
+            m_coralClaw.setSetPointClaw(
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {
