@@ -75,22 +75,22 @@ public class ShootCmd extends Command {
 
       case CoralL1:
         currentSubsystem = RobotContainer.m_coralClaw;
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
         break;
 
       case CoralL2:
         currentSubsystem = RobotContainer.m_coralClaw;
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
         break;
 
       case CoralL3:
         currentSubsystem = RobotContainer.m_coralClaw;
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
         break;
 
       case CoralL4:
         currentSubsystem = RobotContainer.m_coralClaw;
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
         break;
 
       default:
@@ -99,7 +99,7 @@ public class ShootCmd extends Command {
     }
 
     addRequirements(currentSubsystem);
-    addRequirements(RobotContainer.m_elevator);
+    // addRequirements(RobotContainer.m_elevator);
   }
 
   // Called when the command is initially scheduled.
@@ -126,23 +126,23 @@ public class ShootCmd extends Command {
 
       case CoralL1:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
         ;
         break;
 
       case CoralL2:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
         break;
 
       case CoralL3:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
         break;
 
       case CoralL4:
         /** this should set the elevator height to the desired height */
-        RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
+        // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
         break;
 
       default:
