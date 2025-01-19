@@ -247,19 +247,14 @@ public final class Constants {
   public static class CoralIntakeVariables {
     // TODO: modify angles and speeds
 
+
     // elbow angles in º
-    public static final double kL1Angle = 0.0;
-    public static final double kHandoffAngle = 0.0;
-    public static final double kIntakeAngle = 0.0;
+    public static final double kHandoffAngle = 90;
+    public static final double kIntakeAngle = 15;
 
-    // wrist angles in º
-    public static final double kShootAngle = 0.0;
-    public static final double kNormalAngle = 0.0;
-
-    // wheel speeds
-    public static final double kIntakeSpeed = 0.0;
-    public static final double kShootSpeed = 0.0;
-    public static final double kStopSpeed = 0.0;
+    // wrist angles in motor rotations
+    public static final double Openposition = 0.6;
+    public static final double Closedposition = 0.0;
   }
 
   public static class AlgaeIntakeVariables {
@@ -341,6 +336,7 @@ public final class Constants {
 
     // sensor ids
     public static final int kCoralShooterBeambreakID = 0;
+    public static final int kCoralAutoIntakeBeamBrake = 6;
 
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
     // no clue if this is a good value but it should be fine to start
