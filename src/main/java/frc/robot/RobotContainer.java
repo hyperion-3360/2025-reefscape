@@ -16,6 +16,9 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.CoralClaw.ClawPosition;
+import frc.robot.subsystems.CoralClaw.ClawState;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -118,7 +121,7 @@ public class RobotContainer {
   //       .start()
   //       .and(m_coDriverController.back())
   //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
-    m_driverController.a().onTrue(CORAL_INTAKE_AUTO);
+    m_driverController.a().onTrue(m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
   }
 
   public void configureBindingsTeleop() {

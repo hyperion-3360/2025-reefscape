@@ -42,9 +42,9 @@ public class Elevator extends SubsystemBase {
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
-  private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, false);
-  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID,"CANivore_3360");
-  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID,"CANivore_3360");
+  private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, true);
+  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID, "CANivore_3360");
+  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
   private double m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
 

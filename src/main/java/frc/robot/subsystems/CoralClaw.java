@@ -8,7 +8,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,8 +34,8 @@ public class CoralClaw extends SubsystemBase {
   // CANSparkMax(kidexemple);
   private SparkMax m_ElevationNeo = new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorElbowID, MotorType.kBrushless);
   private SparkMax m_PinchNeo = new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorClawID, MotorType.kBrushless);
-  private SparkBaseConfig m_pinchNeoConfig;
-  private SparkBaseConfig m_elevationNeoConfig;
+  private SparkMaxConfig m_pinchNeoConfig = new SparkMaxConfig();
+  private SparkMaxConfig m_elevationNeoConfig = new SparkMaxConfig();
 
   // pid configs
   private double kp = 0.1;
