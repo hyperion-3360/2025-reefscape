@@ -328,13 +328,13 @@ public final class Constants {
     public static final int kAlgaeGrabberRightMotorID = 16;
     public static final int kAlgaeArmMotorID = 14;
     public static final int kCoralShooterTalonID = 17;
-    public static final int kCoralShooterServoID = 0; // TODO: update
+    public static final int kCoralShooterServoID = 7;
     public static final int kClimberMotorID = 11;
     public static final int kCoralDumperLeftServoID = 8;
     public static final int kCoralDumperRightServoID = 9;
 
     // sensor ids
-    public static final int kCoralShooterBeambreakID = 0;
+    public static final int kCoralShooterBeambreakID = 7;
     public static final int kCoralAutoIntakeBeamBrake = 6;
 
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
