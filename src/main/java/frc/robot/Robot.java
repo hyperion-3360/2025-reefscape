@@ -66,7 +66,6 @@ public class Robot extends TimedRobot {
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
     m_robotContainer.configureBindingsTest(); // goes to test bindings
-
   }
 
   @Override

@@ -73,7 +73,7 @@ public class Elevator extends SubsystemBase {
       m_leftElevatorMotor.setPosition(0.0);
       m_pid.reset();
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
-    }else{
+    } else {
       m_rightElevatorMotor.set(
           m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }

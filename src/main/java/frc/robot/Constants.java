@@ -364,6 +364,5 @@ public final class Constants {
     public static final double kElevatorProcessor = 0.0;
     public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.0;
-
   }
 }
