@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -11,6 +13,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.counter.UpDownCounter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +31,8 @@ public class AlgaeIntake extends SubsystemBase {
   public enum shooting {
     INTAKE,
     PROCESSOR,
-    NET
+    NET,
+    STOP
   }
 
   private static final double kP = 0.0;
@@ -40,17 +44,14 @@ public class AlgaeIntake extends SubsystemBase {
   private SparkMaxConfig m_intakeRightConfig = new SparkMaxConfig();
   private SparkMaxConfig m_directionConfig = new SparkMaxConfig();
 
-  private SparkMax m_pivotMotor =
-      new SparkMax(Constants.SubsystemInfo.kAlgaeArmMotorID, MotorType.kBrushless);
-  private SparkMax m_intakeLeft =
-      new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberLeftMotorID, MotorType.kBrushless);
-  private SparkMax m_intakeRight =
-      new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberRightMotorID, MotorType.kBrushless);
+  private SparkMax m_pivotMotor = new SparkMax(14, MotorType.kBrushless);
+  private SparkMax m_intakeLeft = new SparkMax(15, MotorType.kBrushless);
+  private SparkMax m_intakeRight = new SparkMax(16, MotorType.kBrushless);
 
   private AbsoluteEncoder m_directionEncoder = m_pivotMotor.getAbsoluteEncoder();
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
-  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
+  private double m_SpeedTarget = 0.0;
 
   public AlgaeIntake() {
 
@@ -91,6 +92,8 @@ public class AlgaeIntake extends SubsystemBase {
       case PROCESSOR:
         this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
         break;
+      case STOP:
+      this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
     }
   }
 
@@ -121,4 +124,23 @@ public class AlgaeIntake extends SubsystemBase {
         .until(
             () -> m_intakeRight.getOutputCurrent() == Constants.AlgaeIntakeVariables.kCurrentLimit);
   }
+
+  public Command angle(DoubleSupplier up, DoubleSupplier down){
+    return run(
+      () -> {
+        System.out.println("yippe");
+        if (up.getAsDouble() > 0.0) m_pivotMotor.set(up.getAsDouble());
+        else m_pivotMotor.set(down.getAsDouble());
+      });
+
+    }
+
+public Command speed(DoubleSupplier clockwise, DoubleSupplier counterClockwise) {
+  return run(
+    () -> {
+      System.out.println("It works!?!!");
+      if (clockwise.getAsDouble() > 0.0) m_intakeRight.set(clockwise.getAsDouble());
+      else m_intakeRight.set(counterClockwise.getAsDouble());
+    });
+}
 }

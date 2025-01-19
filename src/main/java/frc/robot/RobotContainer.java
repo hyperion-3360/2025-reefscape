@@ -135,10 +135,20 @@ public class RobotContainer {
         .whileTrue(
             m_coralClaw.setSetPointClaw(
                 () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
+    m_driverController
+        .y()
+        .whileTrue(m_algaeIntake.angle(
+          () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband), 
+          () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
+    m_driverController
+        .povDown()
+        .whileTrue(m_algaeIntake.speed(
+          () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband ),
+          () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband )));
   }
 
   public void configureBindingsTeleop() {
-    /**
+    /**conditionJoysitck
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
