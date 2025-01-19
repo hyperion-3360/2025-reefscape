@@ -5,8 +5,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.CoralClaw.ClawPosition;
+import frc.robot.subsystems.CoralClaw.ClawState;
 
 // spotless:off
 /**
@@ -93,6 +96,8 @@ public class IntakeCmd extends Command {
          * this should : 1. runOnce place the coral intake in intake angles | 2. place the elevator
          * in handoff position
          */
+        Commands.runOnce(
+            () -> RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
         break;
       case CoralFeeder:
         /** this should : 1. lift the elevator to feeder height */
@@ -123,6 +128,12 @@ public class IntakeCmd extends Command {
          * to handoff angle | 3. spin coral feeder intake wheels to intake speed until beambreak 4.
          * isFinished = true
          */
+        Commands.sequence(
+            RobotContainer.m_coralClaw.clawCommand(ClawState.OPEN, ClawPosition.INTAKE),
+            Wait.waitUntil(() -> RobotContainer.m_coralClaw.hasCoral()),
+            RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.INTAKE),
+            Wait.waitSecs(2),
+            RobotContainer.m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
         break;
       case CoralFeeder:
         /**

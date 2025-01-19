@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
+import frc.robot.commands.IntakeCmd;
+import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
@@ -38,13 +40,13 @@ public class RobotContainer {
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
 
-  // // command declarations
-  // public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
+  // command declarations
+  public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
   // public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
   // public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
-  // TODO implement coral feeder in IntakeCmd because this crashes sim and is not supported in
-  // switch case
-  // public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
+  // // TODO implement coral feeder in IntakeCmd because this crashes sim and is not supported in
+  // // switch case
+  // // public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
   // public static final ShootCmd CORAL_SHOOT_L1 = new ShootCmd(ShootType.CoralL1);
   // public static final ShootCmd CORAL_SHOOT_L2 = new ShootCmd(ShootType.CoralL2);
   // public static final ShootCmd CORAL_SHOOT_L3 = new ShootCmd(ShootType.CoralL3);
@@ -90,6 +92,9 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
+
+    Auto.initAutoWidget();
+
     m_swerve.resetModulesToAbsolute();
 
     m_swerve.setDefaultCommand(
@@ -99,27 +104,34 @@ public class RobotContainer {
             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
             () -> true));
-
-    Auto.initAutoWidget();
-
-    m_swerve.resetModulesToAbsolute();
-
-
   }
 
   public void configureBindingsTest() {
-    m_driverController.a().whileTrue(m_elevator.manualTest(
-      () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
-      () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+    m_driverController
+        .a()
+        .whileTrue(
+            m_elevator.manualTest(
+                () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
+                () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-      /**
+    /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
-    // m_coDriverController
-    //    .start()
-    //    .and(m_coDriverController.back())
-    //    .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    //   m_coDriverController
+    //       .start()
+    //       .and(m_coDriverController.back())
+    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    m_driverController
+        .x()
+        .whileTrue(
+            m_coralClaw.setSetPoint(
+                () -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
+    m_driverController
+        .b()
+        .whileTrue(
+            m_coralClaw.setSetPointClaw(
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {
