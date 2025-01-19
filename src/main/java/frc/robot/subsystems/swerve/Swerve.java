@@ -228,8 +228,8 @@ public class Swerve extends SubsystemBase {
         });
 
     var m_odometryPose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
-
     m_field2d.setRobotPose(m_odometryPose);
+    SmartDashboard.putData("field", m_field2d);
   }
 
   public Command resetOdometryBlueSide() {
