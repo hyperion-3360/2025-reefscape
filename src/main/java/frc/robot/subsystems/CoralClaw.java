@@ -139,11 +139,16 @@ public class CoralClaw extends SubsystemBase {
     SmartDashboard.putBoolean("beam break", hasCoral());
   }
 
-  public Command setSetPoint(DoubleSupplier joystickAxis) {
-    return this.run(() -> m_ElevationNeo.set(joystickAxis.getAsDouble()));
+  // This is for test mode
+  public Command clawTestMode(DoubleSupplier angle, DoubleSupplier pinch) {
+    return this.run(
+        () -> {
+          m_ElevationNeo.set(angle.getAsDouble());
+          m_PinchNeo.set(pinch.getAsDouble());
+        });
   }
 
-  public Command setSetPointClaw(DoubleSupplier joystickAxis) {
-    return this.run(() -> m_PinchNeo.set(joystickAxis.getAsDouble()));
-  }
+  // public Command setSetPointClaw(DoubleSupplier joystickAxis) {
+  //  return this.run(() -> m_PinchNeo.set(joystickAxis.getAsDouble()));
+  // }
 }

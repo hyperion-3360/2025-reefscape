@@ -75,6 +75,9 @@ public class RobotContainer {
   private final SlewRateLimiter elevatorUpLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter elevatorDownLimiter = new SlewRateLimiter(3);
 
+  private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
+
   private final double kJoystickDeadband = 0.1;
 
   /***
@@ -126,15 +129,11 @@ public class RobotContainer {
     //       .and(m_coDriverController.back())
     //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
     m_driverController
-        .x()
-        .whileTrue(
-            m_coralClaw.setSetPoint(
-                () -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
-    m_driverController
         .b()
         .whileTrue(
-            m_coralClaw.setSetPointClaw(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
+            m_coralClaw.clawTestMode(
+                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
+                () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)));
     m_driverController
         .y()
         .whileTrue(
