@@ -97,16 +97,18 @@ public class RobotContainer {
 
     m_swerve.resetModulesToAbsolute();
 
-    m_swerve.setDefaultCommand(
-        new TeleopSwerve(
-            m_swerve,
-            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-            () -> true));
   }
 
   public void configureBindingsTest() {
+    var driveCmd = new TeleopSwerve(
+        m_swerve,
+        () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+        () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+        () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+        () -> true);
+
+    m_driverController.leftBumper().whileTrue(driveCmd);
+
     m_driverController
         .a()
         .whileTrue(
