@@ -51,7 +51,7 @@ public class AlgaeIntake extends SubsystemBase {
   private AbsoluteEncoder m_directionEncoder = m_pivotMotor.getAbsoluteEncoder();
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
-  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
+  private double m_SpeedTarget = 0.0;
 
   public AlgaeIntake() {
 
@@ -130,7 +130,7 @@ public class AlgaeIntake extends SubsystemBase {
       () -> {
         System.out.println("yippe");
         if (up.getAsDouble() > 0.0) m_pivotMotor.set(up.getAsDouble());
-        else m_pivotMotor.set(-down.getAsDouble());
+        else m_pivotMotor.set(down.getAsDouble());
       });
 
     }
@@ -140,7 +140,7 @@ public Command speed(DoubleSupplier clockwise, DoubleSupplier counterClockwise) 
     () -> {
       System.out.println("It works!?!!");
       if (clockwise.getAsDouble() > 0.0) m_intakeRight.set(clockwise.getAsDouble());
-      else m_intakeRight.set(-counterClockwise.getAsDouble());
+      else m_intakeRight.set(counterClockwise.getAsDouble());
     });
 }
 }
