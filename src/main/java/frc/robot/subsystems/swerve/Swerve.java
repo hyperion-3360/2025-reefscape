@@ -210,7 +210,6 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     if (m_debug) {
       smartdashboardDebug();
-      m_debug = false;
     }
 
     m_gyro.getRotation2d();

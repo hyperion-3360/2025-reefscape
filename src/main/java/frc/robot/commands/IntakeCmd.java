@@ -64,7 +64,7 @@ public class IntakeCmd extends Command {
     }
 
     addRequirements(subsystem);
-    addRequirements(RobotContainer.m_elevator);
+    // addRequirements(RobotContainer.m_elevator);
   }
 
   // Called when the command is initially scheduled.
