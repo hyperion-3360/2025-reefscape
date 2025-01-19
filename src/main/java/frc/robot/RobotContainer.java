@@ -22,6 +22,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.vision.Vision;
 
 public class RobotContainer {
 
