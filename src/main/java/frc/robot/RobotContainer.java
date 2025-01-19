@@ -15,7 +15,6 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -113,10 +112,10 @@ public class RobotContainer {
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
-    m_coDriverController
-        .start()
-        .and(m_coDriverController.back())
-        .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    // m_coDriverController
+    //    .start()
+    //    .and(m_coDriverController.back())
+    //    .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
   }
 
   public void configureBindingsTeleop() {
