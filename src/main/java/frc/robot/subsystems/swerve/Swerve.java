@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
-import frc.robot.Vision;
+import frc.robot.vision.Vision;
 
 public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
@@ -228,8 +228,8 @@ public class Swerve extends SubsystemBase {
         });
 
     var m_odometryPose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
-
     m_field2d.setRobotPose(m_odometryPose);
+    SmartDashboard.putData("field", m_field2d);
   }
 
   public Command resetOdometryBlueSide() {
