@@ -31,8 +31,8 @@ public class CoralClaw extends SubsystemBase {
   // pour les neo utiliser revlib et spark max ex: private CANSparkMax m_exemple =
   // new
   // CANSparkMax(kidexemple);
-  private SparkMax m_ElevationNeo = new SparkMax(0, MotorType.kBrushless);
-  private SparkMax m_PinchNeo = new SparkMax(1, MotorType.kBrushless);
+  private SparkMax m_ElevationNeo = new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorElbowID, MotorType.kBrushless);
+  private SparkMax m_PinchNeo = new SparkMax(Constants.SubsystemInfo.kCoralIntakeMotorClawID, MotorType.kBrushless);
   private SparkBaseConfig m_pinchNeoConfig;
   private SparkBaseConfig m_elevationNeoConfig;
 
@@ -115,7 +115,7 @@ public class CoralClaw extends SubsystemBase {
    * @return the output of the beam break sensor false if the coral isn't there true if it is
    */
   public boolean hasCoral() {
-    return m_beamBrake.get();
+    return !m_beamBrake.get();
   }
 
   @Override
@@ -127,6 +127,7 @@ public class CoralClaw extends SubsystemBase {
     SmartDashboard.putNumber(
         "ElevationPosition", m_ElevationNeo.getAbsoluteEncoder().getPosition());
     SmartDashboard.putNumber("PinchPosition", m_PinchNeo.getAbsoluteEncoder().getPosition());
+    SmartDashboard.putBoolean("beam break", hasCoral());
   }
 }
 
