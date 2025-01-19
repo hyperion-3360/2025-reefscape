@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -13,11 +11,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.counter.UpDownCounter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import java.util.function.DoubleSupplier;
 
 /** 3 neos 550 (mini-neo) one to go up and down and two to intake* */
 public class AlgaeIntake extends SubsystemBase {
@@ -93,7 +91,7 @@ public class AlgaeIntake extends SubsystemBase {
         this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
         break;
       case STOP:
-      this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
     }
   }
 
@@ -125,22 +123,21 @@ public class AlgaeIntake extends SubsystemBase {
             () -> m_intakeRight.getOutputCurrent() == Constants.AlgaeIntakeVariables.kCurrentLimit);
   }
 
-  public Command angle(DoubleSupplier up, DoubleSupplier down){
+  public Command angle(DoubleSupplier up, DoubleSupplier down) {
     return run(
-      () -> {
-        System.out.println("yippe");
-        if (up.getAsDouble() > 0.0) m_pivotMotor.set(up.getAsDouble());
-        else m_pivotMotor.set(down.getAsDouble());
-      });
+        () -> {
+          System.out.println("yippe");
+          if (up.getAsDouble() > 0.0) m_pivotMotor.set(up.getAsDouble());
+          else m_pivotMotor.set(down.getAsDouble());
+        });
+  }
 
-    }
-
-public Command speed(DoubleSupplier clockwise, DoubleSupplier counterClockwise) {
-  return run(
-    () -> {
-      System.out.println("It works!?!!");
-      if (clockwise.getAsDouble() > 0.0) m_intakeRight.set(clockwise.getAsDouble());
-      else m_intakeRight.set(counterClockwise.getAsDouble());
-    });
-}
+  public Command speed(DoubleSupplier clockwise, DoubleSupplier counterClockwise) {
+    return run(
+        () -> {
+          System.out.println("It works!?!!");
+          if (clockwise.getAsDouble() > 0.0) m_intakeRight.set(clockwise.getAsDouble());
+          else m_intakeRight.set(counterClockwise.getAsDouble());
+        });
+  }
 }
