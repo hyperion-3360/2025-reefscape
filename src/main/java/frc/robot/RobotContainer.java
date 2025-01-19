@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
+import frc.robot.commands.IntakeCmd;
+import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
@@ -91,6 +93,11 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
+
+
+
+    Auto.initAutoWidget();
+
     m_swerve.resetModulesToAbsolute();
 
     m_swerve.setDefaultCommand(
@@ -100,12 +107,6 @@ public class RobotContainer {
             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
             () -> true));
-
-    Auto.initAutoWidget();
-
-    m_swerve.resetModulesToAbsolute();
-
-
   }
 
   public void configureBindingsTest() {
@@ -121,7 +122,10 @@ public class RobotContainer {
   //       .start()
   //       .and(m_coDriverController.back())
   //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
-    m_driverController.a().onTrue(m_coralClaw.clawCommand(ClawState.CLOSE, ClawPosition.HANDOFF));
+  m_driverController.x().whileTrue(
+    m_coralClaw.setSetPoint(() -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
+m_driverController.b().whileTrue(
+  m_coralClaw.setSetPointClaw(() -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {

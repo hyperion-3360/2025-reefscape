@@ -249,12 +249,12 @@ public final class Constants {
 
 
     // elbow angles in º
-    public static final double kHandoffAngle = 90;
-    public static final double kIntakeAngle = 15;
+    public static final double kHandoffAngle = 0;
+    public static final double kIntakeAngle = 26;
 
     // wrist angles in motor rotations
-    public static final double Openposition = 0.6;
-    public static final double Closedposition = 0.0;
+    public static final double Openposition = 1.5;
+    public static final double Closedposition = 0;
   }
 
   public static class AlgaeIntakeVariables {

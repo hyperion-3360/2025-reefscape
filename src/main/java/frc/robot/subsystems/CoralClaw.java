@@ -7,11 +7,16 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,7 +43,7 @@ public class CoralClaw extends SubsystemBase {
   private SparkMaxConfig m_elevationNeoConfig = new SparkMaxConfig();
 
   // pid configs
-  private double kp = 0.1;
+  private double kp = 0.001;
   private double ki = 0.0;
   private double kd = 0.0;
   private PIDController m_PID = new PIDController(kp, ki, kd);
@@ -54,6 +59,9 @@ public class CoralClaw extends SubsystemBase {
     m_elevationNeoConfig.smartCurrentLimit(15);
 
     m_pinchNeoConfig.apply(m_elevationNeoConfig);
+
+    m_ElevationNeo.getEncoder().setPosition(0);
+    m_PinchNeo.getEncoder().setPosition(0);
 
     m_ElevationNeo.configure(
         m_elevationNeoConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -121,14 +129,24 @@ public class CoralClaw extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()) {
+      m_PID.reset();
+    }
     // inputs and updates SmartDashBoard data
     SmartDashboard.putNumber("kp", kp);
     SmartDashboard.putNumber("ki", ki);
     SmartDashboard.putNumber("kd", kd);
     SmartDashboard.putNumber(
-        "ElevationPosition", m_ElevationNeo.getAbsoluteEncoder().getPosition());
-    SmartDashboard.putNumber("PinchPosition", m_PinchNeo.getAbsoluteEncoder().getPosition());
+        "ElevationPosition", m_ElevationNeo.getEncoder().getPosition());
+    SmartDashboard.putNumber("PinchPosition", m_PinchNeo.getEncoder().getPosition());
     SmartDashboard.putBoolean("beam break", hasCoral());
+  }
+
+  public Command setSetPoint(DoubleSupplier joystickAxis) {
+   return this.run(() ->  m_ElevationNeo.set(joystickAxis.getAsDouble()));
+  }
+  public Command setSetPointClaw(DoubleSupplier joystickAxis) {
+    return this.run(() ->  m_PinchNeo.set(joystickAxis.getAsDouble()));
   }
 }
 
