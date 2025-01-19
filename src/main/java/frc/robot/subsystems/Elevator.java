@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase {
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
-  private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, true);
+  private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, false);
   private TalonFX m_rightElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID, "CANivore_3360");
   private TalonFX m_leftElevatorMotor =
@@ -82,7 +82,8 @@ public class Elevator extends SubsystemBase {
           m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }
     SmartDashboard.putNumber("Target", m_elevatorTarget);
-    SmartDashboard.putData("pid", m_pid);
+    SmartDashboard.putData("Elevator pid", m_pid);
+    SmartDashboard.putNumber("Right motor encoder",m_rightElevatorMotor.getPosition().getValueAsDouble());
   }
 
   public void SetHeight(desiredHeight height) {
@@ -90,6 +91,7 @@ public class Elevator extends SubsystemBase {
     switch (height) {
       case LOW:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
+        break;
 
       case L1:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;

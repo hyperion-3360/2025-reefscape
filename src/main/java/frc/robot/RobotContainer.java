@@ -102,16 +102,17 @@ public class RobotContainer {
     m_swerve.resetModulesToAbsolute();
   }
 
-  public void configureBindingsTest() {
-    var driveCmd =
-        new TeleopSwerve(
-            m_swerve,
-            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-            () -> true);
+  }
 
-    m_driverController.leftBumper().whileTrue(driveCmd);
+  public void configureBindingsTest() {
+
+    m_driverController.rightBumper().whileTrue(
+          new TeleopSwerve(
+            m_swerve,
+          () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+          () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+          () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+          () -> true));
 
     m_driverController
         .a()
@@ -120,14 +121,6 @@ public class RobotContainer {
                 () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-    /**
-     * this is an example of how to assign button :
-     * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
-     */
-    //   m_coDriverController
-    //       .start()
-    //       .and(m_coDriverController.back())
-    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
     m_driverController
         .b()
         .whileTrue(
