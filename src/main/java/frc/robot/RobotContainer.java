@@ -15,6 +15,7 @@ import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -33,7 +34,7 @@ public class RobotContainer {
   public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
-  // public static final Elevator m_elevator = new Elevator();
+  public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
 
@@ -60,11 +61,16 @@ public class RobotContainer {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
+  private final int leftTriggerAxis = XboxController.Axis.kLeftTrigger.value;
+  private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
 
   // Slew Rate Limiters to limit acceleration of joystick inputs
   private final SlewRateLimiter translationLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
+
+  private final SlewRateLimiter elevatorUpLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter elevatorDownLimiter = new SlewRateLimiter(3);
 
   private final double kJoystickDeadband = 0.1;
 
@@ -98,17 +104,15 @@ public class RobotContainer {
 
     m_swerve.resetModulesToAbsolute();
 
-    m_swerve.setDefaultCommand(
-        new TeleopSwerve(
-            m_swerve,
-            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-            () -> true));
+
   }
 
   public void configureBindingsTest() {
-    /**
+    m_driverController.a().whileTrue(m_elevator.manualTest(
+      () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
+      () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+
+      /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
