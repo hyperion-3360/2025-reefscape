@@ -73,8 +73,7 @@ public class Elevator extends SubsystemBase {
       m_leftElevatorMotor.setPosition(0.0);
       m_pid.reset();
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
-    }
-    if (DriverStation.isEnabled()) {
+    } else {
       m_rightElevatorMotor.set(
           m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }
@@ -93,35 +92,35 @@ public class Elevator extends SubsystemBase {
         break;
 
       case L2:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL2;
         break;
 
       case L3:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL3;
         break;
 
       case L4:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL4;
         break;
 
       case PROCESSOR:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorProcessor;
         break;
 
       case NET:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorNet;
         break;
 
       case HANDOFF:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorHandoff;
         break;
 
       case ALGAELOW:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         break;
 
       case FEEDER:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorFeeder;
         break;
     }
   }
