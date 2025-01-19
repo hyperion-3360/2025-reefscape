@@ -96,16 +96,16 @@ public class RobotContainer {
     Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
-
   }
 
   public void configureBindingsTest() {
-    var driveCmd = new TeleopSwerve(
-        m_swerve,
-        () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-        () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-        () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-        () -> true);
+    var driveCmd =
+        new TeleopSwerve(
+            m_swerve,
+            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+            () -> true);
 
     m_driverController.leftBumper().whileTrue(driveCmd);
 
@@ -141,6 +141,13 @@ public class RobotContainer {
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
+    m_swerve.setDefaultCommand(
+        new TeleopSwerve(
+            m_swerve,
+            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+            () -> true));
   }
 
   public Command getAutonomousCommand() {
