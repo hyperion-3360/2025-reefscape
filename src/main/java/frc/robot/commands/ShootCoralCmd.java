@@ -8,9 +8,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.AlgaeIntake.shooting;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.desiredHeight;
 
 // spotless:off
 /**
@@ -37,13 +34,10 @@ import frc.robot.subsystems.Elevator.desiredHeight;
  */
 // spotless:on
 
-public class ShootCmd extends Command {
+public class ShootCoralCmd extends Command {
 
   // there might be more things to add (like maybe a coral vomit if needed)
-  public enum ShootType {
-    AlgaeProcessor,
-    AlgaeNet,
-    AlgaeDitch,
+  public enum ShootCoralType {
     CoralAuto,
     CoralL1,
     CoralL2,
@@ -51,25 +45,19 @@ public class ShootCmd extends Command {
     CoralL4
   }
 
-  private ShootType currentShootType = null;
+  private ShootCoralType currentCoralShootType = null;
   private Subsystem currentSubsystem = null;
 
   private boolean isFinished = false;
 
-  public ShootCmd(ShootType type) {
+  public ShootCoralCmd(ShootCoralType type) {
 
-    currentShootType = type;
+    currentCoralShootType = type;
 
     // the lack of break is INTENTIONAL :
     // it is because in 3 cases i want the same result :)
 
-    switch (currentShootType) {
-      case AlgaeProcessor:
-      case AlgaeDitch:
-      case AlgaeNet:
-        currentSubsystem = RobotContainer.m_algaeIntake;
-        break;
-
+    switch (currentCoralShootType) {
       case CoralAuto:
         currentSubsystem = RobotContainer.m_coralClaw;
         break;
@@ -107,19 +95,7 @@ public class ShootCmd extends Command {
      * this method should set the height of the elevator to the desired lvl, with the help of a
      * switch case (refer to IntakeCmd)
      */
-    switch (currentShootType) {
-      case AlgaeProcessor:
-       
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.PROCESSOR);
-
-        break;
-      case AlgaeDitch:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.INTAKE);
-
-      case AlgaeNet:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.NET);
-        break;
-
+    switch (currentCoralShootType) {
       case CoralAuto:
         /** this should put the wrist angle at shoot position */
         break;
