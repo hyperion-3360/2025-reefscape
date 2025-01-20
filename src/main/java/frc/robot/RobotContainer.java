@@ -80,6 +80,8 @@ public class RobotContainer {
   private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
 
+  private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
+
   private final double kJoystickDeadband = 0.1;
 
   /***
@@ -122,14 +124,7 @@ public class RobotContainer {
                 () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-    m_driverController
-        .start()
-        .and(m_driverController.povCenter())
-        .onTrue(Pathfinding.doPathfinding());
-    /**
-     * this is an example of how to assign button :
-     * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
-     */
+    // Need buttons for the climber
     //   m_coDriverController
     //       .start()
     //       .and(m_coDriverController.back())
@@ -163,6 +158,18 @@ public class RobotContainer {
             m_algaeIntake.speed(
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
+    m_driverController
+        .b()
+        .whileTrue(
+            m_coralClaw.clawTestMode(
+                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
+                () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)));
+
+    m_driverController
+        .rightBumper()
+        .whileTrue(
+            m_climber.climberTestMode(
+                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {

@@ -10,10 +10,12 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.SubsystemInfo;
 import frc.robot.Constants.climberAction;
+import java.util.function.DoubleSupplier;
 
 /** 1 falcon winch and unwinch* */
 // La classe devrait avoir un option pour seulement s'activer a 30sec de la fin du jeu,
@@ -101,5 +103,13 @@ public class Climber extends SubsystemBase {
     builder.setSmartDashboardType("Climber");
     builder.addDoubleProperty("GrabTarget", this::getGrabTarget, this::setGrabTarget);
     builder.addDoubleProperty("LiftTarget", this::getLiftTarget, this::setLiftTarget);
+  }
+
+  // This is for test mode
+  public Command climberTestMode(DoubleSupplier speed) {
+    return this.run(
+        () -> {
+          m_climberMotor.set(speed.getAsDouble());
+        });
   }
 }
