@@ -148,7 +148,7 @@ public class CoralClaw extends SubsystemBase {
         });
   }
 
-  // public Command setSetPointClaw(DoubleSupplier joystickAxis) {
-  //  return this.run(() -> m_PinchNeo.set(joystickAxis.getAsDouble()));
-  // }
+  public Command manualControl(DoubleSupplier joystickAxis) {
+   return this.run(() -> m_PinchNeo.set(joystickAxis.getAsDouble()));
+  }
 }

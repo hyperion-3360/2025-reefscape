@@ -75,9 +75,6 @@ public class RobotContainer {
   private final SlewRateLimiter elevatorUpLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter elevatorDownLimiter = new SlewRateLimiter(3);
 
-  private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
-
   private final double kJoystickDeadband = 0.1;
 
   /***
@@ -120,23 +117,21 @@ public class RobotContainer {
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
     m_driverController
+        .x()
+        .whileTrue(
+            m_coralClaw.manualControl(
+                () -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
+    m_driverController
         .b()
         .whileTrue(
-            m_coralClaw.clawTestMode(
-                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)));
-    m_driverController
-        .y()
-        .whileTrue(
-            m_algaeIntake.angle(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            m_coralClaw.manualControl(
                 () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
-    m_driverController
-        .povDown()
-        .whileTrue(
-            m_algaeIntake.speed(
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
+
+    //   m_coDriverController
+    //       .start()
+    //       .and(m_coDriverController.back())
+    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    
   }
 
   public void configureBindingsTeleop() {
@@ -150,16 +145,9 @@ public class RobotContainer {
             () -> true));
             
     /**
-     * conditionJoysitck this is an example of how to assign button :
+     * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
      */
-    m_swerve.setDefaultCommand(
-        new TeleopSwerve(
-            m_swerve,
-            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-            () -> true));
   }
 
   public Command getAutonomousCommand() {

@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.AlgaeIntake.shooting;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 
 // spotless:off
 /**
@@ -74,22 +76,18 @@ public class ShootCmd extends Command {
 
       case CoralL1:
         currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
         break;
 
       case CoralL2:
         currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
         break;
 
       case CoralL3:
         currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
         break;
 
       case CoralL4:
         currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
         break;
 
       default:
@@ -111,10 +109,13 @@ public class ShootCmd extends Command {
      */
     switch (currentShootType) {
       case AlgaeProcessor:
+       
         RobotContainer.m_algaeIntake.shootingSpeed(shooting.PROCESSOR);
+
         break;
       case AlgaeDitch:
         RobotContainer.m_algaeIntake.shootingSpeed(shooting.INTAKE);
+
       case AlgaeNet:
         RobotContainer.m_algaeIntake.shootingSpeed(shooting.NET);
         break;
