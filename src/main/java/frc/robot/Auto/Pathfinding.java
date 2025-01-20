@@ -239,49 +239,6 @@ public class Pathfinding extends Command {
 
       return allCondionsTrue;
     }
-
-    /**
-     * gives the value of the given POI based on multiple factors
-     *
-     * @param poi the poi to which we want to calculate the value
-     * @return the reward in points per meter or another similar unit which must at leas involve
-     *     meters and points
-     */
-    public Double POIValue(POI poi) {
-      double actionTime = 0.0;
-
-      switch (poi) {
-        case ALGAECORALSTANDS:
-          actionTime = Constants.TimeToAction.kIntakeCoral;
-          break;
-        case BRANCHES:
-          actionTime = Constants.TimeToAction.kShootCoralL4;
-          break;
-        case PROCESSOR:
-          actionTime = Constants.TimeToAction.kShootAlgaeProcessor;
-          break;
-        case NET:
-          actionTime = Constants.TimeToAction.kShootNet;
-          break;
-        case DUMPINGUP:
-          break;
-        case DUMPINGDOWN:
-          break;
-
-        default:
-          break;
-      }
-      double timeLeft =
-          DriverStation.isFMSAttached()
-              ? DriverStation.getMatchTime() - 145
-              : 15 - DriverStation.getMatchTime(); // gets time left in auto no matter
-      double timeDelta = timeLeft - actionTime;
-      double distanceRobotToPoint =
-          poi.getCoordinates().getDistance(RobotContainer.m_swerve.getPose().getTranslation());
-      double pointRatio = (poi.getPriority() * timeDelta) / distanceRobotToPoint;
-      System.out.println(pointRatio + " of " + poi.toString());
-      return pointRatio;
-    }
   }
 
   // #endregion
@@ -332,6 +289,52 @@ public class Pathfinding extends Command {
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
   // #endregion
+
+  /**
+   * gives the value of the given POI based on multiple factors
+   *
+   * @param poi the poi to which we want to calculate the value
+   * @return the reward in points per meter or another similar unit which must at leas involve
+   *     meters and points
+   */
+  public static Double POIValue(POI poi) {
+    double actionTime = 0.0;
+
+    switch (poi) {
+      case ALGAECORALSTANDS:
+        actionTime = Constants.TimeToAction.kIntakeCoral;
+        break;
+      case BRANCHES:
+        actionTime = Constants.TimeToAction.kShootCoralL4;
+        break;
+      case PROCESSOR:
+        actionTime = Constants.TimeToAction.kShootAlgaeProcessor;
+        break;
+      case NET:
+        actionTime = Constants.TimeToAction.kShootNet;
+        break;
+      case DUMPINGUP:
+        break;
+      case DUMPINGDOWN:
+        break;
+
+      default:
+        break;
+    }
+    double timeLeft =
+        DriverStation.isFMSAttached()
+            ? DriverStation.getMatchTime() - 145
+            : 15 - DriverStation.getMatchTime(); // gets time left in auto no matter
+    double timeDelta = timeLeft - actionTime;
+    double distanceRobotToPoint =
+        poi.getCoordinates().getDistance(RobotContainer.m_swerve.getPose().getTranslation());
+    double pointRatio = (poi.getPriority() * timeDelta) / distanceRobotToPoint;
+    if (DriverStation.isTest()) {
+      System.out.println(pointRatio + " of " + poi.toString());
+    }
+    return pointRatio;
+  }
+
   /**
    * filters a raw poi array and returns a pose2d object of the most advantageous point
    *
@@ -344,11 +347,13 @@ public class Pathfinding extends Command {
     List<POI> filtered_pois =
         raw_poi.stream()
             .filter(offending_poi -> offending_poi.getConditionStatus() == true)
-            .sorted((p1, p2) -> p1.POIValue(p2).compareTo(p2.POIValue(p1)))
+            .sorted((p1, p2) -> POIValue(p2).compareTo(POIValue(p1)))
             .collect(Collectors.toList());
     Pathfinding.filtered_pois = filtered_pois;
 
-    System.out.println("chosen poi " + filtered_pois.get(0));
+    if (DriverStation.isTest()) {
+      System.out.println("chosen poi " + filtered_pois.get(0));
+    }
 
     // uses the coordinates and angle of the first point
     return robotSizeRecoil(filtered_pois.get(0));
