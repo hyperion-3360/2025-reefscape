@@ -8,9 +8,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.Wait;
+import java.util.function.DoubleSupplier;
 
 public class Shooter extends SubsystemBase {
   private WPI_TalonSRX m_shooter = new WPI_TalonSRX(Constants.SubsystemInfo.kCoralShooterTalonID);
@@ -66,16 +68,29 @@ public class Shooter extends SubsystemBase {
     m_shooter.set(0);
   }
 
-  public void openBlocker() {
-    m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterOpen);
+  public Command openBlocker() {
+    return this.runOnce(
+        () -> m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterOpen));
   }
 
-  public void closeBlocker() {
-    m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterClosed);
+  public Command closeBlocker() {
+    return this.runOnce(
+        () -> m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterClosed));
   }
 
   @Override
   public void periodic() {
     getShooterIR = m_shooterIR.get();
+  }
+
+  /**
+   * this method is used when manually testing the shooter using joysticks
+   *
+   * @param joystick the position of the joystick to influence motor speed
+   * @return a command that runs the motor at a speed equivalent to the joystick position squared
+   */
+  public Command manualTest(DoubleSupplier joystick) {
+    // the speed input is squard to have a smoother control curve
+    return this.run(() -> m_shooter.set(joystick.getAsDouble() * joystick.getAsDouble()));
   }
 }
