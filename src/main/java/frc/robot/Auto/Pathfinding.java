@@ -22,7 +22,21 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-/** Pathfinding */
+/**
+ * Pathfinding this class functions by cycles. A cycle consists of:
+ *
+ * <p>1. The calling of the {@code doPathfinding()} method .
+ *
+ * <p>2. Checking of the closest and most profitable POI using the {@code FilterPOIs} method.
+ *
+ * <p>3. If the POI contains a list of possible Pose2d: give the closest one
+ *
+ * <p>4. Finally pathfind to the best POI and once you reach it: execute the method or sequence
+ * attached to it
+ *
+ * <p>Basically this class acts like a big filter that funels the best POI given the constraints and
+ * vomits that to the Pathfinder class
+ */
 public class Pathfinding extends Command {
   // #region POI enum logic
   public enum POI {
@@ -30,16 +44,19 @@ public class Pathfinding extends Command {
         Constants.AlgaeCoralStand.kStands,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kIntakeCoral,
+        true,
         () -> !Constants.Conditions.hasAlgae() && !Constants.Conditions.hasCoral()),
     BRANCHES(
         Constants.Pegs.kPegs,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
+        true,
         () -> Constants.Conditions.hasCoral()),
     FEEDERS(
         Constants.Feeders.kFeeders,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
+        false,
         () -> Constants.Conditions.hasCoral()),
     PROCESSOR(
         10.0,
@@ -54,13 +71,34 @@ public class Pathfinding extends Command {
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
-        () -> Constants.Conditions.hasAlgae());
+        () -> Constants.Conditions.hasAlgae()),
+    DUMPINGUP(
+        4.073906,
+        4.745482,
+        210,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kIntakeCoral,
+        () -> Constants.Conditions.hasCoral()),
+    DUMPINGDOWN(
+        4.073906,
+        3.306318,
+        150,
+        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        Constants.Priorities.kIntakeCoral,
+        () -> Constants.Conditions.hasCoral());
 
     private Rotation2d angle;
     private Translation2d xy_coordinates;
     private Supplier<Command> event;
     private BooleanSupplier[] conditions;
+    // a list that acts like a buffer accepting pose2ds, sorting them and assigning the closest one
+    // to the point to pathfind to. Emptys out after each cyle to accept new arrays of points
     private ArrayList<Pose2d> positionsList = new ArrayList<>();
+
+    // I need a list separate from positionsList because I need to keep track of all consumed pois
+    // even after a cycle
+    private List<Pose2d> consumedPOIs = new ArrayList<>();
+    private boolean consumable;
     private int priority;
 
     /**
@@ -90,8 +128,9 @@ public class Pathfinding extends Command {
      * constructor overwritting the other one to allow input of a Translation2d object
      *
      * @param xy_coordinates the x and y position of the poi in (x,y)
-     * @param angle the angel the robot should facing once reaching the poi
+     * @param angle the angle the robot should facing once reaching the poi
      * @param event the sequence we want the robot to perform when arriving on point
+     * @param priority how bad we want to pathfind to this point
      * @param removeCondition the condition to which we remove the poi from a list
      */
     private POI(
@@ -107,17 +146,35 @@ public class Pathfinding extends Command {
       this.priority = priority;
     }
 
+    /**
+     * constructor allowing the input of an array of points, then filters and sort to give the
+     * closest one and stores that.
+     *
+     * @param xyThetacoordinates an array of (x, y, θ) coordinates we want to possibly pathfind to
+     * @param event the sequence we want the robot to perform when arriving on point
+     * @param priority how bad we want to pathfind to this point
+     * @param consumable if we should remove the point we just pathfinded to.
+     *     <p>If you have a singular POI that is consumable and thus can't use this param: make a
+     *     isConsumed() condition and place it into the boolean supplier of another constructor
+     * @param removeCondition the condition to which we remove the poi from a list
+     */
     private POI(
         Pose2d[] xyThetacoordinates,
         Supplier<Command> event,
         int priority,
+        boolean consumable,
         BooleanSupplier... removeCondition) {
+      this.consumable = consumable;
+
       for (Pose2d coordinate : xyThetacoordinates) {
         this.positionsList.add(coordinate);
       }
-      // gets the closest peg from the robot
+
+      // gets the closest poi from the robot
       Pose2d pose =
-          positionsList.parallelStream()
+          positionsList.stream()
+              // filter pois we already went to
+              .filter((poseHead) -> !consumedPOIs.contains(poseHead))
               .sorted(
                   (pose1, pose2) -> {
                     if (pose1
@@ -132,11 +189,18 @@ public class Pathfinding extends Command {
               .findFirst()
               .get();
 
+      if (this.consumable == true) {
+        // removes point we already went to
+        consumedPOIs.add(pose);
+      }
+
       this.xy_coordinates = pose.getTranslation();
       this.angle = pose.getRotation();
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
+      // clears the postions list so that we can accept new points
+      positionsList.clear();
     }
 
     /**
@@ -177,12 +241,13 @@ public class Pathfinding extends Command {
     }
 
     /**
-     * generic function to override. If not overriden will always return 0.
+     * gives the value of the given POI based on multiple factors
      *
-     * @param poi the poi to which we want to estimate the reward
-     * @return the reward in points per meter or another similar unit which must involve points
+     * @param poi the poi to which we want to calculate the value
+     * @return the reward in points per meter or another similar unit which must at leas involve
+     *     meters and points
      */
-    public Double rewardFunction(POI poi) {
+    public Double POIValue(POI poi) {
       double actionTime = 0.0;
 
       switch (poi) {
@@ -198,6 +263,10 @@ public class Pathfinding extends Command {
         case NET:
           actionTime = Constants.TimeToAction.kShootNet;
           break;
+        case DUMPINGUP:
+          break;
+        case DUMPINGDOWN:
+          break;
 
         default:
           break;
@@ -210,6 +279,7 @@ public class Pathfinding extends Command {
       double distanceRobotToPoint =
           poi.getCoordinates().getDistance(RobotContainer.m_swerve.getPose().getTranslation());
       double pointRatio = (poi.getPriority() * timeDelta) / distanceRobotToPoint;
+      System.out.println(pointRatio + " of " + poi.toString());
       return pointRatio;
     }
   }
@@ -274,9 +344,11 @@ public class Pathfinding extends Command {
     List<POI> filtered_pois =
         raw_poi.stream()
             .filter(offending_poi -> offending_poi.getConditionStatus() == true)
-            .sorted((p1, p2) -> p1.rewardFunction(p1).compareTo(p2.rewardFunction(p2)))
+            .sorted((p1, p2) -> p1.POIValue(p2).compareTo(p2.POIValue(p1)))
             .collect(Collectors.toList());
     Pathfinding.filtered_pois = filtered_pois;
+
+    System.out.println("chosen poi " + filtered_pois.get(0));
 
     // uses the coordinates and angle of the first point
     return robotSizeRecoil(filtered_pois.get(0));
@@ -310,9 +382,6 @@ public class Pathfinding extends Command {
     createPOIListWidget();
     autoChooser.setDefaultOption(
         "Full Auto (every coordinates)", poiList); // if no options are chosen put every coordinates
-    // autoLayout.add(autoChooser);
-    // autoLayout.add(POIAdder); // adder
-    // autoLayout.add(POIRemover); // remover
     SmartDashboard.putData(POIAdder);
     SmartDashboard.putData(POIRemover);
     SmartDashboard.putData(autoChooser);
