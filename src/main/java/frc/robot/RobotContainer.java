@@ -120,6 +120,10 @@ public class RobotContainer {
                 () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
+    m_driverController
+        .start()
+        .and(m_driverController.povCenter())
+        .onTrue(Pathfinding.doPathfinding());
     /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
