@@ -29,7 +29,6 @@ public class AlgaeIntake extends SubsystemBase {
 
   public enum shooting {
     INTAKE,
-    INTAKE_SLOW,
     PROCESSOR,
     NET,
     STORING, // this is the intake speed / 2

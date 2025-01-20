@@ -15,8 +15,6 @@ import frc.robot.commands.IntakeCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.AlgaeIntake.elevation;
-import frc.robot.subsystems.AlgaeIntake.shooting;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
@@ -125,7 +123,24 @@ public class RobotContainer {
         .start()
         .and(m_driverController.povCenter())
         .onTrue(Pathfinding.doPathfinding());
-    m_driverController.x().onTrue(m_algaeIntake.shoot(elevation.FLOOR, shooting.INTAKE));
+    /**
+     * this is an example of how to assign button :
+     * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
+     */
+    //   m_coDriverController
+    //       .start()
+    //       .and(m_coDriverController.back())
+    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    // m_driverController
+    //     .x()
+    //     .whileTrue(
+    //         m_coralClaw.setSetPoint(
+    //             () -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
+    // m_driverController
+    //     .b()
+    //     .whileTrue(
+    //         m_coralClaw.setSetPointClaw(
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
     m_driverController
         .b()
         .whileTrue(
