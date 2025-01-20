@@ -265,7 +265,7 @@ public final class Constants {
     public static final double kNetAngle = 0.0;
     // auto intake bcuz of the little tower thing
     public static final double kAutoIntakeAngle = 0.0;
-    public static final double kCurrentLimit = 0.0;
+    public static final double kCurrentLimit = 20.0;
 
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
