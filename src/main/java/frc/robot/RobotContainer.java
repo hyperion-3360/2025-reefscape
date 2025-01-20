@@ -135,14 +135,12 @@ public class RobotContainer {
     m_driverController
         .y()
         .whileTrue(
-            m_algaeIntake.angle(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            m_algaeIntake.setAngle(
                 () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
     m_driverController
         .povDown()
         .whileTrue(
-            m_algaeIntake.speed(
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            m_algaeIntake.setSpeed(
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
   }
 

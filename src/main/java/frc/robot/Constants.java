@@ -360,4 +360,8 @@ public final class Constants {
     public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.0;
   }
+
+  public static class AlgaeIntakeConstants {
+    public static final double kAngleTolerance = 0.0;
+  }
 }

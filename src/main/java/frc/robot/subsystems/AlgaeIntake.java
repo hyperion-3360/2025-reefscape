@@ -29,6 +29,7 @@ public class AlgaeIntake extends SubsystemBase {
 
   public enum shooting {
     INTAKE,
+    INTAKE_SLOW,
     PROCESSOR,
     NET,
     STORING, // this is the intake speed / 2
@@ -82,7 +83,7 @@ public class AlgaeIntake extends SubsystemBase {
     SmartDashboard.putNumber("AlgaeEncoder", m_pivotMotor.getEncoder().getPosition());
   }
 
-  public void shootingSpeed(shooting speed) {
+  public void setShootingSpeed(shooting speed) {
 
     switch (speed) {
       case INTAKE:
@@ -106,9 +107,9 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
-  public void shootingAngle(elevation angles) {
+  public void setShootingAngle(elevation angle) {
 
-    switch (angles) {
+    switch (angle) {
       case NET:
         this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kNetAngle;
         break;
@@ -123,42 +124,26 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
-  public Command shoot(elevation shootingAngle, shooting shootingSpeed) {
-
-    return this.run(
-            () -> {
-              shootingSpeed(shootingSpeed);
-              shootingAngle(shootingAngle);
-              m_pivotMotor.set(m_pid.calculate(m_AnglesTarget, m_directionEncoder.getPosition()));
-              m_intakeRight.set(m_SpeedTarget);
-            })
-        .until(
-            () -> m_intakeRight.getOutputCurrent() >= Constants.AlgaeIntakeVariables.kCurrentLimit)
-        .andThen(
-            () -> {
-              shootingAngle(elevation.NET);
-              shootingSpeed(shooting.STORING);
-              m_pivotMotor.set(m_pid.calculate(m_AnglesTarget, m_directionEncoder.getPosition()));
-              m_intakeRight.set(m_SpeedTarget);
-            })
-        .until(() -> m_pivotMotor.getEncoder().getPosition() >= 15);
+  public boolean isAlgaeIn() {
+    return m_intakeRight.getOutputCurrent() >= Constants.AlgaeIntakeVariables.kCurrentLimit;
   }
 
-  public Command angle(DoubleSupplier up, DoubleSupplier down) {
+  public boolean isAtAngle() {
+    return Math.abs(m_AnglesTarget - m_directionEncoder.getPosition())
+        <= Constants.AlgaeIntakeConstants.kAngleTolerance;
+  }
+
+  public Command setAngle(DoubleSupplier angle) {
     return run(
         () -> {
-          System.out.println("yippe");
-          if (up.getAsDouble() > 0.0) m_pivotMotor.set(up.getAsDouble());
-          else m_pivotMotor.set(down.getAsDouble());
+          m_pivotMotor.set(angle.getAsDouble());
         });
   }
 
-  public Command speed(DoubleSupplier clockwise, DoubleSupplier counterClockwise) {
+  public Command setSpeed(DoubleSupplier speed) {
     return run(
         () -> {
-          System.out.println("It works!?!!");
-          if (clockwise.getAsDouble() > 0.0) m_intakeRight.set(clockwise.getAsDouble());
-          else m_intakeRight.set(counterClockwise.getAsDouble());
+          m_intakeRight.set(speed.getAsDouble());
         });
   }
 }
