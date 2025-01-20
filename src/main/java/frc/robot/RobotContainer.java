@@ -8,9 +8,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
+import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.IntakeCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
@@ -122,6 +122,10 @@ public class RobotContainer {
                 () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
+    m_driverController
+        .start()
+        .and(m_driverController.povCenter())
+        .onTrue(Pathfinding.doPathfinding());
     /**
      * this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
@@ -176,6 +180,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return Pathfinding.doPathfinding();
   }
 }
