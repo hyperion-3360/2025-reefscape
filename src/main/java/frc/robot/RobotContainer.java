@@ -140,6 +140,15 @@ public class RobotContainer {
   }
 
   public void configureBindingsTeleop() {
+
+    m_swerve.setDefaultCommand(
+        new TeleopSwerve(
+            m_swerve,
+            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+            () -> true));
+            
     /**
      * conditionJoysitck this is an example of how to assign button :
      * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
