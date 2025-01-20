@@ -102,8 +102,6 @@ public class RobotContainer {
     m_swerve.resetModulesToAbsolute();
   }
 
-  }
-
   public void configureBindingsTest() {
 
     m_driverController.rightBumper().whileTrue(
