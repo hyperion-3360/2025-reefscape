@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 
+
 // spotless:off
 /**
  * TELEOP AND AUTO COMMAND
@@ -61,19 +62,19 @@ public class ShootCoralCmd extends Command {
         break;
 
       case CoralL1:
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
+        currentSubsystem = RobotContainer.m_coralClaw;
         break;
 
       case CoralL2:
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
+        currentSubsystem = RobotContainer.m_coralClaw;
         break;
 
       case CoralL3:
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
+        currentSubsystem = RobotContainer.m_coralClaw;
         break;
 
       case CoralL4:
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
+        currentSubsystem = RobotContainer.m_coralClaw;
         break;
 
       default:

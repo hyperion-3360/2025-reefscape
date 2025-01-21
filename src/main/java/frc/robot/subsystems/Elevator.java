@@ -24,6 +24,7 @@ public class Elevator extends SubsystemBase {
     NET,
     FEEDER,
     ALGAELOW,
+    CORALLOW,
     LOW,
     L1,
     L2,
@@ -126,6 +127,10 @@ public class Elevator extends SubsystemBase {
 
       case FEEDER:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorFeeder;
+        break;
+
+        case CORALLOW:
+        m_elevatorTarget = Constants.ElevatorConstants.kElevatorCoralLow;
         break;
     }
   }

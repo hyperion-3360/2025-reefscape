@@ -358,6 +358,7 @@ public final class Constants {
     public static final double kElevatorProcessor = 10.0;
     public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.0;
+    public static final double kElevatorCoralLow = 0.0;
   }
 
   public static class AlgaeIntakeConstants {
