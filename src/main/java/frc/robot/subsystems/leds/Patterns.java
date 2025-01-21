@@ -4,8 +4,13 @@
 
 package frc.robot.subsystems.leds;
 
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
+
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
+import java.util.Map;
 
 /** All the patterns for the LEDs (some are currently untested) */
 public class Patterns {
@@ -21,6 +26,24 @@ public class Patterns {
     LEDPattern purple = LEDPattern.solid(Color.kPurple);
     LEDPattern red = LEDPattern.solid(Color.kRed);
     LEDPattern cyan = LEDPattern.solid(Color.kCyan);
-    LEDPattern off = LEDPattern.solid(Color.kBlack);
+    LEDPattern off = LEDPattern.kOff;
+  }
+
+  public class reveal {
+    // might not use this (red to yellow gradient, yellow in the middle, red on the ends) (or the
+    // inverse i forgot)
+    LEDPattern cGradient = LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kOrange);
+    // same as last one but red on one end and yellow on the other
+    LEDPattern dGradient =
+        LEDPattern.gradient(GradientType.kDiscontinuous, Color.kRed, Color.kOrange);
+    // moving mask
+    Map<Double, Color> maskSteps = Map.of(0.0, Color.kWhite, 0.5, Color.kBlack);
+    LEDPattern mask =
+        LEDPattern.steps(maskSteps).scrollAtRelativeSpeed(Percent.per(Second).of(0.25));
+    // scrolling gradient
+    LEDPattern sGradient =
+        LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kOrange)
+            .scrollAtRelativeSpeed(Percent.per(Second).of(25));
+    
   }
 }
