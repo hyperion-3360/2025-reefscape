@@ -104,16 +104,17 @@ public class RobotContainer {
     m_swerve.resetModulesToAbsolute();
   }
 
-  public void configureBindingsTest() {
-    var driveCmd =
-        new TeleopSwerve(
-            m_swerve,
-            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-            () -> true);
+  }
 
-    m_driverController.leftBumper().whileTrue(driveCmd);
+  public void configureBindingsTest() {
+
+    m_driverController.rightBumper().whileTrue(
+          new TeleopSwerve(
+            m_swerve,
+          () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+          () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+          () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+          () -> true));
 
     m_driverController
         .a()
@@ -126,24 +127,6 @@ public class RobotContainer {
         .start()
         .and(m_driverController.povCenter())
         .onTrue(Pathfinding.doPathfinding());
-    /**
-     * this is an example of how to assign button :
-     * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
-     */
-    //   m_coDriverController
-    //       .start()
-    //       .and(m_coDriverController.back())
-    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
-    // m_driverController
-    //     .x()
-    //     .whileTrue(
-    //         m_coralClaw.setSetPoint(
-    //             () -> conditionJoystick(translationAxis, rotationLimiter, kJoystickDeadband)));
-    // m_driverController
-    //     .b()
-    //     .whileTrue(
-    //         m_coralClaw.setSetPointClaw(
-    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
     m_driverController.x().onTrue(m_algaeIntake.shoot(elevation.FLOOR, shooting.INTAKE));
     m_driverController
         .b()
