@@ -255,7 +255,6 @@ public class Pathfinding extends Command {
     NINTHUTO(POI.ALGAECORALSTANDS, POI.BRANCHES);
 
     private POI[] desiredPOIs;
-    private List<POI> POIlist = new ArrayList<>();
 
     private CustomAuto(POI... poi) {
       this.desiredPOIs = poi;
@@ -263,11 +262,11 @@ public class Pathfinding extends Command {
 
     public List<POI> getPOIs() {
       // clears the old POI list to accept new ones
-      POIlist.clear();
+      poiList.clear();
       for (POI poi : desiredPOIs) {
-        POIlist.add(poi);
+        poiList.add(poi);
       }
-      return POIlist;
+      return poiList;
     }
   }
 
@@ -284,7 +283,7 @@ public class Pathfinding extends Command {
       Shuffleboard.getTab(tabName).add("path", chosenPath).getEntry();
 
   protected static List<POI> poiList = new ArrayList<>();
-  private static List<POI> filtered_pois; // this is a collection of sorted poilist POI
+  private static POI bestPOI;
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
@@ -342,21 +341,24 @@ public class Pathfinding extends Command {
    * @return The {@link Pose2d} of the most advantageous point
    */
   private static Pose2d FilterPOIs(List<POI> raw_poi) {
-    // filters raw poi data and collects the result into a list of pois sorted from most profitable
-    // point to least
-    List<POI> filtered_pois =
+    // filters and gets the best POI in the raw_poi list
+    POI bestPOI =
         raw_poi.stream()
-            .filter(offending_poi -> offending_poi.getConditionStatus() == true)
+            // removes the POI we are already at
+            .filter(poiHead -> !Pathfinding.bestPOI.equals(poiHead))
+            .filter(poiToCheck -> poiToCheck.getConditionStatus() == true)
             .sorted((p1, p2) -> POIValue(p2).compareTo(POIValue(p1)))
-            .collect(Collectors.toList());
-    Pathfinding.filtered_pois = filtered_pois;
+            .findFirst()
+            .get();
 
+    // this is to prevent the recheking of the best POI when trying to get it's event.
+    Pathfinding.bestPOI = bestPOI;
     if (DriverStation.isTest()) {
-      System.out.println("chosen poi " + filtered_pois.get(0));
+      System.out.println("chosen poi " + bestPOI);
     }
 
     // uses the coordinates and angle of the first point
-    return robotSizeRecoil(filtered_pois.get(0));
+    return robotSizeRecoil(bestPOI);
   }
 
   private static Pose2d robotSizeRecoil(POI poiToPathfind) {
@@ -374,7 +376,10 @@ public class Pathfinding extends Command {
   }
 
   // #region Pathfinding Shuffleboard implementation
-  /** creates the chooser widget for the autonomous mode acts for the Pathfinding class */
+  /**
+   * creates the chooser widget for the autonomous mode acts like a main shuffleboard method for the
+   * Pathfinding class
+   */
   public static void makeChooserWidget() {
     // adds the POIs in the enum
     for (POI poi : POI.values()) {
@@ -448,7 +453,7 @@ public class Pathfinding extends Command {
         assert foundToken == true;
       } catch (AssertionError e) {
         e.printStackTrace();
-        System.out.println("error in POI reading no POI matched the value" + currentString);
+        System.out.println("error in POI reading no POI matched the value " + currentString);
       }
     }
     return readPOIs;
@@ -476,8 +481,9 @@ public class Pathfinding extends Command {
         (poi) -> {
           chosenPath =
               chosenPath
+                  // deletes the coordinate we don't want
                   .replace(poi.toString(), "")
-                  .strip(); // deletes the coordinate we don't want
+                  .strip();
           pathEntry.setString(chosenPath);
         });
   }
@@ -502,7 +508,7 @@ public class Pathfinding extends Command {
     }
 
     return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
-        .andThen(filtered_pois.get(0).getEvent())
+        .andThen(bestPOI.getEvent())
         .repeatedly()
         .until(() -> DriverStation.isTeleop());
   }
