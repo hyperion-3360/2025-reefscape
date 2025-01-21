@@ -104,13 +104,15 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
 
-    m_driverController.rightBumper().whileTrue(
-          new TeleopSwerve(
-            m_swerve,
-          () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-          () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-          () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-          () -> true));
+    m_driverController
+        .rightBumper()
+        .whileTrue(
+            new TeleopSwerve(
+                m_swerve,
+                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+                () -> true));
 
     m_driverController
         .a()

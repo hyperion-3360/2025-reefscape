@@ -72,15 +72,14 @@ public class ShootAlgaeCmd extends Command {
      */
     switch (currentAlgaeShootType) {
       case AlgaeProcessor:
-       
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.PROCESSOR);
+        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.PROCESSOR);
 
         break;
       case AlgaeDitch:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.INTAKE);
+        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.INTAKE);
 
       case AlgaeNet:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.NET);
+        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.NET);
         break;
 
       default:
