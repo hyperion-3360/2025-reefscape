@@ -14,6 +14,14 @@ Nous utilisons le command based system de Wpilib. Il s'agit d'une excellent faç
 
 Nouveauté cette année, nous utilisons le mode de test de la driver station pour changer l'assignation des commandes sur les contrôleurs de jeu. De cette manière le mode Teleop du robot, contient toujours l'assignation officielle communiquée aux pilotes et donne la liberté à l'équipe de programmation de travailler et valider les sous systèmes manuellement en utilisant un assignation de commandes différentes.
 
+Maintenir RIGHT BUMPER: les deux joysticks servent à controller les swerves (comme en Teleop)
+Maintenir A BUTTON: TRIGGER gauche elevator UP
+                    TRIGGER droit elevator DOWN
+Maintenir START and POV CENTER: Path finding
+Maintenir B BUTTON: Joystick gauche: fermer ouvrir la pince, Joystick droit: monter et descendre le pivot de la pince
+Maintenir Y BUTTON: Joystick gauche: monter et descendre le pivot de l'intake à algue
+Maintenir POV DOWN: Joystick gauche: intake algae motor speed
+
 # Foire aux questions
 
 Vous pouvez consulter, et maintenir!!!, la foire aux questions à l'addressse suivante: https://github.com/hyperion-3360/tutoriels. 
