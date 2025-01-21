@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
@@ -34,10 +33,11 @@ public class Climber extends SubsystemBase {
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
-  private TalonFX m_climberMotor = new TalonFX(SubsystemInfo.kClimberMotorID);
+  private TalonFX m_climberMotor = new TalonFX(SubsystemInfo.kClimberMotorID, "CANivore_3360");
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
   private final ArmFeedforward m_feedforward = new ArmFeedforward(kS, kG, kV);
+  private Double m_direction = 0.0;
 
   private static double GrabPosition = 30;
   private static double LiftPosition = 0;
@@ -71,14 +71,15 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isEnabled()) {
-      // Make the motor get to the target
-      m_climberMotor.set(
-          m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(), m_climberTarget)
-              + m_feedforward.calculate(
-                  m_climberMotor.getPosition().getValueAsDouble(),
-                  m_climberMotor.getVelocity().getValueAsDouble()));
-    }
+    // if (DriverStation.isEnabled()) {
+    // Make the motor get to the target
+    //   m_climberMotor.set(
+    //       m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(),
+    // m_climberTarget)
+    //           + m_feedforward.calculate(
+    //               m_climberMotor.getPosition().getValueAsDouble(),
+    //               m_climberMotor.getVelocity().getValueAsDouble()));
+    // }
     // SmartDashboard.putNumber("ClimbeGrab", GrabPosition);
   }
 
@@ -109,7 +110,8 @@ public class Climber extends SubsystemBase {
   public Command climberTestMode(DoubleSupplier speed) {
     return this.run(
         () -> {
-          m_climberMotor.set(speed.getAsDouble());
+          m_direction = Math.signum(speed.getAsDouble());
+          m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
         });
   }
 }
