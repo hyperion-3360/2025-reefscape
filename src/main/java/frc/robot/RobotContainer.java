@@ -19,6 +19,7 @@ import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.AlgaeIntake.shooting;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
+import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -42,6 +43,7 @@ public class RobotContainer {
   public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
+  public static final Dumper m_dumper = new Dumper();
 
   // command declarations
   public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
