@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +32,8 @@ public class AlgaeIntake extends SubsystemBase {
     INTAKE,
     PROCESSOR,
     NET,
-    STOP
+    STORING, // this is the intake speed / 2
+    STORED // this is resting speed or 0
   }
 
   private static final double kP = 0.0;
@@ -42,14 +45,17 @@ public class AlgaeIntake extends SubsystemBase {
   private SparkMaxConfig m_intakeRightConfig = new SparkMaxConfig();
   private SparkMaxConfig m_directionConfig = new SparkMaxConfig();
 
-  private SparkMax m_pivotMotor = new SparkMax(14, MotorType.kBrushless);
-  private SparkMax m_intakeLeft = new SparkMax(15, MotorType.kBrushless);
-  private SparkMax m_intakeRight = new SparkMax(16, MotorType.kBrushless);
+  private SparkMax m_pivotMotor =
+      new SparkMax(Constants.SubsystemInfo.kAlgaeArmMotorID, MotorType.kBrushless);
+  private SparkMax m_intakeLeft =
+      new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberLeftMotorID, MotorType.kBrushless);
+  private SparkMax m_intakeRight =
+      new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberRightMotorID, MotorType.kBrushless);
 
   private AbsoluteEncoder m_directionEncoder = m_pivotMotor.getAbsoluteEncoder();
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
-  private double m_SpeedTarget = 0.0;
+  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
 
   public AlgaeIntake() {
 
@@ -69,14 +75,15 @@ public class AlgaeIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    m_pivotMotor.set(m_pid.calculate(m_AnglesTarget, m_directionEncoder.getPosition()));
-    m_intakeRight.set(m_SpeedTarget);
+    if (DriverStation.isDisabled()) {
+      m_pid.reset();
+    }
 
     SmartDashboard.putNumber("Current", m_intakeRight.getOutputCurrent());
+    SmartDashboard.putNumber("AlgaeEncoder", m_pivotMotor.getEncoder().getPosition());
   }
 
-  public void shootingSpeed(shooting speed) {
+  public void setShootingSpeed(shooting speed) {
 
     switch (speed) {
       case INTAKE:
@@ -90,14 +97,19 @@ public class AlgaeIntake extends SubsystemBase {
       case PROCESSOR:
         this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
         break;
-      case STOP:
-        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
+
+      case STORING:
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed / 2;
+        break;
+
+      case STORED:
+        this.m_SpeedTarget = 0.0;
     }
   }
 
-  public void shootingAngles(elevation angles) {
+  public void setShootingAngle(elevation angle) {
 
-    switch (angles) {
+    switch (angle) {
       case NET:
         this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kNetAngle;
         break;
@@ -112,32 +124,34 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
-  public Command shoot(elevation shootingAngles, shooting shootingSpeed) {
-
-    return this.run(
-            () -> {
-              shootingSpeed(shootingSpeed);
-              shootingAngles(shootingAngles);
-            })
-        .until(
-            () -> m_intakeRight.getOutputCurrent() == Constants.AlgaeIntakeVariables.kCurrentLimit);
+  public boolean isAlgaeIn() {
+    return currentInterpolation(m_intakeRight.getOutputCurrent())
+        >= Constants.AlgaeIntakeVariables.kCurrentLimit;
   }
 
-  public Command angle(DoubleSupplier up, DoubleSupplier down) {
+  public boolean isAtAngle() {
+    return Math.abs(m_AnglesTarget - m_directionEncoder.getPosition())
+        <= Constants.AlgaeIntakeConstants.kAngleTolerance;
+  }
+
+  public Command setAngle(DoubleSupplier angle) {
     return run(
         () -> {
-          System.out.println("yippe");
-          if (up.getAsDouble() > 0.0) m_pivotMotor.set(up.getAsDouble());
-          else m_pivotMotor.set(down.getAsDouble());
+          m_pivotMotor.set(angle.getAsDouble());
         });
   }
 
-  public Command speed(DoubleSupplier clockwise, DoubleSupplier counterClockwise) {
+  public Command setSpeed(DoubleSupplier speed) {
     return run(
         () -> {
-          System.out.println("It works!?!!");
-          if (clockwise.getAsDouble() > 0.0) m_intakeRight.set(clockwise.getAsDouble());
-          else m_intakeRight.set(counterClockwise.getAsDouble());
+          m_intakeRight.set(speed.getAsDouble());
         });
+  }
+
+  private double currentInterpolation(double current) {
+    double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
+    double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
+    System.out.println(linearInterpolate);
+    return linearInterpolate;
   }
 }

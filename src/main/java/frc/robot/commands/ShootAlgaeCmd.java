@@ -22,74 +22,35 @@ import frc.robot.subsystems.AlgaeIntake.shooting;
  *    * this command is unconfirmed and might be deleted
  * AlgaeDitch :
  *    the algae is shot out of the robot in case of emergency, teleop
- * CoralAuto :
- *    that one time where we quickly drop off the coral in L1 while passing by, auto
- * CoralL1 :
- *    shoots coral in L1, teleop (and auto if needed)
- * CoralL2 :
- *    shoots coral in L2, teleop (and auto if needed)
- * CoralL3 : 
- *    shoots coral in L3, teleop (and auto if needed)
- * CoralL4 :
- *    shoots coral in L4, teleop and auto
  */
 // spotless:on
 
-public class ShootCmd extends Command {
+public class ShootAlgaeCmd extends Command {
 
   // there might be more things to add (like maybe a coral vomit if needed)
-  public enum ShootType {
+  public enum ShootAlgaeType {
     AlgaeProcessor,
     AlgaeNet,
     AlgaeDitch,
-    CoralAuto,
-    CoralL1,
-    CoralL2,
-    CoralL3,
-    CoralL4
   }
 
-  private ShootType currentShootType = null;
+  private ShootAlgaeType currentAlgaeShootType = null;
   private Subsystem currentSubsystem = null;
 
   private boolean isFinished = false;
 
-  public ShootCmd(ShootType type) {
+  public ShootAlgaeCmd(ShootAlgaeType type) {
 
-    currentShootType = type;
+    currentAlgaeShootType = type;
 
     // the lack of break is INTENTIONAL :
     // it is because in 3 cases i want the same result :)
 
-    switch (currentShootType) {
+    switch (currentAlgaeShootType) {
       case AlgaeProcessor:
       case AlgaeDitch:
       case AlgaeNet:
         currentSubsystem = RobotContainer.m_algaeIntake;
-        break;
-
-      case CoralAuto:
-        currentSubsystem = RobotContainer.m_coralClaw;
-        break;
-
-      case CoralL1:
-        currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
-        break;
-
-      case CoralL2:
-        currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
-        break;
-
-      case CoralL3:
-        currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
-        break;
-
-      case CoralL4:
-        currentSubsystem = RobotContainer.m_coralClaw;
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
         break;
 
       default:
@@ -109,39 +70,16 @@ public class ShootCmd extends Command {
      * this method should set the height of the elevator to the desired lvl, with the help of a
      * switch case (refer to IntakeCmd)
      */
-    switch (currentShootType) {
+    switch (currentAlgaeShootType) {
       case AlgaeProcessor:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.PROCESSOR);
+        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.PROCESSOR);
+
         break;
       case AlgaeDitch:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.INTAKE);
+        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.INTAKE);
+
       case AlgaeNet:
-        RobotContainer.m_algaeIntake.shootingSpeed(shooting.NET);
-        break;
-
-      case CoralAuto:
-        /** this should put the wrist angle at shoot position */
-        break;
-
-      case CoralL1:
-        /** this should set the elevator height to the desired height */
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
-        ;
-        break;
-
-      case CoralL2:
-        /** this should set the elevator height to the desired height */
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
-        break;
-
-      case CoralL3:
-        /** this should set the elevator height to the desired height */
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
-        break;
-
-      case CoralL4:
-        /** this should set the elevator height to the desired height */
-        // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
+        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.NET);
         break;
 
       default:

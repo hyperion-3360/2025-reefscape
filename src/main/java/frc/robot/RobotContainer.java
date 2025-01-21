@@ -8,9 +8,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
+import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.IntakeCmd;
 import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
@@ -80,6 +80,8 @@ public class RobotContainer {
   private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
 
+  private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
+
   private final SlewRateLimiter shooterLimiter = new SlewRateLimiter(3);
 
   private final double kJoystickDeadband = 0.1;
@@ -107,15 +109,16 @@ public class RobotContainer {
   }
 
   public void configureBindingsTest() {
-    var driveCmd =
-        new TeleopSwerve(
-            m_swerve,
-            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-            () -> true);
 
-    m_driverController.leftBumper().whileTrue(driveCmd);
+    m_driverController
+        .rightBumper()
+        .whileTrue(
+            new TeleopSwerve(
+                m_swerve,
+                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+                () -> true));
 
     m_driverController
         .a()
@@ -124,14 +127,11 @@ public class RobotContainer {
                 () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-    /**
-     * this is an example of how to assign button :
-     * m_driverController.a().onTrue(ALGAE_INTAKE_AUTO); (so clean i know)
-     */
-    //   m_coDriverController
-    //       .start()
-    //       .and(m_coDriverController.back())
-    //       .onTrue(CLIMBER_GRAB.andThen(CLIMBER_LIFT));
+    m_driverController
+        .start()
+        .and(m_driverController.povCenter())
+        .onTrue(Pathfinding.doPathfinding());
+
     m_driverController
         .a()
         .and(m_driverController.b())
@@ -149,15 +149,19 @@ public class RobotContainer {
     m_driverController
         .y()
         .whileTrue(
-            m_algaeIntake.angle(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            m_algaeIntake.setAngle(
                 () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
     m_driverController
         .povDown()
         .whileTrue(
-            m_algaeIntake.speed(
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            m_algaeIntake.setSpeed(
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
+
+    m_driverController
+        .rightBumper()
+        .whileTrue(
+            m_climber.climberTestMode(
+                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {
@@ -175,6 +179,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return Pathfinding.doPathfinding();
   }
 }
