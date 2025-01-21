@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -124,7 +125,8 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   public boolean isAlgaeIn() {
-    return m_intakeRight.getOutputCurrent() >= Constants.AlgaeIntakeVariables.kCurrentLimit;
+    return currentInterpolation(m_intakeRight.getOutputCurrent())
+        >= Constants.AlgaeIntakeVariables.kCurrentLimit;
   }
 
   public boolean isAtAngle() {
@@ -144,5 +146,12 @@ public class AlgaeIntake extends SubsystemBase {
         () -> {
           m_intakeRight.set(speed.getAsDouble());
         });
+  }
+
+  private double currentInterpolation(double current) {
+    double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
+    double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
+    System.out.println(linearInterpolate);
+    return linearInterpolate;
   }
 }
