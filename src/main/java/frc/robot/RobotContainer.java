@@ -78,6 +78,8 @@ public class RobotContainer {
   private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
 
+  private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
+
   private final double kJoystickDeadband = 0.1;
 
   /***
@@ -142,6 +144,12 @@ public class RobotContainer {
         .whileTrue(
             m_algaeIntake.setSpeed(
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
+
+    m_driverController
+        .rightBumper()
+        .whileTrue(
+            m_climber.climberTestMode(
+                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {
