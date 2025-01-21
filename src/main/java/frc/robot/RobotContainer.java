@@ -144,12 +144,6 @@ public class RobotContainer {
         .whileTrue(
             m_algaeIntake.setSpeed(
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
-    m_driverController
-        .b()
-        .whileTrue(
-            m_coralClaw.clawTestMode(
-                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)));
 
     m_driverController
         .rightBumper()
