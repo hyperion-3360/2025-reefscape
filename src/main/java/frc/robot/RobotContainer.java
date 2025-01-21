@@ -18,6 +18,7 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -31,6 +32,7 @@ public class RobotContainer {
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
 
   // subsystem declarations
+  public static final Shooter m_shooter = new Shooter();
   public static final Vision m_vision = new Vision();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
   public static final Swerve m_swerve = new Swerve(m_vision);
@@ -80,6 +82,8 @@ public class RobotContainer {
 
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
 
+  private final SlewRateLimiter shooterLimiter = new SlewRateLimiter(3);
+
   private final double kJoystickDeadband = 0.1;
 
   /***
@@ -127,6 +131,14 @@ public class RobotContainer {
         .start()
         .and(m_driverController.povCenter())
         .onTrue(Pathfinding.doPathfinding());
+
+    m_driverController
+        .a()
+        .and(m_driverController.b())
+        .whileTrue(
+            m_shooter.manualTest(
+                () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)));
+    m_driverController.x().onTrue(m_shooter.openBlocker()).onFalse(m_shooter.closeBlocker());
 
     m_driverController
         .b()
