@@ -77,10 +77,8 @@ public class Elevator extends SubsystemBase {
       m_leftElevatorMotor.setPosition(0.0);
       m_pid.reset();
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
-    } else {
-      m_rightElevatorMotor.set(
-          m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }
+    
     SmartDashboard.putNumber("Target", m_elevatorTarget);
     SmartDashboard.putData("Elevator pid", m_pid);
     SmartDashboard.putNumber("Right motor encoder",m_rightElevatorMotor.getPosition().getValueAsDouble());
@@ -137,6 +135,14 @@ public class Elevator extends SubsystemBase {
           System.out.println(String.format("%f : %f", up.getAsDouble(), down.getAsDouble()));
           if (up.getAsDouble() > 0.0) m_rightElevatorMotor.set(up.getAsDouble());
           else m_rightElevatorMotor.set(-down.getAsDouble());
+        });
+  }
+
+  public Command Elevate(desiredHeight height) {
+    SetHeight(height);
+    return run( 
+        () -> { m_rightElevatorMotor.set(
+          m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
         });
   }
 }
