@@ -2,6 +2,9 @@ package frc.robot.Auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.path.RotationTarget;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -40,12 +43,18 @@ import java.util.stream.Collectors;
 public class Pathfinding extends Command {
   // #region POI enum logic
   public enum POI {
-    ALGAECORALSTANDS(
+    ALGAE(
+        Constants.AlgaeCoralStand.kStands,
+        () -> Commands.runOnce(() -> System.out.println("Hello Algae")),
+        Constants.Priorities.kIntakeCoral,
+        true,
+        () -> !Constants.Conditions.hasAlgae()),
+    CORAL(
         Constants.AlgaeCoralStand.kStands,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kIntakeCoral,
         true,
-        () -> !Constants.Conditions.hasAlgae() && !Constants.Conditions.hasCoral()),
+        () -> !Constants.Conditions.hasCoral()),
     BRANCHES(
         Constants.Pegs.kPegs,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
@@ -245,14 +254,14 @@ public class Pathfinding extends Command {
 
   enum CustomAuto {
     FIRSTAUTO(POI.FEEDERS, POI.BRANCHES),
-    SECONDAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
-    THIRDAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
-    FOURTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
+    SECONDAUTO(POI.CORAL, POI.BRANCHES),
+    THIRDAUTO(POI.CORAL, POI.BRANCHES),
+    FOURTHAUTO(POI.CORAL, POI.BRANCHES),
     FIFTHAUTO(POI.PROCESSOR, POI.BRANCHES),
-    SIXTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
-    SEVENTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
-    EIGHTHAUTO(POI.ALGAECORALSTANDS, POI.BRANCHES),
-    NINTHUTO(POI.ALGAECORALSTANDS, POI.BRANCHES);
+    SIXTHAUTO(POI.CORAL, POI.BRANCHES),
+    SEVENTHAUTO(POI.CORAL, POI.BRANCHES),
+    EIGHTHAUTO(POI.CORAL, POI.BRANCHES),
+    NINTHUTO(POI.CORAL, POI.BRANCHES);
 
     private POI[] desiredPOIs;
 
@@ -300,7 +309,7 @@ public class Pathfinding extends Command {
     double actionTime = 0.0;
 
     switch (poi) {
-      case ALGAECORALSTANDS:
+      case CORAL:
         actionTime = Constants.TimeToAction.kIntakeCoral;
         break;
       case BRANCHES:
@@ -316,7 +325,8 @@ public class Pathfinding extends Command {
         break;
       case DUMPINGDOWN:
         break;
-
+      case ALGAE:
+        break;
       default:
         break;
     }
@@ -340,7 +350,8 @@ public class Pathfinding extends Command {
    * @param raw_poi a list of POIs to filter through
    * @return The {@link Pose2d} of the most advantageous point
    */
-  private static Pose2d FilterPOIs(List<POI> raw_poi) {
+  private static List<PathPoint> FilterPOIs(List<POI> raw_poi) {
+    List<PathPoint> path = new ArrayList<>();
     // filters and gets the best POI in the raw_poi list
     POI bestPOI =
         raw_poi.stream()
@@ -351,28 +362,70 @@ public class Pathfinding extends Command {
             .findFirst()
             .get();
 
-    // this is to prevent the recheking of the best POI when trying to get it's event.
+    // this is to prevent the rechecking of the best POI when trying to get it's event.
     Pathfinding.bestPOI = bestPOI;
     if (DriverStation.isTest()) {
       System.out.println("chosen poi " + bestPOI);
     }
 
+    Pose2d optimisedPos = POICoordinatesOptimisation(bestPOI);
+    Pose2d lineupPos = lineupPoint(optimisedPos);
+    // spotless:off
+    // TODO change the RotationTarget's param to match what we want because I'm not sure what the waypoint does
+    // spotless:on
+    path.add(
+        new PathPoint(
+            lineupPos.getTranslation(),
+            new RotationTarget(lineupPos.getTranslation().getNorm(), lineupPos.getRotation())));
+    path.add(
+        new PathPoint(
+            optimisedPos.getTranslation(),
+            new RotationTarget(
+                optimisedPos.getTranslation().getNorm(), optimisedPos.getRotation())));
+
     // uses the coordinates and angle of the first point
-    return robotSizeRecoil(bestPOI);
+    return path;
   }
 
-  private static Pose2d robotSizeRecoil(POI poiToPathfind) {
+  private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
+
     double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
     double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
     double robotHyp = Math.hypot(robotLengthPlusBuffer, robotWidthPlusBuffer);
+    Rotation2d rotation = poiToPathfind.getAngle();
 
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
         new Translation2d(
-            poiToPathfind.getCoordinates().getX() + robotHyp * poiToPathfind.getAngle().getSin(),
-            poiToPathfind.getCoordinates().getY() + poiToPathfind.getAngle().getCos() * robotHyp);
+            poiToPathfind.getCoordinates().getX() + robotHyp * poiToPathfind.getAngle().getCos(),
+            poiToPathfind.getCoordinates().getY() + poiToPathfind.getAngle().getSin() * robotHyp);
 
-    return new Pose2d(widthToBacktrack, poiToPathfind.getAngle());
+    // TODO make this code more modular for the future
+    if (poiToPathfind.equals(POI.ALGAE) || poiToPathfind.equals(POI.CORAL)) {
+      // sets the rotation to the orientation of the vector robot  -> pose2D
+      rotation =
+          (RobotContainer.m_swerve.getRotation2d().getDegrees() <= 180)
+              ? new Rotation2d(
+                  180
+                      - Math.atan(
+                          poiToPathfind.getCoordinates().getX()
+                              / poiToPathfind.getCoordinates().getY()))
+              : new Rotation2d(
+                  180
+                      + Math.atan(
+                          poiToPathfind.getCoordinates().getX()
+                              / poiToPathfind.getCoordinates().getY()));
+    }
+
+    return new Pose2d(widthToBacktrack, rotation);
+  }
+
+  public static Pose2d lineupPoint(Pose2d poiToLineup) {
+
+    return new Pose2d(
+        poiToLineup.getTranslation().getX() + 0.1 * poiToLineup.getRotation().getCos(),
+        poiToLineup.getTranslation().getY() + 0.1 * poiToLineup.getRotation().getSin(),
+        poiToLineup.getRotation());
   }
 
   // #region Pathfinding Shuffleboard implementation
@@ -507,7 +560,8 @@ public class Pathfinding extends Command {
       poiList.add(poiArrayElement);
     }
 
-    return AutoBuilder.pathfindToPose(FilterPOIs(poiList), constraints)
+    return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathPoints(FilterPOIs(poiList), constraints, null), constraints)
         .andThen(bestPOI.getEvent())
         .repeatedly()
         .until(() -> DriverStation.isTeleop());
