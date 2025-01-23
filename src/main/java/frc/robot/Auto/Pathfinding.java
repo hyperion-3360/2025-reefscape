@@ -1,6 +1,7 @@
 package frc.robot.Auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
@@ -269,13 +270,8 @@ public class Pathfinding extends Command {
       this.desiredPOIs = poi;
     }
 
-    public List<POI> getPOIs() {
-      // clears the old POI list to accept new ones
-      poiList.clear();
-      for (POI poi : desiredPOIs) {
-        poiList.add(poi);
-      }
-      return poiList;
+    public POI[] getPOIs() {
+      return this.desiredPOIs;
     }
   }
 
@@ -356,12 +352,11 @@ public class Pathfinding extends Command {
     POI bestPOI =
         raw_poi.stream()
             // removes the POI we are already at
-            .filter(poiHead -> !Pathfinding.bestPOI.equals(poiHead))
+            .filter(poiHead -> Pathfinding.bestPOI != poiHead)
             .filter(poiToCheck -> poiToCheck.getConditionStatus() == true)
             .sorted((p1, p2) -> POIValue(p2).compareTo(POIValue(p1)))
             .findFirst()
             .get();
-
     // this is to prevent the rechecking of the best POI when trying to get it's event.
     Pathfinding.bestPOI = bestPOI;
     if (DriverStation.isTest()) {
@@ -452,12 +447,18 @@ public class Pathfinding extends Command {
   }
 
   private static void createWidgetList(CustomAuto auto) {
-
     autoChooser.addOption(
         auto.toString(), // gives the name
         // converts the POIs array into a list
         poiList.stream()
-            .filter((poi) -> auto.getPOIs().contains(poi)) // removes irrelevant POIs
+            .filter(
+                // removes irrelevant POIs
+                (poi) -> {
+                  for (int i = 0; i < auto.getPOIs().length; i++) {
+                    if (poi.equals(auto.getPOIs()[i])) return true;
+                  }
+                  return false;
+                })
             .collect(Collectors.toList()));
   }
 
@@ -561,7 +562,9 @@ public class Pathfinding extends Command {
     }
 
     return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathPoints(FilterPOIs(poiList), constraints, null), constraints)
+            PathPlannerPath.fromPathPoints(
+                FilterPOIs(poiList), constraints, new GoalEndState(0, bestPOI.getAngle())),
+            constraints)
         .andThen(bestPOI.getEvent())
         .repeatedly()
         .until(() -> DriverStation.isTeleop());
