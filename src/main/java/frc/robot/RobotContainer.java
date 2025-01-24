@@ -158,7 +158,7 @@ public class RobotContainer {
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
 
     m_driverController
-        .rightBumper()
+        .leftBumper()
         .whileTrue(
             m_climber.climberTestMode(
                 () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
