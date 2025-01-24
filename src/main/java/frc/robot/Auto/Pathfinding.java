@@ -280,6 +280,7 @@ public class Pathfinding extends Command {
   private static SendableChooser<POI> POIAdder = new SendableChooser<>();
   private static SendableChooser<POI> POIRemover = new SendableChooser<>();
   private static String tabName = "Auto";
+  private static List<PathPoint> path = new ArrayList<>();
   // private static ShuffleboardLayout autoLayout =
   //  Shuffleboard.getTab(tabName).getLayout("AutoChooser", BuiltInLayouts.kList);
   private static String chosenPath = "";
@@ -291,6 +292,7 @@ public class Pathfinding extends Command {
   private static POI bestPOI;
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+  private static int index = 0;
 
   // #endregion
 
@@ -346,40 +348,72 @@ public class Pathfinding extends Command {
    * @param raw_poi a list of POIs to filter through
    * @return The {@link Pose2d} of the most advantageous point
    */
-  private static List<PathPoint> FilterPOIs(List<POI> raw_poi) {
-    List<PathPoint> path = new ArrayList<>();
-    // filters and gets the best POI in the raw_poi list
-    POI bestPOI =
+  private static List<PathPoint> convertToPathPoints(List<POI> raw_poi) {
+    // if we already have a list don't make a new one`
+    if (!path.isEmpty() && path.size() >= 1) {
+      path.remove(0);
+      path.remove(1);
+      return path.subList(0, 1);
+    }
+
+    path.clear();
+    List<POI> bestPOICombinaison = new ArrayList<>();
+    List<POI> POIsToRetain = new ArrayList<>();
+    // adds the first POI to make comparisons
+    bestPOICombinaison.add(
         raw_poi.stream()
             // removes the POI we are already at
             .filter(poiHead -> Pathfinding.bestPOI != poiHead)
             .filter(poiToCheck -> poiToCheck.getConditionStatus() == true)
             .sorted((p1, p2) -> POIValue(p2).compareTo(POIValue(p1)))
             .findFirst()
-            .get();
-    // this is to prevent the rechecking of the best POI when trying to get it's event.
-    Pathfinding.bestPOI = bestPOI;
-    if (DriverStation.isTest()) {
-      System.out.println("chosen poi " + bestPOI);
-    }
+            .get());
 
-    Pose2d optimisedPos = POICoordinatesOptimisation(bestPOI);
-    Pose2d lineupPos = lineupPoint(optimisedPos);
-    // spotless:off
+    // gets the next two pois to add to the list
+    for (index = 1; index < 2; index++) {
+      bestPOICombinaison.addAll(
+          raw_poi.stream()
+              // removes the POI we are already at
+              .filter(poiHead -> bestPOICombinaison.get(index - 1) != poiHead)
+              .filter(poiToCheck -> poiToCheck.getConditionStatus() == true)
+              .sorted(
+                  (p1, p2) -> {
+                    if (POIValue(bestPOICombinaison.get(index - 1)) + POIValue(p2)
+                        >= POIValue(bestPOICombinaison.get(index - 1)) + (POIValue(p1))) {
+                      POIsToRetain.add(p2);
+                      return 1;
+                    }
+                    return 0;
+                  })
+              .collect(Collectors.toList()));
+      // retains only the pois we want
+      bestPOICombinaison.retainAll(POIsToRetain);
+    }
+    // filters and gets the best POI in the raw_poi list
+    if (DriverStation.isTest()) {
+      bestPOICombinaison.forEach(
+          (printedPOI) -> System.out.println("chosen poi is " + printedPOI.toString()));
+    }
+    bestPOICombinaison.forEach(
+        (poiToTransform) -> {
+          Pose2d optimisedPos = POICoordinatesOptimisation(poiToTransform);
+          Pose2d lineupPos = lineupPoint(optimisedPos);
+          // spotless:off
     // TODO change the RotationTarget's param to match what we want because I'm not sure what the waypoint does
     // spotless:on
-    path.add(
-        new PathPoint(
-            lineupPos.getTranslation(),
-            new RotationTarget(lineupPos.getTranslation().getNorm(), lineupPos.getRotation())));
-    path.add(
-        new PathPoint(
-            optimisedPos.getTranslation(),
-            new RotationTarget(
-                optimisedPos.getTranslation().getNorm(), optimisedPos.getRotation())));
-
+          path.add(
+              new PathPoint(
+                  lineupPos.getTranslation(),
+                  new RotationTarget(
+                      lineupPos.getTranslation().getNorm(), lineupPos.getRotation())));
+          path.add(
+              new PathPoint(
+                  optimisedPos.getTranslation(),
+                  new RotationTarget(
+                      optimisedPos.getTranslation().getNorm(), optimisedPos.getRotation())));
+        });
     // uses the coordinates and angle of the first point
-    return path;
+    return path.subList(0, 1);
   }
 
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
@@ -388,12 +422,11 @@ public class Pathfinding extends Command {
     double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
     double robotHyp = Math.hypot(robotLengthPlusBuffer, robotWidthPlusBuffer);
     Rotation2d rotation = poiToPathfind.getAngle();
-
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
         new Translation2d(
-            poiToPathfind.getCoordinates().getX() + robotHyp * poiToPathfind.getAngle().getCos(),
-            poiToPathfind.getCoordinates().getY() + poiToPathfind.getAngle().getSin() * robotHyp);
+            poiToPathfind.getCoordinates().getX() - (robotHyp * poiToPathfind.getAngle().getCos()),
+            poiToPathfind.getCoordinates().getY() - (poiToPathfind.getAngle().getSin() * robotHyp));
 
     // TODO make this code more modular for the future
     if (poiToPathfind.equals(POI.ALGAE) || poiToPathfind.equals(POI.CORAL)) {
@@ -563,7 +596,7 @@ public class Pathfinding extends Command {
 
     return AutoBuilder.pathfindThenFollowPath(
             PathPlannerPath.fromPathPoints(
-                FilterPOIs(poiList), constraints, new GoalEndState(0, bestPOI.getAngle())),
+                convertToPathPoints(poiList), constraints, new GoalEndState(0, bestPOI.getAngle())),
             constraints)
         .andThen(bestPOI.getEvent())
         .repeatedly()
