@@ -63,7 +63,7 @@ public class Swerve extends SubsystemBase {
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            Constants.Swerve.swerveKinematics, getHeading(), positions, getPose());
+            Constants.Swerve.swerveKinematics, getHeading(), positions, new Pose2d());
   }
 
   public void drive(
@@ -208,28 +208,52 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_debug) {
-      smartdashboardDebug();
-    }
+    
 
-    m_gyro.getRotation2d();
+    
     // updates the odometry positon
     // var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
     // m_field2d.setRobotPose(m_odometryPose);
 
     var visionEst = vision.getEstimatedGlobalPose();
+    // if vision estimation is present, create method est to add vision measurment to 
+    // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
     visionEst.ifPresent(
-        est -> {
-          var estStdDevs = vision.getEstimationStdDevs();
+      est -> {
+        var estStdDevs = vision.getEstimationStdDevs();
+        poseEstimator.addVisionMeasurement(
+          est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs
+        );
 
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
+        // debugging to see if it goes thru
+        System.out.println("hello");
+      }
+    );
 
-    var m_odometryPose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
-    m_field2d.setRobotPose(m_odometryPose);
-    SmartDashboard.putData("field", m_field2d);
+    var currentpose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
+
+    m_field2d.setRobotPose(currentpose);
+
+    if (m_debug) {
+      // smartdashboardDebug();
+      for (SwerveModule mod : mSwerveMods) {
+        SmartDashboard.putNumber(
+            "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
+        SmartDashboard.putNumber(
+            "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+        SmartDashboard.putNumber(
+            "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+      }
+  
+      SmartDashboard.putNumber("currentpsoe X", currentpose.getX());
+      SmartDashboard.putNumber("pose estimate X", poseEstimator.getEstimatedPosition().getX());
+      SmartDashboard.putString("est global pose", vision.getEstimatedGlobalPose().toString());
+      SmartDashboard.putBoolean(
+          "est global pose present?", vision.getEstimatedGlobalPose().isPresent());
+    }
+
+    // System.out.println("current pose x = " + currentpose.getX() + " current pose y = " + currentpose.getY());
   }
 
   public Command resetOdometryBlueSide() {
@@ -262,23 +286,5 @@ public class Swerve extends SubsystemBase {
 
   public Command runDriveDynamTest(SysIdRoutine.Direction direction) {
     return m_driveSysIdRoutine.dynamic(direction);
-  }
-
-  private void smartdashboardDebug() {
-
-    for (SwerveModule mod : mSwerveMods) {
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-    }
-
-    SmartDashboard.putNumber("pose estimate X", poseEstimator.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("pose estimate Y", poseEstimator.getEstimatedPosition().getY());
-    SmartDashboard.putString("est global pose", vision.getEstimatedGlobalPose().toString());
-    SmartDashboard.putBoolean(
-        "est global pose present?", vision.getEstimatedGlobalPose().isPresent());
   }
 }
