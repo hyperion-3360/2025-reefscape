@@ -36,7 +36,7 @@ public class AlgaeIntake extends SubsystemBase {
     STORED // this is resting speed or 0
   }
 
-  private static final double kP = 0.0;
+  private static final double kP = 0.1;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
@@ -77,6 +77,7 @@ public class AlgaeIntake extends SubsystemBase {
   public void periodic() {
     if (DriverStation.isDisabled()) {
       m_pid.reset();
+      m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
     }
 
     SmartDashboard.putNumber("Current", m_intakeRight.getOutputCurrent());
@@ -153,5 +154,21 @@ public class AlgaeIntake extends SubsystemBase {
     double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
     System.out.println(linearInterpolate);
     return linearInterpolate;
+  }
+
+  public Command pivotAlgae(elevation angle) {
+    setShootingAngle(angle);
+    return run(
+        () -> {
+          m_pivotMotor.set(m_pid.calculate(m_directionEncoder.getPosition(), m_AnglesTarget));
+        });
+  }
+
+  public Command shootAlgae(shooting speed) {
+    setShootingSpeed(speed);
+    return run(
+        () -> {
+          m_intakeRight.set(m_SpeedTarget);
+        });
   }
 }

@@ -208,28 +208,24 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
 
-    
     // updates the odometry positon
     // var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
     // m_field2d.setRobotPose(m_odometryPose);
 
     var visionEst = vision.getEstimatedGlobalPose();
-    // if vision estimation is present, create method est to add vision measurment to 
+    // if vision estimation is present, create method est to add vision measurment to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
     visionEst.ifPresent(
-      est -> {
-        var estStdDevs = vision.getEstimationStdDevs();
-        poseEstimator.addVisionMeasurement(
-          est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs
-        );
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevs();
+          poseEstimator.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
 
-        // debugging to see if it goes thru
-        System.out.println("hello");
-      }
-    );
+          // debugging to see if it goes thru
+          System.out.println("hello");
+        });
 
     var currentpose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
@@ -245,7 +241,7 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber(
             "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
       }
-  
+
       SmartDashboard.putNumber("currentpsoe X", currentpose.getX());
       SmartDashboard.putNumber("pose estimate X", poseEstimator.getEstimatedPosition().getX());
       SmartDashboard.putString("est global pose", vision.getEstimatedGlobalPose().toString());
@@ -253,7 +249,8 @@ public class Swerve extends SubsystemBase {
           "est global pose present?", vision.getEstimatedGlobalPose().isPresent());
     }
 
-    // System.out.println("current pose x = " + currentpose.getX() + " current pose y = " + currentpose.getY());
+    // System.out.println("current pose x = " + currentpose.getX() + " current pose y = " +
+    // currentpose.getY());
   }
 
   public Command resetOdometryBlueSide() {

@@ -41,7 +41,7 @@ public class Vision {
     camera = new PhotonCamera("lml3");
     photonEstimator =
         new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
-    photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);  
+    photonEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
