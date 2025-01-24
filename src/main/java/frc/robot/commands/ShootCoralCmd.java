@@ -6,8 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.Shooter;
 
 // spotless:off
 /**
@@ -46,48 +45,42 @@ public class ShootCoralCmd extends Command {
   }
 
   private ShootCoralType currentCoralShootType = null;
-  private Subsystem currentSubsystem = null;
+  private Shooter m_shooter = null;
 
   private boolean isFinished = false;
 
-  public ShootCoralCmd(ShootCoralType type) {
+  public ShootCoralCmd(ShootCoralType type, Shooter theShooter) {
 
     currentCoralShootType = type;
-
+    m_shooter = theShooter;
     // the lack of break is INTENTIONAL :
     // it is because in 3 cases i want the same result :)
 
     switch (currentCoralShootType) {
       case CoralAuto:
-        currentSubsystem = RobotContainer.m_coralClaw;
         break;
 
       case CoralL1:
-        currentSubsystem = RobotContainer.m_coralClaw;
         // RobotContainer.m_elevator.SetHeight(desiredHeight.L1);
         break;
 
       case CoralL2:
-        currentSubsystem = RobotContainer.m_coralClaw;
         // RobotContainer.m_elevator.SetHeight(desiredHeight.L2);
         break;
 
       case CoralL3:
-        currentSubsystem = RobotContainer.m_coralClaw;
         // RobotContainer.m_elevator.SetHeight(desiredHeight.L3);
         break;
 
       case CoralL4:
-        currentSubsystem = RobotContainer.m_coralClaw;
         // RobotContainer.m_elevator.SetHeight(desiredHeight.L4);
         break;
 
       default:
-        currentSubsystem = null;
         break;
     }
 
-    addRequirements(currentSubsystem);
+    addRequirements(m_shooter);
     // addRequirements(RobotContainer.m_elevator);
   }
 

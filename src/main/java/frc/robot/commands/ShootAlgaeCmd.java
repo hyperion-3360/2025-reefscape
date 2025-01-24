@@ -6,8 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.shooting;
 
 // spotless:off
@@ -35,30 +34,15 @@ public class ShootAlgaeCmd extends Command {
   }
 
   private ShootAlgaeType currentAlgaeShootType = null;
-  private Subsystem currentSubsystem = null;
+  private AlgaeIntake m_algaeSystem = null;
 
   private boolean isFinished = false;
 
-  public ShootAlgaeCmd(ShootAlgaeType type) {
+  public ShootAlgaeCmd(ShootAlgaeType type, AlgaeIntake subsystem) {
 
     currentAlgaeShootType = type;
-
-    // the lack of break is INTENTIONAL :
-    // it is because in 3 cases i want the same result :)
-
-    switch (currentAlgaeShootType) {
-      case AlgaeProcessor:
-      case AlgaeDitch:
-      case AlgaeNet:
-        currentSubsystem = RobotContainer.m_algaeIntake;
-        break;
-
-      default:
-        currentSubsystem = null;
-        break;
-    }
-
-    addRequirements(currentSubsystem);
+    m_algaeSystem = subsystem;
+    addRequirements(subsystem);
     // addRequirements(RobotContainer.m_elevator);
   }
 
@@ -72,14 +56,14 @@ public class ShootAlgaeCmd extends Command {
      */
     switch (currentAlgaeShootType) {
       case AlgaeProcessor:
-        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.PROCESSOR);
+        m_algaeSystem.setShootingSpeed(shooting.PROCESSOR);
 
         break;
       case AlgaeDitch:
-        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.INTAKE);
+        m_algaeSystem.setShootingSpeed(shooting.INTAKE);
 
       case AlgaeNet:
-        RobotContainer.m_algaeIntake.setShootingSpeed(shooting.NET);
+        m_algaeSystem.setShootingSpeed(shooting.NET);
         break;
 
       default:
