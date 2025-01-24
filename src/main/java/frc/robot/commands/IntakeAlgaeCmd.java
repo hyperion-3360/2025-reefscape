@@ -18,20 +18,14 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
 
   public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation shootingAngle) {
     addCommands(
-        Commands.runOnce(
-                () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake)
-            .andThen(new WaitUntilCommand(() -> m_algaeIntake.isAlgaeIn()))
-            .andThen(
-                Commands.runOnce(
-                    () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING),
-                    m_algaeIntake))
-            .andThen(
-                Commands.runOnce(
-                    () -> m_algaeIntake.setShootingAngle(shootingAngle), m_algaeIntake))
-            .andThen(new WaitUntilCommand(() -> m_algaeIntake.isAtAngle()))
-            .andThen(
-                Commands.runOnce(
-                    () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED),
-                    m_algaeIntake)));
+        Commands.run(
+            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
+        new WaitUntilCommand(() -> m_algaeIntake.isAlgaeIn()),
+        Commands.run(
+            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
+        Commands.run(() -> m_algaeIntake.setShootingAngle(shootingAngle), m_algaeIntake),
+        new WaitUntilCommand(() -> m_algaeIntake.isAtAngle()),
+        Commands.run(
+            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake));
   }
 }
