@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.commands.IntakeCmd;
-import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
@@ -46,7 +44,7 @@ public class RobotContainer {
   public static final Patterns m_patterns = new Patterns();
 
   // command declarations
-  public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
+  //   public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
   // public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
   // public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
   // // TODO implement coral feeder in IntakeCmd because this crashes sim and is not supported in
@@ -106,25 +104,28 @@ public class RobotContainer {
   public RobotContainer() {
 
     Auto.initAutoWidget();
+    m_leds.setDefaultCommand(
+        m_leds.setGradientPattern(
+            new Color8Bit(Color.kOrange), new Color8Bit(Color.kDarkOrange), 50, 3, 2));
 
-    m_swerve.resetModulesToAbsolute();
+    // m_swerve.resetModulesToAbsolute();
   }
 
   public void configureBindingsTest() {
 
     m_leds.setDefaultCommand(
         m_leds.setGradientPattern(
-            new Color8Bit(Color.kOrange), new Color8Bit(Color.kDarkOrange), 50, 3, 2));
+            new Color8Bit(10, 250, 0), new Color8Bit(5, 125, 0), 100, 0.5, 2));
 
-    m_driverController
-        .rightBumper()
-        .whileTrue(
-            new TeleopSwerve(
-                m_swerve,
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-                () -> true));
+    // m_driverController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new TeleopSwerve(
+    //             m_swerve,
+    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+    //             () -> true));
 
     m_driverController
         .a()

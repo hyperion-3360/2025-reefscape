@@ -36,7 +36,7 @@ public class LEDs extends SubsystemBase {
   @Override
   public void periodic() {
 
-    ExecLedState(m_currentState);
+    // ExecLedState(m_currentState);
     // Rainbow();
     // Orange();
     // Move();
@@ -179,9 +179,9 @@ public class LEDs extends SubsystemBase {
    * @param sharpness the sharpness of the sine wave
    */
   private void LEDSinWave(
-      Color8Bit color1, Color8Bit color2, int brightness, int frequency, int sharpness) {
+      Color8Bit color1, Color8Bit color2, int brightness, double frequency, int sharpness) {
     zeroPos += 0.03;
-    int multiplier = MathUtil.clamp(brightness, 0, 1);
+    int multiplier = MathUtil.clamp(brightness, 0, 100);
     for (int i = 0; i < ledBuffer.getLength(); i++) {
 
       double pctDownStrip = (double) i / ledBuffer.getLength() * 4;
@@ -198,12 +198,12 @@ public class LEDs extends SubsystemBase {
       // mixes the two colors using the sine wave value and sets their values
       int lerpedColor =
           Color.lerpRGB(
-              MathUtil.clamp(color1.red * multiplier, 0, 255),
-              MathUtil.clamp(color1.green * multiplier, 0, 255),
-              MathUtil.clamp(color1.blue * multiplier, 0, 255),
-              MathUtil.clamp(color2.red * multiplier, 0, 255),
-              MathUtil.clamp(color2.green * multiplier, 0, 255),
-              MathUtil.clamp(color2.blue * multiplier, 0, 255),
+              MathUtil.clamp(color1.red * multiplier, 0, 100000),
+              MathUtil.clamp(color1.green * multiplier, 0, 100000),
+              MathUtil.clamp(color1.blue * multiplier, 0, 100000),
+              MathUtil.clamp(color2.red * multiplier, 0, 100000),
+              MathUtil.clamp(color2.green * multiplier, 0, 100000),
+              MathUtil.clamp(color2.blue * multiplier, 0, 100000),
               colorBump);
 
       int redColor = Color.unpackRGB(lerpedColor, RGBChannel.kRed);
@@ -226,7 +226,7 @@ public class LEDs extends SubsystemBase {
    * @param sharpness the sharpness of the sine wave
    */
   public Command setGradientPattern(
-      Color8Bit color1, Color8Bit color2, int brightness, int frequency, int sharpness) {
+      Color8Bit color1, Color8Bit color2, int brightness, double frequency, int sharpness) {
     return this.run(() -> LEDSinWave(color1, color2, brightness, frequency, sharpness));
   }
 }
