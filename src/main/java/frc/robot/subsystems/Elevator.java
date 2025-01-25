@@ -78,6 +78,10 @@ public class Elevator extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       m_pid.reset();
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
+    } else {
+      m_rightElevatorMotor.set(
+              m_pid.calculate(
+                  m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }
 
     SmartDashboard.putNumber("Target", m_elevatorTarget);
@@ -145,12 +149,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command Elevate(desiredHeight height) {
-    SetHeight(height);
     return run(
         () -> {
-          m_rightElevatorMotor.set(
-              m_pid.calculate(
-                  m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
-        });
+          SetHeight(height);});
   }
 }

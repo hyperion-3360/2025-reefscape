@@ -348,7 +348,7 @@ public final class Constants {
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
     public static final double kElevatorDown =
-        1.0; // for some reason 0.0 no work          // MAX 37 MOTOR TURNS
+        0.0; // for some reason 0.0 no work          // MAX 37 MOTOR TURNS
     public static final double kElevatorL1 = 10.0;
     public static final double kElevatorL2 = 15.0;
     public static final double kElevatorL3 = 20.0;

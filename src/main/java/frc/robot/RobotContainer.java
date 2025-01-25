@@ -108,11 +108,17 @@ public class RobotContainer {
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
     m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.L2));
+
     m_driverController
         .x()
         .and(m_driverController.a())
         .onTrue(m_elevator.Elevate(desiredHeight.LOW));
-    m_driverController.x().and(m_driverController.y()).onTrue(m_elevator.Elevate(desiredHeight.L1));
+
+    m_driverController
+        .x()
+        .and(m_driverController.y())
+        .onTrue(m_elevator.Elevate(desiredHeight.L1));
+
     m_driverController
         .x()
         .and(m_driverController.b())
