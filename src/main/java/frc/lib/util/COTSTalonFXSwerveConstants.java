@@ -48,7 +48,6 @@ public class COTSTalonFXSwerveConstants {
         double wheelDiameter = Units.inchesToMeters(4.0);
 
         /** (396 / 35) : 1 */
-        // TODO: change gear ratio
         double angleGearRatio = ((396.0 / 35.0) / 1.0);
 
         double angleKP = 1.0;

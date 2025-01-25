@@ -11,12 +11,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.commands.IntakeCmd;
-import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.CoralClaw;
+// import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
@@ -36,33 +34,14 @@ public class RobotContainer {
   public static final Vision m_vision = new Vision();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
   public static final Swerve m_swerve = new Swerve(m_vision);
-  public static final CoralClaw m_coralClaw = new CoralClaw();
+  // public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
   public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
 
-  // command declarations
-  public static final IntakeCmd CORAL_INTAKE_AUTO = new IntakeCmd(IntakeType.CoralAuto);
-  // public static final IntakeCmd ALGAE_INTAKE_AUTO = new IntakeCmd(IntakeType.AlgaeAuto);
-  // public static final IntakeCmd ALGAE_INTAKE_GROUND = new IntakeCmd(IntakeType.AlgaeGround);
-  // // TODO implement coral feeder in IntakeCmd because this crashes sim and is not supported in
-  // // switch case
-  // // public static final IntakeCmd CORAL_INTAKE_FEEDER = new IntakeCmd(IntakeType.CoralFeeder);
-  // public static final ShootCmd CORAL_SHOOT_L1 = new ShootCmd(ShootType.CoralL1);
-  // public static final ShootCmd CORAL_SHOOT_L2 = new ShootCmd(ShootType.CoralL2);
-  // public static final ShootCmd CORAL_SHOOT_L3 = new ShootCmd(ShootType.CoralL3);
-  // public static final ShootCmd CORAL_SHOOT_L4 = new ShootCmd(ShootType.CoralL4);
-  // public static final ShootCmd CORAL_SHOOT_AUTO = new ShootCmd(ShootType.CoralAuto);
-  // public static final ShootCmd ALGAE_SHOOT_DITCH = new ShootCmd(ShootType.AlgaeDitch);
-  // public static final ShootCmd ALGAE_SHOOT_NET = new ShootCmd(ShootType.AlgaeNet);
-  // public static final ShootCmd ALGAE_SHOOT_PROCESSOR = new ShootCmd(ShootType.AlgaeProcessor);
-  // public static final ClimberCmd CLIMBER_GRAB = new ClimberCmd(ClimberType.CLIMBERGRAB,
-  // m_climber);
-  // public static final ClimberCmd CLIMBER_LIFT = new ClimberCmd(ClimberType.CLIMBERLIFT,
-  // m_climber);
-
+  // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
@@ -77,8 +56,8 @@ public class RobotContainer {
   private final SlewRateLimiter elevatorUpLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter elevatorDownLimiter = new SlewRateLimiter(3);
 
-  private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
+  // private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
+  // private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
 
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
 
@@ -137,25 +116,30 @@ public class RobotContainer {
         .and(m_driverController.b())
         .whileTrue(
             m_shooter.manualTest(
-                () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)));
+                () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
+        .onFalse(m_shooter.manualTest(() -> 0.0));
     m_driverController.x().onTrue(m_shooter.openBlocker()).onFalse(m_shooter.closeBlocker());
 
-    m_driverController
+    /*m_driverController
         .b()
         .whileTrue(
             m_coralClaw.clawTestMode(
                 () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)));
+            () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)))
+    .onFalse(m_coralClaw.clawTestMode(() -> 0.0, () -> 0.0));
+    */
     m_driverController
         .y()
         .whileTrue(
             m_algaeIntake.setAngle(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)));
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
+        .onFalse(m_algaeIntake.setAngle(() -> 0.0));
     m_driverController
         .povDown()
         .whileTrue(
             m_algaeIntake.setSpeed(
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)));
+                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
+        .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
 
     m_driverController
         .leftBumper()

@@ -110,7 +110,6 @@ public final class Constants {
     public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
 
     /* Module Specific Constants */
-    // TODO: update with real motor information once robot is built
 
     /* Front Left Module - Module 0 */
     public static final class Mod0 {
