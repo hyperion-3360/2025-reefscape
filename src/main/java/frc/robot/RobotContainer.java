@@ -11,13 +11,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.commands.IntakeCmd;
-import frc.robot.commands.IntakeCmd.IntakeType;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.CoralClaw;
+// import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -91,15 +90,15 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
 
-    m_driverController
-        .rightBumper()
-        .whileTrue(
-            new TeleopSwerve(
-                m_swerve,
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-                () -> true));
+    // m_driverController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new TeleopSwerve(
+    //             m_swerve,
+    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+    //             () -> true));
 
     m_driverController
         .a()
@@ -107,6 +106,9 @@ public class RobotContainer {
             m_elevator.manualTest(
                 () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
                 () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+
+    m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.PROCESSOR));
+    m_driverController.x().onTrue(m_elevator.Elevate(desiredHeight.LOW));
 
     m_driverController
         .start()
@@ -130,12 +132,6 @@ public class RobotContainer {
             () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)))
     .onFalse(m_coralClaw.clawTestMode(() -> 0.0, () -> 0.0));
     */
-    m_driverController
-        .b()
-        .whileTrue(
-            m_coralClaw.clawTestMode(
-                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)));
     m_driverController
         .y()
         .whileTrue(
