@@ -1,46 +1,232 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.leds;
 
-import static edu.wpi.first.units.Units.Percent;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color.RGBChannel;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
 
-  AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
-  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
-
-  /** This variable should be able to be changed in smart dashboard */
-  double brightnessPercent = 0.0;
-
-  public LEDs() {
-    m_led.setLength(m_ledBuffer.getLength());
-    m_led.setData(m_ledBuffer);
-    m_led.start();
-    SmartDashboard.putNumber("LED Brightness (%)", brightnessPercent);
+  public enum LEDState {
+    Orange,
+    Rainbow,
+    Green,
+    Off
   }
 
-  // spotless:off
-  /** Sets a non-moving pattern to the LEDs 
-   * (could potentially be remade to work with moving patterns) 
-   */
-  // spotless:on
-  public void setStillPattern(LEDPattern pattern) {
-    pattern
-        .atBrightness(Percent.of(SmartDashboard.getNumber(getName(), brightnessPercent)))
-        .applyTo(m_ledBuffer);
+  AddressableLED ledStrip = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
+  AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
+
+  private int m_rainbowFirstPixelHue = 0;
+  double zeroPos = 0;
+  private int firstPos = 0;
+  private LEDState m_currentState = LEDState.Off;
+
+  public LEDs() {
+    ledStrip.setLength(ledBuffer.getLength());
+    ledStrip.setData(ledBuffer);
+    ledStrip.start();
   }
 
   @Override
   public void periodic() {
-    m_led.setData(m_ledBuffer);
+
+    ExecLedState(m_currentState);
+    // Rainbow();
+    // Orange();
+    // Move();
+    // OrangeOnOff();
+    ledStrip.setData(ledBuffer);
+  }
+
+  private void ExecLedState(LEDState ledState) {
+    switch (ledState) {
+      case Orange:
+        OrangeOnOff();
+        break;
+
+      case Green:
+        greenOnOff();
+        break;
+
+      case Rainbow:
+        Rainbow();
+        break;
+
+      case Off:
+        TurnOff();
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  public Command SetLedState(LEDState state) {
+    return this.run(() -> m_currentState = state);
+  }
+
+  private void TurnOff() {
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, 0, 0, 0);
+    }
+  }
+
+  private void Rainbow() {
+
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+      final int hue = (m_rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
+      ledBuffer.setHSV(i, hue, 255, 128);
+    }
+    m_rainbowFirstPixelHue += 5;
+    m_rainbowFirstPixelHue %= 180;
+  }
+
+  private void Orange() {
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+      if (i % 5 == 0) {
+        i += 5;
+      }
+      ledBuffer.setRGB(i, 255, 35, 0);
+    }
+
+    ledStrip.setData(ledBuffer);
+  }
+
+  private void Move() {
+    int prevPos = firstPos;
+
+    ledBuffer.setRGB(prevPos, 0, 0, 0);
+    firstPos += 1;
+
+    if (firstPos >= ledBuffer.getLength()) {
+      firstPos = 0;
+    }
+
+    ledBuffer.setRGB(firstPos, 255, 0, 0);
+  }
+
+  private void greenOnOff() {
+
+    zeroPos += 0.03;
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+
+      // Create a "bumpy" waveform that shifts down the strip over time
+      // Output range shoudl be [0,1]
+      double pctDownStrip = (double) i / ledBuffer.getLength();
+      double numCyclesOnStrip =
+          (double) ledBuffer.getLength() / (double) ledBuffer.getLength() / 2.0;
+      double colorBump =
+          Math.sin(2 * Math.PI * numCyclesOnStrip * (pctDownStrip - zeroPos)) * 0.5 + 0.5;
+
+      // Square the value so that the edge is sharper.
+      colorBump *= colorBump;
+
+      // Scale to LED units
+      colorBump *= 30;
+
+      // Set the pixel color
+      ledBuffer.setRGB(
+          i,
+          (int) colorBump, // Red
+          (int) colorBump, // Green
+          0); // Blue
+    }
+  }
+
+  private void OrangeOnOff() {
+
+    zeroPos += 0.03;
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+
+      // Create a "bumpy" waveform that shifts down the strip over time
+      // Output range shoudl be [0,1]
+      double pctDownStrip = (double) i / ledBuffer.getLength() * 4;
+      double numCyclesOnStrip =
+          (double) ledBuffer.getLength() / (double) ledBuffer.getLength() / 2.0 * 4;
+      double colorBump =
+          Math.sin(Math.PI * numCyclesOnStrip * (pctDownStrip - zeroPos)) * 0.5 + 0.5;
+
+      // Square the value so that the edge is sharper.
+      colorBump *= colorBump;
+
+      // Scale to LED units
+      colorBump *= 30;
+
+      double colorBumpR = colorBump * 8;
+
+      // Set the pixel color
+      ledBuffer.setRGB(
+          i,
+          (int) colorBumpR, // Red
+          (int) colorBump, // Green
+          0); // Blue
+    }
+  }
+
+  /**
+   * creates a sine wave and lerp between the two to mix the colors
+   *
+   * @param color1 the first color to blend with you can make a new color using new Color8Bit
+   * @param color2 the second color to blend with you can make a new color using new Color8Bit
+   * @param brightness in percentage [0, 1]
+   * @param frequency the number of waves the function does per cycle
+   * @param sharpness the sharpness of the sine wave
+   */
+  private void LEDSinWave(
+      Color8Bit color1, Color8Bit color2, int brightness, int frequency, int sharpness) {
+    zeroPos += 0.03;
+    int multiplier = MathUtil.clamp(brightness, 0, 1);
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+
+      double pctDownStrip = (double) i / ledBuffer.getLength() * 4;
+      double numCyclesOnStrip =
+          (double) ledBuffer.getLength() / (double) ledBuffer.getLength() / 2.0 * 4;
+      // this was graphed using desmos so it should be accurate
+      double colorBump =
+          Math.pow(
+              Math.pow(
+                  Math.sin((frequency * 2) * Math.PI * numCyclesOnStrip * (pctDownStrip - zeroPos)),
+                  2),
+              sharpness);
+
+      // mixes the two colors using the sine wave value and sets their values
+      int lerpedColor =
+          Color.lerpRGB(
+              MathUtil.clamp(color1.red * multiplier, 0, 255),
+              MathUtil.clamp(color1.green * multiplier, 0, 255),
+              MathUtil.clamp(color1.blue * multiplier, 0, 255),
+              MathUtil.clamp(color2.red * multiplier, 0, 255),
+              MathUtil.clamp(color2.green * multiplier, 0, 255),
+              MathUtil.clamp(color2.blue * multiplier, 0, 255),
+              colorBump);
+
+      int redColor = Color.unpackRGB(lerpedColor, RGBChannel.kRed);
+
+      int greenColor = Color.unpackRGB(lerpedColor, RGBChannel.kGreen);
+
+      int blueColor = Color.unpackRGB(lerpedColor, RGBChannel.kBlue);
+
+      ledBuffer.setRGB(i, redColor, greenColor, blueColor);
+    }
+  }
+
+  /**
+   * creates a sine wave and lerp between the two to mix the colors
+   *
+   * @param color1 the first color to blend with you can make a new color using new Color8Bit
+   * @param color2 the second color to blend with you can make a new color using new Color8Bit
+   * @param brightness in percentage [0, 1]
+   * @param frequency the number of waves the function does per cycle
+   * @param sharpness the sharpness of the sine wave
+   */
+  public Command setGradientPattern(
+      Color8Bit color1, Color8Bit color2, int brightness, int frequency, int sharpness) {
+    return this.run(() -> LEDSinWave(color1, color2, brightness, frequency, sharpness));
   }
 }

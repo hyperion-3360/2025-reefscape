@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
@@ -109,6 +111,10 @@ public class RobotContainer {
   }
 
   public void configureBindingsTest() {
+
+    m_leds.setDefaultCommand(
+        m_leds.setGradientPattern(
+            new Color8Bit(Color.kOrange), new Color8Bit(Color.kDarkOrange), 50, 3, 2));
 
     m_driverController
         .rightBumper()
