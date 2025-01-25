@@ -129,7 +129,7 @@ public class Elevator extends SubsystemBase {
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorFeeder;
         break;
 
-        case CORALLOW:
+      case CORALLOW:
         m_elevatorTarget = Constants.ElevatorConstants.kElevatorCoralLow;
         break;
     }
