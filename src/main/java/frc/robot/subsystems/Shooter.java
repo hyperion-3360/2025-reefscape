@@ -91,6 +91,11 @@ public class Shooter extends SubsystemBase {
    */
   public Command manualTest(DoubleSupplier joystick) {
     // the speed input is squard to have a smoother control curve
-    return this.run(() -> m_shooter.set(joystick.getAsDouble() * joystick.getAsDouble()));
+
+    return this.run(
+        () -> {
+          double throttle = joystick.getAsDouble();
+          m_shooter.set(-1.0 * throttle * throttle);
+        });
   }
 }
