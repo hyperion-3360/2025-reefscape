@@ -69,13 +69,13 @@ public class Elevator extends SubsystemBase {
     m_rightElevatorMotor.getConfigurator().apply(m_rightMotorConfig);
     m_leftElevatorMotor.getConfigurator().apply(m_leftMotorConfig);
     m_leftElevatorMotor.setControl(m_follower);
-    m_rightElevatorMotor.setPosition(0.0);
-    m_leftElevatorMotor.setPosition(0.0);
   }
 
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) {
+      m_rightElevatorMotor.setPosition(0.0);
+      m_leftElevatorMotor.setPosition(0.0);
       m_pid.reset();
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
     }
