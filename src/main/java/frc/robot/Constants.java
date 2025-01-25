@@ -348,14 +348,14 @@ public final class Constants {
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
     public static final int kFollowerId = 0;
-    public static final double kElevatorDown = 0.0;
-    public static final double kElevatorL1 = 0.0;
-    public static final double kElevatorL2 = 0.0;
-    public static final double kElevatorL4 = 0.0;
-    public static final double kElevatorL3 = 0.0;
+    public static final double kElevatorDown = 1.0; // MAX 37 MOTOR TURNS
+    public static final double kElevatorL1 = 10.0;
+    public static final double kElevatorL2 = 15.0;
+    public static final double kElevatorL3 = 20.0;
+    public static final double kElevatorL4 = 25.0;
     public static final double kElevatorHandoff = 0.0;
-    public static final double kElevatorNet = 0.0;
-    public static final double kElevatorProcessor = 0.0;
+    public static final double kElevatorNet = 35.0;
+    public static final double kElevatorProcessor = 10.0;
     public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.0;
   }
