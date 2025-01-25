@@ -85,25 +85,28 @@ public class RobotContainer {
   public RobotContainer() {
 
     Auto.initAutoWidget();
+    m_leds.setDefaultCommand(
+        m_leds.setGradientPattern(
+            new Color8Bit(Color.kOrange), new Color8Bit(Color.kDarkOrange), 50, 3, 2));
 
-    m_swerve.resetModulesToAbsolute();
+    // m_swerve.resetModulesToAbsolute();
   }
 
   public void configureBindingsTest() {
 
     m_leds.setDefaultCommand(
         m_leds.setGradientPattern(
-            new Color8Bit(Color.kOrange), new Color8Bit(Color.kDarkOrange), 50, 3, 2));
+            new Color8Bit(10, 250, 0), new Color8Bit(5, 125, 0), 100, 0.5, 2));
 
-    m_driverController
-        .rightBumper()
-        .whileTrue(
-            new TeleopSwerve(
-                m_swerve,
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-                () -> true));
+    // m_driverController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new TeleopSwerve(
+    //             m_swerve,
+    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+    //             () -> true));
 
     m_driverController
         .a()
