@@ -87,6 +87,9 @@ public class Elevator extends SubsystemBase {
     m_leftElevatorMotor.setControl(m_follower);
     m_rightElevatorMotor.setPosition(0.0);
     m_leftElevatorMotor.setPosition(0.0);
+
+    SmartDashboard.putData("Elevator ProfiledPID", m_controller);
+    SmartDashboard.putData("Elevator feedforward", m_feedforward);
   }
 
   @Override
@@ -107,8 +110,6 @@ public class Elevator extends SubsystemBase {
             + m_feedforward.calculate(m_controller.getSetpoint().velocity));
 
     SmartDashboard.putNumber("Target", m_elevatorTarget);
-    SmartDashboard.putData("Elevator ProfiledPID", m_controller);
-    SmartDashboard.putData("Elevator feedforward", m_feedforward);
     SmartDashboard.putNumber(
         "Right motor encoder", m_rightElevatorMotor.getPosition().getValueAsDouble());
   }
