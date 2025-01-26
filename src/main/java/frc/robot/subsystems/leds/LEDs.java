@@ -23,6 +23,8 @@ public class LEDs extends SubsystemBase {
   AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
 
   private int m_rainbowFirstPixelHue = 0;
+  private int m_pulsePixelValueFade = 0;
+  private int currentLEDPixel = 0;
   double zeroPos = 0;
   private int firstPos = 0;
   private LEDState m_currentState = LEDState.Off;
@@ -179,9 +181,9 @@ public class LEDs extends SubsystemBase {
    * @param sharpness the sharpness of the sine wave
    */
   private void LEDSinWave(
-      Color8Bit color1, Color8Bit color2, int brightness, double frequency, int sharpness) {
+      Color8Bit color1, Color8Bit color2, double brightness, double frequency, int sharpness) {
     zeroPos += 0.03;
-    int multiplier = MathUtil.clamp(brightness, 0, 100);
+    double multiplier = MathUtil.clamp(brightness, 0, 1);
     for (int i = 0; i < ledBuffer.getLength(); i++) {
 
       double pctDownStrip = (double) i / ledBuffer.getLength() * 4;
@@ -198,12 +200,12 @@ public class LEDs extends SubsystemBase {
       // mixes the two colors using the sine wave value and sets their values
       int lerpedColor =
           Color.lerpRGB(
-              MathUtil.clamp(color1.red * multiplier, 0, 100000),
-              MathUtil.clamp(color1.green * multiplier, 0, 100000),
-              MathUtil.clamp(color1.blue * multiplier, 0, 100000),
-              MathUtil.clamp(color2.red * multiplier, 0, 100000),
-              MathUtil.clamp(color2.green * multiplier, 0, 100000),
-              MathUtil.clamp(color2.blue * multiplier, 0, 100000),
+              MathUtil.clamp(color1.red * multiplier, 0, 255),
+              MathUtil.clamp(color1.green * multiplier, 0, 255),
+              MathUtil.clamp(color1.blue * multiplier, 0, 255),
+              MathUtil.clamp(color2.red * multiplier, 0, 255),
+              MathUtil.clamp(color2.green * multiplier, 0, 255),
+              MathUtil.clamp(color2.blue * multiplier, 0, 255),
               colorBump);
 
       int redColor = Color.unpackRGB(lerpedColor, RGBChannel.kRed);
@@ -226,7 +228,49 @@ public class LEDs extends SubsystemBase {
    * @param sharpness the sharpness of the sine wave
    */
   public Command setGradientPattern(
-      Color8Bit color1, Color8Bit color2, int brightness, double frequency, int sharpness) {
+      Color8Bit color1, Color8Bit color2, double brightness, double frequency, int sharpness) {
     return this.run(() -> LEDSinWave(color1, color2, brightness, frequency, sharpness));
+  }
+
+  /**
+   * @param color1
+   * @param brightness
+   * @param speed ms till next change
+   */
+  private void LEDPulsePattern(Color8Bit color1, double brightness, double speed) {
+    m_pulsePixelValueFade += 0.3;
+    currentLEDPixel += 10  / speed;
+
+    double multiplier = MathUtil.clamp(brightness, 0, 1);
+    for (int i = 0; i < ledBuffer.getLength() / 2; i++) {
+
+      // fades the multiplier by the percentage of the pixelFadeValue
+      multiplier *= m_pulsePixelValueFade;
+
+      ledBuffer.setRGB(
+          i,
+          color1.red * (int) multiplier,
+          color1.green * (int) multiplier,
+          color1.blue * (int) multiplier);
+      ledBuffer.setRGB(
+          (ledBuffer.getLength() - i) - 1,
+          color1.red * (int) multiplier,
+          color1.green * (int) multiplier,
+          color1.blue * (int) multiplier);
+
+      ledBuffer.setRGB(currentLEDPixel, color1.red, color1.green, color1.blue);
+
+      ledBuffer.setRGB(
+          (ledBuffer.getLength() - currentLEDPixel) - 1, color1.red, color1.green, color1.blue);
+    }
+
+    // checks if the pulse percentage is at max
+    m_pulsePixelValueFade %= 1;
+    // loops back if the current pixel is at max
+    currentLEDPixel %= ledBuffer.getLength() / 2;
+  }
+
+  public Command setPulsePattern(Color8Bit color, double brightness, double speed) {
+    return this.run(() -> LEDPulsePattern(color, brightness, speed));
   }
 }
