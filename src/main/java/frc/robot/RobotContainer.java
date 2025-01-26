@@ -90,15 +90,15 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
 
-    // m_driverController
-    //     .rightBumper()
-    //     .whileTrue(
-    //         new TeleopSwerve(
-    //             m_swerve,
-    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-    //             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-    //             () -> true));
+    m_driverController
+        .rightBumper()
+        .whileTrue(
+            new TeleopSwerve(
+                m_swerve,
+                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+                () -> true));
 
     m_driverController
         .a()
@@ -112,17 +112,11 @@ public class RobotContainer {
     m_driverController
         .x()
         .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.LOW));
-
-    m_driverController
-        .x()
-        .and(m_driverController.y())
-        .onTrue(m_elevator.Elevate(desiredHeight.L1));
-
-    m_driverController
-        .x()
-        .and(m_driverController.b())
         .onTrue(m_elevator.Elevate(desiredHeight.NET));
+
+    m_driverController.x().and(m_driverController.y()).onTrue(m_elevator.Elevate(desiredHeight.L1));
+
+    m_driverController.x().and(m_driverController.b()).onTrue(m_elevator.Elevate(desiredHeight.L2));
 
     m_driverController
         .start()
