@@ -114,9 +114,8 @@ public class RobotContainer {
   public void configureBindingsTest() {
 
     m_leds.setDefaultCommand(
-        m_leds.setGradientPattern(
-            new Color8Bit(10, 250, 0), new Color8Bit(5, 125, 0), 100, 0.5, 2));
-
+        m_leds.setGradientPattern(new Color8Bit(10, 250, 0), new Color8Bit(5, 125, 0), 1, 0.5, 2));
+    m_driverController.povUp().onTrue(m_leds.setPulsePattern(new Color8Bit(10, 250, 0), 1, 10));
     // m_driverController
     //     .rightBumper()
     //     .whileTrue(
