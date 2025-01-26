@@ -140,17 +140,21 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   public boolean isAtAngle() {
+    return Math.abs(m_AnglesTarget - m_pivotMotor.getEncoder().getPosition())
+        <= Constants.AlgaeIntakeConstants.kAngleTolerance;
     return m_pid.atSetpoint();
   }
 
   public Command setAngle(DoubleSupplier angle) {
     return run(
         () -> {
+          System.out.println(m_pivotMotor.getEncoder().getPosition());
           m_pivotMotor.set(angle.getAsDouble());
         });
   }
 
   public Command setSpeed(DoubleSupplier speed) {
+    System.out.println(m_pivotMotor.getEncoder().getPosition());
     return run(
         () -> {
           m_intakeRight.set(speed.getAsDouble());
