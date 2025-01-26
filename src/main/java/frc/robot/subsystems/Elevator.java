@@ -8,13 +8,13 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.TunableElevatorFF;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
@@ -58,8 +58,8 @@ public class Elevator extends SubsystemBase {
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
   private final ProfiledPIDController m_controller =
       new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  // private final TunableElevatorFF m_feedforward = new TunableElevatorFF(kS, kG, kV);
-  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
+  private final TunableElevatorFF m_feedforward = new TunableElevatorFF(kS, kG, kV);
+  //  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase {
     m_leftElevatorMotor.setPosition(0.0);
 
     SmartDashboard.putData("Elevator ProfiledPID", m_controller);
-    // SmartDashboard.putData("Elevator feedforward", m_feedforward);
+    SmartDashboard.putData("Tunable feedforward", m_feedforward);
   }
 
   @Override

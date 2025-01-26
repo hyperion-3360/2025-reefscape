@@ -11,26 +11,26 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 
 /** Add your docs here. */
 public class TunableElevatorFF implements Sendable {
-  private static int instances;
-  private double k_s = 0.0;
+  private double k_a = 0.0;
   private double k_g = 0.0;
   private double k_v = 0.0;
   private ElevatorFeedforward m_feedForward;
+  private static int instances = 0;
 
-  public TunableElevatorFF(double s, double g, double v) {
-    k_s = s;
+  public TunableElevatorFF(double a, double g, double v) {
+    k_a = a;
     k_g = g;
     k_v = v;
     renewFF();
-    SendableRegistry.addLW(this, "Tunable Elevator Feedforward", instances++);
+    SendableRegistry.add(this, "TunableElevatorFF", instances);
   }
 
-  public double getS() {
-    return m_feedForward.getKs();
+  public double getA() {
+    return m_feedForward.getKa();
   }
 
-  public void setS(double s) {
-    k_s = s;
+  public void setA(double a) {
+    k_a = a;
     renewFF();
   }
 
@@ -52,8 +52,12 @@ public class TunableElevatorFF implements Sendable {
     renewFF();
   }
 
+  public void reset() {
+    renewFF();
+  }
+
   private void renewFF() {
-    m_feedForward = new ElevatorFeedforward(k_s, k_g, k_v, 0.0);
+    m_feedForward = new ElevatorFeedforward(0, k_g, k_v, k_a);
   }
 
   public double calculate(double velocity) {
@@ -62,9 +66,10 @@ public class TunableElevatorFF implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Tunable Elevator Feedforward");
-    builder.addDoubleProperty("Ks", this::getS, this::setS);
-    builder.addDoubleProperty("Kg", this::getG, this::setG);
+    System.out.println("initSendable, TunableElevatorFF");
+    builder.setSmartDashboardType("RobotPreferences");
     builder.addDoubleProperty("Kv", this::getV, this::setV);
+    builder.addDoubleProperty("Kg", this::getG, this::setG);
+    builder.addDoubleProperty("Ka", this::getA, this::setA);
   }
 }
