@@ -89,7 +89,7 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
 
-    m_leds.setDefaultCommand(m_leds.setPulsePattern(new Color8Bit(10, 250, 0), 1, 1));
+    m_leds.setDefaultCommand(m_leds.setPulsePattern(new Color8Bit(10, 250, 0), 0.01, 0.5, false));
     // m_driverController
     //     .rightBumper()
     //     .whileTrue(

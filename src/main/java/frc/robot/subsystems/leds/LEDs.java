@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color.RGBChannel;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -251,9 +252,9 @@ public class LEDs extends SubsystemBase {
   /**
    * @param color
    */
-  private void LEDPulsePattern(Color8Bit color) {
+  private void LEDPulsePattern(Color8Bit color, boolean fade) {
 
-    for (int i = 0; i < ledBuffer.getLength() / 2; i++) {
+    for (int i = 0; i < (ledBuffer.getLength()) / 2; i++) {
       // makes the "head" of the pulse effect
       if (pixelIndex - i == 0) {
         multiplier = 1;
@@ -264,7 +265,10 @@ public class LEDs extends SubsystemBase {
       }
       // makes a trailing tail effect behind the head of the LED
       if (pixelIndex - i > 0) {
-        MathUtil.clamp(multiplier += 1 / pixelIndex, 0.2, 1);
+        multiplier = 0.2;
+        if (fade) {
+          MathUtil.clamp(multiplier = (double) i / (double) pixelIndex, 0.2, 1);
+        }
       }
 
       ledBuffer.setRGB(
@@ -280,6 +284,7 @@ public class LEDs extends SubsystemBase {
           (int) MathUtil.clamp(color.blue * multiplier, 0, 255));
     }
     pixelIndex++;
+
     // if the pixelIndex is at the middle of the ledBuffer: restart it
     if (pixelIndex % (double) (ledBuffer.getLength()) / 2 == 0) {
       pixelIndex = 0;
@@ -291,20 +296,17 @@ public class LEDs extends SubsystemBase {
    * @param speed
    * @return
    */
-  public Command setPulsePattern(Color8Bit color, double speed, double delay) {
+  public Command setPulsePattern(Color8Bit color, double speed, double delay, boolean fade) {
     r = (int) SmartDashboard.getNumber("red", color.red);
     g = (int) SmartDashboard.getNumber("green", color.green);
     b = (int) SmartDashboard.getNumber("blue", color.blue);
     pulseSpeed = (int) SmartDashboard.getNumber("pulse speed", speed);
     pulseDelay = SmartDashboard.getNumber("pulse delay", delay);
 
-    LEDPulsePattern(color);
-    return this.run(
-            () -> {
-              LEDPulsePattern(color);
-            })
-        .andThen(new WaitCommand(speed))
-        .until(() -> pixelIndex % (double) ledBuffer.getLength() / 2 == 0)
+    return Commands.sequence(
+            this.runOnce(() -> LEDPulsePattern(color, fade)), new WaitCommand(speed))
+        .repeatedly()
+        .until(() -> pixelIndex % (double) (ledBuffer.getLength()) / 2 == 0)
         .andThen(new WaitCommand(delay))
         .repeatedly();
   }
