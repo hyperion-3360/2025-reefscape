@@ -21,10 +21,8 @@ public class LEDs extends SubsystemBase {
 
   AddressableLED ledStrip = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
   AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
-
+  private double multiplier = 0;
   private int m_rainbowFirstPixelHue = 0;
-  private int m_pulsePixelValueFade = 0;
-  private int currentLEDPixel = 0;
   double zeroPos = 0;
   private int firstPos = 0;
   private LEDState m_currentState = LEDState.Off;
@@ -37,7 +35,6 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     // ExecLedState(m_currentState);
     // Rainbow();
     // Orange();
@@ -234,43 +231,32 @@ public class LEDs extends SubsystemBase {
 
   /**
    * @param color1
-   * @param brightness
-   * @param speed ms till next change
    */
-  private void LEDPulsePattern(Color8Bit color1, double brightness, double speed) {
-    m_pulsePixelValueFade += 0.3;
-    currentLEDPixel += 10  / speed;
+  private void LEDPulsePattern(Color8Bit color1) {
 
-    double multiplier = MathUtil.clamp(brightness, 0, 1);
+    multiplier += (1 / ledBuffer.getLength()) / 2;
+
     for (int i = 0; i < ledBuffer.getLength() / 2; i++) {
-
-      // fades the multiplier by the percentage of the pixelFadeValue
-      multiplier *= m_pulsePixelValueFade;
 
       ledBuffer.setRGB(
           i,
-          color1.red * (int) multiplier,
-          color1.green * (int) multiplier,
-          color1.blue * (int) multiplier);
+          (int) MathUtil.clamp(color1.red * multiplier, 0, 255),
+          (int) MathUtil.clamp(color1.green* multiplier, 0, 255),
+          (int) MathUtil.clamp(color1.blue* multiplier, 0, 255));
+
       ledBuffer.setRGB(
           (ledBuffer.getLength() - i) - 1,
-          color1.red * (int) multiplier,
-          color1.green * (int) multiplier,
-          color1.blue * (int) multiplier);
+          (int) MathUtil.clamp(color1.red * multiplier, 0, 255),
+          (int) MathUtil.clamp(color1.green * multiplier, 0, 255),
+          (int) MathUtil.clamp(color1.blue * multiplier, 0, 255));
 
-      ledBuffer.setRGB(currentLEDPixel, color1.red, color1.green, color1.blue);
-
-      ledBuffer.setRGB(
-          (ledBuffer.getLength() - currentLEDPixel) - 1, color1.red, color1.green, color1.blue);
     }
-
-    // checks if the pulse percentage is at max
-    m_pulsePixelValueFade %= 1;
-    // loops back if the current pixel is at max
-    currentLEDPixel %= ledBuffer.getLength() / 2;
+   if (multiplier % 1 == 0) {
+    multiplier = 1/ ledBuffer.getLength(); 
+   } 
   }
 
-  public Command setPulsePattern(Color8Bit color, double brightness, double speed) {
-    return this.run(() -> LEDPulsePattern(color, brightness, speed));
+  public Command setPulsePattern(Color8Bit color) {
+    return this.run(() -> LEDPulsePattern(color));
   }
 }
