@@ -4,9 +4,7 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.AlgaeIntake;
 
 public class IntakeAlgaeCmd extends SequentialCommandGroup {
@@ -18,16 +16,15 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
 
   public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle) {
     addCommands(
-        Commands.run(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
-        new WaitUntilCommand(() -> m_algaeIntake.isAlgaeIn()),
-        Commands.run(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
-        Commands.run(() -> m_algaeIntake.setShootingAngle(angle), m_algaeIntake),
-        new WaitUntilCommand(() -> m_algaeIntake.isAtAngle()),
-        Commands.run(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake),
-        Commands.run(
-            () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED), m_algaeIntake));
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.INTAKE)
+            .until(() -> m_algaeIntake.isAlgaeIn()),
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.STORING)
+            .alongWith(m_algaeIntake.pivotAlgae(angle))
+            .until(() -> m_algaeIntake.isAtAngle()),
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.STORED)
+            .alongWith(m_algaeIntake.pivotAlgae(AlgaeIntake.elevation.STORED)));
   }
 }

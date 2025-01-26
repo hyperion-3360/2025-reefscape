@@ -260,8 +260,8 @@ public final class Constants {
 
     // in º
     public static final double kStartingAngle = 0.0;
-    public static final double kFloorIntakeAngle = 0.0;
-    public static final double kNetAngle = 0.0;
+    public static final double kFloorIntakeAngle = -22.0;
+    public static final double kNetAngle = -10.0;
     // auto intake bcuz of the little tower thing
     public static final double kAutoIntakeAngle = 0.0;
     public static final double kCurrentLimit = 20.0;

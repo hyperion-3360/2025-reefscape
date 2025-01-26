@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -51,8 +50,6 @@ public class AlgaeIntake extends SubsystemBase {
       new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberLeftMotorID, MotorType.kBrushless);
   private SparkMax m_intakeRight =
       new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberRightMotorID, MotorType.kBrushless);
-
-  private AbsoluteEncoder m_directionEncoder = m_pivotMotor.getAbsoluteEncoder();
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
@@ -131,18 +128,20 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   public boolean isAtAngle() {
-    return Math.abs(m_AnglesTarget - m_directionEncoder.getPosition())
+    return Math.abs(m_AnglesTarget - m_pivotMotor.getEncoder().getPosition())
         <= Constants.AlgaeIntakeConstants.kAngleTolerance;
   }
 
   public Command setAngle(DoubleSupplier angle) {
     return run(
         () -> {
+          System.out.println(m_pivotMotor.getEncoder().getPosition());
           m_pivotMotor.set(angle.getAsDouble());
         });
   }
 
   public Command setSpeed(DoubleSupplier speed) {
+    System.out.println(m_pivotMotor.getEncoder().getPosition());
     return run(
         () -> {
           m_intakeRight.set(speed.getAsDouble());
@@ -160,7 +159,8 @@ public class AlgaeIntake extends SubsystemBase {
     setShootingAngle(angle);
     return run(
         () -> {
-          m_pivotMotor.set(m_pid.calculate(m_directionEncoder.getPosition(), m_AnglesTarget));
+          m_pivotMotor.set(
+              m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
         });
   }
 
