@@ -88,7 +88,8 @@ public class RobotContainer {
   }
 
   public void configureBindingsTest() {
-    m_driverController.povUp().onTrue(m_leds.setPulsePattern(new Color8Bit(10, 250, 0), 100, 1));
+
+    m_leds.setDefaultCommand(m_leds.setPulsePattern(new Color8Bit(10, 250, 0), 1, 1));
     // m_driverController
     //     .rightBumper()
     //     .whileTrue(

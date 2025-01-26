@@ -3,12 +3,14 @@ package frc.robot.subsystems.leds;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color.RGBChannel;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
@@ -29,7 +31,22 @@ public class LEDs extends SubsystemBase {
   private int firstPos = 0;
   private LEDState m_currentState = LEDState.Off;
 
+  // shuffleboard values
+  private String tabName = "LEDs";
+  private int r = 0;
+  private int g = 0;
+  private int b = 0;
+  private int pulseSpeed = 0;
+  private double pulseDelay = 0;
+
   public LEDs() {
+    Shuffleboard.getTab(tabName);
+    SmartDashboard.putNumber("red", r);
+    SmartDashboard.putNumber("green", g);
+    SmartDashboard.putNumber("blue", b);
+    SmartDashboard.putNumber("pulse speed", pulseSpeed);
+    SmartDashboard.putNumber("pulse delay", pulseDelay);
+
     ledStrip.setLength(ledBuffer.getLength());
     ledStrip.setData(ledBuffer);
     ledStrip.start();
@@ -232,9 +249,9 @@ public class LEDs extends SubsystemBase {
   }
 
   /**
-   * @param color1
+   * @param color
    */
-  private void LEDPulsePattern(Color8Bit color1) {
+  private void LEDPulsePattern(Color8Bit color) {
 
     for (int i = 0; i < ledBuffer.getLength() / 2; i++) {
       // makes the "head" of the pulse effect
@@ -252,37 +269,43 @@ public class LEDs extends SubsystemBase {
 
       ledBuffer.setRGB(
           i,
-          (int) MathUtil.clamp(color1.red * multiplier, 0, 255),
-          (int) MathUtil.clamp(color1.green * multiplier, 0, 255),
-          (int) MathUtil.clamp(color1.blue * multiplier, 0, 255));
+          (int) MathUtil.clamp(color.red * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.green * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.blue * multiplier, 0, 255));
 
       ledBuffer.setRGB(
           (ledBuffer.getLength() - i) - 1,
-          (int) MathUtil.clamp(color1.red * multiplier, 0, 255),
-          (int) MathUtil.clamp(color1.green * multiplier, 0, 255),
-          (int) MathUtil.clamp(color1.blue * multiplier, 0, 255));
+          (int) MathUtil.clamp(color.red * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.green * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.blue * multiplier, 0, 255));
     }
     pixelIndex++;
     // if the pixelIndex is at the middle of the ledBuffer: restart it
-    if (pixelIndex % 1 / ((double) ledBuffer.getLength()) / 2 == 0) {
+    if (pixelIndex % (double) (ledBuffer.getLength()) / 2 == 0) {
       pixelIndex = 0;
     }
   }
 
   /**
    * @param color the color of the pulse
-   * @param speed speed in ms (note, we subtract 20ms to the speed to account for periodic's 20ms
-   *     loop)
+   * @param speed
    * @return
    */
   public Command setPulsePattern(Color8Bit color, double speed, double delay) {
+    r = (int) SmartDashboard.getNumber("red", color.red);
+    g = (int) SmartDashboard.getNumber("green", color.green);
+    b = (int) SmartDashboard.getNumber("blue", color.blue);
+    pulseSpeed = (int) SmartDashboard.getNumber("pulse speed", speed);
+    pulseDelay = SmartDashboard.getNumber("pulse delay", delay);
+
     LEDPulsePattern(color);
-    return this.runOnce(() -> LEDPulsePattern(color))
-        .andThen(
-            new WaitUntilCommand((speed - 20) / 1000)
-                .repeatedly()
-                .until(() -> pixelIndex % 1 / ((double) ledBuffer.getLength()) / 2 == 0)
-                .andThen(new WaitUntilCommand(delay))
-                .repeatedly());
+    return this.run(
+            () -> {
+              LEDPulsePattern(color);
+            })
+        .andThen(new WaitCommand(speed))
+        .until(() -> pixelIndex % (double) ledBuffer.getLength() / 2 == 0)
+        .andThen(new WaitCommand(delay))
+        .repeatedly();
   }
 }
