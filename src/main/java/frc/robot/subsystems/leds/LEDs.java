@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.util.Color.RGBChannel;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
@@ -22,6 +23,7 @@ public class LEDs extends SubsystemBase {
   AddressableLED ledStrip = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
   AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
   private double multiplier = 0;
+  private int pixelIndex = 0;
   private int m_rainbowFirstPixelHue = 0;
   double zeroPos = 0;
   private int firstPos = 0;
@@ -234,29 +236,47 @@ public class LEDs extends SubsystemBase {
    */
   private void LEDPulsePattern(Color8Bit color1) {
 
-    multiplier += (1 / ledBuffer.getLength()) / 2;
-
     for (int i = 0; i < ledBuffer.getLength() / 2; i++) {
+      // makes the "head" of the pulse effect
+      if (pixelIndex - i == 0) {
+        multiplier = 1;
+      }
+      // makes everything above the "head" be a constant brightness
+      if (pixelIndex - i < 0) {
+        multiplier = 0.2;
+      }
+      // makes a trailing tail effect behind the head of the LED
+      if (pixelIndex - i > 0) {
+        MathUtil.clamp(multiplier += 1 / pixelIndex, 0.2, 1);
+      }
 
       ledBuffer.setRGB(
           i,
           (int) MathUtil.clamp(color1.red * multiplier, 0, 255),
-          (int) MathUtil.clamp(color1.green* multiplier, 0, 255),
-          (int) MathUtil.clamp(color1.blue* multiplier, 0, 255));
+          (int) MathUtil.clamp(color1.green * multiplier, 0, 255),
+          (int) MathUtil.clamp(color1.blue * multiplier, 0, 255));
 
       ledBuffer.setRGB(
           (ledBuffer.getLength() - i) - 1,
           (int) MathUtil.clamp(color1.red * multiplier, 0, 255),
           (int) MathUtil.clamp(color1.green * multiplier, 0, 255),
           (int) MathUtil.clamp(color1.blue * multiplier, 0, 255));
-
     }
-   if (multiplier % 1 == 0) {
-    multiplier = 1/ ledBuffer.getLength(); 
-   } 
+    pixelIndex++;
+    // if the pixelIndex is at the middle of the ledBuffer: restart it
+    if (pixelIndex % 1 / ((double) ledBuffer.getLength()) / 2 == 0) {
+      pixelIndex = 0;
+    }
   }
-
-  public Command setPulsePattern(Color8Bit color) {
-    return this.run(() -> LEDPulsePattern(color));
+/**
+ * 
+ * @param color the color of the pulse
+ * @param speed speed in ms (note, we subtract 20ms to the speed to account for periodic's 20ms loop)
+ * @return
+ */
+  public Command setPulsePattern(Color8Bit color, double speed) {
+    LEDPulsePattern(color);
+    return this.runOnce(() -> LEDPulsePattern(color))
+        .andThen(new WaitUntilCommand((speed - 20) / 1000).repeatedly());
   }
 }

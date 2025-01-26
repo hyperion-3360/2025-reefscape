@@ -101,14 +101,13 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
-
     Auto.initAutoWidget();
 
     // m_swerve.resetModulesToAbsolute();
   }
 
   public void configureBindingsTest() {
-    m_driverController.povUp().onTrue(m_leds.setPulsePattern(new Color8Bit(10, 250, 0)));
+    m_driverController.povUp().onTrue(m_leds.setPulsePattern(new Color8Bit(10, 250, 0), 100));
     // m_driverController
     //     .rightBumper()
     //     .whileTrue(
