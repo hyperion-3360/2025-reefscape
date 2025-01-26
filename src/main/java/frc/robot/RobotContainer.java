@@ -11,8 +11,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.commands.IntakeAlgaeCmd;
+import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.CoralClaw;
 import frc.robot.subsystems.Elevator;
@@ -66,6 +69,9 @@ public class RobotContainer {
 
   private final double kJoystickDeadband = 0.1;
 
+  private ShootAlgaeCmd vomitProcessor = new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR);
+  private IntakeAlgaeCmd intakeFloor = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
+
   /***
    * conditionJoystick
    * Condition a joystick axis value given a slewrate limiter and deadband
@@ -90,15 +96,13 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
 
-    m_driverController
-        .rightBumper()
-        .whileTrue(
-            new TeleopSwerve(
-                m_swerve,
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-                () -> true));
+    m_swerve.setDefaultCommand(
+        new TeleopSwerve(
+            m_swerve,
+            () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+            () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+            () -> 0.0,
+            () -> true));
 
     // m_driverController
     //     .a()
@@ -156,6 +160,8 @@ public class RobotContainer {
     //         m_climber.climberTestMode(
     //             () -> conditionJoystick(translationAxis, climberSpeedLimiter,
     // kJoystickDeadband)));
+    m_driverController.povDown().onTrue(intakeFloor);
+    m_driverController.povUp().onTrue(vomitProcessor);
   }
 
   public void configureBindingsTeleop() {

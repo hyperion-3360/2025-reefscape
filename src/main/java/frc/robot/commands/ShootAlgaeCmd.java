@@ -1,8 +1,7 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.AlgaeIntake;
 
 public class ShootAlgaeCmd extends SequentialCommandGroup {
@@ -18,19 +17,16 @@ public class ShootAlgaeCmd extends SequentialCommandGroup {
    */
   public ShootAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation shootingAngle) {
     addCommands(
-        Commands.run(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
-        new WaitUntilCommand(0.1),
         m_algaeIntake.pivotAlgae(shootingAngle),
-        Commands.run(
-            () ->
-                m_algaeIntake.setShootingSpeed(
-                    shootingAngle == AlgaeIntake.elevation.NET
-                        ? AlgaeIntake.shooting.NET
-                        : AlgaeIntake.shooting.PROCESSOR),
-            m_algaeIntake),
-        new WaitUntilCommand(1),
-        Commands.run(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake));
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.INTAKE)
+            .until(() -> new WaitCommand(0.1).isFinished()),
+        m_algaeIntake
+            .shootAlgae(
+                shootingAngle == AlgaeIntake.elevation.NET
+                    ? AlgaeIntake.shooting.NET
+                    : AlgaeIntake.shooting.PROCESSOR)
+            .until(() -> new WaitCommand(1).isFinished()),
+        m_algaeIntake.shootAlgae(AlgaeIntake.shooting.STORED));
   }
 }
