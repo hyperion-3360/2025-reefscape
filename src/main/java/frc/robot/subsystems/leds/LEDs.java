@@ -268,15 +268,21 @@ public class LEDs extends SubsystemBase {
       pixelIndex = 0;
     }
   }
-/**
- * 
- * @param color the color of the pulse
- * @param speed speed in ms (note, we subtract 20ms to the speed to account for periodic's 20ms loop)
- * @return
- */
-  public Command setPulsePattern(Color8Bit color, double speed) {
+
+  /**
+   * @param color the color of the pulse
+   * @param speed speed in ms (note, we subtract 20ms to the speed to account for periodic's 20ms
+   *     loop)
+   * @return
+   */
+  public Command setPulsePattern(Color8Bit color, double speed, double delay) {
     LEDPulsePattern(color);
     return this.runOnce(() -> LEDPulsePattern(color))
-        .andThen(new WaitUntilCommand((speed - 20) / 1000).repeatedly());
+        .andThen(
+            new WaitUntilCommand((speed - 20) / 1000)
+                .repeatedly()
+                .until(() -> pixelIndex % 1 / ((double) ledBuffer.getLength()) / 2 == 0)
+                .andThen(new WaitUntilCommand(delay))
+                .repeatedly());
   }
 }
