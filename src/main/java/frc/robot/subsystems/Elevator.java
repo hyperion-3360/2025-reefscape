@@ -34,8 +34,7 @@ public class Elevator extends SubsystemBase {
 
   // pid values
 
-  private static final double kP = 0.0;
-  private static final double kI = 0.0;
+  private static final double kP = 0.185;
   private static final double kD = 0.0;
 
   private PIDController m_pid = new PIDController(kP, kI, kD);
@@ -80,8 +79,7 @@ public class Elevator extends SubsystemBase {
       m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
     } else {
       m_rightElevatorMotor.set(
-              m_pid.calculate(
-                  m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
+          m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
     }
 
     SmartDashboard.putNumber("Target", m_elevatorTarget);
@@ -151,6 +149,7 @@ public class Elevator extends SubsystemBase {
   public Command Elevate(desiredHeight height) {
     return run(
         () -> {
-          SetHeight(height);});
+          SetHeight(height);
+        });
   }
 }
