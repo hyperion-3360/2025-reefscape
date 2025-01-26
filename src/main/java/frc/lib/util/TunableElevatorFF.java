@@ -54,7 +54,7 @@ public class TunableElevatorFF implements Sendable {
   }
 
   public double calculate(double velocity) {
-    return m_feedForward.calculate(velocity, 0);
+    return m_feedForward.calculate(velocity);
   }
 
   @Override

@@ -37,16 +37,13 @@ public class Elevator extends SubsystemBase {
 
   private static final double kP = 0.185;
   private static final double kD = 0.0;
-  //  private static final double kI = 0.0;
 
   //  private PIDController m_pid = new PIDController(kP, kI, kD);
 
   private static double kDt = 0.02;
   private static double kMaxVelocity = 1.75;
   private static double kMaxAcceleration = 0.75;
-  private static double kP = 1.3;
   private static double kI = 0.0;
-  private static double kD = 0.7;
   private static double kS = 1.1;
   private static double kG = 1.2;
   private static double kV = 1.3;
