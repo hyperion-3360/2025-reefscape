@@ -8,8 +8,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,18 +48,25 @@ public class Elevator extends SubsystemBase {
   private static double kMaxVelocity = 0.3;
   private static double kMaxAcceleration = 0.3;
   private static double kI = 0.0;
-  private static double kS = 0.0;
-  private static double kG = 0.075;
-  private static double kV = 1.0;
+  // sprivate static double kS = 0.0;
+  private static double kA = 0.0;
+  private static double kG = 0.095;
+  private static double kV = 0.0;
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
-  private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  private final TunableElevatorFF m_feedforward = new TunableElevatorFF(kS, kG, kV);
-  //  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
+  // private final TrapezoidProfile.Constraints m_constraints =
+  //    new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+  // private final ProfiledPIDController m_controller =
+  //    new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+  private final TunableElevatorFF m_feedforward = new TunableElevatorFF(kG, kV, kA);
+  public ExponentialProfile m_profile =
+      new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(12.0, kV, kA));
+
+  public PIDController m_feedback = new PIDController(kP, kI, kD);
+
+  public ExponentialProfile.State m_currentSetpoint = new ExponentialProfile.State();
+  public ExponentialProfile.State m_goal = new ExponentialProfile.State();
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
@@ -69,7 +76,7 @@ public class Elevator extends SubsystemBase {
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
-  private double m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
+  private double m_elevatorTarget = Constants.ElevatorConstants.kElevatorL4;//kElevatorDown;
 
   public Elevator() {
 
@@ -93,39 +100,24 @@ public class Elevator extends SubsystemBase {
     m_rightElevatorMotor.setPosition(0.0);
     m_leftElevatorMotor.setPosition(0.0);
 
-    SmartDashboard.putData("Elevator ProfiledPID", m_controller);
+    SmartDashboard.putData("Elevator PID", m_feedback);
     SmartDashboard.putData("Tunable feedforward", m_feedforward);
   }
 
   @Override
   public void periodic() {
-
-    //    if (DriverStation.isDisabled()) {
-    //      m_pid.reset();
-    //      m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
-    //    } else {
-    //      m_rightElevatorMotor.set(
-    //              m_pid.calculate(
-    //                  m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
-    //    }
+    if (DriverStation.isDisabled()) {
+      return;
+    }
 
     // Run controller and update motor output
-    if (DriverStation.isEnabled()) {
-
-      double pidresult =
-          m_controller.calculate(
-              m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget);
-      double velocity = m_controller.getSetpoint().velocity;
-      double ffresult = m_feedforward.calculate(velocity);
-      m_rightElevatorMotor.set(pidresult + ffresult);
-
-      SmartDashboard.putNumber("Target", m_elevatorTarget);
-      SmartDashboard.putNumber(
-          "Right motor encoder", m_rightElevatorMotor.getPosition().getValueAsDouble());
-      SmartDashboard.putNumber("pidresult", pidresult);
-      SmartDashboard.putNumber("ffresult", ffresult);
-      SmartDashboard.putNumber("velocity", velocity);
-    }
+    m_goal.position = m_elevatorTarget;
+    var nextSetpoint = m_profile.calculate(kDt, m_currentSetpoint, m_goal);
+    m_rightElevatorMotor.setVoltage(
+        m_feedforward.calculate(m_currentSetpoint.velocity, nextSetpoint.velocity)
+            + m_feedback.calculate(
+                m_rightElevatorMotor.getPosition().getValueAsDouble(), m_currentSetpoint.position));
+    m_currentSetpoint = nextSetpoint;
   }
 
   public void SetHeight(desiredHeight height) {

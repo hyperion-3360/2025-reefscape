@@ -14,10 +14,11 @@ public class TunableElevatorFF implements Sendable {
   private double k_a = 0.0;
   private double k_g = 0.0;
   private double k_v = 0.0;
+  private final double k_s = 0.1;
   private ElevatorFeedforward m_feedForward;
   private static int instances = 0;
 
-  public TunableElevatorFF(double a, double g, double v) {
+  public TunableElevatorFF(double g, double v, double a) {
     k_a = a;
     k_g = g;
     k_v = v;
@@ -57,11 +58,11 @@ public class TunableElevatorFF implements Sendable {
   }
 
   private void renewFF() {
-    m_feedForward = new ElevatorFeedforward(0, k_g, k_v, k_a);
+    m_feedForward = new ElevatorFeedforward(k_s, k_g, k_v, k_a);
   }
 
-  public double calculate(double velocity) {
-    return m_feedForward.calculate(velocity);
+  public double calculate(double currentVelocity, double nextVelocity) {
+    return m_feedForward.calculateWithVelocities(currentVelocity, nextVelocity);
   }
 
   @Override
