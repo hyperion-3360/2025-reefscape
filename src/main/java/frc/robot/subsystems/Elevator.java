@@ -8,11 +8,12 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.TunableElevatorFF;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
@@ -36,8 +37,27 @@ public class Elevator extends SubsystemBase {
 
   private static final double kP = 0.185;
   private static final double kD = 0.0;
+  //  private static final double kI = 0.0;
 
-  private PIDController m_pid = new PIDController(kP, kI, kD);
+  //  private PIDController m_pid = new PIDController(kP, kI, kD);
+
+  private static double kDt = 0.02;
+  private static double kMaxVelocity = 1.75;
+  private static double kMaxAcceleration = 0.75;
+  private static double kP = 1.3;
+  private static double kI = 0.0;
+  private static double kD = 0.7;
+  private static double kS = 1.1;
+  private static double kG = 1.2;
+  private static double kV = 1.3;
+
+  // Create a PID controller whose setpoint's change is subject to maximum
+  // velocity and acceleration constraints.
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+  private final TunableElevatorFF m_feedforward = new TunableElevatorFF(kS, kG, kV);
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
@@ -74,16 +94,24 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled()) {
-      m_pid.reset();
-      m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
-    } else {
-      m_rightElevatorMotor.set(
-          m_pid.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
-    }
+
+    //    if (DriverStation.isDisabled()) {
+    //      m_pid.reset();
+    //      m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
+    //    } else {
+    //      m_rightElevatorMotor.set(
+    //              m_pid.calculate(
+    //                  m_rightElevatorMotor.getPosition().getValueAsDouble(), m_elevatorTarget));
+    //    }
+
+    // Run controller and update motor output
+    m_rightElevatorMotor.setVoltage(
+        m_controller.calculate(m_rightElevatorMotor.getPosition().getValueAsDouble())
+            + m_feedforward.calculate(m_controller.getSetpoint().velocity));
 
     SmartDashboard.putNumber("Target", m_elevatorTarget);
-    SmartDashboard.putData("Elevator pid", m_pid);
+    SmartDashboard.putData("Elevator ProfiledPID", m_controller);
+    SmartDashboard.putData("Elevator feedforward", m_feedforward);
     SmartDashboard.putNumber(
         "Right motor encoder", m_rightElevatorMotor.getPosition().getValueAsDouble());
   }
