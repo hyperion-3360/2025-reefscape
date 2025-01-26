@@ -76,6 +76,9 @@ public class Swerve extends SubsystemBase implements Runnable {
     // var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
     // m_field2d.setRobotPose(m_odometryPose);
+
+    visionEst = vision.getEstimatedGlobalPose();
+
     if (visionEst.isPresent()) {
       thread.start();
     }
@@ -95,8 +98,10 @@ public class Swerve extends SubsystemBase implements Runnable {
             "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
       }
 
-      SmartDashboard.putNumber("currentpsoe X", currentpose.getX());
-      SmartDashboard.putNumber("pose estimate X", poseEstimator.getEstimatedPosition().getX());
+      SmartDashboard.putNumber("currentpose X", currentpose.getX());
+      SmartDashboard.putNumber("field 2d X", m_field2d.getRobotPose().getX());
+      SmartDashboard.putNumber("currentpose Y", currentpose.getY());
+      SmartDashboard.putNumber("gyro", m_gyro.getAngle());
       SmartDashboard.putBoolean("visionEst present?", visionEst.isPresent());
     }
   }
@@ -108,7 +113,6 @@ public class Swerve extends SubsystemBase implements Runnable {
 
     // if vision estimation is present, create method est to add vision measurment to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
-    visionEst = vision.getEstimatedGlobalPose();
 
     visionEst.ifPresent(
         est -> {
