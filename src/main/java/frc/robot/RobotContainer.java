@@ -99,7 +99,7 @@ public class RobotContainer {
     //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
     //             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
     //             () -> true));
-
+    m_driverController.povUp().onTrue(m_leds.setLEDSolid(new Color8Bit(10, 250, 0)));
     m_driverController
         .a()
         .whileTrue(

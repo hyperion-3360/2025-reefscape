@@ -310,4 +310,12 @@ public class LEDs extends SubsystemBase {
         .andThen(new WaitCommand(delay))
         .repeatedly();
   }
+  public void LEDSolid(Color8Bit color) {
+    for (int i = 0; i < ledBuffer.getLength(); i++) {
+      ledBuffer.setRGB(i, color.red, color.green, color.blue);
+    }
+  }
+  public Command setLEDSolid(Color8Bit color) {
+    return this.run(() -> LEDSolid(color));
+  }
 }
