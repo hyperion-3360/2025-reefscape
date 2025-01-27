@@ -8,15 +8,13 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.trajectory.ExponentialProfile;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.TunableElevatorFF;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
@@ -41,7 +39,7 @@ public class Elevator extends SubsystemBase {
   // private static final double kI = 0.0095;
   // private static final double kD = 0.0;
 
-  private static double kP = 0.0;
+  private static double kP = 0.027;
   private static double kD = 0.0;
 
   //  private PIDController m_pid = new PIDController(kP, kI, kD);
@@ -51,9 +49,10 @@ public class Elevator extends SubsystemBase {
   private static double kMaxAcceleration = 0.3;
   private static double kI = 0.0;
   // sprivate static double kS = 0.0;
-  private static double kA = 0.0;
-  private static double kG = 1.25;
-  private static double kV = 45.0;
+  private static double kA = 0.001;
+  private static double kG = 1.15;
+  private static double kV = 0.1;
+  private static double kS = 0.01;
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
@@ -61,14 +60,9 @@ public class Elevator extends SubsystemBase {
   //    new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
   // private final ProfiledPIDController m_controller =
   //    new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  private TunableElevatorFF m_feedforward = new TunableElevatorFF(kG, kV, kA);
-  private ExponentialProfile m_profile =
-      new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(12.0, kV, kA));
+  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
 
   private PIDController m_feedback = new PIDController(kP, kI, kD);
-
-  private ExponentialProfile.State m_currentSetpoint = new ExponentialProfile.State();
-  private ExponentialProfile.State m_goal = new ExponentialProfile.State();
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
@@ -110,18 +104,19 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("elevator pos", m_leftElevatorMotor.getPosition().getValueAsDouble());
     if (DriverStation.isDisabled()) {
       return;
     }
 
     // Run controller and update motor output
-    m_goal.position = m_elevatorTarget;
-    var nextSetpoint = m_profile.calculate(kDt, m_currentSetpoint, m_goal);
     m_rightElevatorMotor.setVoltage(
-        m_feedforward.calculate(m_currentSetpoint.velocity, nextSetpoint.velocity)
+        m_feedforward.calculate(
+                m_leftElevatorMotor.getVelocity().getValueAsDouble(), m_elevatorTarget)
             + m_feedback.calculate(
-                m_rightElevatorMotor.getPosition().getValueAsDouble(), m_currentSetpoint.position));
-    m_currentSetpoint = nextSetpoint;
+                m_rightElevatorMotor.getPosition().getValueAsDouble(),
+                m_leftElevatorMotor.getVelocity().getValueAsDouble()));
   }
 
   public void SetHeight(desiredHeight height) {
@@ -187,80 +182,5 @@ public class Elevator extends SubsystemBase {
         () -> {
           SetHeight(height);
         });
-  }
-
-  public void resetFF() {
-    m_currentSetpoint = new ExponentialProfile.State();
-    m_feedforward = new TunableElevatorFF(kG, kV, kA);
-    m_profile =
-        new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(12.0, kV, kA));
-  }
-
-  public double getA() {
-    return kA;
-  }
-
-  public void setA(double a) {
-    kA = a;
-    resetFF();
-  }
-
-  public double getG() {
-    return kG;
-  }
-
-  public void setG(double g) {
-    kG = g;
-    resetFF();
-  }
-
-  public double getV() {
-    return kV;
-  }
-
-  public void setV(double v) {
-    kV = v;
-    resetFF();
-  }
-
-  public double getP() {
-    return kP;
-  }
-
-  public void setP(double p) {
-    kP = p;
-    m_feedback = new PIDController(kP, kI, kD);
-    m_feedforward.reset();
-  }
-
-  public double getI() {
-    return kI;
-  }
-
-  public void setI(double i) {
-    kI = i;
-    m_feedback = new PIDController(kP, kI, kD);
-    m_feedforward.reset();
-  }
-
-  public double getD() {
-    return kD;
-  }
-
-  public void setD(double d) {
-    kD = d;
-    m_feedback = new PIDController(kP, kI, kD);
-    m_feedforward.reset();
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("RobotPreferences");
-    builder.addDoubleProperty("Kv", this::getV, this::setV);
-    builder.addDoubleProperty("Kg", this::getG, this::setG);
-    builder.addDoubleProperty("Ka", this::getA, this::setA);
-    builder.addDoubleProperty("kP", this::getP, this::setP);
-    builder.addDoubleProperty("kI", this::getI, this::setI);
-    builder.addDoubleProperty("kD", this::getD, this::setD);
   }
 }
