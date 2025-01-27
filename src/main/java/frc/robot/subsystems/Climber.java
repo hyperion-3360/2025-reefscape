@@ -4,7 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -113,5 +116,12 @@ public class Climber extends SubsystemBase {
           m_direction = Math.signum(speed.getAsDouble());
           m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
         });
+  }
+  public Command brakeMotors() {
+    return this.run(() -> m_climberMotor.setNeutralMode(NeutralModeValue.Brake));
+  }
+  public Command coastMotor() {
+    return this.run(() -> m_climberMotor.setNeutralMode(NeutralModeValue.Coast));
+
   }
 }
