@@ -104,6 +104,8 @@ public class RobotContainer {
             () -> 0.0,
             () -> true));
 
+    m_driverController.b().onTrue(m_climber.brakeMotors());
+    m_driverController.x().onTrue(m_climber.coastMotor());
     // m_driverController
     //     .a()
     //     .whileTrue(
