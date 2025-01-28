@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
@@ -63,6 +64,8 @@ public class AlgaeIntake extends SubsystemBase {
     m_intakeRightConfig.smartCurrentLimit(20);
     m_directionConfig.smartCurrentLimit(20);
 
+    m_pivotMotor.getEncoder().setPosition(0);
+
     m_intakeLeft.configure(
         m_intakeLeftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_intakeRight.configure(
@@ -77,7 +80,10 @@ public class AlgaeIntake extends SubsystemBase {
   public void periodic() {
     if (DriverStation.isDisabled()) {
       m_pid.reset();
-      m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
+      m_SpeedTarget = 0;
+      if (this.getCurrentCommand() != null) {
+        this.getCurrentCommand().cancel();
+      }
     }
     m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     m_intakeRight.set(m_SpeedTarget);
@@ -97,15 +103,15 @@ public class AlgaeIntake extends SubsystemBase {
 
     switch (speed) {
       case INTAKE:
-        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
+        m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
         break;
 
       case NET:
-        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kNetSpeed;
+        m_SpeedTarget = Constants.AlgaeIntakeVariables.kNetSpeed;
         break;
 
       case PROCESSOR:
-        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
+        m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
         break;
 
       case STORING:
@@ -122,15 +128,15 @@ public class AlgaeIntake extends SubsystemBase {
 
     switch (angle) {
       case NET:
-        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kNetAngle;
+        m_AnglesTarget = Constants.AlgaeIntakeVariables.kNetAngle;
         break;
 
       case FLOOR:
-        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kFloorIntakeAngle;
+        m_AnglesTarget = Constants.AlgaeIntakeVariables.kFloorIntakeAngle;
         break;
 
       case STORED:
-        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
+        m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
         break;
     }
   }
