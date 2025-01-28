@@ -123,7 +123,6 @@ public class Climber extends SubsystemBase {
     builder.setSmartDashboardType("RobotPreferences");
     builder.addDoubleProperty("GrabTarget", this::getGrabTarget, this::setGrabTarget);
     builder.addDoubleProperty("LiftTarget", this::getLiftTarget, this::setLiftTarget);
-    // builder.addDoubleProperty("LiftTarget2", this::getLiftTarget, this::setLiftTarget);
   }
 
   // This is for test mode
