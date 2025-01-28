@@ -131,6 +131,7 @@ public class Climber extends SubsystemBase implements TestBindings {
     builder.setSmartDashboardType("RobotPreferences");
     builder.addDoubleProperty("GrabTarget", this::getGrabTarget, this::setGrabTarget);
     builder.addDoubleProperty("LiftTarget", this::getLiftTarget, this::setLiftTarget);
+    // builder.addDoubleProperty("LiftTarget2", this::getLiftTarget, this::setLiftTarget);
   }
 
   // This is for test mode
@@ -138,7 +139,7 @@ public class Climber extends SubsystemBase implements TestBindings {
     return this.run(
         () -> {
           m_direction = Math.signum(speed.getAsDouble());
-          m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
+          m_climberMotor.set(-(Math.pow(speed.getAsDouble(), 2) * m_direction));
         });
   }
 
