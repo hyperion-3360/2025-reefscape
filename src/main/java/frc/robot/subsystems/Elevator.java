@@ -9,7 +9,8 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,35 +35,28 @@ public class Elevator extends SubsystemBase {
     L4
   }
 
-  // pid values
-  // private static final double kP = 0.185;
-  // private static final double kI = 0.0095;
-  // private static final double kD = 0.0;
-
-  private static double kP = 0.027;
-  private static double kD = 0.0;
-
-  //  private PIDController m_pid = new PIDController(kP, kI, kD);
+  private static double kP = 0;
+  private static double kI = 0.0;
+  private static double kD = 0;
 
   private static double kDt = 0.02;
-  private static double kMaxVelocity = 0.3;
-  private static double kMaxAcceleration = 0.3;
-  private static double kI = 0.0;
-  // sprivate static double kS = 0.0;
-  private static double kA = 0.001;
-  private static double kG = 1.15;
-  private static double kV = 0.1;
-  private static double kS = 0.01;
+
+  private static double kMaxVelocity = 2;
+  private static double kMaxAcceleration = 2;
+
+  //  private static double kG = 0.98; // not moving
+  private static double kG = 0.75;
+  private static double kA = 0;
+  private static double kV = 0.4;
+  private static double kS = 0.2;
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  // private final TrapezoidProfile.Constraints m_constraints =
-  //    new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
-  // private final ProfiledPIDController m_controller =
-  //    new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
-
-  private PIDController m_feedback = new PIDController(kP, kI, kD);
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
@@ -72,10 +66,7 @@ public class Elevator extends SubsystemBase {
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
-  private double m_elevatorTarget = Constants.ElevatorConstants.kElevatorL4; // kElevatorDown;
-
   public Elevator() {
-
     // motor configs
     m_rightMotorConfig.MotorOutput.Inverted =
         Constants.ElevatorConstants.kRightElevatorMotorNotInverted;
@@ -100,72 +91,83 @@ public class Elevator extends SubsystemBase {
     // SmartDashboard.putData("Tunable feedforward", m_feedforward);
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
+    SetHeight(desiredHeight.L2);
   }
 
   @Override
   public void periodic() {
 
-    SmartDashboard.putNumber("elevator pos", m_leftElevatorMotor.getPosition().getValueAsDouble());
     if (DriverStation.isDisabled()) {
       return;
     }
 
+    var elevatorPos = m_rightElevatorMotor.getPosition().getValueAsDouble();
+    var elevatorVelocity = m_rightElevatorMotor.getVelocity().getValueAsDouble();
+
+    var feedback = m_controller.calculate(elevatorPos);
+    var setPointVelocity = m_controller.getSetpoint().velocity;
+    var setPointPosition = m_controller.getSetpoint().position;
+    var feedforward = m_feedforward.calculate(setPointVelocity);
+    var output = feedback + feedforward;
+
+    SmartDashboard.putNumber("elevator position", elevatorPos);
+    SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
+    SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
+    SmartDashboard.putNumber("setpoint position", setPointPosition);
+    SmartDashboard.putNumber("output voltage", output);
+
     // Run controller and update motor output
-    m_rightElevatorMotor.setVoltage(
-        m_feedforward.calculate(
-                m_leftElevatorMotor.getVelocity().getValueAsDouble(), m_elevatorTarget)
-            + m_feedback.calculate(
-                m_rightElevatorMotor.getPosition().getValueAsDouble(),
-                m_leftElevatorMotor.getVelocity().getValueAsDouble()));
+    m_rightElevatorMotor.setVoltage(output);
   }
 
   public void SetHeight(desiredHeight height) {
     // add things to move to desired height
+    var heightTarget = 0.0;
     switch (height) {
       case LOW:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorDown;
+        heightTarget = Constants.ElevatorConstants.kElevatorDown;
         break;
-
       case L1:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL1;
+        heightTarget = Constants.ElevatorConstants.kElevatorL1;
         break;
 
       case L2:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL2;
+        heightTarget = Constants.ElevatorConstants.kElevatorL2;
         break;
 
       case L3:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL3;
+        heightTarget = Constants.ElevatorConstants.kElevatorL3;
         break;
 
       case L4:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorL4;
+        heightTarget = Constants.ElevatorConstants.kElevatorL4;
         break;
 
       case PROCESSOR:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorProcessor;
+        heightTarget = Constants.ElevatorConstants.kElevatorProcessor;
         break;
 
       case NET:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorNet;
+        heightTarget = Constants.ElevatorConstants.kElevatorNet;
         break;
 
       case HANDOFF:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorHandoff;
+        heightTarget = Constants.ElevatorConstants.kElevatorHandoff;
         break;
 
       case ALGAELOW:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
+        heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         break;
 
       case FEEDER:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorFeeder;
+        heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
         break;
 
       case CORALLOW:
-        m_elevatorTarget = Constants.ElevatorConstants.kElevatorCoralLow;
+        heightTarget = Constants.ElevatorConstants.kElevatorCoralLow;
         break;
     }
+    m_controller.setGoal(heightTarget);
   }
 
   public Command manualTest(DoubleSupplier up, DoubleSupplier down) {
