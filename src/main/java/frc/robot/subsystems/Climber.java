@@ -4,11 +4,16 @@
 
 package frc.robot.subsystems;
 
+// import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
@@ -46,6 +51,9 @@ public class Climber extends SubsystemBase {
   public Climber() {
     // How do you fully reset a motor to ensure start position?
     m_climberMotor.set(0);
+    m_climberMotor.setNeutralMode(NeutralModeValue.Brake);
+    SendableRegistry.add(this, "Climber", 0);
+    SmartDashboard.putData("Climber", this);
   }
 
   // create falcons motor control
@@ -101,9 +109,10 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Climber");
+    builder.setSmartDashboardType("RobotPreferences");
     builder.addDoubleProperty("GrabTarget", this::getGrabTarget, this::setGrabTarget);
     builder.addDoubleProperty("LiftTarget", this::getLiftTarget, this::setLiftTarget);
+    // builder.addDoubleProperty("LiftTarget2", this::getLiftTarget, this::setLiftTarget);
   }
 
   // This is for test mode
@@ -111,7 +120,7 @@ public class Climber extends SubsystemBase {
     return this.run(
         () -> {
           m_direction = Math.signum(speed.getAsDouble());
-          m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
+          m_climberMotor.set(-(Math.pow(speed.getAsDouble(), 2) * m_direction));
         });
   }
 }
