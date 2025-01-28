@@ -103,9 +103,9 @@ public class RobotContainer {
             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
             () -> 0.0,
             () -> true));
-
-    m_driverController.b().onTrue(m_climber.brakeMotors());
-    m_driverController.x().onTrue(m_climber.coastMotor());
+    m_driverController.x().onTrue(m_algaeIntake.cocking());
+    // m_driverController.b().onTrue(m_climber.brakeMotors());
+    // m_driverController.x().onTrue(m_climber.coastMotor());
     // m_driverController
     //     .a()
     //     .whileTrue(
@@ -155,15 +155,18 @@ public class RobotContainer {
     //         m_algaeIntake.setSpeed(
     //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
     //     .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
-
+    // m_driverController.povDown().onTrue(vomitProcessor.repeatedly());
+    // m_driverController.povUp().onTrue(intakeFloor);
     // m_driverController
     //     .leftBumper()
     //     .whileTrue(
     //         m_climber.climberTestMode(
-    //             () -> conditionJoystick(translationAxis, climberSpeedLimiter,
-    // kJoystickDeadband)));
+    //             () -> conditionJoystick(rotationAxis, climberSpeedLimiter, kJoystickDeadband)));
+
     m_driverController.povDown().onTrue(intakeFloor);
-    m_driverController.povUp().onTrue(vomitProcessor);
+    m_driverController.povUp().onTrue(m_algaeIntake.vomit(-0.6));
+    m_driverController.povLeft().onTrue(intakeFloor.cancelCommand());
+    m_driverController.povRight().onTrue(m_algaeIntake.vomit(0.0));
   }
 
   public void configureBindingsTeleop() {
