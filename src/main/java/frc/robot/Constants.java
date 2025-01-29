@@ -351,9 +351,9 @@ public final class Constants {
     public static final double kElevatorL1 = 0.2;
     public static final double kElevatorL2 = 0.4;
     public static final double kElevatorL3 = 0.6;
-    public static final double kElevatorL4 = 1.2;
+    public static final double kElevatorL4 = 1.45;
     public static final double kElevatorHandoff = 0.0;
-    public static final double kElevatorNet = 35.0;
+    public static final double kElevatorNet = 2.0;
     public static final double kElevatorProcessor = 10.0;
     public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.0;

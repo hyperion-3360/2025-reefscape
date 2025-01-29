@@ -35,19 +35,19 @@ public class Elevator extends SubsystemBase {
     L4
   }
 
-  private static double kP = 0;
-  private static double kI = 0.0;
+  private static double kP = 11.0;
+  private static double kI = 0.5;
   private static double kD = 0;
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 2;
-  private static double kMaxAcceleration = 2;
+  private static double kMaxVelocity = 3;
+  private static double kMaxAcceleration = 4;
 
   //  private static double kG = 0.98; // not moving
-  private static double kG = 0.75;
+  private static double kG = 0.90;
   private static double kA = 0.0;
-  private static double kV = 2.3;
+  private static double kV = 2.5;
   private static double kS = 0.2;
 
   // Create a PID controller whose setpoint's change is subject to maximum
@@ -65,6 +65,8 @@ public class Elevator extends SubsystemBase {
       new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID, "CANivore_3360");
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
+
+  private int test_heightIndex;
 
   public Elevator() {
 
@@ -92,13 +94,14 @@ public class Elevator extends SubsystemBase {
     // SmartDashboard.putData("Tunable feedforward", m_feedforward);
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
-    SetHeight(desiredHeight.L4);
+    m_controller.setGoal(0.01);
+    test_heightIndex = 0;
   }
 
   @Override
   public void periodic() {
 
-    var elevatorPos = m_rightElevatorMotor.getPosition().getValueAsDouble() * 0.04596;
+    var elevatorPos = m_rightElevatorMotor.getPosition().getValueAsDouble() * 0.0447;
     SmartDashboard.putNumber("elevator position", elevatorPos);
 
     if (DriverStation.isDisabled()) {
@@ -182,9 +185,17 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command Elevate(desiredHeight height) {
-    return run(
+    desiredHeight[] heightArray = {
+      desiredHeight.L1, desiredHeight.L2, desiredHeight.L3, desiredHeight.L4, desiredHeight.NET
+    };
+    return runOnce(
         () -> {
-          SetHeight(height);
+          System.out.println("Before: " + test_heightIndex);
+          desiredHeight testHeight = heightArray[test_heightIndex];
+          test_heightIndex++;
+          test_heightIndex = test_heightIndex % heightArray.length;
+          System.out.println("After: " + test_heightIndex);
+          SetHeight(testHeight);
         });
   }
 }

@@ -100,37 +100,34 @@ public class RobotContainer {
                 () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
                 () -> true));
 
-    m_driverController
-        .a()
-        .whileTrue(
-            m_elevator.manualTest(
-                () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
-                () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+    // m_driverController
+    //     .a()
+    //     .whileTrue(
+    //         m_elevator.manualTest(
+    //             () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
+    //             () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-    m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.L2));
+    // m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.L2));
 
-    m_driverController
-        .x()
-        .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.NET));
+    m_driverController.x().onTrue(m_elevator.Elevate(desiredHeight.NET));
 
-    m_driverController.x().and(m_driverController.y()).onTrue(m_elevator.Elevate(desiredHeight.L1));
+    // m_driverController.x().and(m_driverController.y()).onTrue(m_elevator.Elevate(desiredHeight.L1));
 
-    m_driverController.x().and(m_driverController.b()).onTrue(m_elevator.Elevate(desiredHeight.L2));
+    // m_driverController.x().and(m_driverController.b()).onTrue(m_elevator.Elevate(desiredHeight.L2));
 
     m_driverController
         .start()
         .and(m_driverController.povCenter())
         .onTrue(Pathfinding.doPathfinding());
 
-    m_driverController
-        .a()
-        .and(m_driverController.b())
-        .whileTrue(
-            m_shooter.manualTest(
-                () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
-        .onFalse(m_shooter.manualTest(() -> 0.0));
-    m_driverController.x().onTrue(m_shooter.openBlocker()).onFalse(m_shooter.closeBlocker());
+    // m_driverController
+    //     .a()
+    //     .and(m_driverController.b())
+    //     .whileTrue(
+    //         m_shooter.manualTest(
+    //             () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
+    //     .onFalse(m_shooter.manualTest(() -> 0.0));
+    // m_driverController.x().onTrue(m_shooter.openBlocker()).onFalse(m_shooter.closeBlocker());
 
     /*m_driverController
         .b()
@@ -140,24 +137,25 @@ public class RobotContainer {
             () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)))
     .onFalse(m_coralClaw.clawTestMode(() -> 0.0, () -> 0.0));
     */
-    m_driverController
-        .y()
-        .whileTrue(
-            m_algaeIntake.setAngle(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
-        .onFalse(m_algaeIntake.setAngle(() -> 0.0));
-    m_driverController
-        .povDown()
-        .whileTrue(
-            m_algaeIntake.setSpeed(
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
-        .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
+    // m_driverController
+    //     .y()
+    //     .whileTrue(
+    //         m_algaeIntake.setAngle(
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
+    //     .onFalse(m_algaeIntake.setAngle(() -> 0.0));
+    // m_driverController
+    //     .povDown()
+    //     .whileTrue(
+    //         m_algaeIntake.setSpeed(
+    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
+    //     .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
 
-    m_driverController
-        .leftBumper()
-        .whileTrue(
-            m_climber.climberTestMode(
-                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
+    // m_driverController
+    //     .leftBumper()
+    //     .whileTrue(
+    //         m_climber.climberTestMode(
+    //             () -> conditionJoystick(translationAxis, climberSpeedLimiter,
+    // kJoystickDeadband)));
   }
 
   public void configureBindingsTeleop() {
