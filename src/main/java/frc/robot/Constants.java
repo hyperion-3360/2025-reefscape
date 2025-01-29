@@ -336,6 +336,9 @@ public final class Constants {
     // sensor ids
     public static final int kCoralShooterBeambreakID = 7;
     public static final int kCoralAutoIntakeBeamBrake = 6;
+    // TODO put real IDs
+    public static final int kAlgaeIntakeUltrasonicSensorInputID = 0;
+    public static final int kAlgaeIntakeUltrasonicSensorOutputID = 1;
 
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
     // no clue if this is a good value but it should be fine to start

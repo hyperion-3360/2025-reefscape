@@ -55,7 +55,10 @@ public class AlgaeIntake extends SubsystemBase {
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
 
-  private Ultrasonic m_sensor = new Ultrasonic(0, 0);
+  private Ultrasonic m_sensor =
+      new Ultrasonic(
+          Constants.SubsystemInfo.kAlgaeIntakeUltrasonicSensorOutputID,
+          Constants.SubsystemInfo.kAlgaeIntakeUltrasonicSensorInputID);
   private LinearFilter m_sensorfilter = LinearFilter.movingAverage(10);
 
   public AlgaeIntake() {
