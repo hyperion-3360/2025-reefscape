@@ -12,7 +12,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -55,6 +55,9 @@ public class AlgaeIntake extends SubsystemBase {
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
 
+  private Ultrasonic m_sensor = new Ultrasonic(0, 0);
+  private LinearFilter m_sensorfilter = LinearFilter.movingAverage(10);
+
   public AlgaeIntake() {
 
     m_intakeLeftConfig.follow(m_intakeRight, true);
@@ -64,6 +67,8 @@ public class AlgaeIntake extends SubsystemBase {
     m_directionConfig.smartCurrentLimit(15);
     m_directionConfig.openLoopRampRate(0.3);
 
+    m_sensor.setEnabled(true);
+
     m_pivotMotor.getEncoder().setPosition(0);
 
     m_intakeLeft.configure(
@@ -72,7 +77,6 @@ public class AlgaeIntake extends SubsystemBase {
         m_intakeRightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_pivotMotor.configure(
         m_directionConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
   }
 
   @Override
@@ -93,6 +97,7 @@ public class AlgaeIntake extends SubsystemBase {
       m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     }
     m_intakeRight.set(m_SpeedTarget);
+    SmartDashboard.putNumber("Sensor detection", m_sensor.getRangeMM());
   }
 
   public void setShootingSpeed(shooting speed) {
@@ -138,8 +143,7 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   public boolean isAlgaeIn() {
-    return false;
-    // return currentInterpolation(m_intakeRight.getOutputCurrent()) >= Constants.AlgaeIntakeVariables.kCurrentLimit;
+    return m_sensorfilter.calculate(m_sensor.getRangeMM()) <= 50;
   }
 
   public boolean isAtAngle() {

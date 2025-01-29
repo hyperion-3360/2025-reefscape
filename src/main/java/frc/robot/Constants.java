@@ -263,7 +263,7 @@ public final class Constants {
     public static final double kFloorIntakeAngle = -20.0;
     public static final double kNetAngle = -8.0;
 
-    // auto intake because the algae/coral stand's algae is a bit higher 
+    // auto intake because the algae/coral stand's algae is a bit higher
     public static final double kAutoIntakeAngle = -10.0;
     public static final double kCurrentLimit = 15.0;
 
