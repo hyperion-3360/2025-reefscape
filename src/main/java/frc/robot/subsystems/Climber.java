@@ -55,13 +55,11 @@ public class Climber extends SubsystemBase {
     // motor configs
     m_climberMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_climberMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    // m_climberMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    // m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
-
+    m_climberMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     m_climberMotor.getConfigurator().apply(m_climberMotorConfig);
+
     m_climberMotor.set(0);
-    m_climberMotor.setNeutralMode(NeutralModeValue.Brake);
 
     SendableRegistry.add(this, "Climber", 0);
     SmartDashboard.putData("Climber", this);
