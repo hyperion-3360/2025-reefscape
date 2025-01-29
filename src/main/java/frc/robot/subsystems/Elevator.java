@@ -46,8 +46,8 @@ public class Elevator extends SubsystemBase {
 
   //  private static double kG = 0.98; // not moving
   private static double kG = 0.75;
-  private static double kA = 0;
-  private static double kV = 0.4;
+  private static double kA = 0.0;
+  private static double kV = 2.3;
   private static double kS = 0.2;
 
   // Create a PID controller whose setpoint's change is subject to maximum
@@ -67,6 +67,7 @@ public class Elevator extends SubsystemBase {
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
   public Elevator() {
+
     // motor configs
     m_rightMotorConfig.MotorOutput.Inverted =
         Constants.ElevatorConstants.kRightElevatorMotorNotInverted;
@@ -91,17 +92,19 @@ public class Elevator extends SubsystemBase {
     // SmartDashboard.putData("Tunable feedforward", m_feedforward);
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
-    SetHeight(desiredHeight.L2);
+    SetHeight(desiredHeight.L4);
   }
 
   @Override
   public void periodic() {
 
+    var elevatorPos = m_rightElevatorMotor.getPosition().getValueAsDouble() * 0.04596;
+    SmartDashboard.putNumber("elevator position", elevatorPos);
+
     if (DriverStation.isDisabled()) {
       return;
     }
 
-    var elevatorPos = m_rightElevatorMotor.getPosition().getValueAsDouble();
     var elevatorVelocity = m_rightElevatorMotor.getVelocity().getValueAsDouble();
 
     var feedback = m_controller.calculate(elevatorPos);
@@ -110,7 +113,6 @@ public class Elevator extends SubsystemBase {
     var feedforward = m_feedforward.calculate(setPointVelocity);
     var output = feedback + feedforward;
 
-    SmartDashboard.putNumber("elevator position", elevatorPos);
     SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
     SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
     SmartDashboard.putNumber("setpoint position", setPointPosition);
