@@ -10,12 +10,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
@@ -54,7 +54,6 @@ public class AlgaeIntake extends SubsystemBase {
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
-  private double m_baseVoltage;
 
   public AlgaeIntake() {
 
@@ -74,8 +73,6 @@ public class AlgaeIntake extends SubsystemBase {
     m_pivotMotor.configure(
         m_directionConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    // sets the battery voltage on init to have a base measurement for lerp
-    m_baseVoltage = RobotController.getBatteryVoltage();
   }
 
   @Override
@@ -141,7 +138,8 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   public boolean isAlgaeIn() {
-    return m_intakeRight.getOutputCurrent() >= Constants.AlgaeIntakeVariables.kCurrentLimit;
+    return false;
+    // return currentInterpolation(m_intakeRight.getOutputCurrent()) >= Constants.AlgaeIntakeVariables.kCurrentLimit;
   }
 
   public boolean isAtAngle() {
@@ -151,47 +149,14 @@ public class AlgaeIntake extends SubsystemBase {
   public Command setAngle(DoubleSupplier angle) {
     return run(
         () -> {
-          System.out.println(m_pivotMotor.getEncoder().getPosition());
           m_pivotMotor.set(angle.getAsDouble());
         });
   }
 
   public Command setSpeed(DoubleSupplier speed) {
-    System.out.println(m_pivotMotor.getEncoder().getPosition());
     return run(
         () -> {
           m_intakeRight.set(speed.getAsDouble());
-        });
-  }
-
-  private double currentInterpolation(double current) {
-    double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
-    double linearInterpolate =
-        -0.86 * (m_baseVoltage - RobotController.getBatteryVoltage()) + startPoint;
-    return linearInterpolate;
-  }
-
-  public Command pivotAlgae(elevation angle) {
-    return runOnce(
-        () -> {
-          setShootingAngle(angle);
-        });
-  }
-
-  public Command cocking() {
-    return this.runOnce(() -> setShootingSpeed(shooting.INTAKE))
-        .andThen(new WaitCommand(0.5))
-        .andThen(() -> setShootingSpeed(shooting.PROCESSOR));
-  }
-
-  public Command vomit(double speed) {
-    return this.runOnce(() -> m_SpeedTarget = speed);
-  }
-
-  public Command shootAlgae(shooting speed) {
-    return runOnce(
-        () -> {
-          setShootingSpeed(speed);
         });
   }
 }
