@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StringPublisher;
@@ -40,6 +41,16 @@ public final class Elastic {
     }
   }
 
+  boolean show_other_objects = true;
+  boolean show_tragectory = true;
+
+  double robot_width = 0.85;
+  double robot_length = 0.85;
+  double field_rotation = 0.0;
+
+  int field_game = 2025;
+  int robot_color = 0x00000000;
+  int trajectory_color = 0x00000000;
   /**
    * Selects the tab of the dashboard with the given name. If no tab matches the name, this will
    * have no effect on the widgets or tabs in view.
@@ -63,18 +74,11 @@ public final class Elastic {
     selectTab(Integer.toString(tabIndex));
   }
 
-  /*public void robotPosition(double xMeters, double yMeters, double rotationRadians)
-  {
-    field_game: ;
-    robot_width: ;
-    robot_length: ;
-    show_other_objects: ;
-    show_trajectories: ;
-    field_rotation: ;
-    robot_color: ;
-    trajectory_color: ;
-  }
-  */
+  
+
+
+  
+  
 
   /**
    * Represents an notification object to be sent to the Elastic dashboard. This object holds
