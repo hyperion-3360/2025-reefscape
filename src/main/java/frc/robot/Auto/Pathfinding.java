@@ -382,6 +382,28 @@ public class Pathfinding extends Command {
     return path;
   }
 
+  private static List<PathPoint> convertToPathPoints(POI raw_poi) {
+    List<PathPoint> path = new ArrayList<>();
+
+    Pose2d optimisedPos = POICoordinatesOptimisation(raw_poi);
+    Pose2d lineupPos = lineupPoint(optimisedPos);
+    // spotless:off
+    // TODO change the RotationTarget's param to match what we want because I'm not sure what the waypoint does
+    // spotless:on
+    path.add(
+        new PathPoint(
+            lineupPos.getTranslation(),
+            new RotationTarget(lineupPos.getTranslation().getNorm(), lineupPos.getRotation())));
+    path.add(
+        new PathPoint(
+            optimisedPos.getTranslation(),
+            new RotationTarget(
+                optimisedPos.getTranslation().getNorm(), optimisedPos.getRotation())));
+
+    // uses the coordinates and angle of the first point
+    return path;
+  }
+
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
 
     double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
@@ -392,8 +414,8 @@ public class Pathfinding extends Command {
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
         new Translation2d(
-            poiToPathfind.getCoordinates().getX() + robotHyp * poiToPathfind.getAngle().getCos(),
-            poiToPathfind.getCoordinates().getY() + poiToPathfind.getAngle().getSin() * robotHyp);
+            poiToPathfind.getCoordinates().getX() - robotHyp * poiToPathfind.getAngle().getCos(),
+            poiToPathfind.getCoordinates().getY() - poiToPathfind.getAngle().getSin() * robotHyp);
 
     // TODO make this code more modular for the future
     if (poiToPathfind.equals(POI.ALGAE) || poiToPathfind.equals(POI.CORAL)) {
@@ -418,8 +440,8 @@ public class Pathfinding extends Command {
   public static Pose2d lineupPoint(Pose2d poiToLineup) {
 
     return new Pose2d(
-        poiToLineup.getTranslation().getX() + 0.1 * poiToLineup.getRotation().getCos(),
-        poiToLineup.getTranslation().getY() + 0.1 * poiToLineup.getRotation().getSin(),
+        poiToLineup.getTranslation().getX() - 0.1 * poiToLineup.getRotation().getCos(),
+        poiToLineup.getTranslation().getY() - 0.1 * poiToLineup.getRotation().getSin(),
         poiToLineup.getRotation());
   }
 
@@ -568,5 +590,15 @@ public class Pathfinding extends Command {
         .andThen(bestPOI.getEvent())
         .repeatedly()
         .until(() -> DriverStation.isTeleop());
+  }
+
+  public static Command goThere(POI placeToGo) {
+    return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathPoints(
+                convertToPathPoints(placeToGo),
+                constraints,
+                new GoalEndState(0, placeToGo.getAngle())),
+            constraints)
+        .andThen(placeToGo.getEvent());
   }
 }
