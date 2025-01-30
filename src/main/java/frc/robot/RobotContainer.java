@@ -38,7 +38,6 @@ public class RobotContainer {
   public static final Vision m_vision = new Vision();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
   public static final Swerve m_swerve = new Swerve(m_vision);
-  // public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
   // public static final Elevator m_elevator = new Elevator();
@@ -57,8 +56,7 @@ public class RobotContainer {
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
-  private final SlewRateLimiter elevatorUpLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter elevatorDownLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
   // private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
   // private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
@@ -114,7 +112,23 @@ public class RobotContainer {
     //             () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
     //             () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
 
-    // m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.L2));
+    // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
+    m_driverController
+        .back()
+        .and(m_driverController.a())
+        .onTrue(m_elevator.Elevate(desiredHeight.L1));
+    m_driverController
+        .back()
+        .and(m_driverController.b())
+        .onTrue(m_elevator.Elevate(desiredHeight.L2));
+    m_driverController
+        .back()
+        .and(m_driverController.x())
+        .onTrue(m_elevator.Elevate(desiredHeight.L3));
+    m_driverController
+        .back()
+        .and(m_driverController.y())
+        .onTrue(m_elevator.Elevate(desiredHeight.L4));
 
     // m_driverController.x().onTrue(m_elevator.Elevate(desiredHeight.NET));
 
@@ -127,35 +141,27 @@ public class RobotContainer {
         .and(m_driverController.povCenter())
         .onTrue(Pathfinding.doPathfinding());
 
-    // m_driverController
-    //     .a()
-    //     .and(m_driverController.b())
-    //     .whileTrue(
-    //         m_shooter.manualTest(
-    //             () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
-    //     .onFalse(m_shooter.manualTest(() -> 0.0));
-    // m_driverController.x().onTrue(m_shooter.openBlocker()).onFalse(m_shooter.closeBlocker());
-
-    /*m_driverController
-        .b()
+    // Coral shooter manual test POV Right and left joystick
+    m_driverController
+        .povRight()
         .whileTrue(
-            m_coralClaw.clawTestMode(
-                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)))
-    .onFalse(m_coralClaw.clawTestMode(() -> 0.0, () -> 0.0));
-    */
-    // m_driverController
-    //     .y()
-    //     .whileTrue(
-    //         m_algaeIntake.setAngle(
-    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
-    //     .onFalse(m_algaeIntake.setAngle(() -> 0.0));
-    // m_driverController
-    //     .povDown()
-    //     .whileTrue(
-    //         m_algaeIntake.setSpeed(
-    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
-    //     .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
+            m_shooter.manualTest(
+                () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
+        .onFalse(m_shooter.manualTest(() -> 0.0));
+
+    // Coral blocker POV Center
+    m_driverController
+        .povCenter()
+        .onTrue(m_shooter.openBlocker())
+        .onFalse(m_shooter.closeBlocker());
+
+    // Algea elevator manual control  POV left + left joystick
+    m_driverController
+        .povLeft()
+        .whileTrue(
+            m_algaeIntake.setAngle(
+                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
+        .onFalse(m_algaeIntake.setAngle(() -> 0.0));
 
     // m_driverController
     //     .leftBumper()

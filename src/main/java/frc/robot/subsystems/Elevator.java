@@ -175,12 +175,11 @@ public class Elevator extends SubsystemBase {
     m_controller.setGoal(heightTarget);
   }
 
-  public Command manualTest(DoubleSupplier up, DoubleSupplier down) {
+  public Command manualTest(DoubleSupplier speed) {
     return run(
         () -> {
-          System.out.println(String.format("%f : %f", up.getAsDouble(), down.getAsDouble()));
-          if (up.getAsDouble() > 0.0) m_rightElevatorMotor.set(up.getAsDouble());
-          else m_rightElevatorMotor.set(-down.getAsDouble());
+          System.out.println(String.format("Elevator speed: %f", speed.getAsDouble()));
+          m_rightElevatorMotor.set(speed.getAsDouble());
         });
   }
 
