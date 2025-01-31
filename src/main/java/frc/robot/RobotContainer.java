@@ -12,12 +12,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.DumperCMD;
+import frc.robot.commands.IntakeCoralCmd;
+import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -66,6 +67,9 @@ public class RobotContainer {
 
   private final double kJoystickDeadband = 0.1;
 
+  private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter);
+  private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter);
+
   /***
    * conditionJoystick
    * Condition a joystick axis value given a slewrate limiter and deadband
@@ -109,22 +113,22 @@ public class RobotContainer {
     m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
-    m_driverController
-        .back()
-        .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.L1));
-    m_driverController
-        .back()
-        .and(m_driverController.b())
-        .onTrue(m_elevator.Elevate(desiredHeight.L2));
-    m_driverController
-        .back()
-        .and(m_driverController.x())
-        .onTrue(m_elevator.Elevate(desiredHeight.L3));
-    m_driverController
-        .back()
-        .and(m_driverController.y())
-        .onTrue(m_elevator.Elevate(desiredHeight.L4));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.a())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L1));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.b())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L2));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.x())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L3));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.y())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L4));
 
     // Path finding  START and POV center
     m_driverController
@@ -133,41 +137,45 @@ public class RobotContainer {
         .onTrue(Pathfinding.doPathfinding());
 
     // Coral shooter manual test POV Right and left joystick
-    m_driverController
-        .povRight()
-        .whileTrue(
-            m_shooter.manualTest(
-                () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
-        .onFalse(m_shooter.manualTest(() -> 0.0));
+    // m_driverController
+    //     .povRight()
+    //     .whileTrue(
+    //         m_shooter.manualTest(
+    //             () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
+    //     .onFalse(m_shooter.manualTest(() -> 0.0));
 
     // Coral blocker POV Center
-    m_driverController
-        .povCenter()
-        .onTrue(m_shooter.openBlocker())
-        .onFalse(m_shooter.closeBlocker());
+    // m_driverController
+    //     .povCenter()
+    //     .onTrue(m_shooter.openBlocker())
+    //     .onFalse(m_shooter.closeBlocker());
 
     // Algea elevator manual control  POV left + left joystick
-    m_driverController
-        .povLeft()
-        .whileTrue(
-            m_algaeIntake.setAngle(
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
-        .onFalse(m_algaeIntake.setAngle(() -> 0.0));
+    // m_driverController
+    //     .povLeft()
+    //     .whileTrue(
+    //         m_algaeIntake.setAngle(
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
+    //     .onFalse(m_algaeIntake.setAngle(() -> 0.0));
 
     // Algea intake manual control POV down + left joystick
-    m_driverController
-        .povDown()
-        .whileTrue(
-            m_algaeIntake.setSpeed(
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
-        .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
+    // m_driverController
+    //     .povDown()
+    //     .whileTrue(
+    //         m_algaeIntake.setSpeed(
+    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
+    //     .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
 
-    // Climber manual control left bumpber + left joystick
-    m_driverController
-        .leftBumper()
-        .whileTrue(
-            m_climber.climberTestMode(
-                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
+    // // Climber manual control left bumpber + left joystick
+    // m_driverController
+    //     .leftBumper()
+    //     .whileTrue(
+    //         m_climber.climberTestMode(
+    //             () -> conditionJoystick(translationAxis, climberSpeedLimiter,
+    // kJoystickDeadband)));
+
+    m_driverController.a().onTrue(intakeCoral).onFalse(intakeCoral.cancelCommand());
+    m_driverController.b().onTrue(shootCoral).onFalse(shootCoral.cancelCommand());
   }
 
   public void configureBindingsTeleop() {

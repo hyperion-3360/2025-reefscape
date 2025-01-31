@@ -11,14 +11,13 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Shooter;
 
-public class ShootCoralCmd extends SequentialCommandGroup {
-  public ShootCoralCmd(Shooter m_shooter) {
-    this.addCommands(
-    m_shooter.openBlocker(),
-    new WaitCommand(0.3),
-    Commands.runOnce(() -> m_shooter.setShoot()),
-    new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
-    Commands.runOnce(() -> m_shooter.stop())
+public class IntakeCoralCmd extends SequentialCommandGroup {
+  public IntakeCoralCmd(Shooter m_shooter) {
+    this.addCommands(m_shooter.closeBlocker(),
+        new WaitCommand(0.3),
+        Commands.runOnce(() -> m_shooter.setIntake()),
+        new WaitUntilCommand(() -> m_shooter.isCoralIn()),
+        Commands.runOnce(() -> m_shooter.stop())
     );
   }
 

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,10 +20,12 @@ public class Shooter extends SubsystemBase {
   private Servo m_coralBlocker = new Servo(Constants.SubsystemInfo.kCoralShooterServoID);
   private DigitalInput m_shooterIR =
       new DigitalInput(Constants.SubsystemInfo.kCoralShooterBeambreakID);
-  public boolean getShooterIR = m_shooterIR.get();
-  public double CoralShooterSpeed = m_shooter.get();
-  public double TestSpeed = 0.0;
-  public double SpeedTestTime = 0.0;
+      
+  private boolean getShooterIR = m_shooterIR.get();
+  private double CoralShooterSpeed = m_shooter.get();
+  private double TestSpeed = 0.0;
+  private double SpeedTestTime = 0.0;
+  private double speed = 0.0;
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
   public Shooter() {
@@ -42,22 +45,6 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Shooter test time", SpeedTestTime);
   }
 
-  public void shoot() {
-    openBlocker();
-    m_shooter.set(Constants.CoralShooterVariables.kShootSpeed);
-    Wait.waitUntil(() -> getShooterIR);
-    Wait.waitSecs(0.1);
-    stop();
-    closeBlocker();
-  }
-
-  public void intake() {
-    closeBlocker();
-    m_shooter.set(Constants.CoralShooterVariables.kIntakeSpeed);
-    Wait.waitUntil(() -> !getShooterIR);
-    stop();
-  }
-
   public void testSpeed() {
     m_shooter.set(SmartDashboard.getNumber(getName(), CoralShooterSpeed));
     Wait.waitSecs(SmartDashboard.getNumber(getName(), SpeedTestTime));
@@ -65,7 +52,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stop() {
-    m_shooter.set(0);
+   speed = 0.0;
   }
 
   public Command openBlocker() {
@@ -81,6 +68,10 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     getShooterIR = m_shooterIR.get();
+    if (DriverStation.isDisabled()) {
+      speed = 0.0;
+    }
+    m_shooter.set(speed);
   }
 
   /**
@@ -97,5 +88,17 @@ public class Shooter extends SubsystemBase {
           double throttle = joystick.getAsDouble();
           m_shooter.set(-1.0 * throttle * throttle);
         });
+  }
+
+  public void setShoot() {
+ speed = -0.5;
+  }
+
+  public void setIntake() {
+   speed = 0.5;
+  }
+
+  public boolean isCoralIn() {
+    return getShooterIR;
   }
 }
