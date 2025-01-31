@@ -192,6 +192,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.doPathfinding();
+    return Pathfinding.fullControl();
   }
 }

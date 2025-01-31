@@ -49,7 +49,7 @@ public class Pathfinding extends Command {
         () -> Commands.runOnce(() -> System.out.println("Hello Algae")),
         Constants.Priorities.kIntakeCoral,
         true,
-        () -> !Constants.Conditions.hasAlgae()),
+        () -> !RobotContainer.m_algaeIntake.isAlgaeIn()),
     CORAL(
         Constants.AlgaeCoralStand.kStands,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
@@ -67,21 +67,21 @@ public class Pathfinding extends Command {
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         false,
-        () -> Constants.Conditions.hasCoral()),
+        () -> !Constants.Conditions.hasCoral()),
     PROCESSOR(
         10.0,
         5.3,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootingProcessor,
-        () -> Constants.Conditions.hasAlgae()),
+        () -> RobotContainer.m_algaeIntake.isAlgaeIn()),
     NET(
         7.734,
         4,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
-        () -> Constants.Conditions.hasAlgae()),
+        () -> RobotContainer.m_algaeIntake.isAlgaeIn()),
     DUMPINGUP(
         4.073906,
         4.745482,
@@ -291,6 +291,7 @@ public class Pathfinding extends Command {
   private static POI bestPOI;
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+  private static int index = 0;
 
   // #endregion
 
@@ -451,9 +452,10 @@ public class Pathfinding extends Command {
    * Pathfinding class
    */
   public static void makeChooserWidget() {
+    List<POI> poiListClone = poiList;
     // adds the POIs in the enum
     for (POI poi : POI.values()) {
-      poiList.add(poi);
+      poiListClone.add(poi);
     }
 
     for (CustomAuto autos : CustomAuto.values()) {
@@ -461,11 +463,13 @@ public class Pathfinding extends Command {
     }
     createPOIListWidget();
     autoChooser.setDefaultOption(
-        "Full Auto (every coordinates)", poiList); // if no options are chosen put every coordinates
+        "Full Auto (every coordinates)",
+        poiListClone); // if no options are chosen put every coordinates
     SmartDashboard.putData(POIAdder);
     SmartDashboard.putData(POIRemover);
     SmartDashboard.putData(autoChooser);
     logicHandler();
+    poiList.clear();
   }
 
   private static void createWidgetList(CustomAuto auto) {
@@ -578,6 +582,12 @@ public class Pathfinding extends Command {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
+    // this is to ensure that we chose the default option if nothing is chosen
+    if (chosenPath == "") {
+      for (POI poi : POI.values()) {
+        poiList.add(poi);
+      }
+    }
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
@@ -600,5 +610,29 @@ public class Pathfinding extends Command {
                 new GoalEndState(0, placeToGo.getAngle())),
             constraints)
         .andThen(placeToGo.getEvent());
+  }
+
+  public static Command fullControl() {
+    // this is to ensure that we chose the default option if nothing is chosen
+    if (chosenPath == "") {
+      for (POI poi : POI.values()) {
+        poiList.add(poi);
+      }
+    }
+    // once we have the POIs we want, we replace the old list and add them
+    for (POI poiArrayElement : tokenReader(chosenPath)) {
+      poiList.add(poiArrayElement);
+    }
+
+    return AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathPoints(
+                convertToPathPoints(poiList.get(index)),
+                constraints,
+                new GoalEndState(0, poiList.get(index).getAngle())),
+            constraints)
+        .andThen(poiList.get(index).getEvent())
+        .andThen(() -> index++)
+        .repeatedly()
+        .until(() -> DriverStation.isTeleop());
   }
 }
