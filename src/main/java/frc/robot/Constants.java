@@ -273,7 +273,7 @@ public final class Constants {
     public static final double kStoringSpeed = 0.15;
     public static final double kProcessorSpeed = -0.8;
     public static final double kStopSpeed = 0.0;
-    public static final double kNetSpeed = -0.5;
+    public static final double kNetSpeed = 0.0;
   }
 
   public static class CoralShooterVariables {

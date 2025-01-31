@@ -36,7 +36,7 @@ public class AlgaeIntake extends SubsystemBase {
     STORED // this is resting speed or 0
   }
 
-  private static final double kP = 0.01;
+  private static final double kP = 0.1;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
@@ -53,7 +53,7 @@ public class AlgaeIntake extends SubsystemBase {
       new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberRightMotorID, MotorType.kBrushless);
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
-  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
+  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
 
   public AlgaeIntake() {
 
@@ -80,10 +80,7 @@ public class AlgaeIntake extends SubsystemBase {
   public void periodic() {
     if (DriverStation.isDisabled()) {
       m_pid.reset();
-      m_SpeedTarget = 0;
-      if (this.getCurrentCommand() != null) {
-        this.getCurrentCommand().cancel();
-      }
+      m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
     }
     m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     m_intakeRight.set(m_SpeedTarget);
@@ -103,15 +100,15 @@ public class AlgaeIntake extends SubsystemBase {
 
     switch (speed) {
       case INTAKE:
-        m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
         break;
 
       case NET:
-        m_SpeedTarget = Constants.AlgaeIntakeVariables.kNetSpeed;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kNetSpeed;
         break;
 
       case PROCESSOR:
-        m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kProcessorSpeed;
         break;
 
       case STORING:
@@ -128,15 +125,15 @@ public class AlgaeIntake extends SubsystemBase {
 
     switch (angle) {
       case NET:
-        m_AnglesTarget = Constants.AlgaeIntakeVariables.kNetAngle;
+        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kNetAngle;
         break;
 
       case FLOOR:
-        m_AnglesTarget = Constants.AlgaeIntakeVariables.kFloorIntakeAngle;
+        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kFloorIntakeAngle;
         break;
 
       case STORED:
-        m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
+        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
         break;
     }
   }
@@ -162,6 +159,30 @@ public class AlgaeIntake extends SubsystemBase {
     return run(
         () -> {
           m_intakeRight.set(speed.getAsDouble());
+        });
+  }
+
+  private double currentInterpolation(double current) {
+    double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
+    double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
+    System.out.println(linearInterpolate);
+    return linearInterpolate;
+  }
+
+  public Command pivotAlgae(elevation angle) {
+    setShootingAngle(angle);
+    return run(
+        () -> {
+          m_pivotMotor.set(
+              m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
+        });
+  }
+
+  public Command shootAlgae(shooting speed) {
+    setShootingSpeed(speed);
+    return run(
+        () -> {
+          m_intakeRight.set(m_SpeedTarget);
         });
   }
 }
