@@ -7,8 +7,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.AlgaeIntake;
 
 public class IntakeAlgaeCmd extends SequentialCommandGroup {
@@ -20,17 +18,19 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
 
   public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle) {
     addCommands(
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
-        new WaitCommand(1),
-        new WaitUntilCommand(() -> m_algaeIntake.isAlgaeIn()),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.NET)),
-        new WaitUntilCommand(() -> m_algaeIntake.isAtAngle()),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)));
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.INTAKE)
+            .until(() -> m_algaeIntake.isAlgaeIn()),
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.STORING)
+            .alongWith(m_algaeIntake.pivotAlgae(angle))
+            .until(() -> m_algaeIntake.isAtAngle()),
+        m_algaeIntake
+            .shootAlgae(AlgaeIntake.shooting.STORED)
+            .alongWith(m_algaeIntake.pivotAlgae(AlgaeIntake.elevation.STORED)));
   }
 
-  public Command cancelCommand() {
-    return Commands.runOnce(() -> this.cancel());
-  }
+public Command cancelCommand() {
+   return Commands.runOnce(() -> this.cancel());
+}
 }

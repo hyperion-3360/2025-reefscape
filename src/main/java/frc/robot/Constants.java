@@ -260,18 +260,17 @@ public final class Constants {
 
     // in º
     public static final double kStartingAngle = 0.0;
-    public static final double kFloorIntakeAngle = -20.0;
-    public static final double kNetAngle = -8.0;
-
-    // auto intake because the algae/coral stand's algae is a bit higher
-    public static final double kAutoIntakeAngle = -10.0;
-    public static final double kCurrentLimit = 15.0;
+    public static final double kFloorIntakeAngle = -22.0;
+    public static final double kNetAngle = -10.0;
+    // auto intake bcuz of the little tower thing
+    public static final double kAutoIntakeAngle = 0.0;
+    public static final double kCurrentLimit = 20.0;
 
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
-    public static final double kProcessorSpeed = -0.5;
+    public static final double kProcessorSpeed = 0.0;
     public static final double kStopSpeed = 0.0;
-    public static final double kNetSpeed = -0.5;
+    public static final double kNetSpeed = 0.0;
   }
 
   public static class CoralShooterVariables {
@@ -365,6 +364,6 @@ public final class Constants {
   }
 
   public static class AlgaeIntakeConstants {
-    public static final double kAngleTolerance = 0.8;
+    public static final double kAngleTolerance = 0.0;
   }
 }
