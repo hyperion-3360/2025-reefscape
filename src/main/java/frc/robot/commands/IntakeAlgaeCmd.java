@@ -20,16 +20,16 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
 
   public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle) {
     addCommands(
-        Commands.run(
+        Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
         new WaitUntilCommand(() -> m_algaeIntake.isAlgaeIn()),
-        Commands.run(
+        Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
         Commands.run(() -> m_algaeIntake.setShootingAngle(angle), m_algaeIntake),
         new WaitUntilCommand(() -> m_algaeIntake.isAtAngle()),
-        Commands.run(
+        Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake),
-        Commands.run(
+        Commands.runOnce(
             () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED), m_algaeIntake));
   }
 
