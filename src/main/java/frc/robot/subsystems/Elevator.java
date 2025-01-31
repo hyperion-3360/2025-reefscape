@@ -184,17 +184,19 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command Elevate(desiredHeight height) {
-    desiredHeight[] heightArray = {
-      desiredHeight.L1, desiredHeight.L2, desiredHeight.L3, desiredHeight.L4, desiredHeight.NET
-    };
-    return runOnce(
-        () -> {
-          System.out.println("Before: " + test_heightIndex);
-          desiredHeight testHeight = heightArray[test_heightIndex];
-          test_heightIndex++;
-          test_heightIndex = test_heightIndex % heightArray.length;
-          System.out.println("After: " + test_heightIndex);
-          SetHeight(testHeight);
-        });
+
+    return runOnce(()-> SetHeight(height));
+    // desiredHeight[] heightArray = {
+    //   desiredHeight.L1, desiredHeight.L2, desiredHeight.L3, desiredHeight.L4, desiredHeight.NET
+    // };
+    // return runOnce(
+    //     () -> {
+    //       System.out.println("Before: " + test_heightIndex);
+    //       desiredHeight testHeight = heightArray[test_heightIndex];
+    //       test_heightIndex++;
+    //       test_heightIndex = test_heightIndex % heightArray.length;
+    //       System.out.println("After: " + test_heightIndex);
+    //       SetHeight(testHeight);
+    //     });
   }
 }
