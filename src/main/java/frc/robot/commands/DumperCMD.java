@@ -11,13 +11,12 @@ import frc.robot.subsystems.Dumper;
 public class DumperCMD extends Command {
 
   public final Dumper m_dumper;
-  /** Creates a new servoCMD. */
 
+  /** Creates a new servoCMD. */
   public DumperCMD(Dumper subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_dumper = subsystem;
     addRequirements(m_dumper);
-
   }
 
   // Called when the command is initially scheduled.

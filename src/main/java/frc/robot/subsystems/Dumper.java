@@ -1,20 +1,20 @@
-
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Dumper extends SubsystemBase {
-    private Servo leftServo = new Servo(7);
-    private Servo rightServo = new Servo(9);
-    public Dumper() {}
+  private Servo leftServo = new Servo(Constants.SubsystemInfo.kCoralDumperLeftServoID);
+  private Servo rightServo = new Servo(Constants.SubsystemInfo.kCoralDumperRightServoID);
 
-    public void dumpRight() {
-        rightServo.setAngle(60);
-    }
+  public Dumper() {}
 
-    public void dumpLeft() {
-        leftServo.setAngle(60);
-}
+  public void dumpRight() {
+    rightServo.setAngle(60);
+  }
 
+  public void dumpLeft() {
+    leftServo.setAngle(60);
+  }
 }
