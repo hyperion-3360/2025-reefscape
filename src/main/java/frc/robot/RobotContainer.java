@@ -40,7 +40,7 @@ public class RobotContainer {
   public static final Swerve m_swerve = new Swerve(m_vision);
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
-  public static final Elevator m_elevator = new Elevator();
+  // public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
@@ -96,15 +96,15 @@ public class RobotContainer {
   public void configureBindingsTest() {
 
     // Swerve control Right bumper + left and right joystick
-    m_driverController
-        .rightBumper()
-        .whileTrue(
-            new TeleopSwerve(
-                m_swerve,
-                () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
-                () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
-                () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
-                () -> true));
+    // m_driverController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new TeleopSwerve(
+    //             m_swerve,
+    //             () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
+    //             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
+    //             () -> true));
 
     // Elevator control Pov UP + left joystick
     //m_driverController
@@ -114,28 +114,28 @@ public class RobotContainer {
     m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
-    m_driverController
-        .back()
-        .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.L1));
-    m_driverController
-        .back()
-        .and(m_driverController.b())
-        .onTrue(m_elevator.Elevate(desiredHeight.L2));
-    m_driverController
-        .back()
-        .and(m_driverController.x())
-        .onTrue(m_elevator.Elevate(desiredHeight.L3));
-    m_driverController
-        .back()
-        .and(m_driverController.y())
-        .onTrue(m_elevator.Elevate(desiredHeight.L4));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.a())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L1));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.b())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L2));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.x())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L3));
+    // m_driverController
+    //     .back()
+    //     .and(m_driverController.y())
+    //     .onTrue(m_elevator.Elevate(desiredHeight.L4));
 
     // Path finding  START and POV center
-    m_driverController
-        .start()
-        .and(m_driverController.povCenter())
-        .onTrue(Pathfinding.doPathfinding());
+    // m_driverController
+    //     .start()
+    //     .and(m_driverController.povCenter())
+    //     .onTrue(Pathfinding.doPathfinding());
 
     // Coral shooter manual test POV Right and left joystick
     // m_driverController
@@ -176,9 +176,7 @@ public class RobotContainer {
     // kJoystickDeadband)));
 
     m_driverController.povUp().onTrue(intakeCoral);
-    m_driverController.povUp().onTrue(shootCoral.cancelCommand());
     m_driverController.povDown().onTrue(shootCoral);
-    m_driverController.povDown().onTrue(intakeCoral.cancelCommand());
   }
 
   public void configureBindingsTeleop() {

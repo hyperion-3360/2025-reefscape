@@ -84,7 +84,15 @@ public class Shooter extends SubsystemBase {
         });
   }
 
+  /** We want a ramp rate when intaking so set the speed at -1 in 0.5 seconds */
+  public void setIntake() {
+    m_shooter.configOpenloopRamp(0.5);
+    m_shooter.set(-1);
+  }
+
+  /** We don't want a ramp rate when shooting so set the speed at -1 in 0.0 seconds */
   public void setShoot() {
+    m_shooter.configOpenloopRamp(0.0);
     m_shooter.set(-1);
   }
 
