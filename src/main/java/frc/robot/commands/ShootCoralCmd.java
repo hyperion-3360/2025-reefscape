@@ -8,18 +8,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Shooter;
 
 public class ShootCoralCmd extends SequentialCommandGroup {
   public ShootCoralCmd(Shooter m_shooter) {
     this.addCommands(
-    m_shooter.openBlocker(),
-    new WaitCommand(0.3),
-    Commands.runOnce(() -> m_shooter.setShoot()),
-    new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
-    Commands.runOnce(() -> m_shooter.stop())
-    );
+        Commands.runOnce(() -> m_shooter.openBlocker()),
+        new WaitCommand(0.3),
+        Commands.run(() -> m_shooter.setShoot()).until(() -> m_shooter.isCoralIn()),
+        new WaitCommand(0.8),
+        Commands.runOnce(() -> m_shooter.stop()));
   }
 
   public Command cancelCommand() {

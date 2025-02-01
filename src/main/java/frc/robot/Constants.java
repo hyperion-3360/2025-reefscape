@@ -284,8 +284,8 @@ public final class Constants {
 
     // TODO: Find angles
     // angles in º
-    public static final double kCoralShooterClosed = 9.0;
-    public static final double kCoralShooterOpen = 80.0;
+    public static final double kCoralShooterClosed = 32.0;
+    public static final double kCoralShooterOpen = 120.0;
   }
 
   public static class LEDConstants {

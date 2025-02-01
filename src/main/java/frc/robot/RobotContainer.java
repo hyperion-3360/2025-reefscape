@@ -19,6 +19,7 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -67,8 +68,8 @@ public class RobotContainer {
 
   private final double kJoystickDeadband = 0.1;
 
-  private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter);
-  private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter);
+  public final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter);
+  public final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter);
 
   /***
    * conditionJoystick
@@ -113,22 +114,22 @@ public class RobotContainer {
     m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
-    // m_driverController
-    //     .back()
-    //     .and(m_driverController.a())
-    //     .onTrue(m_elevator.Elevate(desiredHeight.L1));
-    // m_driverController
-    //     .back()
-    //     .and(m_driverController.b())
-    //     .onTrue(m_elevator.Elevate(desiredHeight.L2));
-    // m_driverController
-    //     .back()
-    //     .and(m_driverController.x())
-    //     .onTrue(m_elevator.Elevate(desiredHeight.L3));
-    // m_driverController
-    //     .back()
-    //     .and(m_driverController.y())
-    //     .onTrue(m_elevator.Elevate(desiredHeight.L4));
+    m_driverController
+        .back()
+        .and(m_driverController.a())
+        .onTrue(m_elevator.Elevate(desiredHeight.L1));
+    m_driverController
+        .back()
+        .and(m_driverController.b())
+        .onTrue(m_elevator.Elevate(desiredHeight.L2));
+    m_driverController
+        .back()
+        .and(m_driverController.x())
+        .onTrue(m_elevator.Elevate(desiredHeight.L3));
+    m_driverController
+        .back()
+        .and(m_driverController.y())
+        .onTrue(m_elevator.Elevate(desiredHeight.L4));
 
     // Path finding  START and POV center
     m_driverController
@@ -174,8 +175,10 @@ public class RobotContainer {
     //             () -> conditionJoystick(translationAxis, climberSpeedLimiter,
     // kJoystickDeadband)));
 
-    m_driverController.a().onTrue(intakeCoral).onFalse(intakeCoral.cancelCommand());
-    m_driverController.b().onTrue(shootCoral).onFalse(shootCoral.cancelCommand());
+    m_driverController.a().onTrue(intakeCoral);
+    m_driverController.a().onTrue(shootCoral.cancelCommand());
+    m_driverController.b().onTrue(shootCoral);
+    m_driverController.b().onTrue(intakeCoral.cancelCommand());
   }
 
   public void configureBindingsTeleop() {

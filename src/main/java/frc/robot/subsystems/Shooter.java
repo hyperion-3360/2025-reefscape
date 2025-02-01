@@ -20,12 +20,11 @@ public class Shooter extends SubsystemBase {
   private Servo m_coralBlocker = new Servo(Constants.SubsystemInfo.kCoralShooterServoID);
   private DigitalInput m_shooterIR =
       new DigitalInput(Constants.SubsystemInfo.kCoralShooterBeambreakID);
-      
+
   private boolean getShooterIR = m_shooterIR.get();
   private double CoralShooterSpeed = m_shooter.get();
   private double TestSpeed = 0.0;
   private double SpeedTestTime = 0.0;
-  private double speed = 0.0;
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
   public Shooter() {
@@ -52,26 +51,23 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stop() {
-   speed = 0.0;
+    m_shooter.set(0.0);
   }
 
-  public Command openBlocker() {
-    return this.runOnce(
-        () -> m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterOpen));
+  public void openBlocker() {
+    m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterOpen);
   }
 
-  public Command closeBlocker() {
-    return this.runOnce(
-        () -> m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterClosed));
+  public void closeBlocker() {
+    m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterClosed);
   }
 
   @Override
   public void periodic() {
     getShooterIR = m_shooterIR.get();
     if (DriverStation.isDisabled()) {
-      speed = 0.0;
+      m_shooter.set(0.0);
     }
-    m_shooter.set(speed);
   }
 
   /**
@@ -91,11 +87,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setShoot() {
- speed = -0.5;
-  }
-
-  public void setIntake() {
-   speed = 0.5;
+    m_shooter.set(-0.9);
   }
 
   public boolean isCoralIn() {
