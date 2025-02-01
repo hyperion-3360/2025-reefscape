@@ -270,6 +270,7 @@ public final class Constants {
 
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
+    public static final double kStoringSpeed = 0.25;
     public static final double kProcessorSpeed = -0.8;
     public static final double kStopSpeed = 0.0;
     public static final double kNetSpeed = 0.0;

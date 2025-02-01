@@ -84,6 +84,8 @@ public class AlgaeIntake extends SubsystemBase {
     m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     m_intakeRight.set(m_SpeedTarget);
 
+    SmartDashboard.putNumber(
+        "Output du pid", m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     SmartDashboard.putNumber("Current", m_intakeRight.getOutputCurrent());
     SmartDashboard.putNumber("AlgaeEncoder", m_pivotMotor.getEncoder().getPosition());
     SmartDashboard.putNumber("beamBreakVoltage", m_beamBreak.getVoltage());
@@ -109,11 +111,12 @@ public class AlgaeIntake extends SubsystemBase {
         break;
 
       case STORING:
-        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed / 2;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoringSpeed;
         break;
 
       case STORED:
         this.m_SpeedTarget = 0.0;
+        break;
     }
   }
 
