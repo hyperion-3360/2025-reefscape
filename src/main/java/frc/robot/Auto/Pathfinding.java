@@ -590,14 +590,28 @@ public class Pathfinding extends Command {
         .until(() -> DriverStation.isTeleop());
   }
 
+  /**
+   * A simple command to go to a specified POI in order to execute a command. This should only be
+   * used during teleop
+   *
+   * @param placeToGo The poi to go to
+   * @return A command to pathfind and execute the event
+   */
   public static Command goThere(POI placeToGo) {
-    return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathPoints(
-                convertToPathPoints(placeToGo),
-                constraints,
-                new GoalEndState(0, placeToGo.getAngle())),
-            constraints)
+    return AutoBuilder.pathfindToPose(
+            new Pose2d(placeToGo.getCoordinates(), placeToGo.getAngle()), constraints)
         .andThen(placeToGo.getEvent());
+  }
+
+/**
+   * A simple command to go to a specified POI in order to execute a command. This should only be
+   * used during teleop
+   *
+   * @param placeToGo The pose2d we want to go to
+   * @return A command to pathfind to a specified point
+   */
+  public static Command goThere(Pose2d placeToGo) {
+    return AutoBuilder.pathfindToPose(placeToGo, constraints);
   }
 
   public static Command fullControl() {
@@ -607,13 +621,13 @@ public class Pathfinding extends Command {
     }
 
     return Commands.repeatingSequence(
-            AutoBuilder.pathfindThenFollowPath(
-                PathPlannerPath.fromPathPoints(
-                    convertToPathPoints(poiList.get(index)),
-                    constraints,
-                    new GoalEndState(0, poiList.get(index).getAngle())),
-                constraints),
-            Commands.runOnce(() -> poiList.get(index).getEvent()),
-            Commands.runOnce(() -> index++));
+        AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathPoints(
+                convertToPathPoints(poiList.get(index)),
+                constraints,
+                new GoalEndState(0, poiList.get(index).getAngle())),
+            constraints),
+        Commands.runOnce(() -> poiList.get(index).getEvent()),
+        Commands.runOnce(() -> index++));
   }
 }
