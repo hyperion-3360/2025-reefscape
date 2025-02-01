@@ -266,6 +266,8 @@ public final class Constants {
     public static final double kAutoIntakeAngle = 0.0;
     public static final double kCurrentLimit = 15.0;
 
+    public static final double kVoltageTotrigger = 0.1;
+
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
     public static final double kProcessorSpeed = -0.8;
@@ -364,6 +366,6 @@ public final class Constants {
   }
 
   public static class AlgaeIntakeConstants {
-    public static final double kAngleTolerance = 0.0;
+    public static final double kAngleTolerance = 0.6;
   }
 }

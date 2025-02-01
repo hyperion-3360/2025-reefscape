@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -35,8 +36,8 @@ public class AlgaeIntake extends SubsystemBase {
     STORED // this is resting speed or 0
   }
 
-  private static final double kP = 0.01;
-  private static final double kI = 0.0;
+  private static final double kP = 0.05;
+  private static final double kI = 0.001;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
 
@@ -53,6 +54,8 @@ public class AlgaeIntake extends SubsystemBase {
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
+
+  private SparkAnalogSensor m_beamBreak = m_intakeLeft.getAnalog();
 
   public AlgaeIntake() {
 
@@ -83,6 +86,11 @@ public class AlgaeIntake extends SubsystemBase {
 
     SmartDashboard.putNumber("Current", m_intakeRight.getOutputCurrent());
     SmartDashboard.putNumber("AlgaeEncoder", m_pivotMotor.getEncoder().getPosition());
+    SmartDashboard.putNumber("beamBreakVoltage", m_beamBreak.getVoltage());
+    SmartDashboard.putNumber("error", m_pid.getError());
+    SmartDashboard.putNumber(
+        "pid Calculation",
+        m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
   }
 
   public void setShootingSpeed(shooting speed) {
@@ -126,13 +134,17 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
+  private boolean sensorTriggered() {
+    return m_beamBreak.getVoltage() >= Constants.AlgaeIntakeVariables.kVoltageTotrigger;
+  }
+
   public boolean isAlgaeIn() {
-    return m_intakeRight.getOutputCurrent() >= Constants.AlgaeIntakeVariables.kCurrentLimit;
+    return m_intakeRight.getOutputCurrent() >= Constants.AlgaeIntakeVariables.kCurrentLimit
+        || sensorTriggered();
   }
 
   public boolean isAtAngle() {
-    return Math.abs(m_AnglesTarget - m_pivotMotor.getEncoder().getPosition())
-        <= Constants.AlgaeIntakeConstants.kAngleTolerance;
+    return m_pid.atSetpoint();
   }
 
   public Command setAngle(DoubleSupplier angle) {
@@ -153,19 +165,5 @@ public class AlgaeIntake extends SubsystemBase {
     double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
     double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
     return linearInterpolate;
-  }
-
-  public Command pivotAlgae(elevation angle) {
-    return runOnce(
-        () -> {
-          setShootingAngle(angle);
-        });
-  }
-
-  public Command shootAlgae(shooting speed) {
-    return runOnce(
-        () -> {
-          setShootingSpeed(speed);
-        });
   }
 }
