@@ -50,12 +50,6 @@ public class Pathfinding extends Command {
         Constants.Priorities.kIntakeCoral,
         true,
         () -> !RobotContainer.m_algaeIntake.isAlgaeIn()),
-    CORAL(
-        Constants.AlgaeCoralStand.kStands,
-        () -> Commands.runOnce(() -> System.out.println("Hello World")),
-        Constants.Priorities.kIntakeCoral,
-        true,
-        () -> !Constants.Conditions.hasCoral()),
     BRANCHES(
         Constants.Pegs.kPegs,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
@@ -255,14 +249,14 @@ public class Pathfinding extends Command {
 
   enum CustomAuto {
     FIRSTAUTO(POI.FEEDERS, POI.BRANCHES),
-    SECONDAUTO(POI.CORAL, POI.BRANCHES),
-    THIRDAUTO(POI.CORAL, POI.BRANCHES),
-    FOURTHAUTO(POI.CORAL, POI.BRANCHES),
+    SECONDAUTO(POI.ALGAE, POI.BRANCHES),
+    THIRDAUTO(POI.ALGAE, POI.BRANCHES),
+    FOURTHAUTO(POI.ALGAE, POI.BRANCHES),
     FIFTHAUTO(POI.PROCESSOR, POI.BRANCHES),
-    SIXTHAUTO(POI.CORAL, POI.BRANCHES),
-    SEVENTHAUTO(POI.CORAL, POI.BRANCHES),
-    EIGHTHAUTO(POI.CORAL, POI.BRANCHES),
-    NINTHUTO(POI.CORAL, POI.BRANCHES);
+    SIXTHAUTO(POI.ALGAE, POI.BRANCHES),
+    SEVENTHAUTO(POI.ALGAE, POI.BRANCHES),
+    EIGHTHAUTO(POI.ALGAE, POI.BRANCHES),
+    NINTHUTO(POI.ALGAE, POI.BRANCHES);
 
     private POI[] desiredPOIs;
 
@@ -306,9 +300,6 @@ public class Pathfinding extends Command {
     double actionTime = 0.0;
 
     switch (poi) {
-      case CORAL:
-        actionTime = Constants.TimeToAction.kIntakeCoral;
-        break;
       case BRANCHES:
         actionTime = Constants.TimeToAction.kShootCoralL4;
         break;
@@ -419,7 +410,7 @@ public class Pathfinding extends Command {
             poiToPathfind.getCoordinates().getY() - poiToPathfind.getAngle().getSin() * robotHyp);
 
     // TODO make this code more modular for the future
-    if (poiToPathfind.equals(POI.ALGAE) || poiToPathfind.equals(POI.CORAL)) {
+    if (poiToPathfind.equals(POI.ALGAE)) {
       // sets the rotation to the orientation of the vector robot  -> pose2D
       rotation =
           (RobotContainer.m_swerve.getRotation2d().getDegrees() <= 180)
@@ -506,7 +497,9 @@ public class Pathfinding extends Command {
 
     if (inputPOI.equals("")) {
       // if the inputPOI is empty get default option
-      autoChooser.getSelected().forEach((poi) -> chosenPath += " " + poi.toString());
+      for (POI poi : POI.values()) {
+        chosenPath += " " + poi.toString();
+      }
       chosenPath.trim();
     } else {
       // this is so that we only use one tokenizer
@@ -582,12 +575,7 @@ public class Pathfinding extends Command {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
-    // this is to ensure that we chose the default option if nothing is chosen
-    if (chosenPath == "") {
-      for (POI poi : POI.values()) {
-        poiList.add(poi);
-      }
-    }
+
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
@@ -613,12 +601,6 @@ public class Pathfinding extends Command {
   }
 
   public static Command fullControl() {
-    // this is to ensure that we chose the default option if nothing is chosen
-    if (chosenPath == "") {
-      for (POI poi : POI.values()) {
-        poiList.add(poi);
-      }
-    }
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
@@ -630,7 +612,7 @@ public class Pathfinding extends Command {
                 constraints,
                 new GoalEndState(0, poiList.get(index).getAngle())),
             constraints)
-        .andThen(poiList.get(index).getEvent())
+        .finallyDo(() -> poiList.get(index).getEvent())
         .andThen(() -> index++)
         .repeatedly()
         .until(() -> DriverStation.isTeleop());
