@@ -4,9 +4,9 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.AlgaeIntake;
 
@@ -17,11 +17,12 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
   // then reduce the speed of the intake rollers and lift the intake to a preset position
   // then stop the intake rollers when desired elevation is reached
 
-
   public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle) {
     addCommands(
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
+        new WaitCommand(1.5),
         new WaitUntilCommand(() -> m_algaeIntake.isAlgaeIn()),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
@@ -30,10 +31,6 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake),
         Commands.runOnce(
-            () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED), m_algaeIntake));
+            () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.NET), m_algaeIntake));
   }
-
-public Command cancelCommand() {
-   return Commands.runOnce(() -> this.cancel());
-}
 }

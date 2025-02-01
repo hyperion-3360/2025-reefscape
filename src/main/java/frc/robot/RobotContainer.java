@@ -7,7 +7,10 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
@@ -18,8 +21,6 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Climber;
 // import frc.robot.subsystems.CoralClaw;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -41,7 +42,7 @@ public class RobotContainer {
   // public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
-  public static final Elevator m_elevator = new Elevator();
+  // public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
 
@@ -92,6 +93,7 @@ public class RobotContainer {
     Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
+    SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
   public void configureBindingsTest() {
@@ -115,7 +117,7 @@ public class RobotContainer {
 
     // m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.L2));
 
-    m_driverController.x().onTrue(m_elevator.Elevate(desiredHeight.NET));
+    // m_driverController.x().onTrue(m_elevator.Elevate(desiredHeight.NET));
 
     // m_driverController.x().and(m_driverController.y()).onTrue(m_elevator.Elevate(desiredHeight.L1));
 
@@ -164,8 +166,12 @@ public class RobotContainer {
     // kJoystickDeadband)));
     m_driverController.povDown().onTrue(intakeFloor);
     m_driverController.povUp().onTrue(vomitProcessor);
-    m_driverController.povLeft().onTrue(intakeFloor.cancelCommand());
-    m_driverController.povRight().onTrue(vomitProcessor.cancelCommand());
+
+    m_driverController.povLeft().onTrue(Commands.runOnce(() -> vomitProcessor.cancel()));
+    m_driverController.povRight().onTrue(Commands.runOnce(() -> intakeFloor.cancel()));
+
+    // m_driverController.povLeft().onTrue(intakeFloor.cancelCommand());
+    // m_driverController.povRight().onTrue(vomitProcessor.cancelCommand());
   }
 
   public void configureBindingsTeleop() {
