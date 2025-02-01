@@ -118,19 +118,19 @@ public class RobotContainer {
     m_driverController
         .back()
         .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.L1));
+        .onTrue(m_elevator.Elevate(desiredHeight.LOW));
     m_driverController
         .back()
         .and(m_driverController.b())
-        .onTrue(m_elevator.Elevate(desiredHeight.L2));
+        .onTrue(m_elevator.Elevate(desiredHeight.FEEDER));
     m_driverController
         .back()
         .and(m_driverController.x())
-        .onTrue(m_elevator.Elevate(desiredHeight.L3));
+        .onTrue(m_elevator.Elevate(desiredHeight.L1));
     m_driverController
         .back()
         .and(m_driverController.y())
-        .onTrue(m_elevator.Elevate(desiredHeight.L4));
+        .onTrue(m_elevator.Elevate(desiredHeight.L2));
 
     // Path finding  START and POV center
     m_driverController

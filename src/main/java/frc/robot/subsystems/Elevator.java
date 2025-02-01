@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,10 +46,14 @@ public class Elevator extends SubsystemBase {
   private static double kMaxAcceleration = 4;
 
   //  private static double kG = 0.98; // not moving
-  private static double kG = 0.90;
+  private static double kG = 0.95;
   private static double kA = 0.0;
   private static double kV = 2.5;
   private static double kS = 0.2;
+
+  private static double pulleyDiam = 3;
+  private static double pulleyCircumference = Math.PI * Units.inchesToMeters(pulleyDiam);
+  private static double toRotations = 1 / (2 * Math.PI);
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
@@ -101,10 +106,15 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
 
-    var elevatorPos = m_rightElevatorMotor.getPosition().getValueAsDouble() * 0.0447;
+    var setPointPosition = m_controller.getSetpoint().position;
+    var elevatorPos =
+        (m_rightElevatorMotor.getPosition().getValueAsDouble() * toRotations) * pulleyCircumference;
     SmartDashboard.putNumber("elevator position", elevatorPos);
+    SmartDashboard.putNumber("setpoint position", setPointPosition);
 
     if (DriverStation.isDisabled()) {
+      m_controller.reset(0.01);
+      m_controller.setGoal(0.01);
       return;
     }
 
@@ -112,13 +122,11 @@ public class Elevator extends SubsystemBase {
 
     var feedback = m_controller.calculate(elevatorPos);
     var setPointVelocity = m_controller.getSetpoint().velocity;
-    var setPointPosition = m_controller.getSetpoint().position;
     var feedforward = m_feedforward.calculate(setPointVelocity);
     var output = feedback + feedforward;
 
     SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
     SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
-    SmartDashboard.putNumber("setpoint position", setPointPosition);
     SmartDashboard.putNumber("output voltage", output);
 
     // Run controller and update motor output
