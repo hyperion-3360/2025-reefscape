@@ -16,7 +16,7 @@ public class IntakeCoralCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_shooter.closeBlocker()),
         new WaitCommand(0.3),
         Commands.run(() -> m_shooter.setShoot()).until(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(0.8),
+        new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()));
   }
 

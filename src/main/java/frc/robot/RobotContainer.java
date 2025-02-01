@@ -175,10 +175,10 @@ public class RobotContainer {
     //             () -> conditionJoystick(translationAxis, climberSpeedLimiter,
     // kJoystickDeadband)));
 
-    m_driverController.a().onTrue(intakeCoral);
-    m_driverController.a().onTrue(shootCoral.cancelCommand());
-    m_driverController.b().onTrue(shootCoral);
-    m_driverController.b().onTrue(intakeCoral.cancelCommand());
+    m_driverController.povUp().onTrue(intakeCoral);
+    m_driverController.povUp().onTrue(shootCoral.cancelCommand());
+    m_driverController.povDown().onTrue(shootCoral);
+    m_driverController.povDown().onTrue(intakeCoral.cancelCommand());
   }
 
   public void configureBindingsTeleop() {

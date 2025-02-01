@@ -34,8 +34,6 @@ public class Shooter extends SubsystemBase {
     m_shooter.configContinuousCurrentLimit(
         Constants.CoralShooterVariables.kCoralShooterCurrentLimit);
     m_shooter.enableCurrentLimit(true);
-    // TODO: Find good ramp rate
-    m_shooter.configOpenloopRamp(Constants.CoralShooterVariables.kCoralShooterRamprate);
 
     // SmartDashboard
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
@@ -87,7 +85,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setShoot() {
-    m_shooter.set(-0.9);
+    m_shooter.set(-1);
   }
 
   public boolean isCoralIn() {

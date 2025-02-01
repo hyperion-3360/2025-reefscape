@@ -185,7 +185,7 @@ public class Elevator extends SubsystemBase {
 
   public Command Elevate(desiredHeight height) {
 
-    return runOnce(()-> SetHeight(height));
+    return runOnce(() -> SetHeight(height));
     // desiredHeight[] heightArray = {
     //   desiredHeight.L1, desiredHeight.L2, desiredHeight.L3, desiredHeight.L4, desiredHeight.NET
     // };
