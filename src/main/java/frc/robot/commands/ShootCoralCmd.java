@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -21,10 +20,5 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()));
 
-    // this.handleInterrupt(() -> System.out.println("I was canceled"));
-  }
-
-  public Command cancelCommand() {
-    return Commands.runOnce(() -> this.cancel());
   }
 }

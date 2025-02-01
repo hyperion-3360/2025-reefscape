@@ -21,10 +21,5 @@ public class IntakeCoralCmd extends SequentialCommandGroup {
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()));
 
-    // this.handleInterrupt(() -> System.out.println("I was canceled"));
-  }
-
-  public Command cancelCommand() {
-    return Commands.runOnce(() -> this.cancel());
   }
 }
