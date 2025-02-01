@@ -102,10 +102,11 @@ public class RobotContainer {
                 () -> true));
 
     // Elevator control Pov UP + left joystick
-    m_driverController
-        .povUp()
-        .whileTrue(
-            m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter, 0.0)));
+    //m_driverController
+    //    .povUp()
+    //    .whileTrue(
+    //        m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter, 0.0)));
+    m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
     m_driverController
