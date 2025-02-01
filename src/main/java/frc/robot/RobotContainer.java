@@ -13,13 +13,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.commands.IntakeAlgaeCmd;
-import frc.robot.commands.ShootAlgaeCmd;
+import frc.robot.commands.DumperCMD;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Climber;
-// import frc.robot.subsystems.CoralClaw;
+import frc.robot.subsystems.Dumper;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -43,6 +44,7 @@ public class RobotContainer {
   // public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
+  public static final Dumper m_dumper = new Dumper();
 
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -103,14 +105,12 @@ public class RobotContainer {
             () -> 0.0,
             () -> true));
 
-    m_driverController.b().onTrue(m_climber.brakeMotors());
-    m_driverController.x().onTrue(m_climber.coastMotor());
-    // m_driverController
-    //     .a()
-    //     .whileTrue(
-    //         m_elevator.manualTest(
-    //             () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
-    //             () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+    // Elevator control Pov UP + left joystick
+    //m_driverController
+    //    .povUp()
+    //    .whileTrue(
+    //        m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter, 0.0)));
+    m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
     m_driverController
