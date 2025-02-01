@@ -78,6 +78,11 @@ public class RobotContainer {
         MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband));
   }
 
+  private double conditionJoystickCodriver(int axis, SlewRateLimiter limiter, double deadband) {
+    return -limiter.calculate(
+        MathUtil.applyDeadband(m_coDriverController.getRawAxis(axis), deadband));
+  }
+
   public RobotContainer() {
 
     Auto.initAutoWidget();
@@ -178,6 +183,8 @@ public class RobotContainer {
             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
             () -> true));
+
+    m_climber.setDefaultCommand(m_climber.climberTestMode(() -> conditionJoystickCodriver(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
   }
 
   public Command getAutonomousCommand() {
