@@ -606,15 +606,14 @@ public class Pathfinding extends Command {
       poiList.add(poiArrayElement);
     }
 
-    return AutoBuilder.pathfindThenFollowPath(
-            PathPlannerPath.fromPathPoints(
-                convertToPathPoints(poiList.get(index)),
-                constraints,
-                new GoalEndState(0, poiList.get(index).getAngle())),
-            constraints)
-        .finallyDo(() -> poiList.get(index).getEvent())
-        .andThen(() -> index++)
-        .repeatedly()
-        .until(() -> DriverStation.isTeleop());
+    return Commands.repeatingSequence(
+            AutoBuilder.pathfindThenFollowPath(
+                PathPlannerPath.fromPathPoints(
+                    convertToPathPoints(poiList.get(index)),
+                    constraints,
+                    new GoalEndState(0, poiList.get(index).getAngle())),
+                constraints),
+            Commands.runOnce(() -> poiList.get(index).getEvent()),
+            Commands.runOnce(() -> index++));
   }
 }
