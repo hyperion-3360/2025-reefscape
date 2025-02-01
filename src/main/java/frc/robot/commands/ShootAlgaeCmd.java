@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -26,9 +25,5 @@ public class ShootAlgaeCmd extends SequentialCommandGroup {
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)));
-  }
-
-  public Command cancelCommand() {
-    return Commands.runOnce(() -> this.cancel());
   }
 }

@@ -127,11 +127,12 @@ public class Climber extends SubsystemBase {
           m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
         });
   }
+
   public Command brakeMotors() {
     return this.run(() -> m_climberMotor.setNeutralMode(NeutralModeValue.Brake));
   }
+
   public Command coastMotor() {
     return this.run(() -> m_climberMotor.setNeutralMode(NeutralModeValue.Coast));
-
   }
 }

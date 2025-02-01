@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.AlgaeIntake;
@@ -33,8 +32,4 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
         Commands.runOnce(
             () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.NET), m_algaeIntake));
   }
-
-public Command cancelCommand() {
-   return Commands.runOnce(() -> this.cancel());
-}
 }

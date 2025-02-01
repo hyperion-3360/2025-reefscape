@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,7 +35,7 @@ public class AlgaeIntake extends SubsystemBase {
     STORED // this is resting speed or 0
   }
 
-  private static final double kP = 0.1;
+  private static final double kP = 0.01;
   private static final double kI = 0.0;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
@@ -53,7 +52,7 @@ public class AlgaeIntake extends SubsystemBase {
       new SparkMax(Constants.SubsystemInfo.kAlgaeGrabberRightMotorID, MotorType.kBrushless);
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
-  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kIntakeSpeed;
+  private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
 
   public AlgaeIntake() {
 
@@ -165,24 +164,20 @@ public class AlgaeIntake extends SubsystemBase {
   private double currentInterpolation(double current) {
     double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
     double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
-    System.out.println(linearInterpolate);
     return linearInterpolate;
   }
 
   public Command pivotAlgae(elevation angle) {
-    setShootingAngle(angle);
-    return run(
+    return runOnce(
         () -> {
-          m_pivotMotor.set(
-              m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
+          setShootingAngle(angle);
         });
   }
 
   public Command shootAlgae(shooting speed) {
-    setShootingSpeed(speed);
-    return run(
+    return runOnce(
         () -> {
-          m_intakeRight.set(m_SpeedTarget);
+          setShootingSpeed(speed);
         });
   }
 }
