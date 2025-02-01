@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.DumperCMD;
+import frc.robot.commands.IntakeCoralCmd;
+import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
@@ -149,12 +151,6 @@ public class RobotContainer {
                 () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
         .onFalse(m_shooter.manualTest(() -> 0.0));
 
-    // Coral blocker POV Center
-    m_driverController
-        .povCenter()
-        .onTrue(m_shooter.openBlocker())
-        .onFalse(m_shooter.closeBlocker());
-
     // Algea elevator manual control  POV left + left joystick
     m_driverController
         .povLeft()
@@ -172,11 +168,16 @@ public class RobotContainer {
     m_driverController.povUp().onTrue(intakeFloor);
     m_driverController.povDown().onTrue(vomitProcessor);
 
-    // m_driverController.povLeft().onTrue(Commands.runOnce(() -> vomitProcessor.cancel()));
-    // m_driverController.povRight().onTrue(Commands.runOnce(() -> intakeFloor.cancel()));
+    // // Climber manual control left bumpber + left joystick
+    m_driverController
+        .leftBumper()
+        .whileTrue(
+            m_climber.climberTestMode(
+                () -> conditionJoystick(translationAxis, climberSpeedLimiter,
+    kJoystickDeadband)));
 
-    // m_driverController.povLeft().onTrue(intakeFloor.cancelCommand());
-    // m_driverController.povRight().onTrue(vomitProcessor.cancelCommand());
+    m_driverController.povUp().onTrue(intakeCoral);
+    m_driverController.povDown().onTrue(shootCoral);
   }
 
   public void configureBindingsTeleop() {
