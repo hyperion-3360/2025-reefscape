@@ -185,6 +185,9 @@ public class RobotContainer {
             () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband),
             () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
             () -> true));
+
+    m_coDriverController.a().onTrue(intakeFloor);
+    m_coDriverController.b().onTrue(vomitProcessor);
   }
 
   public Command getAutonomousCommand() {
