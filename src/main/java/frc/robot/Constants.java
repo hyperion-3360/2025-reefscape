@@ -290,8 +290,8 @@ public final class Constants {
 
   public static class LEDConstants {
     // TODO: update port when robot is built
-    public static final int kLEDPWMPort = 6;
-    public static final int kLEDLength = 60;
+    public static final int kLEDPWMPort = 5;
+    public static final int kLEDLength = 27;
   }
 
   public static class ClimberState {
