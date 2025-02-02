@@ -93,7 +93,7 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     getShooterIR = m_shooterIR.get();
     if (DriverStation.isDisabled()) {
-      m_shooter.set(m_shooterSpeed);
+      m_shooter.set(0.0);
     }
   }
 
@@ -121,8 +121,8 @@ public class Shooter extends SubsystemBase {
 
   /** We don't want a ramp rate when shooting so set the speed at -1 in 0.0 seconds */
   public void setShoot(shootSpeed speed) {
-    setSpeed(speed);
     m_shooter.configOpenloopRamp(0.0);
+    setSpeed(speed);
   }
 
   public boolean isCoralIn() {
