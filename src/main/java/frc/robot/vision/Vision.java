@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -21,7 +22,7 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class Vision {
+public class Vision extends SubsystemBase {
 
   protected final PhotonCamera camera;
   protected final PhotonPoseEstimator photonEstimator;
@@ -49,7 +50,6 @@ public class Vision {
 
     // for a change in target (latest result), estimation.update with latest
     // update estimation standard deviations with new estimation and new target
-    camera.getAllUnreadResults();
     for (var change : camera.getAllUnreadResults()) {
       visionEst = photonEstimator.update(change);
       updateEstimationStdDevs(visionEst, change.getTargets());
