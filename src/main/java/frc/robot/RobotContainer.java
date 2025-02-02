@@ -94,6 +94,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     Auto.initAutoWidget();
+    Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
 
     m_swerve.resetModulesToAbsolute();
   }
@@ -192,6 +193,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.doPathfinding();
+    return Pathfinding.fullControl();
   }
 }

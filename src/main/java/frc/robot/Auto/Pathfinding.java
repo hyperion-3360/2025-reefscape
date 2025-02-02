@@ -19,6 +19,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Dumper;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -49,46 +54,40 @@ public class Pathfinding extends Command {
         () -> Commands.runOnce(() -> System.out.println("Hello Algae")),
         Constants.Priorities.kIntakeCoral,
         true,
-        () -> !Constants.Conditions.hasAlgae()),
-    CORAL(
-        Constants.AlgaeCoralStand.kStands,
-        () -> Commands.runOnce(() -> System.out.println("Hello World")),
-        Constants.Priorities.kIntakeCoral,
-        true,
-        () -> !Constants.Conditions.hasCoral()),
+        () -> !s_algaeIntake.sensorTriggered()),
     BRANCHES(
         Constants.Pegs.kPegs,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         true,
-        () -> Constants.Conditions.hasCoral()),
+        () -> s_shooter.isCoralIn()),
     FEEDERS(
         Constants.Feeders.kFeeders,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         false,
-        () -> Constants.Conditions.hasCoral()),
+        () -> !s_shooter.isCoralIn()),
     PROCESSOR(
         10.0,
         5.3,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootingProcessor,
-        () -> Constants.Conditions.hasAlgae()),
+        () -> s_algaeIntake.sensorTriggered()),
     NET(
         7.734,
         4,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
-        () -> Constants.Conditions.hasAlgae()),
+        () -> s_algaeIntake.sensorTriggered()),
     DUMPINGUP(
         4.073906,
         4.745482,
         210,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kIntakeCoral,
-        () -> Constants.Conditions.hasCoral()),
+        () -> s_shooter.isCoralIn()),
     DUMPINGDOWN(
         4.073906,
         3.306318,
@@ -255,14 +254,14 @@ public class Pathfinding extends Command {
 
   enum CustomAuto {
     FIRSTAUTO(POI.FEEDERS, POI.BRANCHES),
-    SECONDAUTO(POI.CORAL, POI.BRANCHES),
-    THIRDAUTO(POI.CORAL, POI.BRANCHES),
-    FOURTHAUTO(POI.CORAL, POI.BRANCHES),
+    SECONDAUTO(POI.ALGAE, POI.BRANCHES),
+    THIRDAUTO(POI.ALGAE, POI.BRANCHES),
+    FOURTHAUTO(POI.ALGAE, POI.BRANCHES),
     FIFTHAUTO(POI.PROCESSOR, POI.BRANCHES),
-    SIXTHAUTO(POI.CORAL, POI.BRANCHES),
-    SEVENTHAUTO(POI.CORAL, POI.BRANCHES),
-    EIGHTHAUTO(POI.CORAL, POI.BRANCHES),
-    NINTHUTO(POI.CORAL, POI.BRANCHES);
+    SIXTHAUTO(POI.ALGAE, POI.BRANCHES),
+    SEVENTHAUTO(POI.ALGAE, POI.BRANCHES),
+    EIGHTHAUTO(POI.ALGAE, POI.BRANCHES),
+    NINTHUTO(POI.ALGAE, POI.BRANCHES);
 
     private POI[] desiredPOIs;
 
@@ -291,6 +290,33 @@ public class Pathfinding extends Command {
   private static POI bestPOI;
   private static PathConstraints constraints =
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+  private static int index = 0;
+
+  private static Shooter s_shooter;
+  private static Swerve s_swerve;
+  private static Elevator s_elevator;
+  private static AlgaeIntake s_algaeIntake;
+  private static Dumper s_dumper;
+
+  public static void configurePathfinder(
+      Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
+    Shooter s_shooter = shooter;
+    Swerve s_swerve = swerve;
+    Elevator s_elevator = elevator;
+    AlgaeIntake s_algaeIntake = algaeIntake;
+    Dumper s_dumper = dumper;
+
+    try {
+      assert s_algaeIntake != null;
+      assert s_swerve != null;
+      assert s_elevator != null;
+      assert s_shooter != null;
+      assert s_dumper != null;
+    } catch (AssertionError e) {
+      System.out.println(
+          e.getMessage() + " are you sure you configured the pathfinding before using it?");
+    }
+  }
 
   // #endregion
 
@@ -305,9 +331,6 @@ public class Pathfinding extends Command {
     double actionTime = 0.0;
 
     switch (poi) {
-      case CORAL:
-        actionTime = Constants.TimeToAction.kIntakeCoral;
-        break;
       case BRANCHES:
         actionTime = Constants.TimeToAction.kShootCoralL4;
         break;
@@ -382,6 +405,28 @@ public class Pathfinding extends Command {
     return path;
   }
 
+  private static List<PathPoint> convertToPathPoints(POI raw_poi) {
+    List<PathPoint> path = new ArrayList<>();
+
+    Pose2d optimisedPos = POICoordinatesOptimisation(raw_poi);
+    Pose2d lineupPos = lineupPoint(optimisedPos);
+    // spotless:off
+    // TODO change the RotationTarget's param to match what we want because I'm not sure what the waypoint does
+    // spotless:on
+    path.add(
+        new PathPoint(
+            lineupPos.getTranslation(),
+            new RotationTarget(lineupPos.getTranslation().getNorm(), lineupPos.getRotation())));
+    path.add(
+        new PathPoint(
+            optimisedPos.getTranslation(),
+            new RotationTarget(
+                optimisedPos.getTranslation().getNorm(), optimisedPos.getRotation())));
+
+    // uses the coordinates and angle of the first point
+    return path;
+  }
+
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
 
     double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
@@ -392,11 +437,11 @@ public class Pathfinding extends Command {
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
         new Translation2d(
-            poiToPathfind.getCoordinates().getX() + robotHyp * poiToPathfind.getAngle().getCos(),
-            poiToPathfind.getCoordinates().getY() + poiToPathfind.getAngle().getSin() * robotHyp);
+            poiToPathfind.getCoordinates().getX() - robotHyp * poiToPathfind.getAngle().getCos(),
+            poiToPathfind.getCoordinates().getY() - poiToPathfind.getAngle().getSin() * robotHyp);
 
     // TODO make this code more modular for the future
-    if (poiToPathfind.equals(POI.ALGAE) || poiToPathfind.equals(POI.CORAL)) {
+    if (poiToPathfind.equals(POI.ALGAE)) {
       // sets the rotation to the orientation of the vector robot  -> pose2D
       rotation =
           (RobotContainer.m_swerve.getRotation2d().getDegrees() <= 180)
@@ -418,8 +463,8 @@ public class Pathfinding extends Command {
   public static Pose2d lineupPoint(Pose2d poiToLineup) {
 
     return new Pose2d(
-        poiToLineup.getTranslation().getX() + 0.1 * poiToLineup.getRotation().getCos(),
-        poiToLineup.getTranslation().getY() + 0.1 * poiToLineup.getRotation().getSin(),
+        poiToLineup.getTranslation().getX() - 0.1 * poiToLineup.getRotation().getCos(),
+        poiToLineup.getTranslation().getY() - 0.1 * poiToLineup.getRotation().getSin(),
         poiToLineup.getRotation());
   }
 
@@ -429,9 +474,10 @@ public class Pathfinding extends Command {
    * Pathfinding class
    */
   public static void makeChooserWidget() {
+    List<POI> poiListClone = poiList;
     // adds the POIs in the enum
     for (POI poi : POI.values()) {
-      poiList.add(poi);
+      poiListClone.add(poi);
     }
 
     for (CustomAuto autos : CustomAuto.values()) {
@@ -439,11 +485,13 @@ public class Pathfinding extends Command {
     }
     createPOIListWidget();
     autoChooser.setDefaultOption(
-        "Full Auto (every coordinates)", poiList); // if no options are chosen put every coordinates
+        "Full Auto (every coordinates)",
+        poiListClone); // if no options are chosen put every coordinates
     SmartDashboard.putData(POIAdder);
     SmartDashboard.putData(POIRemover);
     SmartDashboard.putData(autoChooser);
     logicHandler();
+    poiList.clear();
   }
 
   private static void createWidgetList(CustomAuto auto) {
@@ -480,7 +528,9 @@ public class Pathfinding extends Command {
 
     if (inputPOI.equals("")) {
       // if the inputPOI is empty get default option
-      autoChooser.getSelected().forEach((poi) -> chosenPath += " " + poi.toString());
+      for (POI poi : POI.values()) {
+        chosenPath += " " + poi.toString();
+      }
       chosenPath.trim();
     } else {
       // this is so that we only use one tokenizer
@@ -556,6 +606,7 @@ public class Pathfinding extends Command {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
+
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
@@ -568,5 +619,46 @@ public class Pathfinding extends Command {
         .andThen(bestPOI.getEvent())
         .repeatedly()
         .until(() -> DriverStation.isTeleop());
+  }
+
+  /**
+   * A simple command to go to a specified POI in order to execute a command. This should only be
+   * used during teleop
+   *
+   * @param placeToGo The poi to go to
+   * @return A command to pathfind and execute the event
+   */
+  public static Command goThere(POI placeToGo) {
+    return AutoBuilder.pathfindToPose(
+            new Pose2d(placeToGo.getCoordinates(), placeToGo.getAngle()), constraints)
+        .andThen(placeToGo.getEvent());
+  }
+
+  /**
+   * A simple command to go to a specified POI in order to execute a command. This should only be
+   * used during teleop
+   *
+   * @param placeToGo The pose2d we want to go to
+   * @return A command to pathfind to a specified point
+   */
+  public static Command goThere(Pose2d placeToGo) {
+    return AutoBuilder.pathfindToPose(placeToGo, constraints);
+  }
+
+  public static Command fullControl() {
+    // once we have the POIs we want, we replace the old list and add them
+    for (POI poiArrayElement : tokenReader(chosenPath)) {
+      poiList.add(poiArrayElement);
+    }
+
+    return Commands.repeatingSequence(
+        AutoBuilder.pathfindThenFollowPath(
+            PathPlannerPath.fromPathPoints(
+                convertToPathPoints(poiList.get(index)),
+                constraints,
+                new GoalEndState(0, poiList.get(index).getAngle())),
+            constraints),
+        Commands.runOnce(() -> poiList.get(index).getEvent()),
+        Commands.runOnce(() -> index++));
   }
 }
