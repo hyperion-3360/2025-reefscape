@@ -19,6 +19,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Dumper;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Shooter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -49,40 +55,40 @@ public class Pathfinding extends Command {
         () -> Commands.runOnce(() -> System.out.println("Hello Algae")),
         Constants.Priorities.kIntakeCoral,
         true,
-        () -> !RobotContainer.m_algaeIntake.isAlgaeIn()),
+        () -> !s_algaeIntake.sensorTriggered()),
     BRANCHES(
         Constants.Pegs.kPegs,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         true,
-        () -> Constants.Conditions.hasCoral()),
+        () -> s_shooter.isCoralIn()),
     FEEDERS(
         Constants.Feeders.kFeeders,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootCoralL4,
         false,
-        () -> !Constants.Conditions.hasCoral()),
+        () -> !s_shooter.isCoralIn()),
     PROCESSOR(
         10.0,
         5.3,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootingProcessor,
-        () -> RobotContainer.m_algaeIntake.isAlgaeIn()),
+        () -> s_algaeIntake.sensorTriggered()),
     NET(
         7.734,
         4,
         180.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
-        () -> RobotContainer.m_algaeIntake.isAlgaeIn()),
+        () -> s_algaeIntake.sensorTriggered()),
     DUMPINGUP(
         4.073906,
         4.745482,
         210,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kIntakeCoral,
-        () -> Constants.Conditions.hasCoral()),
+        () -> s_shooter.isCoralIn()),
     DUMPINGDOWN(
         4.073906,
         3.306318,
@@ -287,6 +293,31 @@ public class Pathfinding extends Command {
       new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
   private static int index = 0;
 
+  private static Shooter s_shooter;
+  private static Swerve s_swerve;
+  private static Elevator s_elevator;
+  private static AlgaeIntake s_algaeIntake;
+  private static Dumper s_dumper;
+
+
+public static void configurePathfinder(Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
+Shooter s_shooter = shooter;
+  Swerve s_swerve = swerve;
+  Elevator s_elevator = elevator;
+  AlgaeIntake s_algaeIntake = algaeIntake;
+  Dumper s_dumper = dumper;
+
+ try {
+  assert s_algaeIntake != null;
+  assert s_swerve != null;
+  assert s_elevator != null;
+  assert s_shooter != null;
+  assert s_dumper != null;
+    }
+    catch(AssertionError e) {
+    System.out.println(e.getMessage() + " are you sure you configured the pathfinding before using it?");
+    }
+  }
   // #endregion
 
   /**
