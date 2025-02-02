@@ -19,12 +19,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
-
+import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -299,25 +298,26 @@ public class Pathfinding extends Command {
   private static AlgaeIntake s_algaeIntake;
   private static Dumper s_dumper;
 
+  public static void configurePathfinder(
+      Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
+    Shooter s_shooter = shooter;
+    Swerve s_swerve = swerve;
+    Elevator s_elevator = elevator;
+    AlgaeIntake s_algaeIntake = algaeIntake;
+    Dumper s_dumper = dumper;
 
-public static void configurePathfinder(Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
-Shooter s_shooter = shooter;
-  Swerve s_swerve = swerve;
-  Elevator s_elevator = elevator;
-  AlgaeIntake s_algaeIntake = algaeIntake;
-  Dumper s_dumper = dumper;
-
- try {
-  assert s_algaeIntake != null;
-  assert s_swerve != null;
-  assert s_elevator != null;
-  assert s_shooter != null;
-  assert s_dumper != null;
-    }
-    catch(AssertionError e) {
-    System.out.println(e.getMessage() + " are you sure you configured the pathfinding before using it?");
+    try {
+      assert s_algaeIntake != null;
+      assert s_swerve != null;
+      assert s_elevator != null;
+      assert s_shooter != null;
+      assert s_dumper != null;
+    } catch (AssertionError e) {
+      System.out.println(
+          e.getMessage() + " are you sure you configured the pathfinding before using it?");
     }
   }
+
   // #endregion
 
   /**
@@ -634,7 +634,7 @@ Shooter s_shooter = shooter;
         .andThen(placeToGo.getEvent());
   }
 
-/**
+  /**
    * A simple command to go to a specified POI in order to execute a command. This should only be
    * used during teleop
    *
