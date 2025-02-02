@@ -275,8 +275,12 @@ public final class Constants {
 
   public static class CoralShooterVariables {
     // TODO: Find actual speed
-    public static final double kShootSpeed = 0.0;
-    public static final double kIntakeSpeed = 0.0;
+    public static final double kShootNo = 0.0;
+    public static final double kShootL1 = -0.6;
+    public static final double kShootL2 = -0.65;
+    public static final double kShootL3 = -0.7;
+    public static final double kShootL4 = -0.75;
+    public static final double kIntakeSpeed = -1.0;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     public static final int kCoralShooterCurrentLimit = 10;
@@ -347,16 +351,16 @@ public final class Constants {
     public static final double kElevatorMotorCurrentLimit = 30.0; // TO BE TESTED
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
-    public static final double kElevatorDown = 0.15; // MAX 37 MOTOR TURNS  1 rotation = 0.04596 m
-    public static final double kElevatorL1 = 0.16;
-    public static final double kElevatorL2 = 0.4;
-    public static final double kElevatorL3 = 0.6;
-    public static final double kElevatorL4 = 1.45;
+    public static final double kElevatorDown = 0.01; // MAX 37 MOTOR TURNS  1 rotation = 0.04596 m
+    public static final double kElevatorL1 = 0.43;
+    public static final double kElevatorL2 = 0.67;
+    public static final double kElevatorL3 = 0.95;
+    public static final double kElevatorL4 = 1.43;
     public static final double kElevatorHandoff = 0.0;
-    public static final double kElevatorNet = 2.0;
+    public static final double kElevatorNet = 1.75;
     public static final double kElevatorProcessor = 10.0;
     public static final double kElevatorAlgaeLow = 0.0;
-    public static final double kElevatorFeeder = 0.0;
+    public static final double kElevatorFeeder = 0.172;
     public static final double kElevatorCoralLow = 1.0;
   }
 

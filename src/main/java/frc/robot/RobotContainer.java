@@ -21,6 +21,7 @@ import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -68,8 +69,11 @@ public class RobotContainer {
 
   private final double kJoystickDeadband = 0.1;
 
-  public final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds);
   public final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_leds);
+  public final ShootCoralCmd shootCoralL1 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1);
+  public final ShootCoralCmd shootCoralL2 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2);
+  public final ShootCoralCmd shootCoralL3 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3);
+  public final ShootCoralCmd shootCoralL4 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4);
 
   /***
    * conditionJoystick
@@ -82,8 +86,9 @@ public class RobotContainer {
    * @return the conditioned value
    */
   private double conditionJoystick(int axis, SlewRateLimiter limiter, double deadband) {
-    return -limiter.calculate(
-        MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband));
+    return Math.pow(
+        -limiter.calculate(MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband)),
+        3);
   }
 
   public RobotContainer() {
@@ -108,21 +113,20 @@ public class RobotContainer {
 
     // Elevator control Pov UP + left joystick
     m_driverController
-       .povUp()
-       .whileTrue(
-           m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter,
-    0.0)));
+        .povUp()
+        .whileTrue(
+            m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter, 0.0)));
     m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
     m_driverController
         .back()
         .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.L1));
+        .onTrue(m_elevator.Elevate(desiredHeight.LOW));
     m_driverController
         .back()
         .and(m_driverController.b())
-        .onTrue(m_elevator.Elevate(desiredHeight.L2));
+        .onTrue(m_elevator.Elevate(desiredHeight.FEEDER));
     m_driverController
         .back()
         .and(m_driverController.x())
@@ -167,11 +171,10 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             m_climber.climberTestMode(
-                () -> conditionJoystick(translationAxis, climberSpeedLimiter,
-    kJoystickDeadband)));
+                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
 
     m_driverController.povUp().onTrue(intakeCoral);
-    m_driverController.povDown().onTrue(shootCoral);
+    m_driverController.povDown().onTrue(shootCoralL1);
   }
 
   public void configureBindingsTeleop() {
