@@ -20,6 +20,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
+import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -68,8 +69,11 @@ public class RobotContainer {
 
   private final double kJoystickDeadband = 0.1;
 
-  public final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds);
+  public final ShootCoralCmd shootCoralL2 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2);
+  public final ShootCoralCmd shootCoralL3 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3);
+  public final ShootCoralCmd shootCoralL4 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4);
   public final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_leds);
+  public final ShootCoralCmd shootCoralL1 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1);
 
   /***
    * conditionJoystick
@@ -127,7 +131,7 @@ public class RobotContainer {
     m_driverController
         .back()
         .and(m_driverController.x())
-        .onTrue(m_elevator.Elevate(desiredHeight.L1));
+        .onTrue(m_elevator.Elevate(desiredHeight.L3));
     m_driverController
         .back()
         .and(m_driverController.y())
@@ -168,11 +172,10 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             m_climber.climberTestMode(
-                () -> conditionJoystick(translationAxis, climberSpeedLimiter,
-    kJoystickDeadband)));
+                () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
 
     m_driverController.povUp().onTrue(intakeCoral);
-    m_driverController.povDown().onTrue(shootCoral);
+    m_driverController.povDown().onTrue(shootCoralL1);
   }
 
   public void configureBindingsTeleop() {

@@ -11,7 +11,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 
 public class ShootCoralCmd extends SequentialCommandGroup {
-  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds) {
+  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds, shootSpeed speed) {
     addRequirements(m_shooter);
     addRequirements(m_leds);
     this.addCommands(
@@ -20,7 +20,7 @@ public class ShootCoralCmd extends SequentialCommandGroup {
             .alongWith(
                 Commands.runOnce(() -> m_shooter.openBlocker()),
                 new WaitCommand(0.3),
-                Commands.run(() -> m_shooter.setShoot()))
+                Commands.run(() -> m_shooter.setShoot(speed)))
             .until(() -> !m_shooter.isCoralIn()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()),

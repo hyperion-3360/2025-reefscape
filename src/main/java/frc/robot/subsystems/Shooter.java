@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.Wait;
+import frc.robot.subsystems.AlgaeIntake.elevation;
+
 import java.util.function.DoubleSupplier;
 
 public class Shooter extends SubsystemBase {
@@ -25,6 +27,37 @@ public class Shooter extends SubsystemBase {
   private double CoralShooterSpeed = m_shooter.get();
   private double TestSpeed = 0.0;
   private double SpeedTestTime = 0.0;
+  private double m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
+
+  public enum shootSpeed {
+    L1,
+    L2,
+    L3,
+    L4
+  }
+
+  private void setSpeed(shootSpeed speed){
+
+    switch(speed){
+      
+      case L1:
+      m_shooterSpeed = Constants.CoralShooterVariables.kShootL1;
+      break;
+
+      case L2:
+      m_shooterSpeed = Constants.CoralShooterVariables.kShootL2;
+      break;
+
+      case L3:
+      m_shooterSpeed = Constants.CoralShooterVariables.kShootL3;
+      break;
+
+      case L4:
+      m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
+      break;
+    }
+
+  }
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
   public Shooter() {
@@ -64,7 +97,7 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     getShooterIR = m_shooterIR.get();
     if (DriverStation.isDisabled()) {
-      m_shooter.set(0.0);
+      m_shooter.set(m_shooterSpeed);
     }
   }
 
@@ -87,13 +120,13 @@ public class Shooter extends SubsystemBase {
   /** We want a ramp rate when intaking so set the speed at -1 in 0.5 seconds */
   public void setIntake() {
     m_shooter.configOpenloopRamp(0.5);
-    m_shooter.set(-1);
+    m_shooter.set(Constants.CoralShooterVariables.kIntakeSpeed);
   }
 
   /** We don't want a ramp rate when shooting so set the speed at -1 in 0.0 seconds */
-  public void setShoot() {
+  public void setShoot(shootSpeed speed) {
+    setSpeed(speed);
     m_shooter.configOpenloopRamp(0.0);
-    m_shooter.set(-1);
   }
 
   public boolean isCoralIn() {
