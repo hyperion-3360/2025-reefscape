@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
@@ -56,5 +59,45 @@ public class LEDs extends SubsystemBase {
   @Override
   public void periodic() {
     m_led.setData(m_ledBuffer);
+  }
+
+  public Command intakeColors() {
+    return Commands.repeatingSequence(
+        new WaitCommand(0.1),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kWhite))),
+        new WaitCommand(0.1),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  }
+
+  public Command readyColor() {
+    return Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kGreen)));
+  }
+
+  public Command elevatingColor() {
+    return Commands.repeatingSequence(
+        new WaitCommand(0.1),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kBlue))),
+        new WaitCommand(0.1),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  }
+
+  public Command climberColor() {
+    return Commands.repeatingSequence(
+        new WaitCommand(0.05),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kTurquoise))),
+        new WaitCommand(0.05),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  }
+
+  public Command shootColor() {
+    return Commands.repeatingSequence(
+        new WaitCommand(0.1),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kGreen))),
+        new WaitCommand(0.1),
+        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  }
+
+  public Command idleColor() {
+    return Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kOrange)));
   }
 }

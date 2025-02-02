@@ -13,12 +13,10 @@ public class ShootCoralCmd extends SequentialCommandGroup {
   public ShootCoralCmd(Shooter m_shooter) {
     addRequirements(m_shooter);
     this.addCommands(
-        Commands.runOnce(() -> System.out.println("I am running")),
         Commands.runOnce(() -> m_shooter.openBlocker()),
         new WaitCommand(0.3),
         Commands.run(() -> m_shooter.setShoot()).until(() -> m_shooter.isCoralIn()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()));
-
   }
 }
