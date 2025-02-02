@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 
 public class ShootCoralCmd extends SequentialCommandGroup {

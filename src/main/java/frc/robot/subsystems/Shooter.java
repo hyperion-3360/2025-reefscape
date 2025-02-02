@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.Wait;
-import frc.robot.subsystems.AlgaeIntake.elevation;
-
 import java.util.function.DoubleSupplier;
 
 public class Shooter extends SubsystemBase {
@@ -36,27 +34,25 @@ public class Shooter extends SubsystemBase {
     L4
   }
 
-  private void setSpeed(shootSpeed speed){
+  private void setSpeed(shootSpeed speed) {
 
-    switch(speed){
-      
+    switch (speed) {
       case L1:
-      m_shooterSpeed = Constants.CoralShooterVariables.kShootL1;
-      break;
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL1;
+        break;
 
       case L2:
-      m_shooterSpeed = Constants.CoralShooterVariables.kShootL2;
-      break;
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL2;
+        break;
 
       case L3:
-      m_shooterSpeed = Constants.CoralShooterVariables.kShootL3;
-      break;
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL3;
+        break;
 
       case L4:
-      m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
-      break;
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
+        break;
     }
-
   }
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
