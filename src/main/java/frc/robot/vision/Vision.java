@@ -23,9 +23,9 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision {
 
-  private final PhotonCamera camera;
-  private final PhotonPoseEstimator photonEstimator;
-  private Matrix<N3, N1> curStdDevs;
+  protected final PhotonCamera camera;
+  protected final PhotonPoseEstimator photonEstimator;
+  protected Matrix<N3, N1> curStdDevs;
 
   // (Fake values. Experiment and determine estimation noise on an actual robot.)
   private Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
@@ -57,7 +57,7 @@ public class Vision {
     return visionEst;
   }
 
-  private void updateEstimationStdDevs(
+  protected void updateEstimationStdDevs(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
 
     if (estimatedPose.isEmpty()) {

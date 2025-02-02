@@ -368,4 +368,9 @@ public final class Constants {
   public static class AlgaeIntakeConstants {
     public static final double kAngleTolerance = 0.0;
   }
+
+  public static class CameraInfo {
+    public static final double kCamHeight = 0.0;
+    public static final double kCamPitch = 0.0;
+  }
 }
