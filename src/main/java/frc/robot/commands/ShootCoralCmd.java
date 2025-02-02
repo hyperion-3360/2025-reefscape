@@ -21,7 +21,7 @@ public class ShootCoralCmd extends SequentialCommandGroup {
                 Commands.runOnce(() -> m_shooter.openBlocker()),
                 new WaitCommand(0.3),
                 Commands.run(() -> m_shooter.setShoot()))
-            .until(() -> m_shooter.isCoralIn()),
+            .until(() -> !m_shooter.isCoralIn()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
