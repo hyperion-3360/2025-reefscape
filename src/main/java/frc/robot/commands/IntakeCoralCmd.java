@@ -15,10 +15,14 @@ public class IntakeCoralCmd extends SequentialCommandGroup {
     addRequirements(m_shooter);
     addRequirements(m_leds);
     this.addCommands(
-        Commands.runOnce(() -> m_shooter.closeBlocker()),
-        new WaitCommand(0.3),
-        Commands.run(() -> m_shooter.setIntake()).until(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(0.3),
-        Commands.runOnce(() -> m_shooter.stop()));
+        m_leds
+            .intakeColors()
+            .alongWith(
+                Commands.runOnce(() -> m_shooter.closeBlocker()),
+                new WaitCommand(0.3),
+                Commands.run(() -> m_shooter.setIntake()))
+            .until(() -> !m_shooter.isCoralIn())
+            .andThen(new WaitCommand(0.3), Commands.runOnce(() -> m_shooter.stop()))
+            .andThen(m_leds.readyColor()));
   }
 }
