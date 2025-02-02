@@ -11,13 +11,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.commands.DumperCMD;
+import frc.robot.commands.IntakeCoralCmd;
+import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
-// import frc.robot.subsystems.CoralClaw;
+import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -35,12 +39,12 @@ public class RobotContainer {
   public static final Vision m_vision = new Vision();
   public static final CTREConfigs ctreConfigs = new CTREConfigs();
   public static final Swerve m_swerve = new Swerve(m_vision);
-  // public static final CoralClaw m_coralClaw = new CoralClaw();
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
   public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
+  public static final Dumper m_dumper = new Dumper();
 
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -54,8 +58,7 @@ public class RobotContainer {
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
-  private final SlewRateLimiter elevatorUpLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter elevatorDownLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
   // private final SlewRateLimiter clawAngleLimiter = new SlewRateLimiter(3);
   // private final SlewRateLimiter clawPincerLimiter = new SlewRateLimiter(3);
@@ -65,6 +68,12 @@ public class RobotContainer {
   private final SlewRateLimiter shooterLimiter = new SlewRateLimiter(3);
 
   private final double kJoystickDeadband = 0.1;
+
+  public final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_leds);
+  public final ShootCoralCmd shootCoralL1 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1);
+  public final ShootCoralCmd shootCoralL2 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2);
+  public final ShootCoralCmd shootCoralL3 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3);
+  public final ShootCoralCmd shootCoralL4 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4);
 
   /***
    * conditionJoystick
@@ -77,8 +86,9 @@ public class RobotContainer {
    * @return the conditioned value
    */
   private double conditionJoystick(int axis, SlewRateLimiter limiter, double deadband) {
-    return -limiter.calculate(
-        MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband));
+    return Math.pow(
+        -limiter.calculate(MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband)),
+        3);
   }
 
   public RobotContainer() {
@@ -90,6 +100,7 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
 
+    // Swerve control Right bumper + left and right joystick
     m_driverController
         .rightBumper()
         .whileTrue(
@@ -100,52 +111,54 @@ public class RobotContainer {
                 () -> conditionJoystick(rotationAxis, rotationLimiter, kJoystickDeadband),
                 () -> true));
 
+    // Elevator control Pov UP + left joystick
     m_driverController
-        .a()
+        .povUp()
         .whileTrue(
-            m_elevator.manualTest(
-                () -> -conditionJoystick(leftTriggerAxis, elevatorUpLimiter, 0.0),
-                () -> -conditionJoystick(rightTriggerAxis, elevatorDownLimiter, 0.0)));
+            m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter, 0.0)));
+    m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
-    m_driverController.leftBumper().onTrue(m_elevator.Elevate(desiredHeight.L2));
-
+    // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
     m_driverController
-        .x()
+        .back()
         .and(m_driverController.a())
-        .onTrue(m_elevator.Elevate(desiredHeight.NET));
+        .onTrue(m_elevator.Elevate(desiredHeight.LOW));
+    m_driverController
+        .back()
+        .and(m_driverController.b())
+        .onTrue(m_elevator.Elevate(desiredHeight.FEEDER));
+    m_driverController
+        .back()
+        .and(m_driverController.x())
+        .onTrue(m_elevator.Elevate(desiredHeight.L3));
+    m_driverController
+        .back()
+        .and(m_driverController.y())
+        .onTrue(m_elevator.Elevate(desiredHeight.L4));
 
-    m_driverController.x().and(m_driverController.y()).onTrue(m_elevator.Elevate(desiredHeight.L1));
-
-    m_driverController.x().and(m_driverController.b()).onTrue(m_elevator.Elevate(desiredHeight.L2));
-
+    // Path finding  START and POV center
     m_driverController
         .start()
         .and(m_driverController.povCenter())
         .onTrue(Pathfinding.doPathfinding());
 
+    // Coral shooter manual test POV Right and left joystick
     m_driverController
-        .a()
-        .and(m_driverController.b())
+        .povRight()
         .whileTrue(
             m_shooter.manualTest(
                 () -> conditionJoystick(translationAxis, shooterLimiter, kJoystickDeadband)))
         .onFalse(m_shooter.manualTest(() -> 0.0));
-    m_driverController.x().onTrue(m_shooter.openBlocker()).onFalse(m_shooter.closeBlocker());
 
-    /*m_driverController
-        .b()
-        .whileTrue(
-            m_coralClaw.clawTestMode(
-                () -> conditionJoystick(translationAxis, clawAngleLimiter, kJoystickDeadband),
-            () -> conditionJoystick(rotationAxis, clawPincerLimiter, kJoystickDeadband)))
-    .onFalse(m_coralClaw.clawTestMode(() -> 0.0, () -> 0.0));
-    */
+    // Algea elevator manual control  POV left + left joystick
     m_driverController
-        .y()
+        .povLeft()
         .whileTrue(
             m_algaeIntake.setAngle(
                 () -> conditionJoystick(strafeAxis, strafeLimiter, kJoystickDeadband)))
         .onFalse(m_algaeIntake.setAngle(() -> 0.0));
+
+    // Algea intake manual control POV down + left joystick
     m_driverController
         .povDown()
         .whileTrue(
@@ -153,11 +166,15 @@ public class RobotContainer {
                 () -> conditionJoystick(translationAxis, translationLimiter, kJoystickDeadband)))
         .onFalse(m_algaeIntake.setSpeed(() -> 0.0));
 
+    // // Climber manual control left bumpber + left joystick
     m_driverController
         .leftBumper()
         .whileTrue(
             m_climber.climberTestMode(
                 () -> conditionJoystick(translationAxis, climberSpeedLimiter, kJoystickDeadband)));
+
+    m_driverController.povUp().onTrue(intakeCoral);
+    m_driverController.povDown().onTrue(shootCoralL1);
   }
 
   public void configureBindingsTeleop() {

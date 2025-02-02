@@ -5,24 +5,23 @@
 package frc.lib.util;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
 
 /** Add your docs here. */
-public class TunableElevatorFF implements Sendable {
+public class TunableElevatorFF /*implements Sendable*/ {
   private double k_a = 0.0;
   private double k_g = 0.0;
   private double k_v = 0.0;
+  private final double k_s = 0.1;
   private ElevatorFeedforward m_feedForward;
-  private static int instances = 0;
 
-  public TunableElevatorFF(double a, double g, double v) {
+  // private static int instances = 0;
+
+  public TunableElevatorFF(double g, double v, double a) {
     k_a = a;
     k_g = g;
     k_v = v;
     renewFF();
-    SendableRegistry.add(this, "TunableElevatorFF", instances);
+    // SendableRegistry.add(this, "TunableElevatorFF", instances);
   }
 
   public double getA() {
@@ -57,19 +56,19 @@ public class TunableElevatorFF implements Sendable {
   }
 
   private void renewFF() {
-    m_feedForward = new ElevatorFeedforward(0, k_g, k_v, k_a);
+    m_feedForward = new ElevatorFeedforward(k_s, k_g, k_v, k_a);
   }
 
-  public double calculate(double velocity) {
-    return m_feedForward.calculate(velocity);
+  public double calculate(double currentVelocity, double nextVelocity) {
+    return m_feedForward.calculateWithVelocities(currentVelocity, nextVelocity);
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    System.out.println("initSendable, TunableElevatorFF");
-    builder.setSmartDashboardType("RobotPreferences");
-    builder.addDoubleProperty("Kv", this::getV, this::setV);
-    builder.addDoubleProperty("Kg", this::getG, this::setG);
-    builder.addDoubleProperty("Ka", this::getA, this::setA);
-  }
+  // @Override
+  // public void initSendable(SendableBuilder builder) {
+  //   System.out.println("initSendable, TunableElevatorFF");
+  //   builder.setSmartDashboardType("RobotPreferences");
+  //   builder.addDoubleProperty("Kv", this::getV, this::setV);
+  //   builder.addDoubleProperty("Kg", this::getG, this::setG);
+  //   builder.addDoubleProperty("Ka", this::getA, this::setA);
+  // }
 }

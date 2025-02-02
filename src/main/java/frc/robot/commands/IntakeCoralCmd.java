@@ -8,24 +8,21 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 
-public class ShootCoralCmd extends SequentialCommandGroup {
-  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds, shootSpeed speed) {
+public class IntakeCoralCmd extends SequentialCommandGroup {
+  public IntakeCoralCmd(Shooter m_shooter, LEDs m_leds) {
     addRequirements(m_shooter);
     addRequirements(m_leds);
     this.addCommands(
         m_leds
-            .shootColor()
+            .intakeColors()
             .alongWith(
-                Commands.runOnce(() -> m_shooter.openBlocker()),
+                Commands.runOnce(() -> m_shooter.closeBlocker()),
                 new WaitCommand(0.3),
-                Commands.run(() -> m_shooter.setShoot(speed)))
-            .until(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(0.3),
-        Commands.runOnce(() -> m_shooter.stop()),
-        Commands.runOnce(() -> m_shooter.closeBlocker()),
-        m_leds.idleColor());
+                Commands.run(() -> m_shooter.setIntake()))
+            .until(() -> m_shooter.isCoralIn())
+            .andThen(new WaitCommand(0.3), Commands.runOnce(() -> m_shooter.stop()))
+            .andThen(m_leds.readyColor()));
   }
 }

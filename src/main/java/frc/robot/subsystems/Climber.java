@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-// import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -50,6 +49,8 @@ public class Climber extends SubsystemBase {
   private static double GrabPosition = 30;
   private static double LiftPosition = 0;
   private double m_climberTarget = LiftPosition;
+
+  private TalonFXConfiguration m_climberConfig = new TalonFXConfiguration();
 
   public Climber() {
     // motor configs

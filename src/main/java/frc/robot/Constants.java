@@ -259,24 +259,29 @@ public final class Constants {
     // TODO: modify angles and wheel speeds
 
     // in º
-    public static final double kStartingAngle = 0.0;
-    public static final double kFloorIntakeAngle = 0.0;
-    public static final double kNetAngle = 0.0;
+    public static final double kStartingAngle = 0.1;
+    public static final double kFloorIntakeAngle = -22.0;
+    public static final double kNetAngle = -10.0;
     // auto intake bcuz of the little tower thing
     public static final double kAutoIntakeAngle = 0.0;
-    public static final double kCurrentLimit = 20.0;
+    public static final double kCurrentLimit = 15.0;
 
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
-    public static final double kProcessorSpeed = 0.0;
+    public static final double kStoringSpeed = 0.15;
+    public static final double kProcessorSpeed = -0.8;
     public static final double kStopSpeed = 0.0;
     public static final double kNetSpeed = 0.0;
   }
 
   public static class CoralShooterVariables {
     // TODO: Find actual speed
-    public static final double kShootSpeed = 0.0;
-    public static final double kIntakeSpeed = 0.0;
+    public static final double kShootNo = 0.0;
+    public static final double kShootL1 = -0.6;
+    public static final double kShootL2 = -0.65;
+    public static final double kShootL3 = -0.7;
+    public static final double kShootL4 = -0.75;
+    public static final double kIntakeSpeed = -1.0;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     public static final int kCoralShooterCurrentLimit = 10;
@@ -284,14 +289,14 @@ public final class Constants {
 
     // TODO: Find angles
     // angles in º
-    public static final double kCoralShooterClosed = 9.0;
-    public static final double kCoralShooterOpen = 80.0;
+    public static final double kCoralShooterClosed = 32.0;
+    public static final double kCoralShooterOpen = 120.0;
   }
 
   public static class LEDConstants {
     // TODO: update port when robot is built
-    public static final int kLEDPWMPort = 6;
-    public static final int kLEDLength = 60;
+    public static final int kLEDPWMPort = 5;
+    public static final int kLEDLength = 27;
   }
 
   public static class ClimberState {
@@ -347,17 +352,16 @@ public final class Constants {
     public static final double kElevatorMotorCurrentLimit = 30.0; // TO BE TESTED
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
-    public static final double kElevatorDown =
-        0.15; // for some reason 0.0 no work          // MAX 37 MOTOR TURNS
-    public static final double kElevatorL1 = 10.0;
-    public static final double kElevatorL2 = 15.0;
-    public static final double kElevatorL3 = 20.0;
-    public static final double kElevatorL4 = 25.0;
+    public static final double kElevatorDown = 0.01; // MAX 37 MOTOR TURNS  1 rotation = 0.04596 m
+    public static final double kElevatorL1 = 0.43;
+    public static final double kElevatorL2 = 0.67;
+    public static final double kElevatorL3 = 0.95;
+    public static final double kElevatorL4 = 1.43;
     public static final double kElevatorHandoff = 0.0;
-    public static final double kElevatorNet = 35.0;
+    public static final double kElevatorNet = 1.75;
     public static final double kElevatorProcessor = 10.0;
     public static final double kElevatorAlgaeLow = 0.0;
-    public static final double kElevatorFeeder = 0.0;
+    public static final double kElevatorFeeder = 0.172;
     public static final double kElevatorCoralLow = 1.0;
   }
 

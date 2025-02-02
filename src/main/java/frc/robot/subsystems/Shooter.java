@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,10 +20,40 @@ public class Shooter extends SubsystemBase {
   private Servo m_coralBlocker = new Servo(Constants.SubsystemInfo.kCoralShooterServoID);
   private DigitalInput m_shooterIR =
       new DigitalInput(Constants.SubsystemInfo.kCoralShooterBeambreakID);
-  public boolean getShooterIR = m_shooterIR.get();
-  public double CoralShooterSpeed = m_shooter.get();
-  public double TestSpeed = 0.0;
-  public double SpeedTestTime = 0.0;
+
+  private boolean getShooterIR = m_shooterIR.get();
+  private double CoralShooterSpeed = m_shooter.get();
+  private double TestSpeed = 0.0;
+  private double SpeedTestTime = 0.0;
+  private double m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
+
+  public enum shootSpeed {
+    L1,
+    L2,
+    L3,
+    L4
+  }
+
+  private void setSpeed(shootSpeed speed) {
+
+    switch (speed) {
+      case L1:
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL1;
+        break;
+
+      case L2:
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL2;
+        break;
+
+      case L3:
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL3;
+        break;
+
+      case L4:
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
+        break;
+    }
+  }
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
   public Shooter() {
@@ -32,30 +63,12 @@ public class Shooter extends SubsystemBase {
     m_shooter.configContinuousCurrentLimit(
         Constants.CoralShooterVariables.kCoralShooterCurrentLimit);
     m_shooter.enableCurrentLimit(true);
-    // TODO: Find good ramp rate
-    m_shooter.configOpenloopRamp(Constants.CoralShooterVariables.kCoralShooterRamprate);
 
     // SmartDashboard
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
     SmartDashboard.putNumber("Coral shooter speed", CoralShooterSpeed);
     SmartDashboard.putNumber("Shooter test speed", TestSpeed);
     SmartDashboard.putNumber("Shooter test time", SpeedTestTime);
-  }
-
-  public void shoot() {
-    openBlocker();
-    m_shooter.set(Constants.CoralShooterVariables.kShootSpeed);
-    Wait.waitUntil(() -> getShooterIR);
-    Wait.waitSecs(0.1);
-    stop();
-    closeBlocker();
-  }
-
-  public void intake() {
-    closeBlocker();
-    m_shooter.set(Constants.CoralShooterVariables.kIntakeSpeed);
-    Wait.waitUntil(() -> !getShooterIR);
-    stop();
   }
 
   public void testSpeed() {
@@ -65,22 +78,23 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stop() {
-    m_shooter.set(0);
+    m_shooter.set(0.0);
   }
 
-  public Command openBlocker() {
-    return this.runOnce(
-        () -> m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterOpen));
+  public void openBlocker() {
+    m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterOpen);
   }
 
-  public Command closeBlocker() {
-    return this.runOnce(
-        () -> m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterClosed));
+  public void closeBlocker() {
+    m_coralBlocker.setAngle(Constants.CoralShooterVariables.kCoralShooterClosed);
   }
 
   @Override
   public void periodic() {
     getShooterIR = m_shooterIR.get();
+    if (DriverStation.isDisabled()) {
+      m_shooter.set(0.0);
+    }
   }
 
   /**
@@ -97,5 +111,21 @@ public class Shooter extends SubsystemBase {
           double throttle = joystick.getAsDouble();
           m_shooter.set(-1.0 * throttle * throttle);
         });
+  }
+
+  /** We want a ramp rate when intaking so set the speed at -1 in 0.5 seconds */
+  public void setIntake() {
+    m_shooter.configOpenloopRamp(0.5);
+    m_shooter.set(Constants.CoralShooterVariables.kIntakeSpeed);
+  }
+
+  /** We don't want a ramp rate when shooting so set the speed at -1 in 0.0 seconds */
+  public void setShoot(shootSpeed speed) {
+    m_shooter.configOpenloopRamp(0.0);
+    setSpeed(speed);
+  }
+
+  public boolean isCoralIn() {
+    return !getShooterIR;
   }
 }
