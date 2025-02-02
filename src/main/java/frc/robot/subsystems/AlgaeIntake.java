@@ -80,6 +80,7 @@ public class AlgaeIntake extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       m_pid.reset();
       m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
+      m_SpeedTarget = 0.0;
     }
     m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     m_intakeRight.set(m_SpeedTarget);
