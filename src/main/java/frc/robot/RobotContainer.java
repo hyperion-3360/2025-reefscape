@@ -82,8 +82,9 @@ public class RobotContainer {
    * @return the conditioned value
    */
   private double conditionJoystick(int axis, SlewRateLimiter limiter, double deadband) {
-    return -limiter.calculate(
-        MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband));
+    return Math.pow(
+        -limiter.calculate(MathUtil.applyDeadband(m_driverController.getRawAxis(axis), deadband)),
+        3);
   }
 
   public RobotContainer() {
@@ -130,7 +131,7 @@ public class RobotContainer {
     m_driverController
         .back()
         .and(m_driverController.y())
-        .onTrue(m_elevator.Elevate(desiredHeight.L2));
+        .onTrue(m_elevator.Elevate(desiredHeight.L4));
 
     // Path finding  START and POV center
     m_driverController
