@@ -10,12 +10,19 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Joysticks;
+import frc.lib.util.TestBindings;
+import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.SubsystemInfo;
 import frc.robot.Constants.climberAction;
@@ -24,7 +31,7 @@ import java.util.function.DoubleSupplier;
 /** 1 falcon winch and unwinch* */
 // La classe devrait avoir un option pour seulement s'activer a 30sec de la fin du jeu,
 // pour eviter un mouvement par accident du pilot
-public class Climber extends SubsystemBase {
+public class Climber extends SubsystemBase implements TestBindings {
 
   private double kDt = ClimberConstants.kDt;
   private double kMaxVelocity = ClimberConstants.kMaxAcceleration;
@@ -49,6 +56,8 @@ public class Climber extends SubsystemBase {
   private static double GrabPosition = 30;
   private static double LiftPosition = 0;
   private double m_climberTarget = LiftPosition;
+  private final int translationAxis = XboxController.Axis.kLeftY.value;
+  private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
 
   private TalonFXConfiguration m_climberConfig = new TalonFXConfiguration();
 
@@ -91,12 +100,12 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     // if (DriverStation.isEnabled()) {
     // Make the motor get to the target
-    //   m_climberMotor.set(
-    //       m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(),
+    // m_climberMotor.set(
+    // m_controller.calculate(m_climberMotor.getPosition().getValueAsDouble(),
     // m_climberTarget)
-    //           + m_feedforward.calculate(
-    //               m_climberMotor.getPosition().getValueAsDouble(),
-    //               m_climberMotor.getVelocity().getValueAsDouble()));
+    // + m_feedforward.calculate(
+    // m_climberMotor.getPosition().getValueAsDouble(),
+    // m_climberMotor.getVelocity().getValueAsDouble()));
     // }
     // SmartDashboard.putNumber("ClimbeGrab", GrabPosition);
   }
@@ -131,5 +140,19 @@ public class Climber extends SubsystemBase {
           m_direction = Math.signum(speed.getAsDouble());
           m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
         });
+  }
+
+  @Override
+  public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
+
+    moduleTrigger
+        .and(controller.leftBumper())
+        .whileTrue(
+            this.climberTestMode(
+                () ->
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(translationAxis),
+                        climberSpeedLimiter,
+                        Constants.stickDeadband)));
   }
 }

@@ -10,17 +10,23 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Joysticks;
+import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends SubsystemBase implements TestBindings {
 
   public enum desiredHeight {
     HANDOFF,
@@ -72,6 +78,10 @@ public class Elevator extends SubsystemBase {
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
   private int test_heightIndex;
+
+  private final int leftTriggerAxis = XboxController.Axis.kLeftTrigger.value;
+  private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
+  private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
   public Elevator() {
 
@@ -206,5 +216,25 @@ public class Elevator extends SubsystemBase {
     //       System.out.println("After: " + test_heightIndex);
     //       SetHeight(testHeight);
     //     });
+  }
+
+  @Override
+  public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
+
+    moduleTrigger
+        .and(controller.a())
+        .whileTrue(
+            this.manualTest(
+                () ->
+                    -Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(rightTriggerAxis), elevatorLimiter, 0.0)));
+
+    moduleTrigger.and(controller.leftBumper()).onTrue(this.Elevate(Elevator.desiredHeight.L2));
+
+    moduleTrigger.and(controller.x()).onTrue(this.Elevate(Elevator.desiredHeight.NET));
+
+    moduleTrigger.and(controller.y()).onTrue(this.Elevate(Elevator.desiredHeight.L1));
+
+    moduleTrigger.and(controller.b()).onTrue(this.Elevate(Elevator.desiredHeight.L2));
   }
 }

@@ -10,16 +10,22 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Joysticks;
+import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
 
 /** 3 neos 550 (mini-neo) one to go up and down and two to intake* */
-public class AlgaeIntake extends SubsystemBase {
+public class AlgaeIntake extends SubsystemBase implements TestBindings {
 
   public enum elevation {
     NET,
@@ -53,6 +59,10 @@ public class AlgaeIntake extends SubsystemBase {
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
+  private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter translationLimiter = new SlewRateLimiter(3);
+  private final int strafeAxis = XboxController.Axis.kLeftX.value;
+  private final int translationAxis = XboxController.Axis.kLeftY.value;
 
   public AlgaeIntake() {
 
@@ -178,5 +188,31 @@ public class AlgaeIntake extends SubsystemBase {
         () -> {
           setShootingSpeed(speed);
         });
+  }
+
+  @Override
+  public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
+
+    moduleTrigger
+        .and(controller.y())
+        .whileTrue(
+            this.setAngle(
+                () ->
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(strafeAxis),
+                        strafeLimiter,
+                        Constants.stickDeadband)))
+        .onFalse(this.setAngle(() -> 0.0));
+
+    moduleTrigger
+        .and(controller.povDown())
+        .whileTrue(
+            this.setSpeed(
+                () ->
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(translationAxis),
+                        translationLimiter,
+                        Constants.stickDeadband)))
+        .onFalse(this.setSpeed(() -> 0.0));
   }
 }

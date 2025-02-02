@@ -5,21 +5,30 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.Joysticks;
+import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import frc.robot.commands.Wait;
 import java.util.function.DoubleSupplier;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements TestBindings {
   private WPI_TalonSRX m_shooter = new WPI_TalonSRX(Constants.SubsystemInfo.kCoralShooterTalonID);
   private Servo m_coralBlocker = new Servo(Constants.SubsystemInfo.kCoralShooterServoID);
   private DigitalInput m_shooterIR =
       new DigitalInput(Constants.SubsystemInfo.kCoralShooterBeambreakID);
+  private final SlewRateLimiter shooterLimiter = new SlewRateLimiter(3);
+  private final int translationAxis = XboxController.Axis.kLeftY.value;
 
   private boolean getShooterIR = m_shooterIR.get();
   private double CoralShooterSpeed = m_shooter.get();
@@ -127,5 +136,24 @@ public class Shooter extends SubsystemBase {
 
   public boolean isCoralIn() {
     return !getShooterIR;
+  }
+
+  @Override
+  public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
+    moduleTrigger
+        .and(controller.x())
+        .onTrue(Commands.runOnce(() -> this.openBlocker(), this))
+        .onFalse(Commands.runOnce(() -> this.closeBlocker(), this));
+
+    moduleTrigger
+        .and(controller.a())
+        .whileTrue(
+            this.manualTest(
+                () ->
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(translationAxis),
+                        shooterLimiter,
+                        Constants.stickDeadband)))
+        .onFalse(this.manualTest(() -> 0.0));
   }
 }
