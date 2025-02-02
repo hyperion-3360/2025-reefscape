@@ -97,6 +97,6 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isCoralIn() {
-    return getShooterIR;
+    return !getShooterIR;
   }
 }

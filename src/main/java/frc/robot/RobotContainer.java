@@ -68,8 +68,8 @@ public class RobotContainer {
 
   private final double kJoystickDeadband = 0.1;
 
-  public final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter);
-  public final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter);
+  public final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds);
+  public final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_leds);
 
   /***
    * conditionJoystick
@@ -107,10 +107,11 @@ public class RobotContainer {
                 () -> true));
 
     // Elevator control Pov UP + left joystick
-    //m_driverController
-    //    .povUp()
-    //    .whileTrue(
-    //        m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter, 0.0)));
+    m_driverController
+       .povUp()
+       .whileTrue(
+           m_elevator.manualTest(() -> -conditionJoystick(translationAxis, elevatorLimiter,
+    0.0)));
     m_driverController.povUp().onTrue(new DumperCMD(m_dumper));
 
     // Elevator position BACK and A B X Y for respectively L1 L2 L3 L4
