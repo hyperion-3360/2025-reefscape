@@ -76,9 +76,10 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     m_intakeRightConfig.smartCurrentLimit(20);
     m_directionConfig.smartCurrentLimit(20);
 
-    // brake mode
+    // brake mode for both pivot and intake
     m_intakeLeftConfig.idleMode(IdleMode.kBrake);
     m_intakeRightConfig.idleMode(IdleMode.kBrake);
+    m_directionConfig.idleMode(IdleMode.kBrake);
 
     m_pivotMotor.getEncoder().setPosition(0);
 
