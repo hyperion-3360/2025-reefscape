@@ -52,8 +52,6 @@ public class RobotContainer {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
-  private final int leftTriggerAxis = XboxController.Axis.kLeftTrigger.value;
-  private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
 
   // Slew Rate Limiters to limit acceleration of joystick inputs
   private final SlewRateLimiter translationLimiter = new SlewRateLimiter(3);
@@ -122,7 +120,11 @@ public class RobotContainer {
                     () -> m_driverController.getRawAxis(strafeAxis),
                     strafeLimiter,
                     Constants.stickDeadband),
-            () -> 0.0,
+            () ->
+                Joysticks.conditionJoystick(
+                    () -> m_driverController.getRawAxis(rotationAxis),
+                    rotationLimiter,
+                    Constants.stickDeadband),
             () -> true);
 
     m_swerve.setDefaultCommand(teleopCmd);
