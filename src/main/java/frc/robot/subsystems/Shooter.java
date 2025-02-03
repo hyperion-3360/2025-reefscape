@@ -103,7 +103,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
     getShooterIR = m_shooterIR.get();
     if (DriverStation.isDisabled()) {
       m_shooter.set(0.0);
-    }
+    } else m_shooter.set(m_shooterSpeed);
   }
 
   /**
