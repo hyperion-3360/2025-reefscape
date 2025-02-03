@@ -4,10 +4,13 @@
 
 package frc.robot.subsystems.leds;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -17,21 +20,29 @@ import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
 
-  AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
-  AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
-  AddressableLEDBuffer m_stageLedBuffer =
+  private AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
+  private AddressableLEDBuffer m_ledBuffer =
+      new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
+  private AddressableLEDBuffer m_stageLedBuffer =
       new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
 
   /** This variable should be able to be changed in smart dashboard */
-  double brightnessPercent = 0.0;
+  // double brightnessPercent = 0.0;
+  private boolean m_isRainbow = false;
+
+  private LEDPattern m_rainbow = LEDPattern.rainbow(255, 255);
+  private Distance LED_SPACING = Meters.of(1.0 / 27);
+  private final LEDPattern m_scrollingRainbow =
+      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
 
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
 
     m_led.start();
-    SmartDashboard.putNumber("LED Brightness (%)", brightnessPercent);
+    // SmartDashboard.putNumber("LED Brightness (%)", brightnessPercent);
     // LEDPattern.solid(Color.kGreen).applyTo(m_stageLedBuffer);
-    LEDPattern.rainbow(255, 255).applyTo(m_stageLedBuffer);
+    m_isRainbow = true;
+    m_scrollingRainbow.applyTo(m_stageLedBuffer);
     stageLEDs();
   }
 
@@ -53,11 +64,16 @@ public class LEDs extends SubsystemBase {
     pattern
         // .atBrightness(Percent.of(SmartDashboard.getNumber(getName(), brightnessPercent)))
         .applyTo(m_stageLedBuffer);
+    m_isRainbow = false;
     stageLEDs();
   }
 
   @Override
   public void periodic() {
+    if (m_isRainbow) {
+      m_scrollingRainbow.applyTo(m_stageLedBuffer);
+      stageLEDs();
+    }
     m_led.setData(m_ledBuffer);
   }
 
