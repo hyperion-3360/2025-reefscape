@@ -68,7 +68,7 @@ public class Swerve extends SubsystemBase {
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            Constants.Swerve.swerveKinematics, getHeading(), positions, new Pose2d());
+            Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
   }
 
   /* periodic */
@@ -81,6 +81,8 @@ public class Swerve extends SubsystemBase {
     // Renews the field periodically
     // m_field2d.setRobotPose(m_odometryPose);
 
+    poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
+
     visionEst = vision.getEstimatedGlobalPose();
 
     if (visionEst.isPresent() && !hasStartedEstimation) {
@@ -88,9 +90,8 @@ public class Swerve extends SubsystemBase {
       estimatePose();
     }
 
-    var currentpose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
-
-    m_field2d.setRobotPose(currentpose);
+    m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+    // System.out.println(getRotation2d());
 
     if (m_debug) {
       // smartdashboardDebug();
@@ -103,11 +104,8 @@ public class Swerve extends SubsystemBase {
             "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
       }
 
-      SmartDashboard.putNumber("currentpose X", currentpose.getX());
-      SmartDashboard.putNumber("field 2d X", m_field2d.getRobotPose().getX());
-      SmartDashboard.putNumber("currentpose Y", currentpose.getY());
-      SmartDashboard.putNumber("gyro", m_gyro.getAngle());
-      SmartDashboard.putBoolean("visionEst present?", visionEst.isPresent());
+      SmartDashboard.putNumber("currentpose X", poseEstimator.getEstimatedPosition().getX());
+      SmartDashboard.putNumber("currentpose Y", poseEstimator.getEstimatedPosition().getY());
     }
   }
 
@@ -123,9 +121,6 @@ public class Swerve extends SubsystemBase {
           var estStdDevs = vision.getEstimationStdDevs();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-
-          // debugging to see if it goes thru
-          System.out.println("hello");
         });
 
     hasStartedEstimation = false;

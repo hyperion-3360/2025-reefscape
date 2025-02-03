@@ -3,15 +3,12 @@ package frc.robot.vision;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.targeting.PhotonTrackedTarget;
-
-import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
 
 public class Selection extends Vision {
 
@@ -59,8 +56,6 @@ public class Selection extends Vision {
   @Override
   public void periodic() {
 
-    SmartDashboard.putBoolean("has vision", hasVision());
-    // camera.getAllUnreadResults();
     setLockTarget();
   }
 
@@ -83,41 +78,41 @@ public class Selection extends Vision {
   private void setLockTarget() {
 
     for (var change : camera.getAllUnreadResults()) {
-      trackedTarget = change.getBestTarget();
-      lockID = trackedTarget.fiducialId;
-      System.out.println(lockID);
+
+      if (change.hasTargets()) {
+
+        trackedTarget = change.getBestTarget();
+        lockID = trackedTarget.fiducialId;
+        // System.out.println(lockID);
+      } else {
+        lockID = 0;
+      }
     }
   }
 
   // will probably refactor
   public Command Align() {
-    if (hasVision()) {
+    if (lockID != 0) {
 
       desiredTranslation =
           new Translation2d(
               // the sin and cos from Math take radians
-              GetTagTranslation().getX()
-                  + (Math.cos(Math.toRadians(GetYaw())) * desiredDistFromTag),
-              GetTagTranslation().getY()
-                  + (Math.sin(Math.toRadians(GetYaw())) * desiredDistFromTag));
+              GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
+              GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
       // not sure abt the 360-yaw
       // return Commands.run(() -> swerve.drive(desiredTranslation, 360 - GetYaw(), true, false));
-      return Commands.runOnce(
-          // returns 0.0 1.0
-          // () -> System.out.println(desiredTranslation.getX() + " " + desiredTranslation.getY()));
-          () -> System.out.println(GetTagTranslation().getX() + " " + GetTagTranslation().getY()));
-
+      return Commands.run(
+              () -> System.out.println(desiredTranslation.getX() + " " + desiredTranslation.getY()))
+          .andThen(
+              () ->
+                  swerve.drive(desiredTranslation, swerve.getHeading().getDegrees(), false, false));
     }
-    return null;
-  }
-
-  public boolean hasVision() {
-    return !super.camera.getAllUnreadResults().isEmpty();
+    return Commands.runOnce(() -> System.out.println("null"));
   }
 
   private double GetYaw() {
     if (trackedTarget != null) {
-      return trackedTarget.yaw;
+      return tagLayout.getTagPose(lockID).get().getRotation().getZ();
     }
     return 0.0;
   }

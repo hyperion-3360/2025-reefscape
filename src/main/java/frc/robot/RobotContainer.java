@@ -25,6 +25,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
 import java.util.function.BooleanSupplier;
 
@@ -41,10 +42,11 @@ public class RobotContainer {
   public static final Swerve m_swerve = new Swerve(m_vision);
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
-  public static final Elevator m_elevator = new Elevator();
+  //   public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
+  public static final Selection m_selector = new Selection(m_swerve);
 
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
