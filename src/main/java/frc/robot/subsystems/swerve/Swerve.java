@@ -439,5 +439,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new InstantCommand(() -> this.resetOdometry(trajectory.getInitialPose())),
         swerveControllerCommand,
         new InstantCommand(() -> this.drive(new Translation2d(0, 0), 0, false, false)));
+      }
+  public void setPoseToEstimation() {
+    AutoBuilder.resetOdom(poseEstimator.getEstimatedPosition());
+    this.setPose(poseEstimator.getEstimatedPosition());
   }
 }
