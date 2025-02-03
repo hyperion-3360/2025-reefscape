@@ -42,7 +42,7 @@ public class RobotContainer {
   public static final Swerve m_swerve = new Swerve(m_vision);
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
-  //   public static final Elevator m_elevator = new Elevator();
+  public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
