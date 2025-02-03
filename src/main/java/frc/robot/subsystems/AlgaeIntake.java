@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -59,6 +60,7 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
 
   private double m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
   private double m_SpeedTarget = Constants.AlgaeIntakeVariables.kStopSpeed;
+
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter translationLimiter = new SlewRateLimiter(3);
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -69,9 +71,14 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     m_intakeLeftConfig.limitSwitch.forwardLimitSwitchEnabled(false);
     m_intakeLeftConfig.follow(m_intakeRight, true);
 
+    // set current limit
     m_intakeLeftConfig.smartCurrentLimit(20);
     m_intakeRightConfig.smartCurrentLimit(20);
     m_directionConfig.smartCurrentLimit(20);
+
+    // brake mode
+    m_intakeLeftConfig.idleMode(IdleMode.kBrake);
+    m_intakeRightConfig.idleMode(IdleMode.kBrake);
 
     m_pivotMotor.getEncoder().setPosition(0);
 
