@@ -1,7 +1,5 @@
 package frc.robot.subsystems.swerve;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -15,14 +13,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants;
 import frc.robot.vision.Vision;
+import java.util.Optional;
+import org.photonvision.EstimatedRobotPose;
 
 public class Swerve extends SubsystemBase {
   public SwerveModule[] mSwerveMods;
@@ -33,9 +33,14 @@ public class Swerve extends SubsystemBase {
   private boolean m_debug = true;
   private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
+  Thread thread = new Thread();
+  ShuffleboardTab VisionSwerveTab = Shuffleboard.getTab("vision and swerve");
+  private boolean hasStartedEstimation = false;
+
+  // vision estimation of robot pose
+  Optional<EstimatedRobotPose> visionEst;
 
   public Swerve(Vision vision) {
-    // TODO get good port
     m_gyro = new AHRS(NavXComType.kMXP_SPI);
     m_field2d = new Field2d();
     m_gyro.reset();
@@ -63,8 +68,65 @@ public class Swerve extends SubsystemBase {
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            Constants.Swerve.swerveKinematics, getHeading(), positions, new Pose2d());
+            Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
   }
+
+  /* periodic */
+
+  @Override
+  public void periodic() {
+
+    // updates the odometry positon
+    // var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    // Renews the field periodically
+    // m_field2d.setRobotPose(m_odometryPose);
+
+    poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
+
+    visionEst = vision.getEstimatedGlobalPose();
+
+    if (visionEst.isPresent() && !hasStartedEstimation) {
+      hasStartedEstimation = true;
+      estimatePose();
+    }
+
+    m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+    // System.out.println(getRotation2d());
+
+    if (m_debug) {
+      // smartdashboardDebug();
+      for (SwerveModule mod : mSwerveMods) {
+        SmartDashboard.putNumber(
+            "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
+        SmartDashboard.putNumber(
+            "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+        SmartDashboard.putNumber(
+            "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+      }
+
+      SmartDashboard.putNumber("currentpose X", poseEstimator.getEstimatedPosition().getX());
+      SmartDashboard.putNumber("currentpose Y", poseEstimator.getEstimatedPosition().getY());
+    }
+  }
+
+  /* thread */
+
+  public void estimatePose() {
+
+    // if vision estimation is present, create method est to add vision measurment to
+    // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
+
+    visionEst.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevs();
+          poseEstimator.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
+
+    hasStartedEstimation = false;
+  }
+
+  /* drive related things */
 
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -84,30 +146,6 @@ public class Swerve extends SubsystemBase {
     for (int i = 0; i < mSwerveMods.length; i++) {
       mSwerveMods[i].setDesiredState(targetStates[i], isOpenLoop);
     }
-  }
-
-  private void configurePathPlanner() {
-    // TODO make actual configs for autobuilder
-    // try catch to remove parsing error
-    AutoBuilder.configure(
-        this::getPose,
-        this::setPose,
-        this::getSpeeds,
-        this::driveRobotRelative,
-        Constants.AutoConstants.kPathFollowController,
-        Constants.AutoConstants.kRobotConfig,
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this);
   }
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
@@ -199,59 +237,13 @@ public class Swerve extends SubsystemBase {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
     for (SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
   }
 
-  @Override
-  public void periodic() {
-
-    // updates the odometry positon
-    // var m_odometryPose = m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
-    // Renews the field periodically
-    // m_field2d.setRobotPose(m_odometryPose);
-
-    var visionEst = vision.getEstimatedGlobalPose();
-    // if vision estimation is present, create method est to add vision measurment to
-    // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
-    visionEst.ifPresent(
-        est -> {
-          var estStdDevs = vision.getEstimationStdDevs();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-
-          // debugging to see if it goes thru
-          System.out.println("hello");
-        });
-
-    var currentpose = poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
-
-    m_field2d.setRobotPose(currentpose);
-
-    if (m_debug) {
-      // smartdashboardDebug();
-      for (SwerveModule mod : mSwerveMods) {
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-      }
-
-      SmartDashboard.putNumber("currentpsoe X", currentpose.getX());
-      SmartDashboard.putNumber("pose estimate X", poseEstimator.getEstimatedPosition().getX());
-      SmartDashboard.putString("est global pose", vision.getEstimatedGlobalPose().toString());
-      SmartDashboard.putBoolean(
-          "est global pose present?", vision.getEstimatedGlobalPose().isPresent());
-    }
-
-    // System.out.println("current pose x = " + currentpose.getX() + " current pose y = " +
-    // currentpose.getY());
-  }
+  /* some odometry stuff */
 
   public Command resetOdometryBlueSide() {
     return this.runOnce(
@@ -271,17 +263,29 @@ public class Swerve extends SubsystemBase {
                 new Pose2d(14.4, 5, Rotation2d.fromDegrees(180))));
   }
 
-  private SysIdRoutine m_driveSysIdRoutine =
-      new SysIdRoutine(
-          //          new SysIdRoutine.Config(null, null, null, ModifiedSignalLogger.logState()),
-          new SysIdRoutine.Config(null, null, null, null),
-          new SysIdRoutine.Mechanism((volts) -> drive(volts.in(Volts)), null, this));
+  /* pathplanner config */
 
-  public Command runDriveQuasiTest(Direction direction) {
-    return m_driveSysIdRoutine.quasistatic(direction);
-  }
+  private void configurePathPlanner() {
+    // TODO make actual configs for autobuilder
+    // try catch to remove parsing error
+    AutoBuilder.configure(
+        this::getPose,
+        this::setPose,
+        this::getSpeeds,
+        this::driveRobotRelative,
+        Constants.AutoConstants.kPathFollowController,
+        Constants.AutoConstants.kRobotConfig,
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-  public Command runDriveDynamTest(SysIdRoutine.Direction direction) {
-    return m_driveSysIdRoutine.dynamic(direction);
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this);
   }
 }
