@@ -9,8 +9,10 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 public class ElevateCmd extends SequentialCommandGroup{
     Elevator m_elevator;
     
-    public Command ElevateCmd(desiredHeight height){
+    public ElevateCmd(desiredHeight height) {
+        //TODO Auto-generated constructor stub
         addRequirements(m_elevator);
-       return Commands.runOnce(()-> m_elevator.SetHeight(height));
+       Commands.runOnce(()-> m_elevator.SetHeight(height));
+
     }
 }
