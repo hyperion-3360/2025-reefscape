@@ -1,5 +1,7 @@
 package frc.robot.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -16,10 +18,18 @@ public class Selection extends Vision {
   List<Integer> reefPegTag = new ArrayList<Integer>();
   int lockID = -1;
   PhotonTrackedTarget trackedTarget;
-  Translation2d desiredTranslation;
+  Translation2d desiredcoordinates;
+  Pose2d currentcoordinates;
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
   double orientationMultipleY = 0;
+
+  double kPtranslation = 3; // stolen from rambrandt to be tuned
+  double kProtation = 0.06; // stolen from rambrandt to be tuned
+  double rotationFromTag = 1; // stolen from rambrandt to be tuned
+
+
+  DriveToPose drivetoPose = new DriveToPose(kPtranslation, kProtation, desiredDistFromTag, rotationFromTag);
 
   public enum direction {
     left,
@@ -55,6 +65,7 @@ public class Selection extends Vision {
 
   @Override
   public void periodic() {
+    currentcoordinates = swerve.getPose();
 
     setLockTarget();
   }
@@ -83,7 +94,7 @@ public class Selection extends Vision {
 
         trackedTarget = change.getBestTarget();
         lockID = trackedTarget.fiducialId;
-        // System.out.println(lockID);
+        System.out.println(lockID);
       } else {
         lockID = 0;
       }
@@ -94,18 +105,24 @@ public class Selection extends Vision {
   public Command Align() {
     if (lockID != 0) {
 
-      desiredTranslation =
+      desiredcoordinates =
           new Translation2d(
               // the sin and cos from Math take radians
               GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
-      // not sure abt the 360-yaw
-      // return Commands.run(() -> swerve.drive(desiredTranslation, 360 - GetYaw(), true, false));
-      return Commands.run(
-              () -> System.out.println(desiredTranslation.getX() + " " + desiredTranslation.getY()))
-          .andThen(
-              () ->
-                  swerve.drive(desiredTranslation, swerve.getHeading().getDegrees(), false, false));
+
+              // no fking cliue if this works
+      // var speed =
+      //     new Translation2d(
+      //         (Math.abs(desiredcoordinates.getX()) - currentcoordinates.getX()) * Math.signum(Math.cos(GetYaw())),
+      //         (Math.abs(desiredcoordinates.getY()) - currentcoordinates.getY()) * Math.signum(Math.sin(GetYaw())));
+
+      var desiredRotation = new Rotation2d(GetYaw());
+      var desiredPose = new Pose2d(desiredcoordinates, desiredRotation);
+
+      drivetoPose.setRobotSpeed(swerve.getSpeeds());
+      var desiredSpeed = drivetoPose.getTargetSpeeds(currentcoordinates, desiredPose);
+      return Commands.run(() -> swerve.driveRobotRelative(desiredSpeed));
     }
     return Commands.runOnce(() -> System.out.println("null"));
   }
