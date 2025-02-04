@@ -46,7 +46,7 @@ Appuyer POV LEFT: Elévateur en L3
 Appuyer POV RIGHT: Elévateur en L2
 Appuyer POV DOWN: Elévateur en L1
 Maintenir X BUTTON: Intake algue L2
-Maintenir Y BUTTON: Intake algue L2
+Maintenir Y BUTTON: Intake algue L3
 Appuyer A BUTTON: Shoot corail
 Appuyer B BUTTON: Shoot algue
 Maintenir LEFT BUMPER: commande automatique pour positionner le robot à la feeding station et être prêt à recevoir un corail du human player
