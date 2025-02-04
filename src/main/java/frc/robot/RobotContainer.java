@@ -114,17 +114,20 @@ public class RobotContainer {
                 Joysticks.conditionJoystick(
                     () -> m_driverController.getRawAxis(translationAxis),
                     translationLimiter,
-                    Constants.stickDeadband),
+                    Constants.stickDeadband,
+                    true),
             () ->
                 Joysticks.conditionJoystick(
                     () -> m_driverController.getRawAxis(strafeAxis),
                     strafeLimiter,
-                    Constants.stickDeadband),
+                    Constants.stickDeadband,
+                    true),
             () ->
                 Joysticks.conditionJoystick(
                     () -> m_driverController.getRawAxis(rotationAxis),
                     rotationLimiter,
-                    Constants.stickDeadband),
+                    Constants.stickDeadband,
+                    true),
             () -> true);
 
     m_swerve.setDefaultCommand(teleopCmd);

@@ -225,8 +225,11 @@ public class Elevator extends SubsystemBase implements TestBindings {
         .whileTrue(
             this.manualTest(
                 () ->
-                    -Joysticks.conditionJoystick(
-                        () -> controller.getRawAxis(rightTriggerAxis), elevatorLimiter, 0.0)));
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(rightTriggerAxis),
+                        elevatorLimiter,
+                        0.0,
+                        false)));
 
     moduleTrigger.and(controller.leftBumper()).onTrue(this.Elevate(Elevator.desiredHeight.L2));
 

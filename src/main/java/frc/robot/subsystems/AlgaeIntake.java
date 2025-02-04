@@ -209,7 +209,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
                     Joysticks.conditionJoystick(
                         () -> controller.getRawAxis(strafeAxis),
                         strafeLimiter,
-                        Constants.stickDeadband)))
+                        Constants.stickDeadband,
+                        true)))
         .onFalse(this.setAngle(() -> 0.0));
 
     moduleTrigger
@@ -220,7 +221,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
                     Joysticks.conditionJoystick(
                         () -> controller.getRawAxis(translationAxis),
                         translationLimiter,
-                        Constants.stickDeadband)))
+                        Constants.stickDeadband,
+                        true)))
         .onFalse(this.setSpeed(() -> 0.0));
   }
 }
