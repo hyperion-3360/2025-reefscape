@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -144,6 +145,8 @@ public class RobotContainer {
     SmartDashboard.putData("Algae Intake", setAlgaeIntakeMode());
     SmartDashboard.putData("Swerve", setSwerveMode());
     SmartDashboard.putData("Dumper", setDumperMode());
+
+    PathPlannerLogging.logCurrentPose(m_swerve.getPose());
 
     var teleopCmd =
         new TeleopSwerve(
