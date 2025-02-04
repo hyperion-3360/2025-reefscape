@@ -47,27 +47,31 @@ public class Selection extends Vision {
   public Selection(Swerve swerve) {
     this.swerve = swerve;
 
-    var alliance = DriverStation.getAlliance().get();
-    if (alliance == Alliance.Blue) {
-      reefPegTag.clear();
-      reefPegTag.add(22);
-      reefPegTag.add(21);
-      reefPegTag.add(20);
-      reefPegTag.add(19);
-      reefPegTag.add(18);
-      reefPegTag.add(17);
+    try {
+      var alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Blue) {
+        reefPegTag.clear();
+        reefPegTag.add(22);
+        reefPegTag.add(21);
+        reefPegTag.add(20);
+        reefPegTag.add(19);
+        reefPegTag.add(18);
+        reefPegTag.add(17);
 
-    } else if (alliance == Alliance.Red) {
-      reefPegTag.clear();
-      reefPegTag.add(6);
-      reefPegTag.add(7);
-      reefPegTag.add(8);
-      reefPegTag.add(9);
-      reefPegTag.add(10);
-      reefPegTag.add(11);
+      } else if (alliance == Alliance.Red) {
+        reefPegTag.clear();
+        reefPegTag.add(6);
+        reefPegTag.add(7);
+        reefPegTag.add(8);
+        reefPegTag.add(9);
+        reefPegTag.add(10);
+        reefPegTag.add(11);
 
-    } else {
-      reefPegTag.clear();
+      } else {
+        reefPegTag.clear();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
