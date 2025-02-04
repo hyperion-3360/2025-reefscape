@@ -29,17 +29,17 @@ import java.util.function.DoubleSupplier;
 public class Elevator extends SubsystemBase implements TestBindings {
 
   public enum desiredHeight {
-    HANDOFF,
     PROCESSOR,
     NET,
     FEEDER,
     ALGAELOW,
-    CORALLOW,
     LOW,
     L1,
     L2,
     L3,
-    L4
+    L4,
+    ALGAEL2,
+    ALGAEL3
   }
 
   private static double kP = 9.0;
@@ -173,10 +173,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorNet;
         break;
 
-      case HANDOFF:
-        heightTarget = Constants.ElevatorConstants.kElevatorHandoff;
-        break;
-
       case ALGAELOW:
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         break;
@@ -185,8 +181,12 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
         break;
 
-      case CORALLOW:
-        heightTarget = Constants.ElevatorConstants.kElevatorCoralLow;
+      case ALGAEL2:
+        heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL2;
+        break;
+
+      case ALGAEL3:
+        heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
         break;
     }
     m_controller.setGoal(heightTarget);
