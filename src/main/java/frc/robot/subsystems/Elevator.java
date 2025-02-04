@@ -29,17 +29,17 @@ import java.util.function.DoubleSupplier;
 public class Elevator extends SubsystemBase implements TestBindings {
 
   public enum desiredHeight {
-    HANDOFF,
     PROCESSOR,
     NET,
     FEEDER,
     ALGAELOW,
-    CORALLOW,
     LOW,
     L1,
     L2,
     L3,
-    L4
+    L4,
+    ALGAEL2,
+    ALGAEL3
   }
 
   private static double kP = 9.0;
@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double kDt = 0.02;
 
   private static double kMaxVelocity = 3;
-  private static double kMaxAcceleration = 4;
+  private static double kMaxAcceleration = 3;
 
   //  private static double kG = 0.98; // not moving
   private static double kG = 0.90;
@@ -77,9 +77,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
-  private int test_heightIndex;
+  //  private int test_heightIndex;
 
-  private final int leftTriggerAxis = XboxController.Axis.kLeftTrigger.value;
   private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
   private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
@@ -110,7 +109,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
     m_controller.setGoal(0.01);
-    test_heightIndex = 0;
+    // test_heightIndex = 0;
   }
 
   @Override
@@ -174,10 +173,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorNet;
         break;
 
-      case HANDOFF:
-        heightTarget = Constants.ElevatorConstants.kElevatorHandoff;
-        break;
-
       case ALGAELOW:
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         break;
@@ -186,8 +181,12 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
         break;
 
-      case CORALLOW:
-        heightTarget = Constants.ElevatorConstants.kElevatorCoralLow;
+      case ALGAEL2:
+        heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL2;
+        break;
+
+      case ALGAEL3:
+        heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
         break;
     }
     m_controller.setGoal(heightTarget);
@@ -226,8 +225,11 @@ public class Elevator extends SubsystemBase implements TestBindings {
         .whileTrue(
             this.manualTest(
                 () ->
-                    -Joysticks.conditionJoystick(
-                        () -> controller.getRawAxis(rightTriggerAxis), elevatorLimiter, 0.0)));
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(rightTriggerAxis),
+                        elevatorLimiter,
+                        0.0,
+                        false)));
 
     moduleTrigger.and(controller.leftBumper()).onTrue(this.Elevate(Elevator.desiredHeight.L2));
 

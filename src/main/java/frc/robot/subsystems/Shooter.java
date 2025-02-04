@@ -153,7 +153,8 @@ public class Shooter extends SubsystemBase implements TestBindings {
                     Joysticks.conditionJoystick(
                         () -> controller.getRawAxis(translationAxis),
                         shooterLimiter,
-                        Constants.stickDeadband)))
+                        Constants.stickDeadband,
+                        true)))
         .onFalse(this.manualTest(() -> 0.0));
   }
 }

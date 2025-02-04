@@ -349,20 +349,23 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final double kElevatorMotorCurrentLimit = 30.0; // TO BE TESTED
+
+    public static final double kElevatorMotorCurrentLimit = 30.0;
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
-    public static final double kElevatorDown = 0.01; // MAX 37 MOTOR TURNS  1 rotation = 0.04596 m
+
+    // elevator heights
+    public static final double kElevatorDown = 0.01;
     public static final double kElevatorL1 = 0.43;
     public static final double kElevatorL2 = 0.67;
     public static final double kElevatorL3 = 0.95;
     public static final double kElevatorL4 = 1.43;
-    public static final double kElevatorHandoff = 0.0;
     public static final double kElevatorNet = 1.75;
     public static final double kElevatorProcessor = 10.0;
-    public static final double kElevatorAlgaeLow = 0.0;
+    public static final double kElevatorAlgaeLow = 25.0;
     public static final double kElevatorFeeder = 0.172;
-    public static final double kElevatorCoralLow = 1.0;
+    public static final double kElevatorAlgaeL2 = 0.59;
+    public static final double kElevatorAlgaeL3 = 0.91;
   }
 
   public static class AlgaeIntakeConstants {

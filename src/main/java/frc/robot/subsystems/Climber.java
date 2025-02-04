@@ -153,6 +153,7 @@ public class Climber extends SubsystemBase implements TestBindings {
                     Joysticks.conditionJoystick(
                         () -> controller.getRawAxis(translationAxis),
                         climberSpeedLimiter,
-                        Constants.stickDeadband)));
+                        Constants.stickDeadband,
+                        true)));
   }
 }
