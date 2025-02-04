@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.AlgaeIntake;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
+import frc.robot.subsystems.leds.LEDs;
 
 public class IntakeAlgaeCmd extends SequentialCommandGroup {
   AlgaeIntake m_algaeIntake;
@@ -17,9 +20,12 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
   // then reduce the speed of the intake rollers and lift the intake to a preset position
   // then stop the intake rollers when desired elevation is reached
 
-  public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle) {
+  public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle, LEDs m_leds, Elevator m_elevator, desiredHeight height) {
     addRequirements(m_algaeIntake);
+    addRequirements(m_leds);
+    addRequirements(m_elevator);
     addCommands(
+        Commands.runOnce(()-> m_elevator.SetHeight(height)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),

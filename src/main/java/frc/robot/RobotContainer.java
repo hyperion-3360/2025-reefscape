@@ -66,14 +66,14 @@ public class RobotContainer {
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
-  private final IntakeAlgaeCmd intakeAlgae = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
+  private final IntakeAlgaeCmd intakeAlgae = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAELOW);
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR);
   private final ShootAlgaeCmd shootAlgaeNet = new ShootAlgaeCmd(m_algaeIntake, elevation.NET);
 
-  private final ShootCoralCmd shootCoralL1 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1);
-  private final ShootCoralCmd shootCoralL2 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2);
-  private final ShootCoralCmd shootCoralL3 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3);
-  private final ShootCoralCmd shootCoralL4 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4);
+  private final ShootCoralCmd shootCoralL1 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1, m_elevator, desiredHeight.L1);
+  private final ShootCoralCmd shootCoralL2 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2, m_elevator, desiredHeight.L2);
+  private final ShootCoralCmd shootCoralL3 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3, m_elevator, desiredHeight.L3);
+  private final ShootCoralCmd shootCoralL4 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4, m_elevator, desiredHeight.L4);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_leds);
 
   private final ElevateCmd elevateL1 = new ElevateCmd(desiredHeight.L1);

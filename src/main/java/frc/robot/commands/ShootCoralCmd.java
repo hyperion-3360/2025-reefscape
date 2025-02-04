@@ -8,17 +8,21 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 
 public class ShootCoralCmd extends SequentialCommandGroup {
-  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds, shootSpeed speed) {
+  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds, shootSpeed speed, Elevator m_elevator, desiredHeight height) {
     addRequirements(m_shooter);
     addRequirements(m_leds);
+    addRequirements(m_elevator);
     this.addCommands(
         m_leds
             .shootColor()
             .alongWith(
+              Commands.runOnce(() -> m_elevator.SetHeight(height)),
                 Commands.runOnce(() -> m_shooter.openBlocker()),
                 new WaitCommand(0.3),
                 Commands.run(() -> m_shooter.setShoot(speed)))
