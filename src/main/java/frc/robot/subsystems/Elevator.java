@@ -77,9 +77,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
-  private int test_heightIndex;
+  //  private int test_heightIndex;
 
-  private final int leftTriggerAxis = XboxController.Axis.kLeftTrigger.value;
   private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
   private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
@@ -110,7 +109,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
     m_controller.setGoal(0.01);
-    test_heightIndex = 0;
+    // test_heightIndex = 0;
   }
 
   @Override
