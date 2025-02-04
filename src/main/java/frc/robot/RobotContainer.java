@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
 import frc.robot.commands.ShootAlgaeCmd;
@@ -66,20 +65,26 @@ public class RobotContainer {
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
-  private final IntakeAlgaeCmd intakeAlgae = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAELOW);
+  private final IntakeAlgaeCmd intakeAlgae =
+      new IntakeAlgaeCmd(
+          m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAELOW);
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR);
   private final ShootAlgaeCmd shootAlgaeNet = new ShootAlgaeCmd(m_algaeIntake, elevation.NET);
 
-  private final ShootCoralCmd shootCoralL1 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1, m_elevator, desiredHeight.L1);
-  private final ShootCoralCmd shootCoralL2 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2, m_elevator, desiredHeight.L2);
-  private final ShootCoralCmd shootCoralL3 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3, m_elevator, desiredHeight.L3);
-  private final ShootCoralCmd shootCoralL4 = new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4, m_elevator, desiredHeight.L4);
-  private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_leds);
+  private final ShootCoralCmd shootCoralL1 =
+      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1, m_elevator, desiredHeight.L1);
+  private final ShootCoralCmd shootCoralL2 =
+      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2, m_elevator, desiredHeight.L2);
+  private final ShootCoralCmd shootCoralL3 =
+      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3, m_elevator, desiredHeight.L3);
+  private final ShootCoralCmd shootCoralL4 =
+      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4, m_elevator, desiredHeight.L4);
+  private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final ElevateCmd elevateL1 = new ElevateCmd(desiredHeight.L1);
-  private final ElevateCmd elevateL2 = new ElevateCmd(desiredHeight.L2);
-  private final ElevateCmd elevateL3 = new ElevateCmd(desiredHeight.L3);
-  private final ElevateCmd elevateL4 = new ElevateCmd(desiredHeight.L4);
+  private final Command elevateL1 = m_elevator.Elevate(desiredHeight.L1);
+  private final Command elevateL2 = m_elevator.Elevate(desiredHeight.L2);
+  private final Command elevateL3 = m_elevator.Elevate(desiredHeight.L3);
+  private final Command elevateL4 = m_elevator.Elevate(desiredHeight.L4);
 
   public enum TestModes {
     NONE,
@@ -170,12 +175,14 @@ public class RobotContainer {
   }
 
   public void configureBindingsTeleop() {
+
     m_driverController
-        .a()
+        .x()
         .toggleOnTrue(intakeAlgae)
         .toggleOnFalse(Commands.runOnce(() -> intakeAlgae.cancel(), m_algaeIntake));
+
     m_driverController.b().onTrue(shootAlgae);
-    m_driverController.povUp().onTrue(intakeCoral);
+    m_driverController.a().onTrue(intakeCoral);
 
     m_climber.setDefaultCommand(
         m_climber.climberTestMode(

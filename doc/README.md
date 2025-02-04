@@ -33,7 +33,7 @@ Maintenir POV DOWN: Joystick gauche: intake algae motor speed
 LEFT JOYSTICK : déplacement de base swerve
 RIGHT JOYSTICK : rotation swerve
 Maintenir X BUTTON: Enlignement sur un AprilTag
-Appuyer A BUTTON: Intake algue APPPUYER de nouveau pour annuler la commande
+Appuyer A BUTTON: Intake corail APPPUYER de nouveau pour annuler la commande
 Maintenir B BUTTON: Score processor
 Maintenir LEFT TRIGGER: déplacement latéral pour alignement récif à gauche
 Maintenir RIGHT TRIGGER: déplacement latéral pour alignement récif à droite

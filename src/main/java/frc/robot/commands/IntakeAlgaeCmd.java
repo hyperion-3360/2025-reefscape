@@ -20,12 +20,17 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
   // then reduce the speed of the intake rollers and lift the intake to a preset position
   // then stop the intake rollers when desired elevation is reached
 
-  public IntakeAlgaeCmd(AlgaeIntake m_algaeIntake, AlgaeIntake.elevation angle, LEDs m_leds, Elevator m_elevator, desiredHeight height) {
+  public IntakeAlgaeCmd(
+      AlgaeIntake m_algaeIntake,
+      AlgaeIntake.elevation angle,
+      LEDs m_leds,
+      Elevator m_elevator,
+      desiredHeight height) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
     addCommands(
-        Commands.runOnce(()-> m_elevator.SetHeight(height)),
+        Commands.runOnce(() -> m_elevator.SetHeight(height)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
