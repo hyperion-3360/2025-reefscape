@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -67,9 +66,11 @@ public class RobotContainer {
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
   private final IntakeAlgaeCmd intakeAlgaeFloor =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
-  private final IntakeAlgaeCmd intakeAlgaeL2 = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
-  private final IntakeAlgaeCmd intakeAlgaeL3 = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
+      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.LOW);
+  private final IntakeAlgaeCmd intakeAlgaeL2 =
+      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL2);
+  private final IntakeAlgaeCmd intakeAlgaeL3 =
+      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL3);
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR);
   private final ShootAlgaeCmd shootAlgaeNet = new ShootAlgaeCmd(m_algaeIntake, elevation.NET);
 
