@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -65,9 +66,10 @@ public class RobotContainer {
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
-  private final IntakeAlgaeCmd intakeAlgae =
-      new IntakeAlgaeCmd(
-          m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAELOW);
+  private final IntakeAlgaeCmd intakeAlgaeFloor =
+      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
+  private final IntakeAlgaeCmd intakeAlgaeL2 = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
+  private final IntakeAlgaeCmd intakeAlgaeL3 = new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR);
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR);
   private final ShootAlgaeCmd shootAlgaeNet = new ShootAlgaeCmd(m_algaeIntake, elevation.NET);
 
@@ -178,8 +180,8 @@ public class RobotContainer {
 
     m_driverController
         .x()
-        .toggleOnTrue(intakeAlgae)
-        .toggleOnFalse(Commands.runOnce(() -> intakeAlgae.cancel(), m_algaeIntake));
+        .toggleOnTrue(intakeAlgaeFloor)
+        .toggleOnFalse(Commands.runOnce(() -> intakeAlgaeFloor.cancel(), m_algaeIntake));
 
     m_driverController.b().onTrue(shootAlgae);
     m_driverController.a().onTrue(intakeCoral);
@@ -198,12 +200,12 @@ public class RobotContainer {
 
     m_coDriverController
         .y()
-        .onTrue(m_elevator.Elevate(desiredHeight.ALGAEL2))
-        .onFalse(m_elevator.Elevate(desiredHeight.FEEDER));
+        .onTrue(intakeAlgaeL2)
+        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
-        .onTrue(m_elevator.Elevate(desiredHeight.ALGAEL3))
-        .onFalse(m_elevator.Elevate(desiredHeight.FEEDER));
+        .onTrue(intakeAlgaeL3)
+        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);
     m_coDriverController.povDown().onTrue(elevateL1);

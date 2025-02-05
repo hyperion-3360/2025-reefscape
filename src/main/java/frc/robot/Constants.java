@@ -289,14 +289,14 @@ public final class Constants {
 
     // TODO: Find angles
     // angles in º
-    public static final double kCoralShooterClosed = 20.0;
+    public static final double kCoralShooterClosed = 10.0;
     public static final double kCoralShooterOpen = 120.0;
   }
 
   public static class LEDConstants {
     // TODO: update port when robot is built
     public static final int kLEDPWMPort = 5;
-    public static final int kLEDLength = 27;
+    public static final int kLEDLength = 30;
   }
 
   public static class ClimberState {

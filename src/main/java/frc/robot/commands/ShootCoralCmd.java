@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
@@ -23,13 +24,14 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         m_leds
             .elevatingColor()
             .alongWith(
-                Commands.runOnce(() -> m_elevator.SetHeight(height)),
-                Commands.runOnce(() -> m_shooter.openBlocker()),
-                new WaitCommand(0.3),
-                Commands.run(() -> m_shooter.setShoot(speed)))
-            .until(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(0.3).andThen(Commands.runOnce(() -> m_shooter.closeBlocker())),
+        Commands.runOnce(() -> m_elevator.SetHeight(height)),
+        new WaitCommand(0.5),
+        Commands.runOnce(() -> m_shooter.openBlocker()),
+        new WaitCommand(0.3),
+        Commands.runOnce(() -> m_shooter.setShoot(speed))).until(() -> !m_shooter.isCoralIn()),
+        new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()),
+        Commands.runOnce(() -> m_shooter.closeBlocker()),
         m_leds.idleColor());
   }
 }

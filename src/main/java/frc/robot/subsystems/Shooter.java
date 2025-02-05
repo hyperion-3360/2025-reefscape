@@ -87,7 +87,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
   }
 
   public void stop() {
-    m_shooter.set(0.0);
+    m_shooterSpeed = 0.0;
   }
 
   public void openBlocker() {
@@ -104,6 +104,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
     if (DriverStation.isDisabled()) {
       m_shooter.set(0.0);
     } else m_shooter.set(m_shooterSpeed);
+    SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
   }
 
   /**

@@ -6,12 +6,18 @@ package frc.robot.subsystems.leds;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,14 +41,26 @@ public class LEDs extends SubsystemBase {
   private final LEDPattern m_scrollingRainbow =
       m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
 
+  private double multiplier = 0;
+  private int pixelIndex = 0;
+  double zeroPos = 0;
+
+  // shuffleboard values
+  private String tabName = "LEDs";
+  private int r = 0;
+  private int g = 0;
+  private int b = 0;
+  private int pulseSpeed = 0;
+  private double pulseDelay = 0;
+
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
 
     m_led.start();
     // SmartDashboard.putNumber("LED Brightness (%)", brightnessPercent);
     // LEDPattern.solid(Color.kGreen).applyTo(m_stageLedBuffer);
-    m_isRainbow = true;
-    m_scrollingRainbow.applyTo(m_stageLedBuffer);
+    m_isRainbow = false;
+    // m_scrollingRainbow.applyTo(m_stageLedBuffer);
     stageLEDs();
   }
 
@@ -115,5 +133,79 @@ public class LEDs extends SubsystemBase {
 
   public Command idleColor() {
     return Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kOrange)));
+  }
+
+  /**
+   * @param color
+   */
+  private void LEDPulsePattern(Color8Bit color, boolean fade) {
+
+    for (int i = 0; i < (m_ledBuffer.getLength()) / 2; i++) {
+      // makes the "head" of the pulse effect
+      if (pixelIndex - i == 0) {
+        multiplier = 1;
+      }
+      // makes everything above the "head" be a constant brightness
+      if (pixelIndex - i < 0) {
+        multiplier = 0.2;
+      }
+      // makes a trailing tail effect behind the head of the LED
+      if (pixelIndex - i > 0) {
+        multiplier = 0.2;
+        if (fade) {
+          MathUtil.clamp(multiplier = (double) i / (double) pixelIndex, 0.2, 1);
+        }
+      }
+
+      m_ledBuffer.setRGB(
+          i,
+          (int) MathUtil.clamp(color.red * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.green * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.blue * multiplier, 0, 255));
+
+      m_ledBuffer.setRGB(
+          (m_ledBuffer.getLength() - i) - 1,
+          (int) MathUtil.clamp(color.red * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.green * multiplier, 0, 255),
+          (int) MathUtil.clamp(color.blue * multiplier, 0, 255));
+    }
+    pixelIndex++;
+
+    // if the pixelIndex is at the middle of the ledBuffer: restart it
+    if (pixelIndex % (double) (m_ledBuffer.getLength()) / 2 == 0) {
+      pixelIndex = 0;
+    }
+  }
+
+  /**
+   * @param color the color of the pulse
+   * @param speed
+   * @return
+   */
+  public Command setPulsePattern(Color8Bit color, double speed, double delay, boolean fade) {
+    r = (int) SmartDashboard.getNumber("red", color.red);
+    g = (int) SmartDashboard.getNumber("green", color.green);
+    b = (int) SmartDashboard.getNumber("blue", color.blue);
+    pulseSpeed = (int) SmartDashboard.getNumber("pulse speed", speed);
+    pulseDelay = SmartDashboard.getNumber("pulse delay", delay);
+
+    return Commands.repeatingSequence(
+            this.runOnce(() -> LEDPulsePattern(new Color8Bit(r, g, b), fade)),
+            new WaitCommand(pulseSpeed))
+        .until(() -> pixelIndex % (double) (m_ledBuffer.getLength()) / 2 == 0)
+        .andThen(new WaitCommand(pulseDelay))
+        .repeatedly();
+  }
+
+  private void scrollingPattern() {
+    LEDPattern base = LEDPattern.gradient(GradientType.kDiscontinuous, Color.kOrange, Color.kBlack);
+    LEDPattern pattern = base.scrollAtRelativeSpeed(Percent.per(Second).of(25));
+
+    // Apply the LED pattern to the data buffer
+    pattern.applyTo(m_ledBuffer);
+  }
+
+  public Command setScrollingPattern() {
+    return this.runOnce(() -> scrollingPattern());
   }
 }
