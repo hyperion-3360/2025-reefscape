@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Second;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -36,10 +37,10 @@ public class LEDs extends SubsystemBase {
   // double brightnessPercent = 0.0;
   private boolean m_isRainbow = false;
 
-  private LEDPattern m_rainbow = LEDPattern.rainbow(255, 255);
+  private LEDPattern m_currentPattern = LEDPattern.rainbow(255, 255);
   private Distance LED_SPACING = Meters.of(1.0 / 27);
   private final LEDPattern m_scrollingRainbow =
-      m_rainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
+      m_currentPattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
 
   private double multiplier = 0;
   private int pixelIndex = 0;
@@ -59,6 +60,7 @@ public class LEDs extends SubsystemBase {
     m_led.start();
     // SmartDashboard.putNumber("LED Brightness (%)", brightnessPercent);
     // LEDPattern.solid(Color.kGreen).applyTo(m_stageLedBuffer);
+    m_currentPattern.applyTo(m_ledBuffer);
     m_isRainbow = false;
     // m_scrollingRainbow.applyTo(m_stageLedBuffer);
     stageLEDs();
@@ -95,44 +97,36 @@ public class LEDs extends SubsystemBase {
     m_led.setData(m_ledBuffer);
   }
 
-  public Command intakeColors() {
-    return Commands.repeatingSequence(
-        new WaitCommand(0.1),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kWhite))),
-        new WaitCommand(0.1),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  public void intakeColors() {
+    m_currentPattern =
+        LEDPattern.solid(Color.kWhite)
+            .blink(Time.ofBaseUnits(0.1, Second), Time.ofBaseUnits(0.1, Second));
   }
 
-  public Command readyColor() {
-    return Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kGreen)));
+  public void readyColor() {
+    m_currentPattern = LEDPattern.solid(Color.kGreen);
   }
 
-  public Command elevatingColor() {
-    return Commands.repeatingSequence(
-        new WaitCommand(0.1),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kBlue))),
-        new WaitCommand(0.1),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  public void elevatingColor() {
+    m_currentPattern =
+        LEDPattern.solid(Color.kGreen)
+            .blink(Time.ofBaseUnits(0.2, Second), Time.ofBaseUnits(0.2, Second));
   }
 
-  public Command climberColor() {
-    return Commands.repeatingSequence(
-        new WaitCommand(0.05),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kTurquoise))),
-        new WaitCommand(0.05),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  public void climberColor() {
+    m_currentPattern =
+        LEDPattern.solid(Color.kWhite)
+            .blink(Time.ofBaseUnits(0.05, Second), Time.ofBaseUnits(0.05, Second));
   }
 
-  public Command shootColor() {
-    return Commands.repeatingSequence(
-        new WaitCommand(0.1),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kGreen))),
-        new WaitCommand(0.1),
-        Commands.runOnce(() -> setStillPattern(LEDPattern.kOff)));
+  public void shootColor() {
+    m_currentPattern =
+        LEDPattern.solid(Color.kWhite)
+            .blink(Time.ofBaseUnits(0.05, Second), Time.ofBaseUnits(0.05, Second));
   }
 
   public Command idleColor() {
-    return Commands.runOnce(() -> setStillPattern(LEDPattern.solid(Color.kOrange)));
+    return Commands.runOnce(() -> setPulsePattern(new Color8Bit(10, 255, 0), 0.3, 0.5, true));
   }
 
   /**

@@ -31,22 +31,13 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     addRequirements(m_elevator);
     addCommands(
-        m_leds
-            .elevatingColor()
-            .until(() -> new WaitCommand(0.5).isFinished())
-            .alongWith(Commands.runOnce(() -> m_elevator.SetHeight(height))),
-        m_leds
-            .intakeColors()
-            .alongWith(
-                Commands.sequence(
-                    Commands.runOnce(
-                        () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
-                    Commands.runOnce(
-                        () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE),
-                        m_algaeIntake),
-                    new WaitCommand(1.5)))
-            .until(() -> m_algaeIntake.sensorTriggered()),
-        m_leds.readyColor(),
+        Commands.runOnce(() -> m_elevator.SetHeight(height)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
+        Commands.runOnce(
+            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
+        new WaitCommand(1.5),
+        new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+        Commands.runOnce(() -> m_leds.readyColor()),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
         Commands.run(() -> m_algaeIntake.setShootingAngle(angle), m_algaeIntake),
@@ -54,18 +45,16 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake),
         Commands.runOnce(
-            () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.NET), m_algaeIntake));
+            () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.NET), m_algaeIntake),
+        m_leds.idleColor());
   }
 
   public Command NoAlgaeCmd(Elevator m_elevator, AlgaeIntake m_algaeIntake, LEDs m_leds) {
     return Commands.sequence(
-        m_leds
-            .elevatingColor()
-            .alongWith(
-                Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
-                Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
-                Commands.runOnce(
-                    () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)))
+        Commands.runOnce(() -> m_leds.elevatingColor()),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED))
             .until(() -> new WaitCommand(0.5).isFinished()),
         m_leds.idleColor());
   }

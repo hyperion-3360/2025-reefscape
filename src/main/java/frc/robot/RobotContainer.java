@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
 import frc.robot.commands.ShootAlgaeCmd;
@@ -71,8 +72,10 @@ public class RobotContainer {
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL2);
   private final IntakeAlgaeCmd intakeAlgaeL3 =
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL3);
-  private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR);
-  private final ShootAlgaeCmd shootAlgaeNet = new ShootAlgaeCmd(m_algaeIntake, elevation.NET);
+  private final ShootAlgaeCmd shootAlgae =
+      new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds);
+  private final ShootAlgaeCmd shootAlgaeNet =
+      new ShootAlgaeCmd(m_algaeIntake, elevation.NET, m_leds);
 
   private final ShootCoralCmd shootCoralL1 =
       new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1, m_elevator, desiredHeight.L1);
@@ -84,10 +87,10 @@ public class RobotContainer {
       new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4, m_elevator, desiredHeight.L4);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final Command elevateL1 = m_elevator.Elevate(desiredHeight.L1);
-  private final Command elevateL2 = m_elevator.Elevate(desiredHeight.L2);
-  private final Command elevateL3 = m_elevator.Elevate(desiredHeight.L3);
-  private final Command elevateL4 = m_elevator.Elevate(desiredHeight.L4);
+  private final ElevateCmd elevateL1 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L1);
+  private final ElevateCmd elevateL2 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L2);
+  private final ElevateCmd elevateL3 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L3);
+  private final ElevateCmd elevateL4 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L4);
 
   public enum TestModes {
     NONE,

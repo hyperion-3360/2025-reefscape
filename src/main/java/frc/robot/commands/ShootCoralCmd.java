@@ -20,15 +20,12 @@ public class ShootCoralCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     addRequirements(m_elevator);
     this.addCommands(
-        m_leds
-            .elevatingColor()
-            .alongWith(
-                Commands.runOnce(() -> m_elevator.SetHeight(height)),
-                new WaitCommand(0.5),
-                Commands.runOnce(() -> m_shooter.openBlocker()),
-                new WaitCommand(0.3),
-                Commands.runOnce(() -> m_shooter.setShoot(speed)))
-            .until(() -> !m_shooter.isCoralIn()),
+        Commands.runOnce(() -> m_leds.elevatingColor()),
+        Commands.runOnce(() -> m_elevator.SetHeight(height)),
+        new WaitCommand(0.5),
+        Commands.runOnce(() -> m_shooter.openBlocker()),
+        new WaitCommand(0.3),
+        Commands.runOnce(() -> m_shooter.setShoot(speed)).until(() -> !m_shooter.isCoralIn()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
