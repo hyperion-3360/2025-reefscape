@@ -3,6 +3,7 @@ package frc.robot.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,8 +29,8 @@ public class Selection extends Vision {
   double kProtation = 0.06; // stolen from rambrandt to be tuned
   double rotationFromTag = 1; // stolen from rambrandt to be tuned
 
-
-  DriveToPose drivetoPose = new DriveToPose(kPtranslation, kProtation, desiredDistFromTag, rotationFromTag);
+  DriveToPose drivetoPose =
+      new DriveToPose(kPtranslation, kProtation, desiredDistFromTag, rotationFromTag);
 
   public enum direction {
     left,
@@ -111,16 +112,18 @@ public class Selection extends Vision {
               GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
 
-              // no fking cliue if this works
+      // no fking cliue if this works
       // var speed =
       //     new Translation2d(
-      //         (Math.abs(desiredcoordinates.getX()) - currentcoordinates.getX()) * Math.signum(Math.cos(GetYaw())),
-      //         (Math.abs(desiredcoordinates.getY()) - currentcoordinates.getY()) * Math.signum(Math.sin(GetYaw())));
+      //         (Math.abs(desiredcoordinates.getX()) - currentcoordinates.getX()) *
+      // Math.signum(Math.cos(GetYaw())),
+      //         (Math.abs(desiredcoordinates.getY()) - currentcoordinates.getY()) *
+      // Math.signum(Math.sin(GetYaw())));
 
-      var desiredRotation = new Rotation2d(GetYaw());
-      var desiredPose = new Pose2d(desiredcoordinates, desiredRotation);
+      var desiredRotation = new Rotation2d(0);
+      var desiredPose = new Pose2d(desiredcoordinates, swerve.getRotation2d());
 
-      drivetoPose.setRobotSpeed(swerve.getSpeeds());
+      drivetoPose.setRobotSpeed(new ChassisSpeeds()); // swerve.getSpeeds());
       var desiredSpeed = drivetoPose.getTargetSpeeds(currentcoordinates, desiredPose);
       return Commands.run(() -> swerve.driveRobotRelative(desiredSpeed));
     }
