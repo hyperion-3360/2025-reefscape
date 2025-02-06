@@ -39,6 +39,7 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+        Commands.print("this went trough"),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
