@@ -82,6 +82,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
   private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
+  private double elevatorPos;
+
   public Elevator() {
 
     // motor configs
@@ -116,7 +118,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   public void periodic() {
 
     var setPointPosition = m_controller.getSetpoint().position;
-    var elevatorPos =
+    // elevatorPos is changed periodically
+    elevatorPos =
         (m_rightElevatorMotor.getPosition().getValueAsDouble() * toRotations) * pulleyCircumference;
     SmartDashboard.putNumber("elevator position", elevatorPos);
     SmartDashboard.putNumber("setpoint position", setPointPosition);
@@ -215,6 +218,10 @@ public class Elevator extends SubsystemBase implements TestBindings {
     //       System.out.println("After: " + test_heightIndex);
     //       SetHeight(testHeight);
     //     });
+  }
+
+  public double getEncoderPos() {
+    return elevatorPos;
   }
 
   @Override

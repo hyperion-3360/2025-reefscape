@@ -128,7 +128,8 @@ public class RobotContainer {
                     rotationLimiter,
                     Constants.stickDeadband,
                     true),
-            () -> true);
+            () -> true,
+            () -> m_elevator.getEncoderPos());
 
     m_swerve.setDefaultCommand(teleopCmd);
   }
@@ -145,7 +146,15 @@ public class RobotContainer {
         new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
   }
 
-  public void configureBindingsTeleop() {}
+  public void configureBindingsTeleop() {
+    m_coDriverController.a().onTrue(m_elevator.Elevate(Elevator.desiredHeight.LOW));
+
+    m_coDriverController.x().onTrue(m_elevator.Elevate(Elevator.desiredHeight.L4));
+
+    m_coDriverController.y().onTrue(m_elevator.Elevate(Elevator.desiredHeight.L1));
+
+    m_coDriverController.b().onTrue(m_elevator.Elevate(Elevator.desiredHeight.L2));
+  }
 
   public Command getAutonomousCommand() {
     return Pathfinding.fullControl();
