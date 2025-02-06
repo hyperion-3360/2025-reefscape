@@ -64,6 +64,7 @@ public class RobotContainer {
     CLIMBER,
     ALGAE_INTAKE,
     SWERVE,
+    DUMPER,
     CORAL_SHOOTER
   }
 
@@ -89,6 +90,10 @@ public class RobotContainer {
     return Commands.runOnce(() -> m_testMode = TestModes.SWERVE);
   }
 
+  Command setDumperMode() {
+    return Commands.runOnce(() -> m_testMode = TestModes.DUMPER);
+  }
+
   BooleanSupplier isMode(TestModes mode) {
     return () -> m_testMode == mode;
   }
@@ -106,6 +111,7 @@ public class RobotContainer {
     SmartDashboard.putData("Coral Shooter", setCoralShooterMode());
     SmartDashboard.putData("Algae Intake", setAlgaeIntakeMode());
     SmartDashboard.putData("Swerve", setSwerveMode());
+    SmartDashboard.putData("Dumper", setDumperMode());
 
     var teleopCmd =
         new TeleopSwerve(
@@ -141,6 +147,8 @@ public class RobotContainer {
     m_elevator.setupTestBindings(new Trigger(isMode(TestModes.ELEVATOR)), m_coDriverController);
 
     m_climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), m_coDriverController);
+
+    m_dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), m_coDriverController);
 
     m_algaeIntake.setupTestBindings(
         new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
