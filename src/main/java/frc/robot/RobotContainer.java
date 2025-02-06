@@ -128,7 +128,8 @@ public class RobotContainer {
                     rotationLimiter,
                     Constants.stickDeadband,
                     true),
-            () -> true);
+            () -> true,
+            m_elevator.getEncoderPos());
 
     m_swerve.setDefaultCommand(teleopCmd);
   }
