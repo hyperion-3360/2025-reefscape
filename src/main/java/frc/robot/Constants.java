@@ -277,11 +277,11 @@ public final class Constants {
   public static class CoralShooterVariables {
     // TODO: Find actual speed
     public static final double kShootNo = 0.0;
-    public static final double kShootL1 = -0.6;
+    public static final double kShootL1 = -0.3;
     public static final double kShootL2 = -0.65;
     public static final double kShootL3 = -0.7;
     public static final double kShootL4 = -0.75;
-    public static final double kIntakeSpeed = -1.0;
+    public static final double kIntakeSpeed = -0.5;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     public static final int kCoralShooterCurrentLimit = 10;
@@ -356,11 +356,11 @@ public final class Constants {
 
     // elevator heights
     public static final double kElevatorDown = 0.01;
-    public static final double kElevatorL1 = 0.43;
-    public static final double kElevatorL2 = 0.67;
-    public static final double kElevatorL3 = 0.95;
-    public static final double kElevatorL4 = 1.43;
-    public static final double kElevatorNet = 1.75;
+    public static final double kElevatorL1 = 0.45;
+    public static final double kElevatorL2 = 0.69;
+    public static final double kElevatorL3 = 1.05;
+    public static final double kElevatorL4 = 1.85;
+    public static final double kElevatorNet = 2.10;
     public static final double kElevatorProcessor = 10.0;
     public static final double kElevatorAlgaeLow = 25.0;
     public static final double kElevatorFeeder = 0.172;

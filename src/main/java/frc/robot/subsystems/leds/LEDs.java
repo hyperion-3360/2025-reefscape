@@ -27,6 +27,15 @@ import frc.robot.Constants;
 
 public class LEDs extends SubsystemBase {
 
+  public enum Pattern {
+    INTAKE,
+    READY,
+    CLIMBER,
+    SHOOTER,
+    ELEVATOR,
+    IDLE
+  }
+
   private AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
   private AddressableLEDBuffer m_ledBuffer =
       new AddressableLEDBuffer(Constants.LEDConstants.kLEDLength);
@@ -54,13 +63,14 @@ public class LEDs extends SubsystemBase {
   private int pulseSpeed = 0;
   private double pulseDelay = 0;
 
+  private Color kTrueOrange = new Color(255, 10, 0);
+
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
 
     m_led.start();
     // SmartDashboard.putNumber("LED Brightness (%)", brightnessPercent);
     // LEDPattern.solid(Color.kGreen).applyTo(m_stageLedBuffer);
-    m_currentPattern.applyTo(m_ledBuffer);
     m_isRainbow = false;
     // m_scrollingRainbow.applyTo(m_stageLedBuffer);
     stageLEDs();
@@ -72,6 +82,43 @@ public class LEDs extends SubsystemBase {
       Color color = m_stageLedBuffer.getLED(i);
       Color swappedRedGreen = new Color(color.green, color.red, color.blue);
       m_ledBuffer.setLED(i, swappedRedGreen);
+    }
+  }
+
+  public void SetPattern(Pattern ledPattern) {
+    switch (ledPattern) {
+      case IDLE:
+        {
+          m_currentPattern = LEDPattern.solid(kTrueOrange);
+          break;
+        }
+      case INTAKE:
+        m_currentPattern =
+            LEDPattern.solid(Color.kWhite)
+                .blink(Time.ofBaseUnits(0.1, Second), Time.ofBaseUnits(0.1, Second));
+        break;
+
+      case ELEVATOR:
+        m_currentPattern =
+            LEDPattern.solid(Color.kWhite)
+                .blink(Time.ofBaseUnits(0.1, Second), Time.ofBaseUnits(0.1, Second));
+        break;
+
+      case READY:
+        m_currentPattern = LEDPattern.solid(Color.kGreen);
+        break;
+
+      case SHOOTER:
+        m_currentPattern =
+            LEDPattern.solid(Color.kWhite)
+                .blink(Time.ofBaseUnits(0.05, Second), Time.ofBaseUnits(0.05, Second));
+        break;
+
+      case CLIMBER:
+        m_currentPattern =
+            LEDPattern.solid(Color.kWhite)
+                .blink(Time.ofBaseUnits(0.05, Second), Time.ofBaseUnits(0.05, Second));
+        break;
     }
   }
 
@@ -90,43 +137,9 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (m_isRainbow) {
-      m_scrollingRainbow.applyTo(m_stageLedBuffer);
-      stageLEDs();
-    }
+    m_currentPattern.applyTo(m_stageLedBuffer);
+    stageLEDs();
     m_led.setData(m_ledBuffer);
-  }
-
-  public void intakeColors() {
-    m_currentPattern =
-        LEDPattern.solid(Color.kWhite)
-            .blink(Time.ofBaseUnits(0.1, Second), Time.ofBaseUnits(0.1, Second));
-  }
-
-  public void readyColor() {
-    m_currentPattern = LEDPattern.solid(Color.kGreen);
-  }
-
-  public void elevatingColor() {
-    m_currentPattern =
-        LEDPattern.solid(Color.kGreen)
-            .blink(Time.ofBaseUnits(0.2, Second), Time.ofBaseUnits(0.2, Second));
-  }
-
-  public void climberColor() {
-    m_currentPattern =
-        LEDPattern.solid(Color.kWhite)
-            .blink(Time.ofBaseUnits(0.05, Second), Time.ofBaseUnits(0.05, Second));
-  }
-
-  public void shootColor() {
-    m_currentPattern =
-        LEDPattern.solid(Color.kWhite)
-            .blink(Time.ofBaseUnits(0.05, Second), Time.ofBaseUnits(0.05, Second));
-  }
-
-  public Command idleColor() {
-    return Commands.runOnce(() -> setPulsePattern(new Color8Bit(10, 255, 0), 0.3, 0.5, true));
   }
 
   /**

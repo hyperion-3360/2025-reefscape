@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDs.Pattern;
 
 public class ShootAlgaeCmd extends SequentialCommandGroup {
   AlgaeIntake m_algaeIntake;
@@ -23,13 +24,13 @@ public class ShootAlgaeCmd extends SequentialCommandGroup {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addCommands(
-        Commands.runOnce(() -> m_leds.shootColor()),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.PROCESSOR)),
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
-        m_leds.idleColor());
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
   }
 }

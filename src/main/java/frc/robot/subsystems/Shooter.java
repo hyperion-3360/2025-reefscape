@@ -125,7 +125,6 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
   /** We want a ramp rate when intaking so set the speed at -1 in 0.5 seconds */
   public void setIntake() {
-    m_shooter.configOpenloopRamp(0.5);
     m_shooter.set(Constants.CoralShooterVariables.kIntakeSpeed);
   }
 

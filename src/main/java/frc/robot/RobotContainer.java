@@ -199,22 +199,22 @@ public class RobotContainer {
                     Constants.stickDeadband,
                     true)));
 
-    m_coDriverController.a().onTrue(shootCoralL1);
+    m_coDriverController.a().onTrue(shootCoralL2);
     m_coDriverController.b().onTrue(shootAlgae);
 
     m_coDriverController
         .y()
-        .onTrue(intakeAlgaeL2)
+        .whileTrue(intakeAlgaeL2)
         .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
-        .onTrue(intakeAlgaeL3)
+        .whileTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
-    m_coDriverController.povUp().onTrue(elevateL4);
-    m_coDriverController.povDown().onTrue(elevateL1);
-    m_coDriverController.povLeft().onTrue(elevateL3);
-    m_coDriverController.povRight().onTrue(elevateL2);
+    m_coDriverController.povUp().onTrue(shootCoralL4);
+    m_coDriverController.povDown().onTrue(shootCoralL1);
+    m_coDriverController.povLeft().onTrue(shootCoralL3);
+    m_coDriverController.povRight().onTrue(shootCoralL2);
   }
 
   public Command getAutonomousCommand() {

@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double kDt = 0.02;
 
   private static double kMaxVelocity = 3;
-  private static double kMaxAcceleration = 4;
+  private static double kMaxAcceleration = 1.5;
 
   //  private static double kG = 0.98; // not moving
   private static double kG = 0.90;
@@ -140,6 +140,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
     SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
     SmartDashboard.putNumber("output voltage", output);
+    SmartDashboard.putNumber("error", m_controller.getPositionError());
 
     // Run controller and update motor output
     m_rightElevatorMotor.setVoltage(output);
