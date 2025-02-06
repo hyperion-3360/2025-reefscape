@@ -14,7 +14,7 @@ public class TeleopSwerve extends Command {
   private DoubleSupplier strafeSup;
   private DoubleSupplier rotationSup;
   private BooleanSupplier robotCentricSup;
-  private double elevatorHeight;
+  private DoubleSupplier elevatorHeight;
 
   /**
    * Swerve drive command for tele operation
@@ -32,7 +32,7 @@ public class TeleopSwerve extends Command {
       DoubleSupplier strafeSup,
       DoubleSupplier rotationSup,
       BooleanSupplier robotCentricSup,
-      double elevatorHeight) {
+      DoubleSupplier elevatorHeight) {
     this.s_Swerve = s_Swerve;
     addRequirements(s_Swerve);
 
@@ -50,13 +50,14 @@ public class TeleopSwerve extends Command {
         MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
     double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
     double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
+    double elevatorHeightVal = elevatorHeight.getAsDouble();
 
     /* Drive */
     s_Swerve.drive(
         new Translation2d(translationVal, strafeVal)
             .times(Constants.Swerve.maxSpeed)
-            .times(SwerveSpeedSlow(elevatorHeight)),
-        (rotationVal * Constants.Swerve.maxAngularVelocity) * SwerveSpeedSlow(elevatorHeight),
+            .times(SwerveSpeedSlow(elevatorHeightVal)),
+        (rotationVal * Constants.Swerve.maxAngularVelocity) * SwerveSpeedSlow(elevatorHeightVal),
         !robotCentricSup.getAsBoolean(),
         true);
   }

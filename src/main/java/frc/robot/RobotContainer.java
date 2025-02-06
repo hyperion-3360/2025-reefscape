@@ -129,7 +129,7 @@ public class RobotContainer {
                     Constants.stickDeadband,
                     true),
             () -> true,
-            m_elevator.getEncoderPos());
+            () -> m_elevator.getEncoderPos());
 
     m_swerve.setDefaultCommand(teleopCmd);
   }
