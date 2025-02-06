@@ -62,8 +62,8 @@ public class Shooter extends SubsystemBase implements TestBindings {
       case L4:
         m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
         break;
-        
-        case STOP:
+
+      case STOP:
         m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
         break;
     }

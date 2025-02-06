@@ -24,7 +24,8 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_shooter.openBlocker()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
-        Commands.runOnce(() -> m_shooter.setShoot(getShootingSpeed(height))).until(() -> !m_shooter.isCoralIn()),
+        Commands.runOnce(() -> m_shooter.setShoot(getShootingSpeed(height)))
+            .until(() -> !m_shooter.isCoralIn()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_shooter.stop()),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
@@ -33,21 +34,24 @@ public class ShootCoralCmd extends SequentialCommandGroup {
   }
 
   private shootSpeed getShootingSpeed(desiredHeight height) {
-  shootSpeed speed = switch (height) {
-      case L1 -> {
-      yield shootSpeed.L1;
-      }
-      case L2 -> {
-      yield shootSpeed.L1;
-      }
-      case L3 -> {
-      yield shootSpeed.L1;
-      }
-      case L4 -> {
-      yield shootSpeed.L1;
-      }
-      default-> {yield shootSpeed.STOP;}
-    };
+    shootSpeed speed =
+        switch (height) {
+          case L1 -> {
+            yield shootSpeed.L1;
+          }
+          case L2 -> {
+            yield shootSpeed.L2;
+          }
+          case L3 -> {
+            yield shootSpeed.L3;
+          }
+          case L4 -> {
+            yield shootSpeed.L4;
+          }
+          default -> {
+            yield shootSpeed.STOP;
+          }
+        };
     return speed;
   }
 }

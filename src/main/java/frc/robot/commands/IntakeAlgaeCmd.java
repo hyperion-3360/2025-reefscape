@@ -53,6 +53,9 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
   }
 
   public Command NoAlgaeCmd(Elevator m_elevator, AlgaeIntake m_algaeIntake, LEDs m_leds) {
+    addRequirements(m_elevator);
+    addRequirements(m_algaeIntake);
+    addRequirements(m_leds);
     return Commands.sequence(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),

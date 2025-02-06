@@ -80,10 +80,14 @@ public class RobotContainer {
       new ShootCoralCmd(m_shooter, m_leds, m_elevator, desiredHeight.L1);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final ElevateCmd elevateL1 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L1);
-  private final ElevateCmd elevateL2 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L2);
-  private final ElevateCmd elevateL3 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L3);
-  private final ElevateCmd elevateL4 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L4);
+  private final ElevateCmd elevateL1 =
+      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L1);
+  private final ElevateCmd elevateL2 =
+      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L2);
+  private final ElevateCmd elevateL3 =
+      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L3);
+  private final ElevateCmd elevateL4 =
+      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L4);
 
   public enum TestModes {
     NONE,
@@ -196,11 +200,11 @@ public class RobotContainer {
 
     m_coDriverController
         .y()
-        .whileTrue(intakeAlgaeL2)
+        .onTrue(intakeAlgaeL2)
         .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
-        .whileTrue(intakeAlgaeL3)
+        .onTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);

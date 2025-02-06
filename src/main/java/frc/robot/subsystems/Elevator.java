@@ -153,6 +153,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
       case LOW:
         heightTarget = Constants.ElevatorConstants.kElevatorDown;
         break;
+
       case L1:
         heightTarget = Constants.ElevatorConstants.kElevatorL1;
         break;
