@@ -641,8 +641,11 @@ public class Pathfinding extends Command {
    * @return A command to pathfind and execute the event
    */
   public static Command goThere(POI placeToGo) {
+    Pose2d positionToPathfind = POICoordinatesOptimisation(placeToGo);
+    PathPlannerLogging.logTargetPose(positionToPathfind);
     return AutoBuilder.pathfindToPose(
-            new Pose2d(placeToGo.getCoordinates(), placeToGo.getAngle()), constraints)
+            new Pose2d(positionToPathfind.getTranslation(), positionToPathfind.getRotation()),
+            constraints)
         .andThen(placeToGo.getEvent());
   }
 
@@ -654,10 +657,9 @@ public class Pathfinding extends Command {
    * @return A command to pathfind to a specified point
    */
   public static Command goThere(Pose2d placeToGo) {
-    Pose2d positionToPathfind = POICoordinatesOptimisation(placeToGo);
-    PathPlannerLogging.logTargetPose(positionToPathfind);
+    PathPlannerLogging.logTargetPose(placeToGo);
 
-    return AutoBuilder.pathfindToPose(positionToPathfind, constraints);
+    return AutoBuilder.pathfindToPose(placeToGo, constraints);
   }
 
   public static Command fullControl() {
