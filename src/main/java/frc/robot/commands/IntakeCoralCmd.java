@@ -22,7 +22,7 @@ public class IntakeCoralCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.FEEDER)),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
-        new WaitCommand(1.5),
+        new WaitCommand(1.0),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
         Commands.run(() -> m_shooter.setIntake()).until(() -> m_shooter.isCoralIn()),
         new WaitCommand(0.3),

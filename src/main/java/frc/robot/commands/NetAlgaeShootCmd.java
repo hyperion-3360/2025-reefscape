@@ -11,33 +11,29 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 
-public class ShootAlgaeCmd extends SequentialCommandGroup {
-  AlgaeIntake m_algaeIntake;
-
-  /**
-   * @brief Creates a new ShootAlgaeCmd.
-   *     <p>This command will shoot the algae ball at the correct elevation. The first part of the
-   *     command will pull the algae ball into the robot, then the robot will pivot the algae arm to
-   *     the correct angle
-   * @param m_algaeIntake The subsystem used by this command.
-   * @param shootingAngle The angle at which the algae ball will be shot
-   */
-  public ShootAlgaeCmd(AlgaeIntake m_algaeIntake, Elevator m_elevator, LEDs m_leds) {
+public class NetAlgaeShootCmd extends SequentialCommandGroup {
+  public NetAlgaeShootCmd(AlgaeIntake m_algaeIntake, LEDs m_leds, Elevator m_elevator) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
+    addRequirements(m_elevator);
     addCommands(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.PROCESSOR)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.NET)),
         new WaitCommand(1.8),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
         new WaitCommand(0.3),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.PROCESSOR)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.NET)),
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
         new WaitCommand(0.5),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L1)),
+        new WaitCommand(1.4),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        new WaitCommand(0.5),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
   }
 }

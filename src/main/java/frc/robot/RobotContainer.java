@@ -18,6 +18,7 @@ import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
+import frc.robot.commands.NetAlgaeShootCmd;
 import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
@@ -71,10 +72,9 @@ public class RobotContainer {
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL2);
   private final IntakeAlgaeCmd intakeAlgaeL3 =
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL3);
-  private final ShootAlgaeCmd shootAlgae =
-      new ShootAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds);
-  private final ShootAlgaeCmd shootAlgaeNet =
-      new ShootAlgaeCmd(m_algaeIntake, elevation.NET, m_leds);
+  private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
+  private final NetAlgaeShootCmd shootAlgaeNet =
+      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator);
 
   private final ShootCoralCmd shootCoral =
       new ShootCoralCmd(m_shooter, m_leds, m_elevator, desiredHeight.L1);
@@ -185,6 +185,7 @@ public class RobotContainer {
         .toggleOnFalse(Commands.runOnce(() -> intakeAlgaeFloor.cancel(), m_algaeIntake));
 
     m_driverController.a().onTrue(intakeCoral);
+    m_driverController.b().onTrue(shootAlgae);
 
     m_climber.setDefaultCommand(
         m_climber.climberTestMode(
@@ -196,15 +197,15 @@ public class RobotContainer {
                     true)));
 
     m_coDriverController.a().onTrue(shootCoral);
-    m_coDriverController.b().onTrue(shootAlgae);
+    m_driverController.y().onTrue(shootAlgaeNet);
 
     m_coDriverController
         .y()
-        .onTrue(intakeAlgaeL2)
+        .whileTrue(intakeAlgaeL2)
         .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
-        .onTrue(intakeAlgaeL3)
+        .whileTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);

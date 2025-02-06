@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -137,6 +138,13 @@ public class LEDs extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()) {
+      SetPattern(Pattern.IDLE);
+      m_currentPattern.applyTo(m_stageLedBuffer);
+      stageLEDs();
+      m_led.setData(m_ledBuffer);
+      return;
+    }
     m_currentPattern.applyTo(m_stageLedBuffer);
     stageLEDs();
     m_led.setData(m_ledBuffer);

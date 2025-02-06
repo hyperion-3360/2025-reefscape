@@ -271,7 +271,7 @@ public final class Constants {
     public static final double kStoringSpeed = 0.15;
     public static final double kProcessorSpeed = -0.8;
     public static final double kStopSpeed = 0.0;
-    public static final double kNetSpeed = 0.0;
+    public static final double kNetSpeed = -1.0;
   }
 
   public static class CoralShooterVariables {
@@ -290,7 +290,7 @@ public final class Constants {
     // TODO: Find angles
     // angles in º
     public static final double kCoralShooterClosed = 10.0;
-    public static final double kCoralShooterOpen = 120.0;
+    public static final double kCoralShooterOpen = 113.0;
   }
 
   public static class LEDConstants {
@@ -357,14 +357,14 @@ public final class Constants {
     // elevator heights
     public static final double kElevatorDown = 0.01;
     public static final double kElevatorL1 = 0.45;
-    public static final double kElevatorL2 = 0.69;
-    public static final double kElevatorL3 = 1.05;
-    public static final double kElevatorL4 = 1.85;
-    public static final double kElevatorNet = 2.10;
-    public static final double kElevatorProcessor = 10.0;
-    public static final double kElevatorAlgaeLow = 25.0;
-    public static final double kElevatorFeeder = 0.172;
-    public static final double kElevatorAlgaeL2 = 0.59;
+    public static final double kElevatorL2 = 0.67;
+    public static final double kElevatorL3 = 0.95;
+    public static final double kElevatorL4 = 1.43;
+    public static final double kElevatorNet = 1.53;
+    public static final double kElevatorProcessor = 0.1;
+    public static final double kElevatorAlgaeLow = 0.01;
+    public static final double kElevatorFeeder = 0.158;
+    public static final double kElevatorAlgaeL2 = 0.63;
     public static final double kElevatorAlgaeL3 = 0.91;
   }
 
