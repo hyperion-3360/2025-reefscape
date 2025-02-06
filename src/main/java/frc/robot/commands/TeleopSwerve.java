@@ -53,15 +53,16 @@ public class TeleopSwerve extends Command {
 
     /* Drive */
     s_Swerve.drive(
-        new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed).times(SwerveSpeedSlow(elevatorHeight)),
+        new Translation2d(translationVal, strafeVal)
+            .times(Constants.Swerve.maxSpeed)
+            .times(SwerveSpeedSlow(elevatorHeight)),
         (rotationVal * Constants.Swerve.maxAngularVelocity) * SwerveSpeedSlow(elevatorHeight),
         !robotCentricSup.getAsBoolean(),
         true);
   }
 
-  public double SwerveSpeedSlow(double elevatorHeight){
-    var functionVal = (Math.pow(0.8*elevatorHeight,3)/Constants.Swerve.maxSpeed);
-    return MathUtil.clamp(functionVal, 0, 0.8);
-
+  public double SwerveSpeedSlow(double elevatorHeight) {
+    var functionVal = (Math.pow(0.8 * elevatorHeight, 3) / Constants.Swerve.maxSpeed);
+    return MathUtil.clamp(functionVal, 0.2, 1);
   }
 }
