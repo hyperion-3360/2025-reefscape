@@ -28,7 +28,6 @@ import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
@@ -77,20 +76,14 @@ public class RobotContainer {
   private final ShootAlgaeCmd shootAlgaeNet =
       new ShootAlgaeCmd(m_algaeIntake, elevation.NET, m_leds);
 
-  private final ShootCoralCmd shootCoralL1 =
-      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L1, m_elevator, desiredHeight.L1);
-  private final ShootCoralCmd shootCoralL2 =
-      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L2, m_elevator, desiredHeight.L2);
-  private final ShootCoralCmd shootCoralL3 =
-      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L3, m_elevator, desiredHeight.L3);
-  private final ShootCoralCmd shootCoralL4 =
-      new ShootCoralCmd(m_shooter, m_leds, shootSpeed.L4, m_elevator, desiredHeight.L4);
+  private final ShootCoralCmd shootCoral =
+      new ShootCoralCmd(m_shooter, m_leds, m_elevator, desiredHeight.L1);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final ElevateCmd elevateL1 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L1);
-  private final ElevateCmd elevateL2 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L2);
-  private final ElevateCmd elevateL3 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L3);
-  private final ElevateCmd elevateL4 = new ElevateCmd(m_elevator, m_leds, desiredHeight.L4);
+  private final ElevateCmd elevateL1 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L1);
+  private final ElevateCmd elevateL2 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L2);
+  private final ElevateCmd elevateL3 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L3);
+  private final ElevateCmd elevateL4 = new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L4);
 
   public enum TestModes {
     NONE,
@@ -187,7 +180,6 @@ public class RobotContainer {
         .toggleOnTrue(intakeAlgaeFloor)
         .toggleOnFalse(Commands.runOnce(() -> intakeAlgaeFloor.cancel(), m_algaeIntake));
 
-    m_driverController.b().onTrue(shootAlgae);
     m_driverController.a().onTrue(intakeCoral);
 
     m_climber.setDefaultCommand(
@@ -199,7 +191,7 @@ public class RobotContainer {
                     Constants.stickDeadband,
                     true)));
 
-    m_coDriverController.a().onTrue(shootCoralL2);
+    m_coDriverController.a().onTrue(shootCoral);
     m_coDriverController.b().onTrue(shootAlgae);
 
     m_coDriverController
@@ -211,10 +203,10 @@ public class RobotContainer {
         .whileTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
-    m_coDriverController.povUp().onTrue(shootCoralL4);
-    m_coDriverController.povDown().onTrue(shootCoralL1);
-    m_coDriverController.povLeft().onTrue(shootCoralL3);
-    m_coDriverController.povRight().onTrue(shootCoralL2);
+    m_coDriverController.povUp().onTrue(elevateL4);
+    m_coDriverController.povDown().onTrue(elevateL1);
+    m_coDriverController.povLeft().onTrue(elevateL3);
+    m_coDriverController.povRight().onTrue(elevateL2);
   }
 
   public Command getAutonomousCommand() {

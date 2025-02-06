@@ -40,7 +40,8 @@ public class Shooter extends SubsystemBase implements TestBindings {
     L1,
     L2,
     L3,
-    L4
+    L4,
+    STOP
   }
 
   private void setSpeed(shootSpeed speed) {
@@ -60,6 +61,10 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
       case L4:
         m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
+        break;
+        
+        case STOP:
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
         break;
     }
   }
