@@ -63,7 +63,7 @@ public class TeleopSwerve extends Command {
   }
 
   public double SwerveSpeedSlow(double elevatorHeight) {
-    var functionVal = (Math.pow(0.8 * elevatorHeight, 3) / Constants.Swerve.maxSpeed);
+    var functionVal = (Math.pow(-0.8 * elevatorHeight, 3) / Constants.Swerve.maxSpeed) + 1;
     return MathUtil.clamp(functionVal, 0.2, 1);
   }
 }
