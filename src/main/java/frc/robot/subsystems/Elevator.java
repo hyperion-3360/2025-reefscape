@@ -42,19 +42,19 @@ public class Elevator extends SubsystemBase implements TestBindings {
     ALGAEL3
   }
 
-  private static double kP = 9.0;
-  private static double kI = 1;
-  private static double kD = 0.01;
+  private static double kP = 10.0;
+  private static double kI = 1.5;
+  private static double kD = 0.02;
 
   private static double kDt = 0.02;
 
   private static double kMaxVelocity = 3;
-  private static double kMaxAcceleration = 3;
+  private static double kMaxAcceleration = 1.5;
 
   //  private static double kG = 0.98; // not moving
   private static double kG = 0.90;
   private static double kA = 0.0;
-  private static double kV = 2.0;
+  private static double kV = 2.25;
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
@@ -140,6 +140,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
     SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
     SmartDashboard.putNumber("output voltage", output);
+    SmartDashboard.putNumber("error", m_controller.getPositionError());
 
     // Run controller and update motor output
     m_rightElevatorMotor.setVoltage(output);
@@ -152,6 +153,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
       case LOW:
         heightTarget = Constants.ElevatorConstants.kElevatorDown;
         break;
+
       case L1:
         heightTarget = Constants.ElevatorConstants.kElevatorL1;
         break;

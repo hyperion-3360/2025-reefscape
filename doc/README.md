@@ -32,12 +32,13 @@ Maintenir POV DOWN: Joystick gauche: intake algae motor speed
 
 LEFT JOYSTICK : déplacement de base swerve
 RIGHT JOYSTICK : rotation swerve
-Maintenir X BUTTON: Enlignement sur un AprilTag
-Appuyer A BUTTON: Intake algue APPPUYER de nouveau pour annuler la commande
+Maintenir X BUTTON (TBD): Enlignement sur un AprilTag
+Appuyer X BUTTON: Intake algue au sol
+Appuyer A BUTTON: Intake corail APPPUYER de nouveau pour annuler la commande (2e partie pas encore implantée)
 Maintenir B BUTTON: Score processor
+Appuyer Y BUTTON: Score net
 Maintenir LEFT TRIGGER: déplacement latéral pour alignement récif à gauche
 Maintenir RIGHT TRIGGER: déplacement latéral pour alignement récif à droite
-Maintenir RIGHT and LEFT BUMPER: commande automatique pour shooter algue dans la barque (positionnement automatique en X seulement)
 
 ## Assignation du contrôleur de jeu CO-PILOTE en mode teleop
 
@@ -46,9 +47,8 @@ Appuyer POV LEFT: Elévateur en L3
 Appuyer POV RIGHT: Elévateur en L2
 Appuyer POV DOWN: Elévateur en L1
 Maintenir X BUTTON: Intake algue L2
-Maintenir Y BUTTON: Intake algue L2
+Maintenir Y BUTTON: Intake algue L3
 Appuyer A BUTTON: Shoot corail
-Appuyer B BUTTON: Shoot algue
 Maintenir LEFT BUMPER: commande automatique pour positionner le robot à la feeding station et être prêt à recevoir un corail du human player
 
 # Foire aux questions

@@ -7,22 +7,26 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDs.Pattern;
 
 public class IntakeCoralCmd extends SequentialCommandGroup {
-  public IntakeCoralCmd(Shooter m_shooter, LEDs m_leds) {
+  public IntakeCoralCmd(Shooter m_shooter, Elevator m_elevator, LEDs m_leds) {
     addRequirements(m_shooter);
     addRequirements(m_leds);
+    addRequirements(m_elevator);
     this.addCommands(
-        m_leds
-            .intakeColors()
-            .alongWith(
-                Commands.runOnce(() -> m_shooter.closeBlocker()),
-                new WaitCommand(0.3),
-                Commands.run(() -> m_shooter.setIntake()))
-            .until(() -> m_shooter.isCoralIn())
-            .andThen(new WaitCommand(0.3), Commands.runOnce(() -> m_shooter.stop()))
-            .andThen(m_leds.readyColor()));
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.FEEDER)),
+        Commands.runOnce(() -> m_shooter.closeBlocker()),
+        new WaitCommand(1.0),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
+        Commands.run(() -> m_shooter.setIntake()).until(() -> m_shooter.isCoralIn()),
+        new WaitCommand(0.3),
+        Commands.runOnce(() -> m_shooter.stop()),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)));
   }
 }

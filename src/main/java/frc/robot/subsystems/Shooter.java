@@ -40,7 +40,8 @@ public class Shooter extends SubsystemBase implements TestBindings {
     L1,
     L2,
     L3,
-    L4
+    L4,
+    STOP
   }
 
   private void setSpeed(shootSpeed speed) {
@@ -60,6 +61,10 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
       case L4:
         m_shooterSpeed = Constants.CoralShooterVariables.kShootL4;
+        break;
+
+      case STOP:
+        m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
         break;
     }
   }
@@ -87,7 +92,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
   }
 
   public void stop() {
-    m_shooter.set(0.0);
+    m_shooterSpeed = 0.0;
   }
 
   public void openBlocker() {
@@ -104,6 +109,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
     if (DriverStation.isDisabled()) {
       m_shooter.set(0.0);
     } else m_shooter.set(m_shooterSpeed);
+    SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
   }
 
   /**
@@ -124,7 +130,6 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
   /** We want a ramp rate when intaking so set the speed at -1 in 0.5 seconds */
   public void setIntake() {
-    m_shooter.configOpenloopRamp(0.5);
     m_shooter.set(Constants.CoralShooterVariables.kIntakeSpeed);
   }
 
