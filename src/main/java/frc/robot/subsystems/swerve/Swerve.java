@@ -252,14 +252,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
-    if (m_debug)
+
+    ChassisSpeeds fieldRelativeSpeed =
+        ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(fieldRelativeSpeed, 0.02);
+    if (m_debug) {
       System.out.println(
           String.format(
               "driveRobotRelative: omega: %f, vx: %f, vy : %f",
-              robotRelativeSpeeds.omegaRadiansPerSecond,
-              robotRelativeSpeeds.vxMetersPerSecond,
-              robotRelativeSpeeds.vyMetersPerSecond));
-    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
+              targetSpeeds.omegaRadiansPerSecond,
+              targetSpeeds.vxMetersPerSecond,
+              targetSpeeds.vyMetersPerSecond));
+
+      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
+      SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
+      SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
+    }
 
     SwerveModuleState[] targetStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
