@@ -76,11 +76,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
-  private PPHolonomicDriveController driveController =
-      new PPHolonomicDriveController(
-          new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-          new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-          );
   // vision estimation of robot pose
   Optional<EstimatedRobotPose> visionEst;
 
@@ -257,26 +252,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
-    if (m_debug) {
-      SmartDashboard.putNumber(
-          "angular velocity before", robotRelativeSpeeds.omegaRadiansPerSecond);
-      SmartDashboard.putNumber("x velocity before", robotRelativeSpeeds.vxMetersPerSecond);
-      SmartDashboard.putNumber("y velocity before", robotRelativeSpeeds.vyMetersPerSecond);
-    }
-    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
-
-    if (m_debug) {
-      SmartDashboard.putNumber("angular velocity after", targetSpeeds.omegaRadiansPerSecond);
-      SmartDashboard.putNumber("x velocity after", targetSpeeds.vxMetersPerSecond);
-      SmartDashboard.putNumber("y velocity after", targetSpeeds.vyMetersPerSecond);
-
+    if (m_debug)
       System.out.println(
           String.format(
               "driveRobotRelative: omega: %f, vx: %f, vy : %f",
               robotRelativeSpeeds.omegaRadiansPerSecond,
               robotRelativeSpeeds.vxMetersPerSecond,
               robotRelativeSpeeds.vyMetersPerSecond));
-    }
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
@@ -372,20 +355,19 @@ public class Swerve extends SubsystemBase implements TestBindings {
   /* pathplanner config */
 
   private void configurePathPlanner() {
-
     // TODO make actual configs for autobuilder
-    try {
-      AutoBuilder.configure(
-          this::getPose,
-          this::setPose,
-          this::getSpeeds,
-          this::driveRobotRelative,
-          driveController,
-          RobotConfig.fromGUISettings(),
-          () -> {
-            // Boolean supplier that controls when the path will be mirrored for the red alliance
-            // This will flip the path being followed to the red side of the field.
-            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    // try catch to remove parsing error
+    AutoBuilder.configure(
+        this::getPose,
+        this::setPose,
+        this::getSpeeds,
+        this::driveRobotRelative,
+        Constants.AutoConstants.kPathFollowController,
+        Constants.AutoConstants.kRobotConfig,
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
           var alliance = DriverStation.getAlliance();
           if (alliance.isPresent()) {
