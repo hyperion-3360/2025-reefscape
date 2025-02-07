@@ -171,8 +171,8 @@ public final class Constants {
 
     public static final PathFollowingController kPathFollowController =
         new PPHolonomicDriveController(
-            new PIDConstants(0.8, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(0.1, 0.0, 0.0) // Rotation PID constants
+            new PIDConstants(0.01, 0.001, 0.0), // Translation PID constants
+            new PIDConstants(0.01, 0.001, 0.0) // Rotation PID constants
             );
   }
 

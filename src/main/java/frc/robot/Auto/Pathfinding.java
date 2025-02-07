@@ -290,7 +290,7 @@ public class Pathfinding extends Command {
   protected static List<POI> poiList = new ArrayList<>();
   private static POI bestPOI;
   private static PathConstraints constraints =
-      new PathConstraints(2.0, 4.0, Units.degreesToRadians(180), Units.degreesToRadians(360));
+      new PathConstraints(3.0, 4.0, Units.degreesToRadians(180), Units.degreesToRadians(360));
   private static int index = 0;
 
   private static Shooter s_shooter;
