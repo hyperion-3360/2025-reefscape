@@ -81,13 +81,13 @@ public class RobotContainer {
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
   private final ElevateCmd elevateL1 =
-      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L1);
+      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L1);
   private final ElevateCmd elevateL2 =
-      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L2);
+      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
   private final ElevateCmd elevateL3 =
-      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L3);
+      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L3);
   private final ElevateCmd elevateL4 =
-      new ElevateCmd(m_elevator, m_shooter, m_leds, desiredHeight.L4);
+      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
 
   public enum TestModes {
     NONE,
