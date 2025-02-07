@@ -198,33 +198,33 @@ public final class Constants {
   public static final class AlgaeCoralStand {
     // TODO add actual values not approximates using pathplanner
     public static final Pose2d[] kStands = {
-      new Pose2d(1.225, 5.855, new Rotation2d(-180)),
-      new Pose2d(1.225, 4.025, new Rotation2d(-180)),
-      new Pose2d(1.225, 2.195, new Rotation2d(-180)),
+      new Pose2d(1.225, 5.855, Rotation2d.fromDegrees(180)),
+      new Pose2d(1.225, 4.025, Rotation2d.fromDegrees(180)),
+      new Pose2d(1.225, 2.195, Rotation2d.fromDegrees(180)),
     };
   }
 
   public static class Pegs {
     public static final Pose2d[] kPegs = {
-      new Pose2d(3.9314751317, 3.2240855, new Rotation2d(240)),
-      new Pose2d(3.657607315, 3.861435, new Rotation2d(240)),
-      new Pose2d(4.6632495, 3.861435, new Rotation2d(180)),
-      new Pose2d(4.6632495, 4.190365, new Rotation2d(180)),
-      new Pose2d(4.2163368683, 4.6632495, new Rotation2d(300)),
-      new Pose2d(3.9314751317, 4.8277145, new Rotation2d(300)),
-      new Pose2d(5.0471708683, 4.8277145, new Rotation2d(60)),
-      new Pose2d(4.7623091317, 4.6632495, new Rotation2d(60)),
-      new Pose2d(5.321046, 4.190365, new Rotation2d(-180)),
-      new Pose2d(5.321046, 3.861435, new Rotation2d(-180)),
-      new Pose2d(4.7623, 3.4901, new Rotation2d(300)),
-      new Pose2d(5.0471, 3.2240, new Rotation2d(300)),
+      new Pose2d(3.9314751317, 3.2240855, Rotation2d.fromDegrees(60)),
+      new Pose2d(3.657607315, 3.861435, Rotation2d.fromDegrees(60)),
+      new Pose2d(4.6632495, 3.861435, Rotation2d.fromDegrees(0)),
+      new Pose2d(4.6632495, 4.190365, Rotation2d.fromDegrees(0)),
+      new Pose2d(4.2163368683, 4.6632495, Rotation2d.fromDegrees(300)),
+      new Pose2d(3.9314751317, 4.8277145, Rotation2d.fromDegrees(300)),
+      new Pose2d(5.0471708683, 4.8277145, Rotation2d.fromDegrees(240)),
+      new Pose2d(4.7623091317, 4.6632495, Rotation2d.fromDegrees(240)),
+      new Pose2d(5.321046, 4.190365, Rotation2d.fromDegrees(180)),
+      new Pose2d(5.321046, 3.861435, Rotation2d.fromDegrees(180)),
+      new Pose2d(4.7623, 3.4901, Rotation2d.fromDegrees(120)),
+      new Pose2d(5.0471, 3.2240, Rotation2d.fromDegrees(120)),
     };
   }
 
   public static class Feeders {
     public static final Pose2d[] kFeeders = {
-      new Pose2d(0.8382, 0.635, new Rotation2d(54)),
-      new Pose2d(0.8382, 7.3914, new Rotation2d(306)),
+      new Pose2d(0.8382, 0.635, Rotation2d.fromDegrees(54)),
+      new Pose2d(0.8382, 7.3914, Rotation2d.fromDegrees(306)),
     };
   }
 
