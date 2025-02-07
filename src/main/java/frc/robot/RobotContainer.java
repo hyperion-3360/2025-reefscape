@@ -183,6 +183,8 @@ public class RobotContainer {
 
     m_algaeIntake.setupTestBindings(
         new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
+
+    m_swerve.setupTestBindings(new Trigger(isMode(TestModes.SWERVE)), m_coDriverController);
   }
 
   public void configureBindingsTeleop() {
