@@ -145,7 +145,9 @@ public class RobotContainer {
         new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
   }
 
-  public void configureBindingsTeleop() {}
+  public void configureBindingsTeleop() {
+    m_driverController.a().whileTrue(m_selector.Align());
+  }
 
   public Command getAutonomousCommand() {
     return Pathfinding.fullControl();

@@ -1,10 +1,15 @@
 package frc.robot.vision;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Auto.Pathfinding;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +25,13 @@ public class Selection extends Vision {
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
   double orientationMultipleY = 0;
+
+  Pose2d currentPose = new Pose2d();
+
+  double kp = 0.03;
+  double ki = 0;
+  double kd = 0;
+  PIDController m_pid = new PIDController(kp, ki, kd);
 
   public enum direction {
     left,
@@ -55,8 +67,10 @@ public class Selection extends Vision {
 
   @Override
   public void periodic() {
-
+    currentPose = swerve.getPose();
     setLockTarget();
+    System.out.println(currentPose);
+    // System.out.println(lockID);
   }
 
   public Command MovePeg(direction direction) {
@@ -83,7 +97,6 @@ public class Selection extends Vision {
 
         trackedTarget = change.getBestTarget();
         lockID = trackedTarget.fiducialId;
-        // System.out.println(lockID);
       } else {
         lockID = 0;
       }
@@ -96,16 +109,16 @@ public class Selection extends Vision {
 
       desiredTranslation =
           new Translation2d(
-              // the sin and cos from Math take radians
               GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
-      // not sure abt the 360-yaw
-      // return Commands.run(() -> swerve.drive(desiredTranslation, 360 - GetYaw(), true, false));
-      return Commands.run(
-              () -> System.out.println(desiredTranslation.getX() + " " + desiredTranslation.getY()))
-          .andThen(
-              () ->
-                  swerve.drive(desiredTranslation, swerve.getHeading().getDegrees(), false, false));
+
+      var desiredPose = new Pose2d(desiredTranslation, new Rotation2d());
+      var targetDiff =
+          new Transform2d(
+              (desiredTranslation.getX() - currentPose.getX()),
+              (desiredTranslation.getY() - currentPose.getY()) , new Rotation2d());
+
+      return Pathfinding.goThere(desiredPose);
     }
     return Commands.runOnce(() -> System.out.println("null"));
   }
