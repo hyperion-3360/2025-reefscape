@@ -31,7 +31,7 @@ public final class Constants {
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
-            COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.driveRatios.X1_10);
+            COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.driveRatios.X1_11);
 
     // coming from datasheet using typical values
     // https://store.ctr-electronics.com/content/user-manual/Magnetic%20Encoder%20User%27s%20Guide.pdf
