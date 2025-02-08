@@ -31,7 +31,7 @@ public final class Constants {
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
-            COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.driveRatios.X1_10);
+            COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.driveRatios.X1_11);
 
     // coming from datasheet using typical values
     // https://store.ctr-electronics.com/content/user-manual/Magnetic%20Encoder%20User%27s%20Guide.pdf
@@ -261,7 +261,7 @@ public final class Constants {
     // in º
     public static final double kStartingAngle = 0.1;
     public static final double kFloorIntakeAngle = -22.0;
-    public static final double kNetAngle = -10.0;
+    public static final double kNetAngle = -5.0;
     // auto intake bcuz of the little tower thing
     public static final double kAutoIntakeAngle = 0.0;
     public static final double kCurrentLimit = 15.0;
@@ -269,19 +269,19 @@ public final class Constants {
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
     public static final double kStoringSpeed = 0.15;
-    public static final double kProcessorSpeed = -0.8;
+    public static final double kProcessorSpeed = -1.0;
     public static final double kStopSpeed = 0.0;
-    public static final double kNetSpeed = 0.0;
+    public static final double kNetSpeed = -0.8;
   }
 
   public static class CoralShooterVariables {
     // TODO: Find actual speed
     public static final double kShootNo = 0.0;
-    public static final double kShootL1 = -0.6;
+    public static final double kShootL1 = -0.3;
     public static final double kShootL2 = -0.65;
     public static final double kShootL3 = -0.7;
     public static final double kShootL4 = -0.75;
-    public static final double kIntakeSpeed = -1.0;
+    public static final double kIntakeSpeed = -0.5;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     public static final int kCoralShooterCurrentLimit = 10;
@@ -289,14 +289,14 @@ public final class Constants {
 
     // TODO: Find angles
     // angles in º
-    public static final double kCoralShooterClosed = 32.0;
-    public static final double kCoralShooterOpen = 120.0;
+    public static final double kCoralShooterClosed = 10.0;
+    public static final double kCoralShooterOpen = 113.0;
   }
 
   public static class LEDConstants {
     // TODO: update port when robot is built
     public static final int kLEDPWMPort = 5;
-    public static final int kLEDLength = 27;
+    public static final int kLEDLength = 30;
   }
 
   public static class ClimberState {
@@ -356,15 +356,15 @@ public final class Constants {
 
     // elevator heights
     public static final double kElevatorDown = 0.01;
-    public static final double kElevatorL1 = 0.43;
+    public static final double kElevatorL1 = 0.45;
     public static final double kElevatorL2 = 0.67;
     public static final double kElevatorL3 = 0.95;
     public static final double kElevatorL4 = 1.43;
-    public static final double kElevatorNet = 1.75;
-    public static final double kElevatorProcessor = 10.0;
-    public static final double kElevatorAlgaeLow = 25.0;
-    public static final double kElevatorFeeder = 0.172;
-    public static final double kElevatorAlgaeL2 = 0.59;
+    public static final double kElevatorNet = 1.53;
+    public static final double kElevatorProcessor = 0.3;
+    public static final double kElevatorAlgaeLow = 0.01;
+    public static final double kElevatorFeeder = 0.158;
+    public static final double kElevatorAlgaeL2 = 0.63;
     public static final double kElevatorAlgaeL3 = 0.91;
   }
 

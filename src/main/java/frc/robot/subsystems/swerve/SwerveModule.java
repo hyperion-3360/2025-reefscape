@@ -114,4 +114,12 @@ public class SwerveModule {
             mDriveMotor.getPosition().getValueAsDouble(), Constants.Swerve.wheelCircumference),
         Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble()));
   }
+
+  public TalonFX getRotationMotor() {
+    return mAngleMotor;
+  }
+
+  public TalonFX getDriveMotor() {
+    return mDriveMotor;
+  }
 }
