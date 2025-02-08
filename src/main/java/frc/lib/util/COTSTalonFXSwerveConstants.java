@@ -129,14 +129,14 @@ public class COTSTalonFXSwerveConstants {
     public static final class SwerveXFlipped {
       /** West Coast Products - SwerveX Flipped (Falcon 500) */
       public static final COTSTalonFXSwerveConstants Falcon500(double driveGearRatio) {
-        double wheelDiameter = Units.inchesToMeters(4.0);
+        double wheelDiameter = Units.inchesToMeters(3.875);
 
         /** (468 / 35) : 1 */
         //        double angleGearRatio = ((468.0 / 35.0) / 1.0);
-        double angleGearRatio = 13.714285714285;
+        double angleGearRatio = 13.3714285714285;
 
-        double angleKP = 100.0;
-        double angleKI = 0.0;
+        double angleKP = 80.0;
+        double angleKI = 0.1; // 0.0
         double angleKD = 0.05;
 
         InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
