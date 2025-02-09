@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -27,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -36,32 +36,37 @@ import frc.robot.Constants;
 import frc.robot.vision.Vision;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
+import org.photonvision.EstimatedRobotPose;
 
 public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
   private final Pigeon2 m_gyro;
   private final Field2d m_field2d;
-  public SwerveDriveOdometry m_odometry;
+  // public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
-  //  private Vision vision;
+  private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
   Thread thread = new Thread();
   ShuffleboardTab VisionSwerveTab = Shuffleboard.getTab("vision and swerve");
   private boolean hasStartedEstimation = false;
   private Orchestra m_orchestra = new Orchestra();
+  private Pose2d startPose = new Pose2d();
+  private Pose2d endPose = new Pose2d();
+  private List<Translation2d> waypoints = List.of();
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
   // vision estimation of robot pose
-  //  Optional<EstimatedRobotPose> visionEst;
+  Optional<EstimatedRobotPose> visionEst;
 
   public Swerve(Vision vision) {
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
     m_field2d = new Field2d();
     m_gyro.reset();
-    //    this.vision = vision;
+    this.vision = vision;
     mSwerveMods =
         new SwerveModule[] {
           new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -80,13 +85,16 @@ public class Swerve extends SubsystemBase implements TestBindings {
       m_orchestra.addInstrument(mod.getRotationMotor());
     }
 
-    m_odometry =
-        new SwerveDriveOdometry(
-            Constants.Swerve.swerveKinematics,
-            m_gyro.getRotation2d(),
-            positions,
-            new Pose2d(0, 0, new Rotation2d()));
-    configurePathPlanner();
+    //    m_orchestra.loadMusic(getName());
+    //    m_orchestra.play();
+
+    // m_odometry =
+    //     new SwerveDriveOdometry(
+    //         Constants.Swerve.swerveKinematics,
+    //         m_gyro.getRotation2d(),
+    //         positions,
+    //         new Pose2d(0, 0, new Rotation2d()));
+    // configurePathPlanner();
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
@@ -99,18 +107,18 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void periodic() {
 
     // updates the odometry positon
-    m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
+    // m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
     // Renews the field periodically
     // m_field2d.setRobotPose(m_odometryPose);
 
-    // poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
+    poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
-    //    visionEst = vision.getEstimatedGlobalPose();
+    visionEst = vision.getEstimatedGlobalPose();
 
-    //   if (visionEst.isPresent() && !hasStartedEstimation) {
-    //     hasStartedEstimation = true;
-    //     estimatePose();
-    //   }
+    if (visionEst.isPresent() && !hasStartedEstimation) {
+      hasStartedEstimation = true;
+      estimatePose();
+    }
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
     // System.out.println(getRotation2d());
@@ -138,12 +146,12 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // if vision estimation is present, create method est to add vision measurment to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
 
-    //    visionEst.ifPresent(
-    //        est -> {
-    //          var estStdDevs = vision.getEstimationStdDevs();
-    //          poseEstimator.addVisionMeasurement(
-    //              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-    //        });
+    visionEst.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevs();
+          poseEstimator.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
 
     hasStartedEstimation = false;
   }
@@ -220,13 +228,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public Pose2d getPose() {
-    var curPos = m_odometry.getPoseMeters();
+    var curPos = poseEstimator.getEstimatedPosition();
     System.out.println(String.format("x: %f y:%f", curPos.getX(), curPos.getY()));
     return curPos;
   }
 
   public void setPose(Pose2d pose) {
-    m_odometry.resetPosition(getRotation2d(), getModulePositions(), pose);
+    poseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
   }
 
   public Rotation2d getHeading() {
@@ -234,12 +242,12 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void setHeading(Rotation2d heading) {
-    m_odometry.resetPosition(
+    poseEstimator.resetPosition(
         getRotation2d(), getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
   }
 
   public void zeroHeading() {
-    m_odometry.resetPosition(
+    poseEstimator.resetPosition(
         getRotation2d(),
         getModulePositions(),
         new Pose2d(getPose().getTranslation(), new Rotation2d()));
@@ -268,7 +276,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(m_gyro.getRotation2d(), getModulePositions(), pose);
+    poseEstimator.resetPosition(m_gyro.getRotation2d(), getModulePositions(), pose);
   }
 
   /* pathplanner config */
@@ -310,13 +318,16 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   @Override
   public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
-
+    moduleTrigger.and(controller.a()).onTrue(createTrajectoryCommand());
     moduleTrigger.and(controller.a()).onTrue(getTestTrajectoryCommand(4.0, 0.0));
     moduleTrigger.and(controller.b()).onTrue(getTestTrajectoryCommand(-4.0, 0.0));
     moduleTrigger.and(controller.x()).onTrue(playThemeMusic());
   }
 
-  public Command getTestTrajectoryCommand(double x, double y) {
+  public Command createTrajectoryCommand() {
+
+    System.out.println("hello");
+
     // Create config for trajectory
     TrajectoryConfig config =
         new TrajectoryConfig(0.5, 0.5)
@@ -324,14 +335,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
             .setKinematics(Constants.Swerve.swerveKinematics);
 
     // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory =
+    Trajectory trajectory =
         TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction
-            Pose2d.kZero,
+            this.getPose(),
             // Pass through these two interior waypoints, making an 's' curve path
             List.of(),
             // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(x, y, Rotation2d.kZero),
+            new Pose2d(2.66, 4.03, new Rotation2d()),
             config);
 
     var thetaController = new ProfiledPIDController(1, 0, 0, kThetaControllerConstraints);
@@ -339,7 +350,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     SwerveControllerCommand swerveControllerCommand =
         new SwerveControllerCommand(
-            exampleTrajectory,
+            trajectory,
             this::getPose, // Functional interface to feed supplier
             Constants.Swerve.swerveKinematics,
 
@@ -353,7 +364,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // Reset odometry to the initial pose of the trajectory, run path following
     // command, then stop at the end.
     return Commands.sequence(
-        new InstantCommand(() -> this.resetOdometry(exampleTrajectory.getInitialPose())),
+        new PrintCommand("hello again"),
+        new InstantCommand(() -> this.resetOdometry(trajectory.getInitialPose())),
         swerveControllerCommand,
         new InstantCommand(() -> this.drive(new Translation2d(0, 0), 0, false, false)));
   }
