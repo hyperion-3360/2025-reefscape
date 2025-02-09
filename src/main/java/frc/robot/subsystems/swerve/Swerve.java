@@ -85,17 +85,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
       m_orchestra.addInstrument(mod.getRotationMotor());
     }
 
-    //    m_orchestra.loadMusic(getName());
-    //    m_orchestra.play();
-
-    // m_odometry =
-    //     new SwerveDriveOdometry(
-    //         Constants.Swerve.swerveKinematics,
-    //         m_gyro.getRotation2d(),
-    //         positions,
-    //         new Pose2d(0, 0, new Rotation2d()));
-    // configurePathPlanner();
-
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
@@ -107,10 +96,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void periodic() {
 
     // updates the odometry positon
-    // m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
-    // Renews the field periodically
-    // m_field2d.setRobotPose(m_odometryPose);
-
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
     visionEst = vision.getEstimatedGlobalPose();
@@ -121,7 +106,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
-    // System.out.println(getRotation2d());
 
     if (m_debug) {
       // smartdashboardDebug();
@@ -319,8 +303,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   @Override
   public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
     moduleTrigger.and(controller.a()).onTrue(createTrajectoryCommand());
-    moduleTrigger.and(controller.a()).onTrue(getTestTrajectoryCommand(4.0, 0.0));
-    moduleTrigger.and(controller.b()).onTrue(getTestTrajectoryCommand(-4.0, 0.0));
     moduleTrigger.and(controller.x()).onTrue(playThemeMusic());
   }
 
