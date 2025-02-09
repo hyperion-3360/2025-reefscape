@@ -198,9 +198,9 @@ public final class Constants {
   public static final class AlgaeCoralStand {
     // TODO add actual values not approximates using pathplanner
     public static final Pose2d[] kStands = {
-      new Pose2d(1.225, 5.855, Rotation2d.fromDegrees(0)),
-      new Pose2d(1.225, 4.025, Rotation2d.fromDegrees(0)),
-      new Pose2d(1.225, 2.195, Rotation2d.fromDegrees(0)),
+      new Pose2d(1.225, 5.855, Rotation2d.fromDegrees(180)),
+      new Pose2d(1.225, 4.025, Rotation2d.fromDegrees(180)),
+      new Pose2d(1.225, 2.195, Rotation2d.fromDegrees(180)),
     };
   }
 
