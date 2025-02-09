@@ -86,14 +86,14 @@ public class Pathfinding extends Command {
     DUMPINGUP(
         4.073906,
         4.745482,
-        210,
+        150,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn()),
     DUMPINGDOWN(
         4.073906,
         3.306318,
-        150,
+        210,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn());
@@ -127,9 +127,7 @@ public class Pathfinding extends Command {
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
-      Pose2d[] poseArray = {
-        new Pose2d(x_coordinates, y_coordinates, Rotation2d.fromDegrees(angle))
-      };
+      Pose2d[] poseArray = {new Pose2d(x_coordinates, y_coordinates, new Rotation2d(angle))};
       this.event = event;
       this.conditions = removeCondition;
       this.poseArray = poseArray;
@@ -151,7 +149,7 @@ public class Pathfinding extends Command {
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
-      Pose2d[] poseArray = {new Pose2d(xy_coordinates, Rotation2d.fromDegrees(angle))};
+      Pose2d[] poseArray = {new Pose2d(xy_coordinates, new Rotation2d(angle))};
       this.poseArray = poseArray;
       this.conditions = removeCondition;
       this.event = event;
@@ -270,7 +268,6 @@ public class Pathfinding extends Command {
   private static POI bestPOI;
   private static PathConstraints constraints =
       new PathConstraints(1.0, 2.0, Units.degreesToRadians(180), Units.degreesToRadians(180));
-  private static int index = 0;
 
   private static Shooter s_shooter;
   private static Swerve s_swerve;
@@ -426,13 +423,11 @@ public class Pathfinding extends Command {
     return new Pose2d(widthToBacktrack, rotation.minus(Rotation2d.fromDegrees(180)));
   }
 
-  private static Pose2d lineupPoint(Pose2d poiToLineup) {
+  public static Pose2d lineupPoint(Pose2d poiToLineup) {
 
     return new Pose2d(
-        poiToLineup.getTranslation().getX()
-            + 0.1 * Math.cos(poiToLineup.getRotation().getDegrees() + 180),
-        poiToLineup.getTranslation().getY()
-            + 0.1 * Math.sin(poiToLineup.getRotation().getDegrees() + 180),
+        poiToLineup.getTranslation().getX() - 0.1 * poiToLineup.getRotation().getCos(),
+        poiToLineup.getTranslation().getY() - 0.1 * poiToLineup.getRotation().getSin(),
         poiToLineup.getRotation());
   }
 
@@ -576,7 +571,7 @@ public class Pathfinding extends Command {
    * @return the command to pathfind to a specified point
    */
   public static Command doPathfinding() {
-    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
+
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
@@ -619,8 +614,9 @@ public class Pathfinding extends Command {
 
   public static Command fullControl() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
-    // adds every POI to a pathfinding sequence
+    // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
+      poiList.add(poiArrayElement);
 
       pathfindingSequence.addCommands(
           AutoBuilder.pathfindToPose(POICoordinatesOptimisation(poiArrayElement), constraints),
