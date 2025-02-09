@@ -560,6 +560,8 @@ public class Pathfinding extends Command {
   @Override
   public void execute() {
     logicHandler();
+    SmartDashboard.putNumber("target x", POICoordinatesOptimisation(poiList.remove(0)).getX());
+    SmartDashboard.putNumber("target y", POICoordinatesOptimisation(poiList.remove(0)).getY());
   }
 
   // #endregion
@@ -615,8 +617,17 @@ public class Pathfinding extends Command {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
+      poiList.add(poiArrayElement);
+
       pathfindingSequence.addCommands(
           AutoBuilder.pathfindToPose(POICoordinatesOptimisation(poiArrayElement), constraints),
+          Commands.runOnce(
+              () -> {
+                SmartDashboard.putNumber(
+                    "target x", POICoordinatesOptimisation(poiArrayElement).getX());
+                SmartDashboard.putNumber(
+                    "target y", POICoordinatesOptimisation(poiArrayElement).getY());
+              }),
           poiArrayElement.getEvent(),
           new WaitUntilCommand(() -> poiArrayElement.getEvent().isFinished()));
     }
