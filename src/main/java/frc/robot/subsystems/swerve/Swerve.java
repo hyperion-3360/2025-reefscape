@@ -1,9 +1,8 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -42,7 +41,7 @@ import org.photonvision.EstimatedRobotPose;
 public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
-  private final AHRS m_gyro;
+  private final Pigeon2 m_gyro;
   private final Field2d m_field2d;
   public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
@@ -60,7 +59,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
    Optional<EstimatedRobotPose> visionEst;
 
   public Swerve(Vision vision) {
-    m_gyro = new AHRS(NavXComType.kMXP_SPI);
+    m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
     m_field2d = new Field2d();
     m_gyro.reset();
     //    this.vision = vision;
