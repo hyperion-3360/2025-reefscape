@@ -185,6 +185,8 @@ public class RobotContainer {
         new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
 
     m_swerve.setupTestBindings(new Trigger(isMode(TestModes.SWERVE)), m_coDriverController);
+
+    // m_driverController.a().onTrue(m_selector.Align());
   }
 
   public void configureBindingsTeleop() {
