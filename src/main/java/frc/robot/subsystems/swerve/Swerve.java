@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import frc.robot.vision.Vision;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -78,10 +80,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
       SmartDashboard.putData(m_field2d);
     }
 
-    //    for (SwerveModule mod : mSwerveMods) {
-    //     m_orchestra.addInstrument(mod.getDriveMotor());
-    //    m_orchestra.addInstrument(mod.getRotationMotor());
-    // }
+    for (SwerveModule mod : mSwerveMods) {
+      m_orchestra.addInstrument(mod.getDriveMotor());
+      m_orchestra.addInstrument(mod.getRotationMotor());
+    }
 
     //    m_orchestra.loadMusic(getName());
     //    m_orchestra.play();
@@ -303,9 +305,23 @@ public class Swerve extends SubsystemBase implements TestBindings {
         this);
   }
 
+  private Command playThemeMusic() {
+    return this.runOnce(
+        () -> {
+          var musicFilePath =
+              Filesystem.getDeployDirectory() + File.separator + "finalcountdown.chrp";
+          System.out.println(musicFilePath);
+          System.out.println(m_orchestra.loadMusic(musicFilePath));
+          System.out.println(m_orchestra.play());
+        });
+  }
+
   @Override
   public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
     moduleTrigger.and(controller.a()).onTrue(createTrajectoryCommand());
+    moduleTrigger.and(controller.a()).onTrue(getTestTrajectoryCommand(4.0, 0.0));
+    moduleTrigger.and(controller.b()).onTrue(getTestTrajectoryCommand(-4.0, 0.0));
+    moduleTrigger.and(controller.x()).onTrue(playThemeMusic());
   }
 
   public Command createTrajectoryCommand() {
