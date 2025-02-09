@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -49,6 +50,8 @@ public class SwerveModule {
     mDriveMotor = new TalonFX(moduleConstants.driveMotorID, "CANivore_3360");
     mDriveMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveDriveFXConfig);
     mDriveMotor.getConfigurator().setPosition(0.0);
+    // prevents the robot from tipping over when the elevator is raised
+    mDriveMotor.setNeutralMode(NeutralModeValue.Coast);
   }
 
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
