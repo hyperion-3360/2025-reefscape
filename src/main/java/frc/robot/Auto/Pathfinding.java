@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.AlgaeIntake;
@@ -68,16 +70,16 @@ public class Pathfinding extends Command {
         false,
         () -> !RobotContainer.m_shooter.isCoralIn()),
     PROCESSOR(
-        10.0,
-        5.3,
-        180.0,
+        5.9875,
+        0,
+        270.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootingProcessor,
         () -> RobotContainer.m_algaeIntake.sensorTriggered()),
     NET(
-        7.734,
-        4,
-        180.0,
+        8.2722,
+        6.1376,
+        0.0,
         () -> Commands.runOnce(() -> System.out.println("Hello World")),
         Constants.Priorities.kShootNet,
         () -> RobotContainer.m_algaeIntake.sensorTriggered()),
@@ -229,7 +231,7 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIRSTAUTO(POI.FEEDERS, POI.BRANCHES),
+    FIRSTAUTO(POI.FEEDERS, POI.PROCESSOR, POI.NET),
     SECONDAUTO(POI.ALGAE, POI.BRANCHES),
     THIRDAUTO(POI.ALGAE, POI.BRANCHES),
     FOURTHAUTO(POI.ALGAE, POI.BRANCHES),
@@ -265,7 +267,7 @@ public class Pathfinding extends Command {
   protected static List<POI> poiList = new ArrayList<>();
   private static POI bestPOI;
   private static PathConstraints constraints =
-      new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+      new PathConstraints(1.0, 2.0, Units.degreesToRadians(180), Units.degreesToRadians(180));
   private static int index = 0;
 
   private static Shooter s_shooter;
@@ -411,7 +413,7 @@ public class Pathfinding extends Command {
     double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
     double robotHyp = Math.hypot(robotLengthPlusBuffer, robotWidthPlusBuffer);
     Rotation2d rotation =
-        Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees());
+        Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees() + 180);
 
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
@@ -419,22 +421,7 @@ public class Pathfinding extends Command {
             poiToPathfind.getPose2d().getX() + robotHyp * rotation.getCos(),
             poiToPathfind.getPose2d().getY() + robotHyp * rotation.getSin());
 
-    // TODO make this code more modular for the future
-    if (poiToPathfind.equals(POI.ALGAE)) {
-      // sets the rotation to the orientation of the vector robot  -> pose2D
-      rotation =
-          (RobotContainer.m_swerve.getRotation2d().getDegrees() <= 180)
-              ? new Rotation2d(
-                  180
-                      - Math.atan(
-                          poiToPathfind.getPose2d().getX() / poiToPathfind.getPose2d().getY()))
-              : new Rotation2d(
-                  180
-                      + Math.atan(
-                          poiToPathfind.getPose2d().getX() / poiToPathfind.getPose2d().getY()));
-    }
-
-    return new Pose2d(widthToBacktrack, rotation);
+    return new Pose2d(widthToBacktrack, rotation.minus(Rotation2d.fromDegrees(180)));
   }
 
   public static Pose2d lineupPoint(Pose2d poiToLineup) {
@@ -625,16 +612,14 @@ public class Pathfinding extends Command {
   }
 
   public static Command fullControl() {
+    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
-      poiList.add(poiArrayElement);
+      pathfindingSequence.addCommands(
+          AutoBuilder.pathfindToPose(POICoordinatesOptimisation(poiArrayElement), constraints),
+          poiArrayElement.getEvent(),
+          new WaitUntilCommand(() -> poiArrayElement.getEvent().isFinished()));
     }
-    bestPOI = poiList.get(index);
-    return AutoBuilder.pathfindToPose(bestPOI.getPose2d(), constraints)
-        .andThen(
-            () -> {
-              index++;
-              bestPOI = poiList.get(index);
-            });
+    return pathfindingSequence;
   }
 }
