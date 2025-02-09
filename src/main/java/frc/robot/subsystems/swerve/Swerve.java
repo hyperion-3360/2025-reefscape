@@ -1,9 +1,8 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -39,7 +38,7 @@ import java.util.List;
 public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
-  private final AHRS m_gyro;
+  private final Pigeon2 m_gyro;
   private final Field2d m_field2d;
   public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
@@ -57,7 +56,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   //  Optional<EstimatedRobotPose> visionEst;
 
   public Swerve(Vision vision) {
-    m_gyro = new AHRS(NavXComType.kMXP_SPI);
+    m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
     m_field2d = new Field2d();
     m_gyro.reset();
     //    this.vision = vision;
@@ -302,10 +301,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
   @Override
   public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
 
-    moduleTrigger.and(controller.a()).onTrue(getTestTrajectoryCommand());
+    moduleTrigger.and(controller.a()).onTrue(getTestTrajectoryCommand(4.0, 0.0));
+    moduleTrigger.and(controller.b()).onTrue(getTestTrajectoryCommand(-4.0, 0.0));
   }
 
-  public Command getTestTrajectoryCommand() {
+  public Command getTestTrajectoryCommand(double x, double y) {
     // Create config for trajectory
     TrajectoryConfig config =
         new TrajectoryConfig(1.0, 1.0)
@@ -320,7 +320,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
             // Pass through these two interior waypoints, making an 's' curve path
             List.of(),
             // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, Rotation2d.kZero),
+            new Pose2d(x, y, Rotation2d.kZero),
             config);
 
     var thetaController = new ProfiledPIDController(1, 0, 0, kThetaControllerConstraints);
