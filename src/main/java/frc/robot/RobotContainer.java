@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -228,7 +230,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.estimatePose();
-    return Pathfinding.fullControl();
+    m_swerve.setPose(new Pose2d(2, 6, Rotation2d.fromDegrees(180)));
+    return Pathfinding.doPathfinding();
   }
 }
