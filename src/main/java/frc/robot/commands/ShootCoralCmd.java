@@ -26,7 +26,7 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_shooter.setShoot(getShootingSpeed(m_elevator.getTargetHeight())))
             .until(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(1.2),
+        new WaitCommand(1.0),
         Commands.runOnce(() -> m_shooter.stop()),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),

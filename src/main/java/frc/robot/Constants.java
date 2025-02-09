@@ -270,7 +270,7 @@ public final class Constants {
 
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
-    public static final double kStoringSpeed = 0.15;
+    public static final double kStoringSpeed = 0.1;
     public static final double kProcessorSpeed = -1.0;
     public static final double kStopSpeed = 0.0;
     public static final double kNetSpeed = -0.8;
@@ -361,13 +361,13 @@ public final class Constants {
     public static final double kElevatorL1 = 0.45;
     public static final double kElevatorL2 = 0.63;
     public static final double kElevatorL3 = 0.965;
-    public static final double kElevatorL4 = 1.42;
+    public static final double kElevatorL4 = 1.46;
     public static final double kElevatorNet = 1.53;
-    public static final double kElevatorProcessor = 0.3;
+    public static final double kElevatorProcessor = 0.25;
     public static final double kElevatorAlgaeLow = 0.01;
-    public static final double kElevatorFeeder = 0.187;
+    public static final double kElevatorFeeder = 0.147;
     public static final double kElevatorAlgaeL2 = 0.64;
-    public static final double kElevatorAlgaeL3 = 0.93;
+    public static final double kElevatorAlgaeL3 = 0.96;
   }
 
   public static class AlgaeIntakeConstants {
