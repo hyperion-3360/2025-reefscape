@@ -25,4 +25,13 @@ public class Joysticks {
             * Math.pow(limiter.calculate(MathUtil.applyDeadband(valueToCondition, deadband)), 2);
     return flipAxis ? -conditionedVal : conditionedVal;
   }
+
+  public static double conditionJoystick(
+      DoubleSupplier axis, SlewRateVariableLimiter limiter, double deadband, boolean flipAxis) {
+    double valueToCondition = axis.getAsDouble();
+    double conditionedVal =
+        Math.signum(valueToCondition)
+            * Math.pow(limiter.calculate(MathUtil.applyDeadband(valueToCondition, deadband)), 2);
+    return flipAxis ? -conditionedVal : conditionedVal;
+  }
 }
