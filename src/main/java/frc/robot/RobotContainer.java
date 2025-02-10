@@ -13,11 +13,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
-import frc.robot.Auto.Auto;
-import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
+import frc.robot.commands.LowerElevatorCmd;
 import frc.robot.commands.NetAlgaeShootCmd;
 import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
@@ -76,8 +75,7 @@ public class RobotContainer {
   private final NetAlgaeShootCmd shootAlgaeNet =
       new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator);
 
-  private final ShootCoralCmd shootCoral =
-      new ShootCoralCmd(m_shooter, m_leds, m_elevator, desiredHeight.L1);
+  private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
   private final ElevateCmd elevateL1 =
@@ -88,6 +86,7 @@ public class RobotContainer {
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L3);
   private final ElevateCmd elevateL4 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
+  private final LowerElevatorCmd elevateLOW = new LowerElevatorCmd(m_elevator, m_leds, m_shooter);
 
   public enum TestModes {
     NONE,
@@ -131,8 +130,8 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    Auto.initAutoWidget();
-    Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
+    // Auto.initAutoWidget();
+    // Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
 
     m_swerve.resetModulesToAbsolute();
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -197,14 +196,14 @@ public class RobotContainer {
     m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
 
-    m_climber.setDefaultCommand(
-        m_climber.climberTestMode(
-            () ->
-                Joysticks.conditionJoystick(
-                    () -> m_coDriverController.getLeftY(),
-                    translationLimiter,
-                    Constants.stickDeadband,
-                    true)));
+    // m_climber.setDefaultCommand(
+    //     m_climber.climberTestMode(
+    //         () ->
+    //             Joysticks.conditionJoystick(
+    //                 () -> m_coDriverController.getLeftY(),
+    //                 translationLimiter,
+    //                 Constants.stickDeadband,
+    //                 true)));
 
     m_coDriverController.a().onTrue(shootCoral);
     m_driverController.y().onTrue(shootAlgaeNet);
@@ -222,9 +221,11 @@ public class RobotContainer {
     m_coDriverController.povDown().onTrue(elevateL1);
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
+    m_coDriverController.b().onTrue(elevateLOW);
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl();
+    return Commands.none();
+    // return Pathfinding.fullControl();
   }
 }

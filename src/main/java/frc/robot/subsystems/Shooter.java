@@ -76,7 +76,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
     m_shooter.setNeutralMode(Constants.CoralShooterVariables.kCoralShooterNeutralMode);
     m_shooter.configContinuousCurrentLimit(
         Constants.CoralShooterVariables.kCoralShooterCurrentLimit);
-    m_shooter.enableCurrentLimit(true);
+    m_shooter.enableCurrentLimit(false);
 
     // SmartDashboard
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
@@ -108,6 +108,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
     getShooterIR = m_shooterIR.get();
     if (DriverStation.isDisabled()) {
       m_shooter.set(0.0);
+      closeBlocker();
     } else m_shooter.set(m_shooterSpeed);
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
   }
@@ -135,7 +136,6 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
   /** We don't want a ramp rate when shooting so set the speed at -1 in 0.0 seconds */
   public void setShoot(shootSpeed speed) {
-    m_shooter.configOpenloopRamp(0.0);
     setSpeed(speed);
   }
 
