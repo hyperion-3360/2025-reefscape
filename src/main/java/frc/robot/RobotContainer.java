@@ -13,21 +13,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
-import frc.robot.Auto.Auto;
-import frc.robot.Auto.Pathfinding;
-import frc.robot.commands.ElevateCmd;
-import frc.robot.commands.IntakeAlgaeCmd;
-import frc.robot.commands.IntakeCoralCmd;
-import frc.robot.commands.NetAlgaeShootCmd;
-import frc.robot.commands.ShootAlgaeCmd;
-import frc.robot.commands.ShootCoralCmd;
+// import frc.robot.Auto.Auto;
+// import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -50,7 +41,7 @@ public class RobotContainer {
   public static final Swerve m_swerve = new Swerve(m_vision);
   public static final AlgaeIntake m_algaeIntake = new AlgaeIntake();
   public static final Climber m_climber = new Climber();
-  public static final Elevator m_elevator = new Elevator();
+  // public static final Elevator m_elevator = new Elevator();
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
@@ -66,28 +57,30 @@ public class RobotContainer {
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
 
-  private final IntakeAlgaeCmd intakeAlgaeFloor =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.LOW);
-  private final IntakeAlgaeCmd intakeAlgaeL2 =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL2);
-  private final IntakeAlgaeCmd intakeAlgaeL3 =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL3);
-  private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
-  private final NetAlgaeShootCmd shootAlgaeNet =
-      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator);
+  // private final IntakeAlgaeCmd intakeAlgaeFloor =
+  //     new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.LOW);
+  // private final IntakeAlgaeCmd intakeAlgaeL2 =
+  //     new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator,
+  // desiredHeight.ALGAEL2);
+  // private final IntakeAlgaeCmd intakeAlgaeL3 =
+  //     new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator,
+  // desiredHeight.ALGAEL3);
+  // private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
+  // private final NetAlgaeShootCmd shootAlgaeNet =
+  //     new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator);
 
-  private final ShootCoralCmd shootCoral =
-      new ShootCoralCmd(m_shooter, m_leds, m_elevator, desiredHeight.L1);
-  private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
+  // private final ShootCoralCmd shootCoral =
+  //     new ShootCoralCmd(m_shooter, m_leds, m_elevator, desiredHeight.L1);
+  // private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final ElevateCmd elevateL1 =
-      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L1);
-  private final ElevateCmd elevateL2 =
-      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
-  private final ElevateCmd elevateL3 =
-      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L3);
-  private final ElevateCmd elevateL4 =
-      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
+  // private final ElevateCmd elevateL1 =
+  //     new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L1);
+  // private final ElevateCmd elevateL2 =
+  //     new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
+  // private final ElevateCmd elevateL3 =
+  //     new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L3);
+  // private final ElevateCmd elevateL4 =
+  //     new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
 
   public enum TestModes {
     NONE,
@@ -131,8 +124,8 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    Auto.initAutoWidget();
-    Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
+    // Auto.initAutoWidget();
+    // Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
 
     m_swerve.resetModulesToAbsolute();
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -166,7 +159,7 @@ public class RobotContainer {
                     Constants.stickDeadband,
                     true),
             () -> true,
-            () -> m_elevator.getEncoderPos());
+            () -> 0.0); // m_elevator.getEncoderPos());
 
     m_swerve.setDefaultCommand(teleopCmd);
   }
@@ -175,7 +168,7 @@ public class RobotContainer {
 
     m_shooter.setupTestBindings(new Trigger(isMode(TestModes.CORAL_SHOOTER)), m_coDriverController);
 
-    m_elevator.setupTestBindings(new Trigger(isMode(TestModes.ELEVATOR)), m_coDriverController);
+    // m_elevator.setupTestBindings(new Trigger(isMode(TestModes.ELEVATOR)), m_coDriverController);
 
     m_climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), m_coDriverController);
 
@@ -185,19 +178,20 @@ public class RobotContainer {
         new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
 
     m_swerve.setupTestBindings(new Trigger(isMode(TestModes.SWERVE)), m_coDriverController);
-
-    // m_driverController.a().onTrue(m_selector.Align());
   }
 
   public void configureBindingsTeleop() {
 
-    m_driverController
-        .x()
-        .whileTrue(intakeAlgaeFloor)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+    // m_driverController
+    //     .x()
+    //     .whileTrue(intakeAlgaeFloor)
+    //     .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
-    m_driverController.a().onTrue(intakeCoral);
-    m_driverController.b().onTrue(shootAlgae);
+    // m_driverController.a().onTrue(intakeCoral);
+    // m_driverController.b().onTrue(shootAlgae);
+    // m_driverController.y().onTrue(shootAlgaeNet);
+
+    m_driverController.leftBumper().onTrue(m_selector.Align());
 
     m_climber.setDefaultCommand(
         m_climber.climberTestMode(
@@ -208,25 +202,25 @@ public class RobotContainer {
                     Constants.stickDeadband,
                     true)));
 
-    m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.y().onTrue(shootAlgaeNet);
+    // m_coDriverController.a().onTrue(shootCoral);
 
-    m_coDriverController
-        .y()
-        .whileTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
-    m_coDriverController
-        .x()
-        .whileTrue(intakeAlgaeL3)
-        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+    // m_coDriverController
+    //     .y()
+    //     .whileTrue(intakeAlgaeL2)
+    //     .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+    // m_coDriverController
+    //     .x()
+    //     .whileTrue(intakeAlgaeL3)
+    //     .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
-    m_coDriverController.povUp().onTrue(elevateL4);
-    m_coDriverController.povDown().onTrue(elevateL1);
-    m_coDriverController.povLeft().onTrue(elevateL3);
-    m_coDriverController.povRight().onTrue(elevateL2);
+    // m_coDriverController.povUp().onTrue(elevateL4);
+    // m_coDriverController.povDown().onTrue(elevateL1);
+    // m_coDriverController.povLeft().onTrue(elevateL3);
+    // m_coDriverController.povRight().onTrue(elevateL2);
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl();
+    // return Pathfinding.fullControl();
+    return null;
   }
 }
