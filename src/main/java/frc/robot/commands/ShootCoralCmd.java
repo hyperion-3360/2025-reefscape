@@ -34,7 +34,7 @@ public class ShootCoralCmd extends SequentialCommandGroup {
   }
 
   private shootSpeed getShootingSpeed(desiredHeight height) {
-    shootSpeed speed = shootSpeed.STOP;
+    shootSpeed speed;
     switch (height) {
       case L1:
         speed = shootSpeed.L1;
@@ -49,10 +49,10 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         speed = shootSpeed.L4;
         break;
       default:
-        speed = frc.robot.subsystems.Shooter.shootSpeed.STOP;
+        speed = shootSpeed.STOP;
         break;
     }
-    ;
+
     return speed;
   }
 }
