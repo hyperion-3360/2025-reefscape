@@ -213,7 +213,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public Pose2d getPose() {
     var curPos = poseEstimator.getEstimatedPosition();
-    System.out.println(String.format("x: %f y:%f", curPos.getX(), curPos.getY()));
+    // System.out.println(String.format("x: %f y:%f", curPos.getX(), curPos.getY()));
     return curPos;
   }
 
