@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
@@ -17,7 +18,7 @@ public class TeleopSwerve extends Command {
   private DoubleSupplier elevatorHeight;
 
   /**
-   * Swerve drive command for tele operation
+   * Swerve drive command for teleoperation
    *
    * @param s_Swerve swerve submodule instance
    * @param translationSup translation forward or backward
@@ -52,18 +53,22 @@ public class TeleopSwerve extends Command {
     double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
     double elevatorHeightVal = elevatorHeight.getAsDouble();
 
+    translationVal *= SwerveSpeedSlow(elevatorHeightVal);
+    strafeVal *= SwerveSpeedSlow(elevatorHeightVal);
+
+    SmartDashboard.putNumber("translation v", translationVal);
+    SmartDashboard.putNumber("strafe v", strafeVal);
+    SmartDashboard.putNumber("function value", SwerveSpeedSlow(elevatorHeightVal));
     /* Drive */
     s_Swerve.drive(
-        new Translation2d(translationVal, strafeVal)
-            .times(Constants.Swerve.maxSpeed)
-            .times(SwerveSpeedSlow(elevatorHeightVal)),
-        (rotationVal * Constants.Swerve.maxAngularVelocity) * SwerveSpeedSlow(elevatorHeightVal),
+        new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
+        (rotationVal * Constants.Swerve.maxAngularVelocity),
         !robotCentricSup.getAsBoolean(),
         true);
   }
 
   public double SwerveSpeedSlow(double elevatorHeight) {
-    var functionVal = (Math.pow(-0.8 * elevatorHeight, 3) / Constants.Swerve.maxSpeed) + 1;
+    var functionVal = (Math.pow(-1.5 * elevatorHeight, 3) / Constants.Swerve.maxSpeed) + 1;
     return MathUtil.clamp(functionVal, 0.2, 1);
   }
 }
