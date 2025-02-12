@@ -111,6 +111,7 @@ public class Pathfinding extends Command {
     private boolean consumable;
     private int priority;
     private Pose2d[] poseArray;
+    private Pose2d pose;
 
     /**
      * constructor stocking all the data we need per poi in variables
@@ -133,6 +134,7 @@ public class Pathfinding extends Command {
       this.conditions = removeCondition;
       this.poseArray = poseArray;
       this.priority = priority;
+      this.pose = changePose2d();
     }
 
     /**
@@ -155,6 +157,7 @@ public class Pathfinding extends Command {
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
+      this.pose = changePose2d();
     }
 
     /**
@@ -180,6 +183,7 @@ public class Pathfinding extends Command {
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
+      this.pose = changePose2d();
     }
 
     private Command getEvent() {
@@ -206,6 +210,10 @@ public class Pathfinding extends Command {
     }
 
     private Pose2d getPose2d() {
+      return pose;
+    }
+
+    private Pose2d changePose2d() {
 
       for (Pose2d coordinate : poseArray) {
         this.positionsList.add(coordinate);
@@ -225,6 +233,7 @@ public class Pathfinding extends Command {
         consumedPOIs.add(pose);
       }
       positionsList.clear();
+      this.pose = pose;
       return pose;
     }
   }
