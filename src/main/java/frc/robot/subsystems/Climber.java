@@ -44,7 +44,9 @@ public class Climber extends SubsystemBase implements TestBindings {
   private double kV = ClimberConstants.kG;
 
   private TalonFXConfiguration m_climberMotorConfig = new TalonFXConfiguration();
-  private TalonFX m_climberMotor = new TalonFX(SubsystemInfo.kClimberMotorID, "CANivore_3360");
+  private TalonFX m_shallowMotor =
+      new TalonFX(SubsystemInfo.kClimberShallowMotorID, "CANivore_3360");
+  private TalonFX m_deepMotor = new TalonFX(SubsystemInfo.kClimberDeepMotorID);
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
@@ -59,17 +61,16 @@ public class Climber extends SubsystemBase implements TestBindings {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
 
-  private TalonFXConfiguration m_climberConfig = new TalonFXConfiguration();
-
   public Climber() {
     // motor configs
     m_climberMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_climberMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
-    m_climberMotor.getConfigurator().apply(m_climberMotorConfig);
-
-    m_climberMotor.set(0);
+    m_shallowMotor.getConfigurator().apply(m_climberMotorConfig);
+    m_shallowMotor.set(0);
+    m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
+    m_deepMotor.set(0);
 
     SendableRegistry.add(this, "Climber", 0);
     SmartDashboard.putData("Climber", this);
@@ -134,11 +135,21 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   // This is for test mode
-  public Command climberTestMode(DoubleSupplier speed) {
+  public Command shallowClimb(DoubleSupplier speed) {
     return this.run(
         () -> {
-          m_direction = Math.signum(speed.getAsDouble());
-          m_climberMotor.set(Math.pow(speed.getAsDouble(), 2) * m_direction);
+          double val = speed.getAsDouble();
+          m_direction = Math.signum(val);
+          m_shallowMotor.set(Math.pow(val, 2) * m_direction);
+        });
+  }
+
+  public Command deepClimb(DoubleSupplier speed) {
+    return this.run(
+        () -> {
+          double val = speed.getAsDouble();
+          m_direction = Math.signum(val);
+          m_deepMotor.set(Math.pow(val, 2) * m_direction);
         });
   }
 
@@ -148,7 +159,17 @@ public class Climber extends SubsystemBase implements TestBindings {
     moduleTrigger
         .and(controller.leftBumper())
         .whileTrue(
-            this.climberTestMode(
+            this.shallowClimb(
+                () ->
+                    Joysticks.conditionJoystick(
+                        () -> controller.getRawAxis(translationAxis),
+                        climberSpeedLimiter,
+                        Constants.stickDeadband,
+                        true)));
+    moduleTrigger
+        .and(controller.rightBumper())
+        .whileTrue(
+            this.deepClimb(
                 () ->
                     Joysticks.conditionJoystick(
                         () -> controller.getRawAxis(translationAxis),

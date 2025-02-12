@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -54,6 +55,7 @@ public class RobotContainer {
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
   public static final Selection m_selector = new Selection(m_swerve);
+  private static SendableChooser<Command> m_climberCommand = new SendableChooser<>();
 
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -64,6 +66,8 @@ public class RobotContainer {
   private final SlewRateLimiter translationLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter strafeLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter rotationLimiter = new SlewRateLimiter(3);
+
+  private final SlewRateLimiter climberLimiter = new SlewRateLimiter(3);
 
   private final IntakeAlgaeCmd intakeAlgaeFloor =
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.LOW);
@@ -142,6 +146,26 @@ public class RobotContainer {
     SmartDashboard.putData("Algae Intake", setAlgaeIntakeMode());
     SmartDashboard.putData("Swerve", setSwerveMode());
     SmartDashboard.putData("Dumper", setDumperMode());
+    m_climberCommand.addOption(
+        "Shallow",
+        m_climber.shallowClimb(
+            () ->
+                Joysticks.conditionJoystick(
+                    () -> m_coDriverController.getLeftY(),
+                    climberLimiter,
+                    Constants.stickDeadband,
+                    true)));
+    m_climberCommand.setDefaultOption(
+        "Deep",
+        m_climber.deepClimb(
+            () ->
+                Joysticks.conditionJoystick(
+                    () -> m_coDriverController.getLeftY(),
+                    climberLimiter,
+                    Constants.stickDeadband,
+                    true)));
+
+    SmartDashboard.putData("Climber Mode", m_climberCommand);
 
     var teleopCmd =
         new TeleopSwerve(
@@ -196,14 +220,7 @@ public class RobotContainer {
     m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
 
-    // m_climber.setDefaultCommand(
-    //     m_climber.climberTestMode(
-    //         () ->
-    //             Joysticks.conditionJoystick(
-    //                 () -> m_coDriverController.getLeftY(),
-    //                 translationLimiter,
-    //                 Constants.stickDeadband,
-    //                 true)));
+    m_climber.setDefaultCommand(m_climberCommand.getSelected());
 
     m_coDriverController.a().onTrue(shootCoral);
     m_driverController.y().onTrue(shootAlgaeNet);

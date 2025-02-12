@@ -328,14 +328,13 @@ public final class Constants {
     // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders
     // motor ids
-    public static final int kCoralIntakeMotorClawID = 13;
-    public static final int kCoralIntakeMotorElbowID = 12;
     public static final int kAlgaeGrabberLeftMotorID = 15;
     public static final int kAlgaeGrabberRightMotorID = 16;
     public static final int kAlgaeArmMotorID = 14;
     public static final int kCoralShooterTalonID = 17;
     public static final int kCoralShooterServoID = 7;
-    public static final int kClimberMotorID = 11;
+    public static final int kClimberShallowMotorID = 11;
+    public static final int kClimberDeepMotorID = 12;
     public static final int kCoralDumperLeftServoID = 8;
     public static final int kCoralDumperRightServoID = 9;
 
