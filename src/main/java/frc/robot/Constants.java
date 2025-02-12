@@ -171,28 +171,9 @@ public final class Constants {
 
     public static final PathFollowingController kPathFollowController =
         new PPHolonomicDriveController(
-            new PIDConstants(0.05, 0.001, 0.0), // Translation PID constants
-            new PIDConstants(0.05, 0.001, 0.0) // Rotation PID constants
+            new PIDConstants(0.3, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(0.3, 0.0, 0.0) // Rotation PID constants
             );
-  }
-
-  public static final class Conditions {
-    // TODO put actual subsystems condition
-    public static boolean hasAlgae() {
-      boolean hasAlgae = false;
-      if (hasAlgae == true) {
-        return true;
-      }
-      return true;
-    }
-
-    public static boolean hasCoral() {
-      boolean hasCoral = false;
-      if (hasCoral == true) {
-        return true;
-      }
-      return true;
-    }
   }
 
   public static final class AlgaeCoralStand {
