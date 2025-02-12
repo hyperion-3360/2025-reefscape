@@ -357,14 +357,14 @@ public final class Constants {
         InvertedValue.Clockwise_Positive;
 
     // elevator heights
-    public static final double kElevatorDown = 0.01;
+    public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.45;
     public static final double kElevatorL2 = 0.63;
     public static final double kElevatorL3 = 0.965;
     public static final double kElevatorL4 = 1.46;
     public static final double kElevatorNet = 1.53;
     public static final double kElevatorProcessor = 0.25;
-    public static final double kElevatorAlgaeLow = 0.01;
+    public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.147;
     public static final double kElevatorAlgaeL2 = 0.64;
     public static final double kElevatorAlgaeL3 = 0.96;
