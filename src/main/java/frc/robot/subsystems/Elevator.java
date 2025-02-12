@@ -135,7 +135,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
       return;
     }
     if (heightEnum == desiredHeight.LOW && m_controller.atSetpoint()) {
-      System.out.println(heightEnum);
       m_controller.reset(0.01);
       m_controller.setGoal(0.01);
     }
