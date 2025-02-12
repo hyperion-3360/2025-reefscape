@@ -43,8 +43,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
     ALGAEL3
   }
 
-  private static double kP = 4.5;
-  private static double kI = 0.2;
+  private static double kP = 14.0;
+  private static double kI = 0.5;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
@@ -55,7 +55,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   //  private static double kG = 0.98; // not moving
   private static double kG = 0.47;
   private static double kA = 0.0;
-  private static double kV = 3.81;
+  private static double kV = 2.8; // 2.5 min
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
@@ -137,7 +137,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     }
     if (isElevatorAtBottom()) {
       m_rightElevatorMotor.setPosition(0.0);
-      m_controller.reset(0.0);
+      // m_controller.reset(0.0);
     }
 
     var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
