@@ -14,7 +14,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,18 +44,18 @@ public class Elevator extends SubsystemBase implements TestBindings {
   }
 
   private static double kP = 4.5;
-  private static double kI = 0.0;
+  private static double kI = 0.2;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
   private static double kMaxVelocity = 3;
-  private static double kMaxAcceleration = 1.5;
+  private static double kMaxAcceleration = 2.5;
 
   //  private static double kG = 0.98; // not moving
-  private static double kG = 0.70;
+  private static double kG = 0.47;
   private static double kA = 0.0;
-  private static double kV = 3.3;
+  private static double kV = 3.81;
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
@@ -78,7 +78,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
-  private DigitalInput m_sensor = new DigitalInput(9);
+  private AnalogPotentiometer m_sensor = new AnalogPotentiometer(0);
 
   //  private int test_heightIndex;
 
@@ -127,17 +127,17 @@ public class Elevator extends SubsystemBase implements TestBindings {
         (m_rightElevatorMotor.getPosition().getValueAsDouble() * toRotations) * pulleyCircumference;
     SmartDashboard.putNumber("elevator position", elevatorPos);
     SmartDashboard.putNumber("setpoint position", setPointPosition);
-    SmartDashboard.putBoolean("elevator sensor", m_sensor.get());
+    SmartDashboard.putBoolean("elevator sensor", m_sensor.get() >= 0.3);
+    SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
 
     if (DriverStation.isDisabled()) {
-      m_controller.reset(0.01);
-      m_controller.setGoal(0.01);
+      m_controller.reset(0.0);
+      m_controller.setGoal(0.0);
       return;
     }
-    if (heightEnum == desiredHeight.LOW && m_controller.atSetpoint()) {
-      System.out.println(heightEnum);
-      m_controller.reset(0.01);
-      m_controller.setGoal(0.01);
+    if (isElevatorAtBottom()) {
+      m_rightElevatorMotor.setPosition(0.0);
+      m_controller.reset(0.0);
     }
 
     var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
@@ -272,5 +272,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   public desiredHeight getTargetHeight() {
     return heightEnum;
+  }
+
+  public boolean isElevatorAtBottom() {
+    return m_sensor.get() >= 0.3;
   }
 }
