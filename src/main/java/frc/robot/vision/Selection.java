@@ -32,6 +32,9 @@ public class Selection extends Vision {
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
   double orientationMultipleY = 0;
+  // TODO: this is an abitrary value, to be measured
+  double pegDistFromTag = 0.2;
+
 
   Pose2d currentPose = new Pose2d();
 
@@ -41,7 +44,7 @@ public class Selection extends Vision {
   PIDController m_pid = new PIDController(kp, ki, kd);
   Pose2d desiredPose = new Pose2d();
 
-  private boolean hasAligned = false;
+  private boolean hasAlignedAlgae = false;
 
   public enum direction {
     left,
@@ -81,7 +84,7 @@ public class Selection extends Vision {
     setLockTarget();
     SmartDashboard.putNumber("lock id", lockID);
 
-    if (lockID != 0) {
+    if (lockID != 0 && !hasAlignedAlgae) {
       var desiredTranslation =
           new Translation2d(
               GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
@@ -99,26 +102,25 @@ public class Selection extends Vision {
 
   public Command MovePeg(direction direction) {
     // will have to do trigo, but make sure align works first.
+    var desiredTranslation = new Translation2d();
 
     switch (direction) {
       case left:
-        // desiredTranslation = // new Translation2d(2.66, 4.01);
-        //     new Translation2d(
-        //         GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
-        //         GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
-        // desiredPose = new Pose2d(desiredTranslation, new Rotation2d());
+        desiredTranslation = // new Translation2d(2.66, 4.01);
+            new Translation2d(
+                GetTagTranslation().getX() + (Math.sin(GetYaw()) * pegDistFromTag),
+                GetTagTranslation().getY() - (Math.sin(GetYaw()) * pegDistFromTag));
+        desiredPose = new Pose2d(desiredTranslation, new Rotation2d());
 
         break;
 
       case right:
-        // desiredTranslation = // new Translation2d(2.66, 4.01);
-        //     new Translation2d(
-        //         GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
-        //         GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
-        // desiredPose = new Pose2d(desiredTranslation, new Rotation2d());
+        desiredTranslation = // new Translation2d(2.66, 4.01);
+            new Translation2d(
+                GetTagTranslation().getX() - (Math.cos(GetYaw()) * desiredDistFromTag),
+                GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
+        desiredPose = new Pose2d(desiredTranslation, new Rotation2d());
 
-        // Reset odometry to the initial pose of the trajectory, run path following
-        // command, then stop at the end.
 
         break;
 
