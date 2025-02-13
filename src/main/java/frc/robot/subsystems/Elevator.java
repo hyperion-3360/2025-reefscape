@@ -14,6 +14,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,9 +43,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
     ALGAEL3
   }
 
-  private static double kP = 10.0;
-  private static double kI = 1.5;
-  private static double kD = 0.02;
+  private static double kP = 4.5;
+  private static double kI = 0.0;
+  private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
@@ -52,9 +53,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double kMaxAcceleration = 1.5;
 
   //  private static double kG = 0.98; // not moving
-  private static double kG = 0.90;
+  private static double kG = 0.70;
   private static double kA = 0.0;
-  private static double kV = 2.25;
+  private static double kV = 3.3;
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
@@ -77,6 +78,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private TalonFX m_leftElevatorMotor =
       new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
 
+  private DigitalInput m_sensor = new DigitalInput(9);
+
   //  private int test_heightIndex;
 
   private final int rightTriggerAxis = XboxController.Axis.kRightTrigger.value;
@@ -84,8 +87,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   private double elevatorPos;
 
-  public Elevator() {
+  private desiredHeight heightEnum = desiredHeight.LOW;
 
+  public Elevator() {
     // motor configs
     m_rightMotorConfig.MotorOutput.Inverted =
         Constants.ElevatorConstants.kRightElevatorMotorNotInverted;
@@ -123,14 +127,20 @@ public class Elevator extends SubsystemBase implements TestBindings {
         (m_rightElevatorMotor.getPosition().getValueAsDouble() * toRotations) * pulleyCircumference;
     SmartDashboard.putNumber("elevator position", elevatorPos);
     SmartDashboard.putNumber("setpoint position", setPointPosition);
+    SmartDashboard.putBoolean("elevator sensor", m_sensor.get());
 
     if (DriverStation.isDisabled()) {
       m_controller.reset(0.01);
       m_controller.setGoal(0.01);
       return;
     }
+    if (heightEnum == desiredHeight.LOW && m_controller.atSetpoint()) {
+      System.out.println(heightEnum);
+      m_controller.reset(0.01);
+      m_controller.setGoal(0.01);
+    }
 
-    var elevatorVelocity = m_rightElevatorMotor.getVelocity().getValueAsDouble();
+    var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
 
     var feedback = m_controller.calculate(elevatorPos);
     var setPointVelocity = m_controller.getSetpoint().velocity;
@@ -152,46 +162,57 @@ public class Elevator extends SubsystemBase implements TestBindings {
     switch (height) {
       case LOW:
         heightTarget = Constants.ElevatorConstants.kElevatorDown;
+        heightEnum = desiredHeight.LOW;
         break;
 
       case L1:
         heightTarget = Constants.ElevatorConstants.kElevatorL1;
+        heightEnum = desiredHeight.L1;
         break;
 
       case L2:
         heightTarget = Constants.ElevatorConstants.kElevatorL2;
+        heightEnum = desiredHeight.L2;
         break;
 
       case L3:
         heightTarget = Constants.ElevatorConstants.kElevatorL3;
+        heightEnum = desiredHeight.L3;
         break;
 
       case L4:
         heightTarget = Constants.ElevatorConstants.kElevatorL4;
+        heightEnum = desiredHeight.L4;
         break;
 
       case PROCESSOR:
         heightTarget = Constants.ElevatorConstants.kElevatorProcessor;
+        heightEnum = desiredHeight.PROCESSOR;
         break;
 
       case NET:
         heightTarget = Constants.ElevatorConstants.kElevatorNet;
+        heightEnum = desiredHeight.NET;
         break;
 
       case ALGAELOW:
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
+        heightEnum = desiredHeight.ALGAELOW;
         break;
 
       case FEEDER:
         heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
+        heightEnum = desiredHeight.FEEDER;
         break;
 
       case ALGAEL2:
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL2;
+        heightEnum = desiredHeight.ALGAEL2;
         break;
 
       case ALGAEL3:
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
+        heightEnum = desiredHeight.ALGAEL3;
         break;
     }
     m_controller.setGoal(heightTarget);
@@ -247,5 +268,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
     moduleTrigger.and(controller.y()).onTrue(this.Elevate(Elevator.desiredHeight.L1));
 
     moduleTrigger.and(controller.b()).onTrue(this.Elevate(Elevator.desiredHeight.L2));
+  }
+
+  public desiredHeight getTargetHeight() {
+    return heightEnum;
   }
 }

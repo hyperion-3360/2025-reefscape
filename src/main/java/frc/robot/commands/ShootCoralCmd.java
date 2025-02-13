@@ -15,7 +15,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 
 public class ShootCoralCmd extends SequentialCommandGroup {
-  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds, Elevator m_elevator, desiredHeight height) {
+  public ShootCoralCmd(Shooter m_shooter, LEDs m_leds, Elevator m_elevator) {
     addRequirements(m_shooter);
     addRequirements(m_leds);
     addRequirements(m_elevator);
@@ -24,9 +24,9 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_shooter.openBlocker()),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
-        Commands.runOnce(() -> m_shooter.setShoot(getShootingSpeed(height)))
+        Commands.runOnce(() -> m_shooter.setShoot(getShootingSpeed(m_elevator.getTargetHeight())))
             .until(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(1.2),
+        new WaitCommand(1.0),
         Commands.runOnce(() -> m_shooter.stop()),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
@@ -34,24 +34,25 @@ public class ShootCoralCmd extends SequentialCommandGroup {
   }
 
   private shootSpeed getShootingSpeed(desiredHeight height) {
-    shootSpeed speed =
-        switch (height) {
-          case L1 -> {
-            yield shootSpeed.L1;
-          }
-          case L2 -> {
-            yield shootSpeed.L2;
-          }
-          case L3 -> {
-            yield shootSpeed.L3;
-          }
-          case L4 -> {
-            yield shootSpeed.L4;
-          }
-          default -> {
-            yield shootSpeed.STOP;
-          }
-        };
+    shootSpeed speed;
+    switch (height) {
+      case L1:
+        speed = shootSpeed.L1;
+        break;
+      case L2:
+        speed = shootSpeed.L2;
+        break;
+      case L3:
+        speed = shootSpeed.L3;
+        break;
+      case L4:
+        speed = shootSpeed.L4;
+        break;
+      default:
+        speed = shootSpeed.STOP;
+        break;
+    }
+
     return speed;
   }
 }

@@ -18,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import frc.robot.vision.Vision;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -78,21 +80,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
       SmartDashboard.putData(m_field2d);
     }
 
-    //    for (SwerveModule mod : mSwerveMods) {
-    //     m_orchestra.addInstrument(mod.getDriveMotor());
-    //    m_orchestra.addInstrument(mod.getRotationMotor());
-    // }
-
-    //    m_orchestra.loadMusic(getName());
-    //    m_orchestra.play();
-
-    // m_odometry =
-    //     new SwerveDriveOdometry(
-    //         Constants.Swerve.swerveKinematics,
-    //         m_gyro.getRotation2d(),
-    //         positions,
-    //         new Pose2d(0, 0, new Rotation2d()));
-    // configurePathPlanner();
+    for (SwerveModule mod : mSwerveMods) {
+      m_orchestra.addInstrument(mod.getDriveMotor());
+      m_orchestra.addInstrument(mod.getRotationMotor());
+    }
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
@@ -105,10 +96,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void periodic() {
 
     // updates the odometry positon
-    // m_odometry.update(m_gyro.getRotation2d(), getModulePositions());
-    // Renews the field periodically
-    // m_field2d.setRobotPose(m_odometryPose);
-
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
     visionEst = vision.getEstimatedGlobalPose();
@@ -119,7 +106,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
-    // System.out.println(getRotation2d());
 
     if (m_debug) {
       // smartdashboardDebug();
@@ -227,7 +213,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public Pose2d getPose() {
     var curPos = poseEstimator.getEstimatedPosition();
-    System.out.println(String.format("x: %f y:%f", curPos.getX(), curPos.getY()));
+    // System.out.println(String.format("x: %f y:%f", curPos.getX(), curPos.getY()));
     return curPos;
   }
 
@@ -301,6 +287,17 @@ public class Swerve extends SubsystemBase implements TestBindings {
           return false;
         },
         this);
+  }
+
+  private Command playThemeMusic() {
+    return this.runOnce(
+        () -> {
+          var musicFilePath =
+              Filesystem.getDeployDirectory() + File.separator + "finalcountdown.chrp";
+          System.out.println(musicFilePath);
+          System.out.println(m_orchestra.loadMusic(musicFilePath));
+          System.out.println(m_orchestra.play());
+        });
   }
 
   @Override
