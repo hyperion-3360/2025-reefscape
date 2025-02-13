@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -40,22 +41,23 @@ public class Elevator extends SubsystemBase implements TestBindings {
     L3,
     L4,
     ALGAEL2,
-    ALGAEL3
+    ALGAEL3,
+    DONTPOUND
   }
 
-  private static double kP = 14.0;
-  private static double kI = 0.5;
+  private static double kP = 8.0;
+  private static double kI = 0.0;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 3;
-  private static double kMaxAcceleration = 2.5;
+  private static double kMaxVelocity = 2;
+  private static double kMaxAcceleration = 2;
 
   //  private static double kG = 0.98; // not moving
   private static double kG = 0.47;
   private static double kA = 0.0;
-  private static double kV = 2.8; // 2.5 min
+  private static double kV = 2.9; // 2.5 min
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
@@ -136,12 +138,11 @@ public class Elevator extends SubsystemBase implements TestBindings {
       return;
     }
     if (isElevatorAtBottom()) {
-      m_rightElevatorMotor.setPosition(0.0);
-      // m_controller.reset(0.0);
+      m_rightElevatorMotor.setPosition(0.0, 0.01);
+      m_controller.reset(0.0);
     }
 
     var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
-
     var feedback = m_controller.calculate(elevatorPos);
     var setPointVelocity = m_controller.getSetpoint().velocity;
     var feedforward = m_feedforward.calculate(setPointVelocity);
@@ -161,58 +162,74 @@ public class Elevator extends SubsystemBase implements TestBindings {
     var heightTarget = 0.0;
     switch (height) {
       case LOW:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorDown;
         heightEnum = desiredHeight.LOW;
         break;
 
       case L1:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL1;
         heightEnum = desiredHeight.L1;
         break;
 
       case L2:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL2;
         heightEnum = desiredHeight.L2;
         break;
 
       case L3:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL3;
         heightEnum = desiredHeight.L3;
         break;
 
       case L4:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL4;
         heightEnum = desiredHeight.L4;
         break;
 
       case PROCESSOR:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorProcessor;
         heightEnum = desiredHeight.PROCESSOR;
         break;
 
       case NET:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorNet;
         heightEnum = desiredHeight.NET;
         break;
 
       case ALGAELOW:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         heightEnum = desiredHeight.ALGAELOW;
         break;
 
       case FEEDER:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
         heightEnum = desiredHeight.FEEDER;
         break;
 
       case ALGAEL2:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL2;
         heightEnum = desiredHeight.ALGAEL2;
         break;
 
       case ALGAEL3:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
         heightEnum = desiredHeight.ALGAEL3;
+        break;
+      case DONTPOUND:
+        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        heightTarget = Constants.ElevatorConstants.kDontPound;
+        heightEnum = desiredHeight.DONTPOUND;
         break;
     }
     m_controller.setGoal(heightTarget);
@@ -276,5 +293,11 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   public boolean isElevatorAtBottom() {
     return m_sensor.get() >= 0.3;
+  }
+  private void slowDownWhenDescent(double height) {
+    if (height - m_controller.getSetpoint().position <= 0) {
+     m_controller.setConstraints(new Constraints(1, 1)); 
+    }
+     m_controller.setConstraints(new Constraints(kMaxVelocity, kMaxAcceleration)); 
   }
 }
