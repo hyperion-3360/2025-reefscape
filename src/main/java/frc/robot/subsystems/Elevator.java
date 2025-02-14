@@ -45,7 +45,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     DONTPOUND
   }
 
-  private static double kP = 5.3;
+  private static double kP = 6.3;
   private static double kI = 0.0;
   private static double kD = 0.0;
 
@@ -54,10 +54,10 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double kMaxVelocity = 4;
   private static double kMaxAcceleration = 4;
 
-  private static double kG = 0.41; // barely moves up
-  private static double kA = 0.4;
-  private static double kV = 5.0;
-  private static double kS = 0.0;
+  private static double kG = 0.48; // barely moves up
+  private static double kA = 0.95;
+  private static double kV = 5.1;
+  private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
   private static double pulleyCircumference = Math.PI * Units.inchesToMeters(pulleyDiam);
@@ -153,7 +153,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
 
     if (DriverStation.isDisabled()) {
-      m_rightElevatorMotor.setPosition(0.0);
       m_controller.reset(0.0);
       m_controller.setGoal(0.0);
       return;
