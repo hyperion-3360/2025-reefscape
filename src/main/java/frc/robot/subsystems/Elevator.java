@@ -45,24 +45,25 @@ public class Elevator extends SubsystemBase implements TestBindings {
     DONTPOUND
   }
 
-  private static double kP = 8.0;
+  private static double kP = 5.3;
   private static double kI = 0.0;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 2;
-  private static double kMaxAcceleration = 2;
+  private static double kMaxVelocity = 4;
+  private static double kMaxAcceleration = 4;
 
-  //  private static double kG = 0.98; // not moving
-  private static double kG = 0.47;
-  private static double kA = 0.0;
-  private static double kV = 2.9; // 2.5 min
-  private static double kS = 0.2;
+  private static double kG = 0.41; // barely moves up
+  private static double kA = 0.4;
+  private static double kV = 5.0;
+  private static double kS = 0.0;
 
   private static double pulleyDiam = 3;
   private static double pulleyCircumference = Math.PI * Units.inchesToMeters(pulleyDiam);
   private static double toRotations = 1 / (2 * Math.PI);
+  private static double gearRatio = 15.0;
+  private static double elevatorSlack = 0.0;
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
@@ -99,58 +100,83 @@ public class Elevator extends SubsystemBase implements TestBindings {
     m_rightMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_leftMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    m_rightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_rightMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
     m_rightMotorConfig.CurrentLimits.SupplyCurrentLimit =
         Constants.ElevatorConstants.kElevatorMotorCurrentLimit;
-    m_leftMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    m_leftMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
     m_leftMotorConfig.CurrentLimits.SupplyCurrentLimit =
         Constants.ElevatorConstants.kElevatorMotorCurrentLimit;
 
     m_rightElevatorMotor.getConfigurator().apply(m_rightMotorConfig);
     m_leftElevatorMotor.getConfigurator().apply(m_leftMotorConfig);
     m_leftElevatorMotor.setControl(m_follower);
-    m_rightElevatorMotor.setPosition(0.0, 0.15);
-    m_leftElevatorMotor.setPosition(0.0, 0.15);
+    m_rightElevatorMotor.setPosition(0.0);
+    m_leftElevatorMotor.setPosition(0.0);
 
     // SmartDashboard.putData("Elevator PID", m_feedback);
     // SmartDashboard.putData("Tunable feedforward", m_feedforward);
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
-    m_controller.setGoal(0.01);
+    m_controller.setGoal(0.0);
     // test_heightIndex = 0;
   }
 
   @Override
   public void periodic() {
-
+    if (isElevatorAtBottom()) {
+      elevatorSlack =
+          (((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
+                      * pulleyCircumference)
+                  / gearRatio)
+              * 10;
+    }
     var setPointPosition = m_controller.getSetpoint().position;
     // elevatorPos is changed periodically
     elevatorPos =
-        (m_rightElevatorMotor.getPosition().getValueAsDouble() * toRotations) * pulleyCircumference;
+        ((((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
+                        * pulleyCircumference)
+                    / gearRatio))
+                * 10
+            - elevatorSlack;
     SmartDashboard.putNumber("elevator position", elevatorPos);
+    SmartDashboard.putNumber(
+        "elevator raw pos",
+        (((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
+                    * pulleyCircumference)
+                / gearRatio)
+            * 10);
+    SmartDashboard.putNumber(
+        "elevator encoder position", m_rightElevatorMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("elevator slack", elevatorSlack);
     SmartDashboard.putNumber("setpoint position", setPointPosition);
     SmartDashboard.putBoolean("elevator sensor", m_sensor.get() >= 0.3);
     SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
 
     if (DriverStation.isDisabled()) {
+      m_rightElevatorMotor.setPosition(0.0);
       m_controller.reset(0.0);
       m_controller.setGoal(0.0);
       return;
     }
-    if (isElevatorAtBottom()) {
-      m_rightElevatorMotor.setPosition(0.0, 0.01);
+
+    if (isElevatorAtBottom() && heightEnum == desiredHeight.LOW) {
       m_controller.reset(0.0);
+      m_rightElevatorMotor.setVoltage(0.0);
     }
 
     var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
     var feedback = m_controller.calculate(elevatorPos);
+    SmartDashboard.putNumber("elevator feedback", feedback);
     var setPointVelocity = m_controller.getSetpoint().velocity;
     var feedforward = m_feedforward.calculate(setPointVelocity);
+    SmartDashboard.putNumber("elevator feedforward", feedforward);
     var output = feedback + feedforward;
 
     SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
     SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
     SmartDashboard.putNumber("output voltage", output);
+    SmartDashboard.putNumber(
+        "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
     SmartDashboard.putNumber("error", m_controller.getPositionError());
 
     // Run controller and update motor output
@@ -162,72 +188,72 @@ public class Elevator extends SubsystemBase implements TestBindings {
     var heightTarget = 0.0;
     switch (height) {
       case LOW:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorDown;
         heightEnum = desiredHeight.LOW;
         break;
 
       case L1:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL1;
         heightEnum = desiredHeight.L1;
         break;
 
       case L2:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL2;
         heightEnum = desiredHeight.L2;
         break;
 
       case L3:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL3;
         heightEnum = desiredHeight.L3;
         break;
 
       case L4:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL4;
         heightEnum = desiredHeight.L4;
         break;
 
       case PROCESSOR:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorProcessor;
         heightEnum = desiredHeight.PROCESSOR;
         break;
 
       case NET:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorNet;
         heightEnum = desiredHeight.NET;
         break;
 
       case ALGAELOW:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         heightEnum = desiredHeight.ALGAELOW;
         break;
 
       case FEEDER:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
         heightEnum = desiredHeight.FEEDER;
         break;
 
       case ALGAEL2:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL2;
         heightEnum = desiredHeight.ALGAEL2;
         break;
 
       case ALGAEL3:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
         heightEnum = desiredHeight.ALGAEL3;
         break;
       case DONTPOUND:
-        slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kDontPound;
         heightEnum = desiredHeight.DONTPOUND;
         break;
@@ -273,10 +299,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
             this.manualTest(
                 () ->
                     Joysticks.conditionJoystick(
-                        () -> controller.getRawAxis(rightTriggerAxis),
-                        elevatorLimiter,
-                        0.0,
-                        false)));
+                        () -> controller.getLeftY(), elevatorLimiter, 0.0, true)));
 
     moduleTrigger.and(controller.leftBumper()).onTrue(this.Elevate(Elevator.desiredHeight.L2));
 
@@ -294,10 +317,11 @@ public class Elevator extends SubsystemBase implements TestBindings {
   public boolean isElevatorAtBottom() {
     return m_sensor.get() >= 0.3;
   }
+
   private void slowDownWhenDescent(double height) {
     if (height - m_controller.getSetpoint().position <= 0) {
-     m_controller.setConstraints(new Constraints(1, 1)); 
+      m_controller.setConstraints(new Constraints(1, 1));
     }
-     m_controller.setConstraints(new Constraints(kMaxVelocity, kMaxAcceleration)); 
+    m_controller.setConstraints(new Constraints(kMaxVelocity, kMaxAcceleration));
   }
 }
