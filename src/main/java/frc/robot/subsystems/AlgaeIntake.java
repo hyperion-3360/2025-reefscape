@@ -43,7 +43,7 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
   }
 
   private static final double kP = 0.01;
-  private static final double kI = 0.0;
+  private static final double kI = 0.001;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
 
