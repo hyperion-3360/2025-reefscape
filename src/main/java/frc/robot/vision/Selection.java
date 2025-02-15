@@ -20,8 +20,6 @@ public class Selection extends Vision {
   double desiredDistFromTag = 1;
   double orientationMultipleY = 0;
   // TODO: this is an abitrary value, to be measured
-  double pegDistFromTag = 0.2;
-
 
   double kp = 0.03;
   double ki = 0;
@@ -70,12 +68,18 @@ public class Selection extends Vision {
 
   private void setLockTarget() {
 
-    for (var change : camera.getAllUnreadResults()) {
+    for (var change : limelight3.getAllUnreadResults()) {
 
       if (change.hasTargets()) {
 
         trackedTarget = change.getBestTarget();
-        lockID = trackedTarget.fiducialId;
+
+        for (int id : reefPegTag) {
+          if (id == trackedTarget.fiducialId) {
+            lockID = trackedTarget.fiducialId;
+            break;
+          }
+        }
       } else {
         lockID = 0;
       }

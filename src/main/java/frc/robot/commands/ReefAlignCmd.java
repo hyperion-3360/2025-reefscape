@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,7 +37,7 @@ public class ReefAlignCmd extends Command {
   private Selection selector;
   private direction direction;
   private Pose2d desiredPose;
-  private double pegDistFromTag = 0.0;
+  private double pegDistFromTag = Units.inchesToMeters(6.5);
   private Trajectory trajectory;
   private SwerveControllerCommand swerveControllerCommand;
   private boolean isFinished = false;
