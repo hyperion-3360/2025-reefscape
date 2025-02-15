@@ -356,6 +356,8 @@ public final class Constants {
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
 
+    public static final double kSensorTreshold = 0.3;
+
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;

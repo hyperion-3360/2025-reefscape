@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -153,8 +154,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
 
     if (DriverStation.isDisabled()) {
-      m_controller.reset(0.0);
-      m_controller.setGoal(0.0);
+      m_controller.reset(0.01);
+      m_controller.setGoal(0.01);
       return;
     }
 
@@ -177,6 +178,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber(
         "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
     SmartDashboard.putNumber("error", m_controller.getPositionError());
+    SmartDashboard.putNumber("sensor reading", m_sensor.get());
 
     // Run controller and update motor output
     m_rightElevatorMotor.setVoltage(output);
