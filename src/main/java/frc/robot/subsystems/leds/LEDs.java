@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Second;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -58,18 +59,9 @@ public class LEDs extends SubsystemBase {
 
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
+    m_led.setColorOrder(ColorOrder.kRGB);
     m_led.start();
     m_currentPattern.applyTo(m_ledBuffer);
-    swapRedGreenLEDs();
-  }
-
-  // Our LED strip is WS2811, red and green are inverted. Swap red and green on all leds.
-  private void swapRedGreenLEDs() {
-    for (int i = 0; i < m_ledBuffer.getLength(); i++) {
-      Color color = m_ledBuffer.getLED(i);
-      Color swappedRedGreen = new Color(color.green, color.red, color.blue);
-      m_ledBuffer.setLED(i, swappedRedGreen);
-    }
   }
 
   public void SetPattern(Pattern ledPattern) {
@@ -118,12 +110,10 @@ public class LEDs extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       SetPattern(Pattern.IDLE);
       m_currentPattern.applyTo(m_ledBuffer);
-      swapRedGreenLEDs();
       m_led.setData(m_ledBuffer);
     }
     if (m_isMovingPattern) {
       m_currentPattern.applyTo(m_ledBuffer);
-      swapRedGreenLEDs();
       m_led.setData(m_ledBuffer);
     }
   }
