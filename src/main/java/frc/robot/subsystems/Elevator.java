@@ -16,7 +16,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,17 +46,17 @@ public class Elevator extends SubsystemBase implements TestBindings {
   }
 
   private static double kP = 6.3;
-  private static double kI = 0.0;
-  private static double kD = 0.0;
+  private static double kI = 3.7;
+  private static double kD = 0.03;
 
   private static double kDt = 0.02;
 
   private static double kMaxVelocity = 4;
   private static double kMaxAcceleration = 4;
 
-  private static double kG = 0.48; // barely moves up
+  private static double kG = 0.41; // barely moves up
   private static double kA = 0.95;
-  private static double kV = 5.1;
+  private static double kV = 4.85;
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
@@ -152,7 +151,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("setpoint position", setPointPosition);
     SmartDashboard.putBoolean("elevator sensor", m_sensor.get() >= 0.3);
     SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
-
     if (DriverStation.isDisabled()) {
       m_controller.reset(0.01);
       m_controller.setGoal(0.01);
@@ -162,26 +160,26 @@ public class Elevator extends SubsystemBase implements TestBindings {
     if (isElevatorAtBottom() && heightEnum == desiredHeight.LOW) {
       m_controller.reset(0.0);
       m_rightElevatorMotor.setVoltage(0.0);
+    } else {
+
+      var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
+      var feedback = m_controller.calculate(elevatorPos);
+      SmartDashboard.putNumber("elevator feedback", feedback);
+      var setPointVelocity = m_controller.getSetpoint().velocity;
+      var feedforward = m_feedforward.calculate(setPointVelocity);
+      SmartDashboard.putNumber("elevator feedforward", feedforward);
+      var output = feedback + feedforward;
+
+      SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
+      SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
+      SmartDashboard.putNumber("output voltage", output);
+      SmartDashboard.putNumber(
+          "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
+      SmartDashboard.putNumber("error", m_controller.getPositionError());
+
+      // Run controller and update motor output
+      m_rightElevatorMotor.setVoltage(output);
     }
-
-    var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
-    var feedback = m_controller.calculate(elevatorPos);
-    SmartDashboard.putNumber("elevator feedback", feedback);
-    var setPointVelocity = m_controller.getSetpoint().velocity;
-    var feedforward = m_feedforward.calculate(setPointVelocity);
-    SmartDashboard.putNumber("elevator feedforward", feedforward);
-    var output = feedback + feedforward;
-
-    SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
-    SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
-    SmartDashboard.putNumber("output voltage", output);
-    SmartDashboard.putNumber(
-        "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("error", m_controller.getPositionError());
-    SmartDashboard.putNumber("sensor reading", m_sensor.get());
-
-    // Run controller and update motor output
-    m_rightElevatorMotor.setVoltage(output);
   }
 
   public void SetHeight(desiredHeight height) {

@@ -283,7 +283,7 @@ public final class Constants {
     public static final double kShootL2 = -1.0;
     public static final double kShootL3 = -1.0;
     public static final double kShootL4 = -1.0;
-    public static final double kIntakeSpeed = -0.5;
+    public static final double kIntakeSpeed = -0.6;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
     public static final int kCoralShooterCurrentLimit = 30;
@@ -356,21 +356,19 @@ public final class Constants {
     public static final InvertedValue kRightElevatorMotorNotInverted =
         InvertedValue.Clockwise_Positive;
 
-    public static final double kSensorTreshold = 0.3;
-
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;
-    public static final double kElevatorL2 = 0.70;
-    public static final double kElevatorL3 = 1.12;
-    public static final double kElevatorL4 = 2.95;
-    public static final double kElevatorNet = 3.40;
+    public static final double kElevatorL2 = 1.14;
+    public static final double kElevatorL3 = 1.78;
+    public static final double kElevatorL4 = 2.83;
+    public static final double kElevatorNet = 2.96;
     public static final double kElevatorProcessor = 0.25;
     public static final double kElevatorAlgaeLow = 0.0;
-    public static final double kElevatorFeeder = 0.157;
+    public static final double kElevatorFeeder = 0.207;
     public static final double kElevatorAlgaeL2 = 0.64;
     public static final double kElevatorAlgaeL3 = 0.96;
-    public static final double kDontPound = 0.65;
+    public static final double kDontPound = 0.67;
   }
 
   public static class AlgaeIntakeConstants {

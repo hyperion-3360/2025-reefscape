@@ -13,6 +13,7 @@ public class LowerElevatorCmd extends SequentialCommandGroup {
   public LowerElevatorCmd(Elevator m_elevator, LEDs m_leds, Shooter m_shooter) {
     addRequirements(m_elevator);
     addRequirements(m_leds);
+    addRequirements(m_shooter);
     addCommands(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
