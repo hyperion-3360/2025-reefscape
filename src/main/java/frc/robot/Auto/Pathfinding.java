@@ -249,7 +249,8 @@ public class Pathfinding extends Command {
     SIXTHAUTO(POI.ALGAE, POI.BRANCHES),
     SEVENTHAUTO(POI.ALGAE, POI.BRANCHES),
     EIGHTHAUTO(POI.ALGAE, POI.BRANCHES),
-    NINTHUTO(POI.ALGAE, POI.BRANCHES);
+    NINTHUTO(POI.ALGAE, POI.BRANCHES),
+    DUMPING(POI.DUMPINGDOWN);
 
     private POI[] desiredPOIs;
 
@@ -651,14 +652,8 @@ public class Pathfinding extends Command {
       poiList.add(poiArrayElement);
 
       pathfindingSequence.addCommands(
-          AutoBuilder.pathfindThenFollowPath(
-              new PathPlannerPath(
-                  convertToWaypoints(POICoordinatesOptimisation(poiArrayElement)),
-                  constraints,
-                  new IdealStartingState(0, poiArrayElement.getPose2d().getRotation()),
-                  new GoalEndState(0, poiArrayElement.getPose2d().getRotation())),
-              constraints),
-          poiArrayElement.getEvent(),
+          AutoBuilder.pathfindToPose(POICoordinatesOptimisation(poiArrayElement), constraints)
+              .alongWith(poiArrayElement.getEvent()),
           new WaitUntilCommand(() -> poiArrayElement.getEvent().isFinished()));
     }
     return pathfindingSequence;
