@@ -26,7 +26,6 @@ public class LEDs extends SubsystemBase {
     CLIMBER,
     SHOOTER,
     ELEVATOR,
-    PULSE,
     IDLE
   }
 
@@ -42,18 +41,6 @@ public class LEDs extends SubsystemBase {
   private LEDPattern m_currentPattern =
       LEDPattern.rainbow(255, 255).scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
 
-  private double multiplier = 0;
-  private int pixelIndex = 0;
-  double zeroPos = 0;
-
-  // shuffleboard values
-  private String tabName = "LEDs";
-  private int r = 0;
-  private int g = 0;
-  private int b = 0;
-  private int pulseSpeed = 0;
-  private double pulseDelay = 0;
-
   // Our LED strip has dim red LEDS. This creates a better orange.
   private Color kTrueOrange = new Color(255, 10, 0);
 
@@ -67,8 +54,10 @@ public class LEDs extends SubsystemBase {
   public void SetPattern(Pattern ledPattern) {
     switch (ledPattern) {
       case IDLE:
-        m_currentPattern = LEDPattern.solid(kTrueOrange);
-        m_isMovingPattern = false;
+        m_currentPattern =
+            LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kBlack, kTrueOrange)
+                .scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
+        m_isMovingPattern = true;
         break;
 
       case INTAKE:
@@ -93,13 +82,6 @@ public class LEDs extends SubsystemBase {
 
       case CLIMBER:
         m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.05));
-        m_isMovingPattern = true;
-        break;
-
-      case PULSE:
-        m_currentPattern =
-            LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kBlack, kTrueOrange)
-                .scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
         m_isMovingPattern = true;
         break;
     }
