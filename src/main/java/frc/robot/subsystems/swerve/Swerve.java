@@ -131,7 +131,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     if (visionEst.isPresent() && !hasStartedEstimation) {
       hasStartedEstimation = true;
-      estimatePose();
+      // estimatePose();
     }
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
