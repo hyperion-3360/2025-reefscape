@@ -379,7 +379,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
           var alliance = DriverStation.getAlliance();
           if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
+            return alliance.get() == DriverStation.Alliance.Blue;
           }
           return false;
         },

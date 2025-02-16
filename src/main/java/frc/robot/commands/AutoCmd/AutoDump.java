@@ -19,6 +19,7 @@ public class AutoDump extends SequentialCommandGroup {
             () -> {
               m_dumper.dumpLeft();
               m_dumper.dumpRight();
+              System.out.println("this is working but it doesn't get me closer to the truth");
             }),
         Commands.print("hello"));
   }
