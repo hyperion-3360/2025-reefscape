@@ -22,6 +22,7 @@ import frc.robot.commands.NetAlgaeShootCmd;
 import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.VomitCoralCmd;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Climber;
@@ -81,6 +82,8 @@ public class RobotContainer {
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
+  private final VomitCoralCmd vomitCoral =
+      new VomitCoralCmd(m_shooter, m_leds, m_elevator, m_coDriverController.getHID());
 
   private final ElevateCmd elevateL1 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L1);

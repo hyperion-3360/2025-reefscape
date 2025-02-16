@@ -50,6 +50,7 @@ Maintenir X BUTTON: Intake algue L2
 Maintenir Y BUTTON: Intake algue L3
 Appuyer A BUTTON: Shoot corail
 Maintenir LEFT BUMPER: commande automatique pour positionner le robot à la feeding station et être prêt à recevoir un corail du human player
+Maintenir RIGHT BUMPER: vomit coral.
 
 # Foire aux questions
 
