@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
+import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -101,6 +102,7 @@ public class RobotContainer {
       new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
+  private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
   private final AutoFeast cycleToFeeder = new AutoFeast(m_elevator, m_shooter, m_leds);
 
   public enum TestModes {
@@ -146,6 +148,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     NamedCommands.registerCommand("dumper", dumpAuto);
+    NamedCommands.registerCommand("feed", feed);
     NamedCommands.registerCommand("print", Commands.print("henlllllllo"));
     // Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
     // Auto.initAutoWidget();
@@ -227,6 +230,9 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
+    m_driverController.leftBumper().onTrue(dumpAuto);
+    m_driverController.rightBumper().onTrue(dumpAuto.cancelDumper(m_dumper));
+
     m_driverController
         .x()
         .toggleOnTrue(intakeAlgaeFloor)
@@ -295,7 +301,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.setPose(new Pose2d(7.500, 6.500, Rotation2d.fromDegrees(180)));
+    m_swerve.setPose(new Pose2d(7.180, 3.000, Rotation2d.fromDegrees(180)));
     return new PathPlannerAuto("dump");
   }
 }

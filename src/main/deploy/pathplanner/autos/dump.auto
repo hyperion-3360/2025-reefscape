@@ -11,13 +11,38 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Dump_low"
+                  "pathName": "Dump_low PL"
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "dumper"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.34
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "dumper"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 2.1
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "feed"
+                      }
+                    }
+                  ]
                 }
               }
             ]
