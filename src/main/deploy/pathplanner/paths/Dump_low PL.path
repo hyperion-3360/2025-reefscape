@@ -8,36 +8,52 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.018571113895725,
-        "y": 4.055308416727426
+        "x": 6.044936409512081,
+        "y": 3.7723620079659117
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.2657031342789935,
-        "y": 2.86359804514292
+        "x": 4.794742039087656,
+        "y": 2.5690841185080036
       },
       "prevControl": {
-        "x": 6.080773459254084,
-        "y": 3.258313130043648
+        "x": 5.726898234149261,
+        "y": 3.042797947931338
       },
       "nextControl": {
-        "x": 4.700429124858886,
-        "y": 2.5898521218972768
+        "x": 3.5571026686075564,
+        "y": 1.940126344326751
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.396,
-        "y": 1.925156242783005
+        "x": 0.8571914337723417,
+        "y": 1.3371796530578082
       },
       "prevControl": {
-        "x": 4.981535229863347,
-        "y": 2.6768639641839114
+        "x": 4.070579322608742,
+        "y": 2.2387494267644104
+      },
+      "nextControl": {
+        "x": 0.6164858822266819,
+        "y": 1.26964568045809
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.740134731493586,
+        "y": 2.7564270638062647
+      },
+      "prevControl": {
+        "x": 1.233496740696698,
+        "y": 1.7716075304324055
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +63,15 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.4500730014176529,
-      "rotationDegrees": -156.467
+      "rotationDegrees": -150.846
+    },
+    {
+      "waypointRelativePos": 1.5358001889561774,
+      "rotationDegrees": -150.846
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": -126.0
     }
   ],
   "constraintZones": [],
@@ -61,7 +85,7 @@
     },
     {
       "name": "dumper",
-      "waypointRelativePos": 1.1,
+      "waypointRelativePos": 1.2,
       "endWaypointRelativePos": 1.0,
       "command": null
     }
