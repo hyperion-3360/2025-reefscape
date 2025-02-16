@@ -136,7 +136,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       SmartDashboard.putNumber("PPID X", x);
 
-      _drive(new Translation2d(x, 0), 0, false, true);
+      drive(new Translation2d(x, 0), 0, false, true);
     }
   }
 
@@ -191,7 +191,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
   }
 
-  private void _drive(
+  public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(
@@ -201,12 +201,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
     setStates(swerveModuleStates, isOpenLoop);
-  }
-
-  public void drive(
-      Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    _drive(translation, rotation, fieldRelative, isOpenLoop);
-    m_targetModeEnabled = false;
   }
 
   public void setStates(SwerveModuleState[] targetStates, boolean isOpenLoop) {

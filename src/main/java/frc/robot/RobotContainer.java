@@ -225,7 +225,10 @@ public class RobotContainer {
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
 
-    m_driverController.leftBumper().onTrue(Commands.runOnce(() -> m_swerve.drivetoTarget(new Pose2d(4, 0, new Rotation2d())))).onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+    m_driverController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_swerve.drivetoTarget(new Pose2d(4, 0, new Rotation2d()))))
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
   }
 
   public Command getAutonomousCommand() {
