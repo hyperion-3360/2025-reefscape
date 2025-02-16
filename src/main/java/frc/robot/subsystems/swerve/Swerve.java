@@ -173,6 +173,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
     return m_targetModeEnabled && isAlmostEqual(pos, goal, 0.1);
   }
 
+  public void disableDriveToTarget() {
+    m_targetModeEnabled = false;
+  }
+
   public void drivetoTarget(Pose2d target) {
     drivetoTarget(target, 0);
   }
