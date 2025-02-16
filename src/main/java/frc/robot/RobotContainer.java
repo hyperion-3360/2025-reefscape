@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,7 +18,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
+import frc.robot.Auto.Pathfinding;
+import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.commands.AutoCmd.AutoDump;
+import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -99,6 +101,7 @@ public class RobotContainer {
   private final LowerElevatorCmd elevateLOW = new LowerElevatorCmd(m_elevator, m_leds, m_shooter);
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
+  private final AutoFeast cycleToFeeder = new AutoFeast(m_elevator, m_shooter, m_leds);
 
   public enum TestModes {
     NONE,
@@ -224,9 +227,6 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    m_driverController.rightBumper().onTrue(dumpAuto);
-    m_driverController.leftBumper().onTrue(dumpAuto.cancelDumper(m_dumper));
-
     m_driverController
         .x()
         .whileTrue(intakeAlgaeFloor)
@@ -254,10 +254,15 @@ public class RobotContainer {
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
+
+    m_coDriverController
+        .leftBumper()
+        .whileTrue(cycleToFeeder)
+        .onFalse(Commands.runOnce(() -> cycleToFeeder.cancel(), m_elevator, m_shooter, m_leds));
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.setPose(new Pose2d(7.500, 3.500, Rotation2d.fromDegrees(180)));
-    return new PathPlannerAuto("dump");
+    m_swerve.setPose(new Pose2d(7.500, 6.500, Rotation2d.fromDegrees(180)));
+    return Pathfinding.goThere(POI.BRANCHES);
   }
 }
