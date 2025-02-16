@@ -5,8 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -228,7 +226,7 @@ public class RobotContainer {
     m_driverController
         .leftBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(new Pose2d(4, 0, new Rotation2d())))
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredpose()))
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
