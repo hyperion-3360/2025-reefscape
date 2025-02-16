@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.List;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
+import java.util.List;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ReefAlignCmd extends Command {
@@ -59,8 +58,10 @@ public class ReefAlignCmd extends Command {
       case Left:
         desiredTranslation = // new Translation2d(2.66, 4.01);
             new Translation2d(
-                selector.GetTagTranslation().getX() + (Math.sin(selector.GetTagYaw()) * pegDistFromTag),
-                selector.GetTagTranslation().getY() - (Math.sin(selector.GetTagYaw()) * pegDistFromTag));
+                selector.GetTagTranslation().getX()
+                    + (Math.sin(selector.GetTagYaw()) * pegDistFromTag),
+                selector.GetTagTranslation().getY()
+                    - (Math.sin(selector.GetTagYaw()) * pegDistFromTag));
         desiredRot = selector.GetTagYaw() + Math.toRadians(180);
         desiredPose = new Pose2d(desiredTranslation, new Rotation2d(desiredRot));
 
@@ -69,11 +70,12 @@ public class ReefAlignCmd extends Command {
       case Right:
         desiredTranslation = // new Translation2d(2.66, 4.01);
             new Translation2d(
-              selector.GetTagTranslation().getX() - (Math.cos(selector.GetTagYaw()) * pegDistFromTag),
-              selector.GetTagTranslation().getY() + (Math.sin(selector.GetTagYaw()) * pegDistFromTag));
+                selector.GetTagTranslation().getX()
+                    - (Math.cos(selector.GetTagYaw()) * pegDistFromTag),
+                selector.GetTagTranslation().getY()
+                    + (Math.sin(selector.GetTagYaw()) * pegDistFromTag));
         desiredRot = selector.GetTagYaw() + Math.toRadians(180);
         desiredPose = new Pose2d(desiredTranslation, new Rotation2d(desiredRot));
-
 
         break;
 

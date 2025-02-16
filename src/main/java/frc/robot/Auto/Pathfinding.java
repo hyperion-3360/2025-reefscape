@@ -43,8 +43,7 @@ import java.util.stream.Collectors;
  * <p>4. Finally pathfind to the best POI and once you reach it: execute the method or sequence
  * attached to it
  *
- * <p>Basically this class acts like a big filter that funels the best POI given the constraints
-and
+ * <p>Basically this class acts like a big filter that funels the best POI given the constraints and
  * vomits that to the Pathfinder class
  */
 public class Pathfinding extends Command {
@@ -162,8 +161,7 @@ public class Pathfinding extends Command {
      * constructor allowing the input of an array of points, then filters and sort to give the
      * closest one and stores that.
      *
-     * @param xyThetacoordinates an array of (x, y, θ) coordinates we want to possibly pathfind
-to
+     * @param xyThetacoordinates an array of (x, y, θ) coordinates we want to possibly pathfind to
      * @param event the sequence we want the robot to perform when arriving on point
      * @param priority how bad we want to pathfind to this point
      * @param consumable if we should remove the point we just pathfinded to.
@@ -303,8 +301,7 @@ to
   private static Dumper s_dumper;
 
   public static void configurePathfinder(
-      Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper)
-{
+      Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
     Shooter s_shooter = shooter;
     Swerve s_swerve = swerve;
     Elevator s_elevator = elevator;
@@ -444,8 +441,7 @@ to
     Translation2d widthToBacktrack =
         new Translation2d(
             poiToPathfind.getCoordinates().getX() - robotHyp * poiToPathfind.getAngle().getCos(),
-            poiToPathfind.getCoordinates().getY() - poiToPathfind.getAngle().getSin() *
-robotHyp);
+            poiToPathfind.getCoordinates().getY() - poiToPathfind.getAngle().getSin() * robotHyp);
 
     // TODO make this code more modular for the future
     if (poiToPathfind.equals(POI.ALGAE)) {
@@ -477,8 +473,7 @@ robotHyp);
 
   // #region Pathfinding Shuffleboard implementation
   /**
-   * creates the chooser widget for the autonomous mode acts like a main shuffleboard method for
-the
+   * creates the chooser widget for the autonomous mode acts like a main shuffleboard method for the
    * Pathfinding class
    */
   public static void makeChooserWidget() {
@@ -526,8 +521,7 @@ the
   }
 
   /**
-   * this method reads a string returned by the shuffleboard auto chooser and returns the pois
-that
+   * this method reads a string returned by the shuffleboard auto chooser and returns the pois that
    * are contained withing that string
    *
    * @param inputPOI the string returned by the shuffleboard auto chooser

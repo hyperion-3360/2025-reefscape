@@ -1,6 +1,5 @@
 package frc.robot.Auto;
 
-
 /** this class handles the shuffleboard implementation for the pathfinding commands */
 public class Auto {
 

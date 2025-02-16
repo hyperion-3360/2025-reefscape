@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +25,10 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class Vision extends SubsystemBase {
 
   protected final PhotonCamera limelight3;
-  protected final PhotonCamera limelight2;
+  // protected final PhotonCamera limelight2;
 
   protected final PhotonPoseEstimator photonEstimatorLml3;
-  protected final PhotonPoseEstimator photonEstimatorLml2;
+  // protected final PhotonPoseEstimator photonEstimatorLml2;
 
   protected Matrix<N3, N1> curStdDevs;
 
@@ -37,23 +36,28 @@ public class Vision extends SubsystemBase {
   private Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
   private Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
-  AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  AprilTagFieldLayout tagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(new Translation3d(-0.03, 0.0, 0.0), new Rotation3d(0, 0, 0));
-      Transform3d robotToCamLml2 =
-      new Transform3d(new Translation3d(-0.15, 0.0, 0.0), new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
+  // Transform3d robotToCamLml2 =
+  // new Transform3d(new Translation3d(-0.15, 0.0, 0.0), new Rotation3d(0, 0,
+  // Units.degreesToRadians(180)));
 
   /** Creates a new Odometry. */
   public Vision() {
 
     limelight3 = new PhotonCamera("lml3");
-    limelight2 = new PhotonCamera("lml2");
+    // limelight2 = new PhotonCamera("lml2");
     photonEstimatorLml3 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
+        new PhotonPoseEstimator(
+            tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
     photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    photonEstimatorLml2 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml2);
-    photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    // photonEstimatorLml2 =
+    //     new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+    // robotToCamLml2);
+    // photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
@@ -61,18 +65,25 @@ public class Vision extends SubsystemBase {
 
     // for a change in target (latest result), estimation.update with latest
     // update estimation standard deviations with new estimation and new target
-    // if the limelight3 is not empty, prioritize its vision since better quality, otherwise use limelight2
-    if (!limelight3.getAllUnreadResults().isEmpty()) {
+    // if the limelight3 is not empty, prioritize its vision since better quality, otherwise use
+    // limelight2
+    //   if (!limelight3.getAllUnreadResults().isEmpty()) {
+    //   for (var change : limelight3.getAllUnreadResults()) {
+    //     visionEst = photonEstimatorLml3.update(change);
+    //     updateEstimationStdDevs(visionEst, change.getTargets());
+    //   }
+    // } else {
+    //   for (var change : limelight2.getAllUnreadResults()) {
+    //     visionEst = photonEstimatorLml2.update(change);
+    //     updateEstimationStdDevs(visionEst, change.getTargets());
+    //   }
+    // }
+
     for (var change : limelight3.getAllUnreadResults()) {
       visionEst = photonEstimatorLml3.update(change);
       updateEstimationStdDevs(visionEst, change.getTargets());
     }
-  } else {
-    for (var change : limelight2.getAllUnreadResults()) {
-      visionEst = photonEstimatorLml2.update(change);
-      updateEstimationStdDevs(visionEst, change.getTargets());
-    }
-  }
+
     return visionEst;
   }
 
