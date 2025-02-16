@@ -55,6 +55,12 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private Pose2d startPose = new Pose2d();
   private Pose2d endPose = new Pose2d();
   private List<Translation2d> waypoints = List.of();
+  private boolean m_targetModeEnabled = false;
+  private ProfiledPIDController m_xController;
+  TrapezoidProfile.Constraints m_xConstraints;
+  private final double kMaxSpeedMetersPerSecondX = 1.0;
+  private final double kMaxAccelerationMetersPerSecondSquaredX = 1.0;
+  private final double kPX = 0.1;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -88,6 +94,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
+    m_xController = new ProfiledPIDController(kPX, 0, 0, m_xConstraints);
   }
 
   /* periodic */
@@ -121,6 +131,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
       SmartDashboard.putNumber("currentpose X", poseEstimator.getEstimatedPosition().getX());
       SmartDashboard.putNumber("currentpose Y", poseEstimator.getEstimatedPosition().getY());
     }
+
+    if (m_targetModeEnabled) {
+      var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
+      SmartDashboard.putNumber("PPID X", x);
+
+      _drive(new Translation2d(x, 0), 0, false, true);
+    }
   }
 
   /* thread */
@@ -142,7 +159,35 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   /* drive related things */
 
-  public void drive(
+  private boolean isAlmostEqual(double a, double b, double epsilon) {
+    return Math.abs(a - b) < epsilon;
+  }
+
+  public boolean targetReached() {
+    var pos = getPose().getX();
+    var goal = m_xController.getGoal().position;
+
+    SmartDashboard.putNumber("Target mode: goal ", goal);
+    SmartDashboard.putNumber("Target mode pos ", pos);
+
+    return m_targetModeEnabled && isAlmostEqual(pos, goal, 0.1);
+  }
+
+  public void drivetoTarget(Pose2d target) {
+    drivetoTarget(target, 0);
+  }
+
+  public void drivetoTarget(Pose2d target, double rotation) {
+    if (target == Pose2d.kZero) {
+      m_targetModeEnabled = false;
+    } else {
+      m_targetModeEnabled = true;
+      m_xController.reset(getPose().getX());
+      m_xController.setGoal(target.getX());
+    }
+  }
+
+  private void _drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(
@@ -152,6 +197,12 @@ public class Swerve extends SubsystemBase implements TestBindings {
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
     setStates(swerveModuleStates, isOpenLoop);
+  }
+
+  public void drive(
+      Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    _drive(translation, rotation, fieldRelative, isOpenLoop);
+    m_targetModeEnabled = false;
   }
 
   public void setStates(SwerveModuleState[] targetStates, boolean isOpenLoop) {
