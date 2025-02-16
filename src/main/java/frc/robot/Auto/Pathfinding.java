@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
@@ -92,10 +93,10 @@ public class Pathfinding extends Command {
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn()),
     DUMPINGDOWN(
-        4.073906,
-        3.306318,
-        210,
-        () -> Commands.runOnce(() -> System.out.println("Hello World")),
+        4.185,
+        2.218,
+        216.715,
+        () -> m_dump,
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn());
 
@@ -129,7 +130,9 @@ public class Pathfinding extends Command {
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
-      Pose2d[] poseArray = {new Pose2d(x_coordinates, y_coordinates, new Rotation2d(angle))};
+      Pose2d[] poseArray = {
+        new Pose2d(x_coordinates, y_coordinates, Rotation2d.fromDegrees(angle))
+      };
       this.event = event;
       this.conditions = removeCondition;
       this.poseArray = poseArray;
@@ -152,7 +155,7 @@ public class Pathfinding extends Command {
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
-      Pose2d[] poseArray = {new Pose2d(xy_coordinates, new Rotation2d(angle))};
+      Pose2d[] poseArray = {new Pose2d(xy_coordinates, Rotation2d.fromDegrees(angle))};
       this.poseArray = poseArray;
       this.conditions = removeCondition;
       this.event = event;
@@ -285,6 +288,8 @@ public class Pathfinding extends Command {
   private static Elevator s_elevator;
   private static AlgaeIntake s_algaeIntake;
   private static Dumper s_dumper;
+
+  private static AutoDump m_dump = new AutoDump(RobotContainer.m_dumper);
 
   public static void configurePathfinder(
       Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {

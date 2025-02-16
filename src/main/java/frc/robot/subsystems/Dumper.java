@@ -15,11 +15,18 @@ public class Dumper extends SubsystemBase implements TestBindings {
   public Dumper() {}
 
   public void dumpRight() {
-    rightServo.setAngle(60);
+    rightServo.setAngle(55);
+    System.out.println(rightServo.getAngle());
   }
 
   public void dumpLeft() {
-    leftServo.setAngle(60);
+    leftServo.setAngle(75);
+    System.out.println(leftServo.getAngle());
+  }
+
+  public void closeDump() {
+    leftServo.setAngle(55);
+    rightServo.setAngle(75);
   }
 
   @Override
