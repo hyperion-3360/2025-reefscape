@@ -227,7 +227,13 @@ public class RobotContainer {
 
     m_driverController
         .leftBumper()
-        .onTrue(Commands.runOnce(() -> m_swerve.drivetoTarget(new Pose2d(4, 0, new Rotation2d()))))
+        .onTrue(
+            Commands.runOnce(() -> m_swerve.drivetoTarget(new Pose2d(4, 0, new Rotation2d())))
+            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+            // m_leds.SetPattern(LEDs.Pattern.READY)))
+            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
+            // m_leds.SetPattern(LEDs.Pattern.READY)))
+            )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
   }
 

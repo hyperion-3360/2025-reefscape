@@ -60,7 +60,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   TrapezoidProfile.Constraints m_xConstraints;
   private final double kMaxSpeedMetersPerSecondX = 1.0;
   private final double kMaxAccelerationMetersPerSecondSquaredX = 1.0;
-  private final double kPX = 0.1;
+  private final double kPX = 1.0;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -134,9 +134,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     if (m_targetModeEnabled) {
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
+      SmartDashboard.putNumber("target pose X", m_xController.getGoal().position);
+      SmartDashboard.putNumber("current pose X", getPose().getX());
       SmartDashboard.putNumber("PPID X", x);
 
-      drive(new Translation2d(x, 0), 0, false, true);
+      _drive(new Translation2d(x, 0), 0, false, true);
     }
   }
 
@@ -177,6 +179,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_targetModeEnabled = false;
   }
 
+  public boolean targetDriveDisabled() {
+    return m_targetModeEnabled == false;
+  }
+
   public void drivetoTarget(Pose2d target) {
     drivetoTarget(target, 0);
   }
@@ -188,10 +194,16 @@ public class Swerve extends SubsystemBase implements TestBindings {
       m_targetModeEnabled = true;
       m_xController.reset(getPose().getX());
       m_xController.setGoal(target.getX());
+      System.out.println(" Drive to target: " + target.getX());
     }
   }
 
   public void drive(
+      Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    if (!m_targetModeEnabled) _drive(translation, rotation, fieldRelative, isOpenLoop);
+  }
+
+  private void _drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(
