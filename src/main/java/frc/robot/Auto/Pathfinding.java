@@ -285,7 +285,7 @@ public class Pathfinding extends Command {
   protected static List<POI> poiList = new ArrayList<>();
   private static POI bestPOI;
   private static PathConstraints constraints =
-      new PathConstraints(1.0, 2.0, Units.degreesToRadians(180), Units.degreesToRadians(180));
+      new PathConstraints(0.5, 1.0, Units.degreesToRadians(180), Units.degreesToRadians(180));
 
   private static Shooter s_shooter;
   private static Swerve s_swerve;
@@ -407,12 +407,6 @@ public class Pathfinding extends Command {
             optimisedPos.getTranslation(),
             lineupPos.getTranslation()));
     path.add(new Waypoint(lineupPos.getTranslation(), lineupPos.getTranslation(), null));
-
-    if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
-      for (Waypoint waypoint : path) {
-        waypoint.flip();
-      }
-    }
 
     PathPlannerPath pathToPathfind =
         new PathPlannerPath(
@@ -652,7 +646,7 @@ public class Pathfinding extends Command {
    * @return A command to pathfind and execute the event
    */
   public static Command goThere(POI placeToGo) {
-    return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo).flipPath(), constraints);
+    return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo), constraints);
   }
 
   /**
