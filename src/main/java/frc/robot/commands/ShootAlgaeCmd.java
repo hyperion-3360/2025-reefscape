@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
+import frc.robot.subsystems.AlgaeIntake.shooting;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.leds.LEDs;
@@ -28,8 +29,11 @@ public class ShootAlgaeCmd extends SequentialCommandGroup {
     addCommands(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.PROCESSOR)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
-        new WaitCommand(1.0),
+        new WaitCommand(0.5),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
+        new WaitCommand(0.5),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
         new WaitCommand(0.3),
