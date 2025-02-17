@@ -657,6 +657,10 @@ public class Pathfinding extends Command {
    * @return A command to pathfind to a specified point
    */
   public static Command goThere(Pose2d placeToGo) {
+    Double[] pose2d = {placeToGo.getX(), placeToGo.getY(), placeToGo.getRotation().getDegrees()};
+    SmartDashboard.putNumber("swerve pathfinding target x", pose2d[0]);
+    SmartDashboard.putNumber("swerve pathfinding target y", pose2d[1]);
+    SmartDashboard.putNumber("swerve pathfinding target theta", pose2d[2]);
     return AutoBuilder.pathfindToPose(placeToGo, constraints);
   }
 
