@@ -22,8 +22,12 @@ public class Selection extends Vision {
 
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
+  double distanceTagToPeg = Units.inchesToMeters(4.5);
 
-  Pose2d desiredPose = new Pose2d();
+  Pose2d desiredPoseAlgae = new Pose2d();
+  Pose2d desiredPoseLeft = new Pose2d();
+  Pose2d desiredPoseRight = new Pose2d();
+
   double desiredRotation = 0.0;
 
   public enum direction {
@@ -56,6 +60,8 @@ public class Selection extends Vision {
     } else {
       reefPegTag.clear();
     }
+
+    SmartDashboard.putNumber("lock ID", lockID);
   }
 
   @Override
@@ -68,22 +74,38 @@ public class Selection extends Vision {
         desiredRotation = GetYaw() + Math.toRadians(180);
       }
 
-      desiredPose =
+      desiredPoseAlgae =
           new Pose2d(
               GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
               new Rotation2d(desiredRotation));
-      SmartDashboard.putNumber("selector pose X", desiredPose.getX());
-      SmartDashboard.putNumber("selector pose Y", desiredPose.getY());
+
+      desiredPoseLeft = new Pose2d(
+        GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
+        GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
+        new Rotation2d(desiredRotation));
+
+        desiredPoseRight = new Pose2d(
+          GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
+          GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
+          new Rotation2d(desiredRotation));
 
     } else {
-      desiredPose = Pose2d.kZero;
+      desiredPoseAlgae = Pose2d.kZero;
     }
     // System.out.println(lockID);
   }
 
-  public Pose2d getDesiredpose() {
-    return desiredPose;
+  public Pose2d getDesiredposeAlgae() {
+    return desiredPoseAlgae;
+  }
+
+  public Pose2d getDesiredposeLeft() {
+    return desiredPoseLeft;
+  }
+  
+  public Pose2d getDesiredposeRight() {
+    return desiredPoseRight;
   }
 
   public Command MovePeg(direction direction) {
@@ -107,7 +129,6 @@ public class Selection extends Vision {
     for (var change : camera.getAllUnreadResults()) {
 
       if (change.hasTargets()) {
-
         trackedTarget = change.getBestTarget();
         lockID = trackedTarget.fiducialId;
       } else {

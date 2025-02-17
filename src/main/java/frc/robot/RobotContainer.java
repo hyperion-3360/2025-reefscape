@@ -224,9 +224,31 @@ public class RobotContainer {
     m_coDriverController.b().onTrue(elevateLOW);
 
     m_driverController
+        .povUp()
+        .onTrue(
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
+            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+            // m_leds.SetPattern(LEDs.Pattern.READY)))
+            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
+            // m_leds.SetPattern(LEDs.Pattern.READY)))
+            )
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+
+        m_driverController
         .leftBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredpose()))
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeLeft()))
+            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+            // m_leds.SetPattern(LEDs.Pattern.READY)))
+            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
+            // m_leds.SetPattern(LEDs.Pattern.READY)))
+            )
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));    
+        
+        m_driverController
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
