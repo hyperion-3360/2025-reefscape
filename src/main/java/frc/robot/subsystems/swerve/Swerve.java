@@ -166,7 +166,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
           "target pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
       SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
 
-      _drive(new Translation2d(x, y), rot, false, true);
+      _drive(new Translation2d(x, y), rot, true, true);
     }
   }
 
