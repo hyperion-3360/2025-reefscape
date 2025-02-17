@@ -7,10 +7,13 @@ package frc.robot.subsystems.leds;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
@@ -26,7 +29,8 @@ public class LEDs extends SubsystemBase {
     CLIMBER,
     SHOOTER,
     ELEVATOR,
-    IDLE
+    IDLE,
+    HEARTBEAT
   }
 
   private AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
@@ -44,6 +48,7 @@ public class LEDs extends SubsystemBase {
   // Our LED strip has dim red LEDS. This creates a better orange.
   private Color kTrueOrange = new Color(255, 10, 0);
 
+  private LEDPattern m_falloff = LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange).breathe(Time.ofBaseUnits(1, Second));
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setColorOrder(ColorOrder.kRGB);
@@ -72,7 +77,7 @@ public class LEDs extends SubsystemBase {
 
       case READY:
         m_currentPattern = LEDPattern.solid(Color.kGreen);
-        m_isMovingPattern = false;
+        m_isMovingPattern = true;
         break;
 
       case SHOOTER:
@@ -84,6 +89,12 @@ public class LEDs extends SubsystemBase {
         m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.05));
         m_isMovingPattern = true;
         break;
+        case HEARTBEAT:
+        m_currentPattern = LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange)
+        .breathe(Time.ofBaseUnits(1, Second))
+        .overlayOn(LEDPattern.solid(kTrueOrange)
+        .blink(Time.ofBaseUnits(1, Seconds), Time.ofBaseUnits(0.5, Seconds)))
+        .overlayOn(m_falloff);
     }
   }
 
