@@ -9,15 +9,41 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "deadline",
                 "data": {
-                  "pathName": "Dump_low"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Dump_low"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.0
+                      }
+                    }
+                  ]
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "dumper"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.7
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "dumper"
+                      }
+                    }
+                  ]
                 }
               }
             ]

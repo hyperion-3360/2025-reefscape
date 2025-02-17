@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -298,6 +299,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     m_swerve.setPose(new Pose2d(7.180, 3.000, Rotation2d.fromDegrees(180)));
-    return cycleToFeeder;
+    return new PathPlannerAuto("dump");
   }
 }
