@@ -1,11 +1,12 @@
 package frc.robot.vision;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
@@ -16,19 +17,14 @@ public class Selection extends Vision {
 
   Swerve swerve;
   List<Integer> reefPegTag = new ArrayList<Integer>();
-  int lockID = -1;
+  int lockID = 0;
   PhotonTrackedTarget trackedTarget;
-  Translation2d desiredTranslation;
+
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
-  double orientationMultipleY = 0;
 
   Pose2d desiredPose = new Pose2d();
-
-  double kp = 0.03;
-  double ki = 0;
-  double kd = 0;
-  PIDController m_pid = new PIDController(kp, ki, kd);
+  double desiredRotation = 0.0;
 
   public enum direction {
     left,
@@ -66,16 +62,23 @@ public class Selection extends Vision {
   public void periodic() {
     setLockTarget();
     if (lockID != 0) {
+      if (GetYaw() + Math.toRadians(180) > Units.degreesToRadians(180)) {
+        desiredRotation = GetYaw() - Math.toRadians(180);
+      } else {
+        desiredRotation = GetYaw() + Math.toRadians(180);
+      }
 
       desiredPose =
           new Pose2d(
               GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
-              new Rotation2d(GetYaw() + Math.toRadians(180)));
+              new Rotation2d(desiredRotation));
+      SmartDashboard.putNumber("selector pose X", desiredPose.getX());
+      SmartDashboard.putNumber("selector pose Y", desiredPose.getY());
+
     } else {
-      desiredPose = new Pose2d();
+      desiredPose = Pose2d.kZero;
     }
-    // System.out.println(currentPose);
     // System.out.println(lockID);
   }
 
@@ -122,7 +125,7 @@ public class Selection extends Vision {
 
   private Translation2d GetTagTranslation() {
 
-    if (lockID != -1) {
+    if (lockID != 0) {
 
       var x = tagLayout.getTagPose(lockID).get().getX();
       var y = tagLayout.getTagPose(lockID).get().getY();

@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -66,8 +67,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationMetersPerSecondSquaredX = 1.0;
   private final double kMaxSpeedMetersPerSecondY = 1.0;
   private final double kMaxAccelerationMetersPerSecondSquaredY = 1.0;
-  private final double kMaxSpeedMetersPerSecondRot = 0.5;
-  private final double kMaxAccelerationMetersPerSecondSquaredRot = 0.5;
+  private final double kMaxSpeedRadiansPerSecond = 0.5;
+  private final double kMaxAccelerationRadiansPerSecondSquared = 0.5;
   private final double kPX = 1.0;
   private final double kPY = 1.0;
   private final double kPRot = 1.0;
@@ -114,7 +115,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_yController = new ProfiledPIDController(kPY, 0, 0, m_yConstraints);
     m_rotConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondRot, kMaxAccelerationMetersPerSecondSquaredRot);
+            kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
   }
 
@@ -157,10 +158,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
           m_rotController.calculate(
               poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
-      SmartDashboard.putNumber("target pose X", m_xController.getGoal().position);
+      SmartDashboard.putNumber("swerve target pose X", m_xController.getGoal().position);
       SmartDashboard.putNumber("current pose X", getPose().getX());
-      SmartDashboard.putNumber("target pose Y", m_yController.getGoal().position);
+      SmartDashboard.putNumber("swerve target pose Y", m_yController.getGoal().position);
       SmartDashboard.putNumber("current pose Y", getPose().getY());
+      SmartDashboard.putNumber(
+          "target pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
+      SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
 
       _drive(new Translation2d(x, y), rot, false, true);
     }
@@ -208,10 +212,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void drivetoTarget(Pose2d target) {
-    drivetoTarget(target, target.getRotation().getRadians());
-  }
-
-  public void drivetoTarget(Pose2d target, double rotation) {
     if (target == Pose2d.kZero) {
       m_targetModeEnabled = false;
     } else {
