@@ -7,16 +7,15 @@ package frc.robot.subsystems.leds;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
-import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -30,7 +29,8 @@ public class LEDs extends SubsystemBase {
     SHOOTER,
     ELEVATOR,
     IDLE,
-    HEARTBEAT
+    HEARTBEAT,
+    SPEEDYPULSE
   }
 
   private AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
@@ -48,7 +48,10 @@ public class LEDs extends SubsystemBase {
   // Our LED strip has dim red LEDS. This creates a better orange.
   private Color kTrueOrange = new Color(255, 10, 0);
 
-  private LEDPattern m_falloff = LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange).breathe(Time.ofBaseUnits(1, Second));
+  private LEDPattern m_falloff =
+      LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange)
+          .breathe(Time.ofBaseUnits(0.8, Second));
+
   public LEDs() {
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setColorOrder(ColorOrder.kRGB);
@@ -89,12 +92,22 @@ public class LEDs extends SubsystemBase {
         m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.05));
         m_isMovingPattern = true;
         break;
-        case HEARTBEAT:
-        m_currentPattern = LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange)
-        .breathe(Time.ofBaseUnits(1, Second))
-        .overlayOn(LEDPattern.solid(kTrueOrange)
-        .blink(Time.ofBaseUnits(1, Seconds), Time.ofBaseUnits(0.5, Seconds)))
-        .overlayOn(m_falloff);
+      case HEARTBEAT:
+        m_currentPattern =
+            LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange)
+                .breathe(Time.ofBaseUnits(1.0, Second))
+                .overlayOn(m_falloff)
+                .blend(
+                    LEDPattern.gradient(
+                            LEDPattern.GradientType.kContinuous, Color.kBlack, kTrueOrange)
+                        .scrollAtAbsoluteSpeed(MetersPerSecond.of(2), LED_SPACING));
+      case SPEEDYPULSE:
+        m_currentPattern =
+            LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kBlack, kTrueOrange)
+                .scrollAtAbsoluteSpeed(MetersPerSecond.of(3), LED_SPACING)
+                .overlayOn(
+                    LEDPattern.gradient(GradientType.kDiscontinuous, kTrueOrange)
+                        .blink(Time.ofBaseUnits(1, Second), Time.ofBaseUnits(1, Second)));
     }
   }
 
@@ -102,6 +115,11 @@ public class LEDs extends SubsystemBase {
   public void periodic() {
     if (DriverStation.isDisabled()) {
       SetPattern(Pattern.IDLE);
+      m_currentPattern.applyTo(m_ledBuffer);
+      m_led.setData(m_ledBuffer);
+    }
+    if (DriverStation.isEnabled()) {
+      SetPattern(Pattern.SPEEDYPULSE);
       m_currentPattern.applyTo(m_ledBuffer);
       m_led.setData(m_ledBuffer);
     }
