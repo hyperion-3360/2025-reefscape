@@ -36,6 +36,7 @@ public class LEDs extends SubsystemBase {
   /** This variable should be able to be changed in smart dashboard */
   // double brightnessPercent = 0.0;
   private boolean m_isMovingPattern = true;
+  private boolean m_isApplied = false;
 
   private Distance LED_SPACING = Meters.of(1.0 / Constants.LEDConstants.kLEDLength);
   private LEDPattern m_currentPattern =
@@ -85,6 +86,7 @@ public class LEDs extends SubsystemBase {
         m_isMovingPattern = true;
         break;
     }
+    m_isApplied = false;
   }
 
   @Override
@@ -94,9 +96,10 @@ public class LEDs extends SubsystemBase {
       m_currentPattern.applyTo(m_ledBuffer);
       m_led.setData(m_ledBuffer);
     }
-    if (m_isMovingPattern) {
+    if (m_isMovingPattern || !m_isApplied) {
       m_currentPattern.applyTo(m_ledBuffer);
       m_led.setData(m_ledBuffer);
+      m_isApplied = true;
     }
   }
 }
