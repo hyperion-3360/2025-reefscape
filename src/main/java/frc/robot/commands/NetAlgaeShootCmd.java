@@ -20,7 +20,7 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.NET)),
-        new WaitCommand(2.3),
+        new WaitCommand(1.3),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
         new WaitCommand(0.3),

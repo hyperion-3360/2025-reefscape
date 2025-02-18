@@ -361,12 +361,12 @@ public final class Constants {
     public static final double kElevatorL2 = 1.14;
     public static final double kElevatorL3 = 1.78;
     public static final double kElevatorL4 = 2.70;
-    public static final double kElevatorNet = 2.96;
-    public static final double kElevatorProcessor = 0.25;
+    public static final double kElevatorNet = 2.86;
+    public static final double kElevatorProcessor = 0.177;
     public static final double kElevatorAlgaeLow = 0.0;
     public static final double kElevatorFeeder = 0.207;
-    public static final double kElevatorAlgaeL2 = 0.64;
-    public static final double kElevatorAlgaeL3 = 0.96;
+    public static final double kElevatorAlgaeL2 = 1.30;
+    public static final double kElevatorAlgaeL3 = 1.92;
     public static final double kDontPound = 0.67;
   }
 

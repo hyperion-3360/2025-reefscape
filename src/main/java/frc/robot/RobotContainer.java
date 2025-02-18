@@ -90,7 +90,8 @@ public class RobotContainer {
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L3);
   private final ElevateCmd elevateL4 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
-  private final LowerElevatorCmd elevateLOW = new LowerElevatorCmd(m_elevator, m_leds, m_shooter);
+  private final LowerElevatorCmd elevateLOW =
+      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
 
   public enum TestModes {
     NONE,
@@ -214,8 +215,8 @@ public class RobotContainer {
 
     m_driverController
         .x()
-        .whileTrue(intakeAlgaeFloor)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+        .toggleOnTrue(intakeAlgaeFloor)
+        .toggleOnFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
