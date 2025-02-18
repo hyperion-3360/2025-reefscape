@@ -106,7 +106,7 @@ public class Selection extends Vision {
 
   @Override
   public void periodic() {
-    setLockTarget();
+    getLockTarget();
     SmartDashboard.putNumber("desiredPose x", desiredPoseRelativeToCenterRotated.getX());
     SmartDashboard.putNumber("desiredPose y", desiredPoseRelativeToCenterRotated.getY());
     SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
@@ -128,20 +128,22 @@ public class Selection extends Vision {
     return isInBounds;
   }
 
-  public Pose2d getDesiredposeAlgae() {
+  private void setDesiredAlignPose()
+  {
     if (lockID != 0) {
-      if (GetYaw() + Math.toRadians(180) > Units.degreesToRadians(180)) {
-        desiredRotation = GetYaw() - Math.toRadians(180);
+      double tagYaw = GetTagYaw();
+      if (tagYaw + Math.toRadians(180) > Units.degreesToRadians(180)) {
+        desiredRotation = tagYaw - Math.toRadians(180);
       } else {
-        desiredRotation = GetYaw() + Math.toRadians(180);
+        desiredRotation = tagYaw + Math.toRadians(180);
       }
 
       angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
 
       desiredPoseCenterAlign =
           new Pose2d(
-              GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
-              GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
+              GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredDistFromTag),
+              GetTagTranslation().getY() + (Math.sin(tagYaw) * desiredDistFromTag),
               new Rotation2d(desiredRotation));
 
     } else if (lockID == 0 && isInBoundsForProcessor()) {
@@ -149,10 +151,18 @@ public class Selection extends Vision {
     } else {
       desiredPoseCenterAlign = Pose2d.kZero;
     }
+  }
+
+  public Pose2d getDesiredposeAlgae() {
+    setDesiredAlignPose();
     return desiredPoseCenterAlign;
   }
 
   public Pose2d getDesiredposeLeft() {
+    if(lockID == 0){
+      return Pose2d.kZero;
+    }
+    setDesiredAlignPose();
     var robotTranslationLeft = new Translation2d(robotHalfLength, -distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
@@ -164,6 +174,10 @@ public class Selection extends Vision {
   }
 
   public Pose2d getDesiredposeRight() {
+    if(lockID == 0){
+      return Pose2d.kZero;
+    }
+    setDesiredAlignPose();
     var robotTranslationRight = new Translation2d(robotHalfLength, distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
@@ -174,37 +188,21 @@ public class Selection extends Vision {
     return desiredPoseRelativeToCenterRotated;
   }
 
-  public Command MovePeg(direction direction) {
-    // will have to do trigo, but make sure align works first.
-    switch (direction) {
-      case left:
-        break;
-
-      case right:
-        break;
-
-      default:
-        break;
-    }
-
-    return null;
-  }
-
-  private void setLockTarget() {
-
-    for (var change : camera.getAllUnreadResults()) {
-
-      if (change.hasTargets()) {
-        trackedTarget = change.getBestTarget();
-        lockID = trackedTarget.fiducialId;
-      } else {
-        lockID = 0;
+  private int getLockTarget() {
+    lockID = 0;
+    var results = camera.getAllUnreadResults();
+    if(!results.isEmpty())
+    {
+      var lastResult = results.get(results.size()-1);
+      if (lastResult.hasTargets()) {
+        lockID = lastResult.getBestTarget().fiducialId;
       }
     }
+    return lockID;
   }
 
-  private double GetYaw() {
-    if (trackedTarget != null) {
+  private double GetTagYaw() {
+    if (lockID != 0) {
       return tagLayout.getTagPose(lockID).get().getRotation().getZ();
     }
     return 0.0;
