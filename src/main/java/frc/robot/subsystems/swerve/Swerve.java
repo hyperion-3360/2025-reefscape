@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -72,6 +74,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kPX = 4.0;
   private final double kPY = 4.0;
   private final double kPRot = 3.0;
+  private SendableChooser<NeutralModeValue> neutralChooser = new SendableChooser<>();
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -117,13 +120,20 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new TrapezoidProfile.Constraints(
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
+    SmartDashboard.putData(neutralChooser);
   }
 
   /* periodic */
 
   @Override
   public void periodic() {
-
+    neutralChooser.onChange(
+        neutralMode -> {
+          for (SwerveModule swerveModule : mSwerveMods) {
+            swerveModule.getDriveMotor().setNeutralMode(neutralChooser.getSelected());
+          }
+          ;
+        });
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
