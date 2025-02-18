@@ -234,7 +234,7 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-        m_driverController
+    m_driverController
         .leftBumper()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeLeft()))
@@ -243,9 +243,9 @@ public class RobotContainer {
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));    
-        
-        m_driverController
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+
+    m_driverController
         .rightBumper()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
