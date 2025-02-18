@@ -1,21 +1,16 @@
 package frc.robot.vision;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,19 +20,23 @@ public class Selection extends Vision {
 
   Swerve swerve;
   List<Integer> reefPegTag = new ArrayList<Integer>();
-  int lockID = -1;
+  int lockID = 0;
   PhotonTrackedTarget trackedTarget;
-  Translation2d desiredTranslation;
+
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
-  double orientationMultipleY = 0;
+  Pose2d desiredPoseAlgae = new Pose2d();
+  Pose2d origin = new Pose2d();
 
-  Pose2d currentPose = new Pose2d();
+  double robotHalfLength = Units.inchesToMeters(16.5);
+  double distTagToPeg = Units.inchesToMeters(7);
 
-  double kp = 0.03;
-  double ki = 0;
-  double kd = 0;
-  PIDController m_pid = new PIDController(kp, ki, kd);
+  Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
+  double angleToRotateBy = 0.0;
+
+  Translation2d reefCenter = new Translation2d();
+
+  double desiredRotation = 0.0;
 
   public enum direction {
     left,
@@ -49,34 +48,94 @@ public class Selection extends Vision {
 
     var alliance = DriverStation.getAlliance().get();
     if (alliance == Alliance.Blue) {
+      reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
+      origin =
+          new Pose2d(
+              tagLayout.getTagPose(18).get().getX(),
+              tagLayout.getTagPose(18).get().getY(),
+              tagLayout.getTagPose(18).get().getRotation().toRotation2d());
       reefPegTag.clear();
+      reefPegTag.add(18);
+      reefPegTag.add(17);
       reefPegTag.add(22);
       reefPegTag.add(21);
       reefPegTag.add(20);
       reefPegTag.add(19);
-      reefPegTag.add(18);
-      reefPegTag.add(17);
 
     } else if (alliance == Alliance.Red) {
+      reefCenter = new Translation2d(Units.inchesToMeters(514.14), Units.inchesToMeters(158.5));
+      origin =
+          new Pose2d(
+              tagLayout.getTagPose(7).get().getX(),
+              tagLayout.getTagPose(7).get().getY(),
+              tagLayout.getTagPose(7).get().getRotation().toRotation2d());
       reefPegTag.clear();
-      reefPegTag.add(6);
       reefPegTag.add(7);
       reefPegTag.add(8);
       reefPegTag.add(9);
       reefPegTag.add(10);
       reefPegTag.add(11);
+      reefPegTag.add(6);
 
     } else {
       reefPegTag.clear();
     }
+
+    SmartDashboard.putNumber("lock ID", lockID);
   }
 
   @Override
   public void periodic() {
-    currentPose = swerve.getPose();
     setLockTarget();
-    // System.out.println(currentPose);
+    if (lockID != 0) {
+      if (GetYaw() + Math.toRadians(180) > Units.degreesToRadians(180)) {
+        desiredRotation = GetYaw() - Math.toRadians(180);
+      } else {
+        desiredRotation = GetYaw() + Math.toRadians(180);
+      }
+
+      angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
+
+      desiredPoseAlgae =
+          new Pose2d(
+              GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
+              GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
+              new Rotation2d(desiredRotation));
+
+    } else {
+      desiredPoseAlgae = Pose2d.kZero;
+    }
+
+    SmartDashboard.putNumber("desiredPose x", desiredPoseRelativeToCenterRotated.getX());
+    SmartDashboard.putNumber("desiredPose y", desiredPoseRelativeToCenterRotated.getY());
+
     // System.out.println(lockID);
+  }
+
+  public Pose2d getDesiredposeAlgae() {
+    return desiredPoseAlgae;
+  }
+
+  public Pose2d getDesiredposeLeft() {
+    var robotTranslationLeft = new Translation2d(robotHalfLength, -distTagToPeg);
+    var robotPoseRelativeToCenter =
+        origin.transformBy(
+            new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));
+    desiredPoseRelativeToCenterRotated =
+        robotPoseRelativeToCenter.rotateAround(
+            reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
+    return desiredPoseRelativeToCenterRotated;
+  }
+
+  public Pose2d getDesiredposeRight() {
+    var robotTranslationRight = new Translation2d(robotHalfLength, distTagToPeg);
+    var robotPoseRelativeToCenter =
+        origin.transformBy(
+            new Transform2d(robotTranslationRight, new Rotation2d(Math.toRadians(-180))));
+    desiredPoseRelativeToCenterRotated =
+        robotPoseRelativeToCenter.rotateAround(
+            reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
+    return desiredPoseRelativeToCenterRotated;
   }
 
   public Command MovePeg(direction direction) {
@@ -100,70 +159,12 @@ public class Selection extends Vision {
     for (var change : camera.getAllUnreadResults()) {
 
       if (change.hasTargets()) {
-
         trackedTarget = change.getBestTarget();
         lockID = trackedTarget.fiducialId;
       } else {
         lockID = 0;
       }
     }
-  }
-
-  // will probably refactor
-  public Command Align() {
-    if (lockID != 0) {
-
-      desiredTranslation = new Translation2d(2.66, 4.01);
-      // new Translation2d(
-      //     GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
-      //     GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag));
-      var desiredPose = new Pose2d(desiredTranslation, new Rotation2d());
-
-      TrajectoryConfig config =
-          new TrajectoryConfig(0.7, 0.7)
-              // Add kinematics to ensure max speed is actually obeyed
-              .setKinematics(Constants.Swerve.swerveKinematics);
-
-      // An example trajectory to follow. All units in meters.
-      Trajectory trajectory =
-          TrajectoryGenerator.generateTrajectory(
-              // Start at the origin facing the +X direction
-              currentPose,
-              // Pass through these two interior waypoints, making an 's' curve path
-              List.of(),
-              // End 3 meters straight ahead of where we started, facing forward
-              desiredPose,
-              config);
-
-      var thetaController =
-          new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(Math.PI, Math.PI));
-      thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-      SwerveControllerCommand swerveControllerCommand =
-          new SwerveControllerCommand(
-              trajectory,
-              swerve::getPose, // Functional interface to feed supplier
-              Constants.Swerve.swerveKinematics,
-
-              // Position controllers
-              new PIDController(5.0, 0, 0),
-              new PIDController(5.0, 0, 0),
-              thetaController,
-              swerve::setModuleStates,
-              this);
-
-      // Reset odometry to the initial pose of the trajectory, run path following
-      // command, then stop at the end.
-
-      // return Commands.runOnce(() -> System.out.println(desiredTranslation));
-      return Commands.sequence(
-          new InstantCommand(() -> swerve.resetOdometry(trajectory.getInitialPose())),
-          swerveControllerCommand,
-          new InstantCommand(() -> swerve.drive(new Translation2d(0, 0), 0, false, false)));
-
-      // return swerve.createTrajectoryCommand(0.2, 0.2, currentPose, List.of(), desiredPose);
-    }
-    return Commands.runOnce(() -> System.out.println("null"));
   }
 
   private double GetYaw() {
@@ -175,7 +176,7 @@ public class Selection extends Vision {
 
   private Translation2d GetTagTranslation() {
 
-    if (lockID != -1) {
+    if (lockID != 0) {
 
       var x = tagLayout.getTagPose(lockID).get().getX();
       var y = tagLayout.getTagPose(lockID).get().getY();
@@ -184,5 +185,24 @@ public class Selection extends Vision {
     }
 
     return new Translation2d();
+  }
+
+  public void teleopInit() {
+    var layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+    var tagPose = layout.getTagPose(18);
+    var origin =
+        new Pose2d(
+            tagPose.get().getX(), tagPose.get().getY(), tagPose.get().getRotation().toRotation2d());
+
+    var a = Units.inchesToMeters(16.5);
+    var b = Units.inchesToMeters(7);
+    var robotTranslation = new Translation2d(a, b);
+    var robotCenter =
+        origin.transformBy(new Transform2d(robotTranslation, new Rotation2d(Math.toRadians(-180))));
+
+    var reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
+
+    var rotatedCenter = robotCenter.rotateAround(reefCenter, new Rotation2d(Math.toRadians(60)));
   }
 }

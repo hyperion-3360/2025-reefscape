@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -55,6 +56,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private Pose2d startPose = new Pose2d();
   private Pose2d endPose = new Pose2d();
   private List<Translation2d> waypoints = List.of();
+  private boolean m_targetModeEnabled = false;
+  private ProfiledPIDController m_xController;
+  TrapezoidProfile.Constraints m_xConstraints;
+  private ProfiledPIDController m_yController;
+  TrapezoidProfile.Constraints m_yConstraints;
+  private ProfiledPIDController m_rotController;
+  TrapezoidProfile.Constraints m_rotConstraints;
+  private final double kMaxSpeedMetersPerSecondX = 3.5;
+  private final double kMaxAccelerationMetersPerSecondSquaredX = 2.0;
+  private final double kMaxSpeedMetersPerSecondY = 3.5;
+  private final double kMaxAccelerationMetersPerSecondSquaredY = 2.0;
+  private final double kMaxSpeedRadiansPerSecond = 1.5;
+  private final double kMaxAccelerationRadiansPerSecondSquared = 1.0;
+  private final double kPX = 4.0;
+  private final double kPY = 4.0;
+  private final double kPRot = 3.0;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -88,6 +105,18 @@ public class Swerve extends SubsystemBase implements TestBindings {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
+    m_xController = new ProfiledPIDController(kPX, 0, 0, m_xConstraints);
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY);
+    m_yController = new ProfiledPIDController(kPY, 0, 0, m_yConstraints);
+    m_rotConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
+    m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
   }
 
   /* periodic */
@@ -121,6 +150,24 @@ public class Swerve extends SubsystemBase implements TestBindings {
       SmartDashboard.putNumber("currentpose X", poseEstimator.getEstimatedPosition().getX());
       SmartDashboard.putNumber("currentpose Y", poseEstimator.getEstimatedPosition().getY());
     }
+
+    if (m_targetModeEnabled) {
+      var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
+      var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
+      var rot =
+          m_rotController.calculate(
+              poseEstimator.getEstimatedPosition().getRotation().getRadians());
+
+      SmartDashboard.putNumber("swerve target pose X", m_xController.getGoal().position);
+      SmartDashboard.putNumber("current pose X", getPose().getX());
+      SmartDashboard.putNumber("swerve target pose Y", m_yController.getGoal().position);
+      SmartDashboard.putNumber("current pose Y", getPose().getY());
+      SmartDashboard.putNumber(
+          "target pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
+      SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
+
+      _drive(new Translation2d(x, y), rot, true, true);
+    }
   }
 
   /* thread */
@@ -142,7 +189,49 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   /* drive related things */
 
+  private boolean isAlmostEqual(double a, double b, double epsilon) {
+    return Math.abs(a - b) < epsilon;
+  }
+
+  public boolean targetReached() {
+    var pos = getPose().getX();
+    var goal = m_xController.getGoal().position;
+
+    SmartDashboard.putNumber("Target mode: goal ", goal);
+    SmartDashboard.putNumber("Target mode pos ", pos);
+
+    return m_targetModeEnabled && isAlmostEqual(pos, goal, 0.1);
+  }
+
+  public void disableDriveToTarget() {
+    m_targetModeEnabled = false;
+  }
+
+  public boolean targetDriveDisabled() {
+    return m_targetModeEnabled == false;
+  }
+
+  public void drivetoTarget(Pose2d target) {
+    if (target == Pose2d.kZero) {
+      m_targetModeEnabled = false;
+    } else {
+      m_targetModeEnabled = true;
+      m_xController.reset(getPose().getX());
+      m_xController.setGoal(target.getX());
+      m_yController.reset(getPose().getY());
+      m_yController.setGoal(target.getY());
+      m_rotController.reset(getPose().getRotation().getRadians());
+      m_rotController.setGoal(target.getRotation().getRadians());
+      System.out.println(" Drive to target: " + target.getX() + " " + target.getY());
+    }
+  }
+
   public void drive(
+      Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    if (!m_targetModeEnabled) _drive(translation, rotation, fieldRelative, isOpenLoop);
+  }
+
+  private void _drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(
