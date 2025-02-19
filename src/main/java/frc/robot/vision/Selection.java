@@ -8,7 +8,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ public class Selection extends Vision {
           new Translation2d(Units.inchesToMeters(270.0), Units.inchesToMeters(50.0));
       processorAlignPosition =
           new Pose2d(
-              Units.inchesToMeters(235.643424), Units.inchesToMeters(17.5), new Rotation2d(-90));
+              Units.inchesToMeters(235.643424), Units.inchesToMeters(17.5), new Rotation2d(Units.degreesToRadians(-90)));
 
       reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
       origin =
@@ -81,7 +80,7 @@ public class Selection extends Vision {
           new Translation2d(Units.inchesToMeters(490.0), Units.inchesToMeters(500));
       processorAlignPosition =
           new Pose2d(
-              Units.inchesToMeters(455.15), Units.inchesToMeters(299.455), new Rotation2d(90));
+              Units.inchesToMeters(455.15), Units.inchesToMeters(299.455), new Rotation2d(Units.degreesToRadians(90)));
 
       reefCenter = new Translation2d(Units.inchesToMeters(514.14), Units.inchesToMeters(158.5));
       origin =
@@ -107,6 +106,7 @@ public class Selection extends Vision {
   @Override
   public void periodic() {
     getLockTarget();
+    isInBoundsForProcessor();
     SmartDashboard.putNumber("desiredPose x", desiredPoseRelativeToCenterRotated.getX());
     SmartDashboard.putNumber("desiredPose y", desiredPoseRelativeToCenterRotated.getY());
     SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
@@ -128,8 +128,7 @@ public class Selection extends Vision {
     return isInBounds;
   }
 
-  private void setDesiredAlignPose()
-  {
+  private void setDesiredAlignPose() {
     if (lockID != 0) {
       double tagYaw = GetTagYaw();
       if (tagYaw + Math.toRadians(180) > Units.degreesToRadians(180)) {
@@ -159,7 +158,7 @@ public class Selection extends Vision {
   }
 
   public Pose2d getDesiredposeLeft() {
-    if(lockID == 0){
+    if (lockID == 0) {
       return Pose2d.kZero;
     }
     setDesiredAlignPose();
@@ -174,7 +173,7 @@ public class Selection extends Vision {
   }
 
   public Pose2d getDesiredposeRight() {
-    if(lockID == 0){
+    if (lockID == 0) {
       return Pose2d.kZero;
     }
     setDesiredAlignPose();
@@ -191,9 +190,8 @@ public class Selection extends Vision {
   private int getLockTarget() {
     lockID = 0;
     var results = camera.getAllUnreadResults();
-    if(!results.isEmpty())
-    {
-      var lastResult = results.get(results.size()-1);
+    if (!results.isEmpty()) {
+      var lastResult = results.get(results.size() - 1);
       if (lastResult.hasTargets()) {
         lockID = lastResult.getBestTarget().fiducialId;
       }
