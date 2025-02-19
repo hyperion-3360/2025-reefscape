@@ -5,22 +5,22 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
@@ -45,6 +45,7 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class RobotContainer {
@@ -296,19 +297,20 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_coDriverController
-        .leftBumper()
-        .whileTrue(cycleToFeeder)
-        .onFalse(Commands.runOnce(() -> cycleToFeeder.cancel(), m_elevator, m_shooter, m_leds));
+    // m_coDriverController
+    //     .leftBumper()
+    //     .whileTrue(cycleToFeeder)
+    //     .onFalse(Commands.runOnce(() -> cycleToFeeder.cancel(), m_elevator, m_shooter, m_leds));
     m_coDriverController
         .leftBumper()
         .onTrue(
-            Pathfinding.goThere(
-                m_swerve.getPose().plus(new Transform2d(2, 0, Rotation2d.fromDegrees(0)))));
+            new DeferredCommand(
+                () -> Pathfinding.goThere(new Pose2d(7.3, 3, Rotation2d.fromDegrees(0))),
+                Set.of(m_swerve)));
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.setPose(new Pose2d(7.180, 3.000, Rotation2d.fromDegrees(0)));
-    return Pathfinding.goThere(POI.FEEDERS);
+    m_swerve.estimatePose();
+    return new PathPlannerAuto("dump");
   }
 }
