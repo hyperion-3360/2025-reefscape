@@ -1,7 +1,5 @@
 package frc.robot.vision;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -10,7 +8,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +22,10 @@ public class Selection extends Vision {
 
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
-  Pose2d desiredPoseAlgae = new Pose2d();
+  Pose2d desiredPoseCenterAlign = new Pose2d();
   Pose2d origin = new Pose2d();
 
-  double robotHalfLength = Units.inchesToMeters(16.5);
+  double robotHalfLength = Units.inchesToMeters(17.5);
   double distTagToPeg = Units.inchesToMeters(7);
 
   Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
@@ -37,6 +34,11 @@ public class Selection extends Vision {
   Translation2d reefCenter = new Translation2d();
 
   double desiredRotation = 0.0;
+
+  Translation2d minimumTranslationProcessor = new Translation2d();
+  Translation2d maximumTranslationProcessor = new Translation2d();
+  Pose2d processorAlignPosition = new Pose2d();
+  boolean isInBounds = false;
 
   public enum direction {
     left,
@@ -48,6 +50,16 @@ public class Selection extends Vision {
 
     var alliance = DriverStation.getAlliance().get();
     if (alliance == Alliance.Blue) {
+      minimumTranslationProcessor =
+          new Translation2d(Units.inchesToMeters(200.0), Units.inchesToMeters(0.0));
+      maximumTranslationProcessor =
+          new Translation2d(Units.inchesToMeters(270.0), Units.inchesToMeters(50.0));
+      processorAlignPosition =
+          new Pose2d(
+              Units.inchesToMeters(235.643424),
+              Units.inchesToMeters(17.5),
+              new Rotation2d(Units.degreesToRadians(-90)));
+
       reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
       origin =
           new Pose2d(
@@ -63,6 +75,17 @@ public class Selection extends Vision {
       reefPegTag.add(19);
 
     } else if (alliance == Alliance.Red) {
+
+      minimumTranslationProcessor =
+          new Translation2d(Units.inchesToMeters(420.0), Units.inchesToMeters(217.0));
+      maximumTranslationProcessor =
+          new Translation2d(Units.inchesToMeters(490.0), Units.inchesToMeters(500));
+      processorAlignPosition =
+          new Pose2d(
+              Units.inchesToMeters(455.15),
+              Units.inchesToMeters(299.455),
+              new Rotation2d(Units.degreesToRadians(90)));
+
       reefCenter = new Translation2d(Units.inchesToMeters(514.14), Units.inchesToMeters(158.5));
       origin =
           new Pose2d(
@@ -80,47 +103,76 @@ public class Selection extends Vision {
     } else {
       reefPegTag.clear();
     }
-
-    SmartDashboard.putNumber("lock ID", lockID);
   }
 
   @Override
   public void periodic() {
     setLockTarget();
-    if (lockID != 0) {
-      if (GetYaw() + Math.toRadians(180) > Units.degreesToRadians(180)) {
-        desiredRotation = GetYaw() - Math.toRadians(180);
-      } else {
-        desiredRotation = GetYaw() + Math.toRadians(180);
-      }
-
-      angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
-
-      desiredPoseAlgae =
-          new Pose2d(
-              GetTagTranslation().getX() + (Math.cos(GetYaw()) * desiredDistFromTag),
-              GetTagTranslation().getY() + (Math.sin(GetYaw()) * desiredDistFromTag),
-              new Rotation2d(desiredRotation));
-
-    } else {
-      desiredPoseAlgae = Pose2d.kZero;
-    }
-
+    isInBoundsForProcessor();
     SmartDashboard.putNumber("desiredPose x", desiredPoseRelativeToCenterRotated.getX());
     SmartDashboard.putNumber("desiredPose y", desiredPoseRelativeToCenterRotated.getY());
+    SmartDashboard.putNumber("desiredPose x center", desiredPoseCenterAlign.getX());
+    SmartDashboard.putNumber("desiredPose y center", desiredPoseCenterAlign.getY());
+    SmartDashboard.putNumber("current pos x", swerve.getPose().getX());
+    SmartDashboard.putNumber("current pos y", swerve.getPose().getY());
+    SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
+    SmartDashboard.putNumber("angle to rotate by", angleToRotateBy);
+    SmartDashboard.putNumber("lock ID", lockID);
 
-    // System.out.println(lockID);
+    System.out.println(lockID);
+  }
+
+  public boolean isInBoundsForProcessor() {
+    if (lockID == 0) {
+      if (swerve.getPose().getX() < maximumTranslationProcessor.getX()
+          && swerve.getPose().getX() > minimumTranslationProcessor.getX()
+          && swerve.getPose().getY() < maximumTranslationProcessor.getY()
+          && swerve.getPose().getY() > minimumTranslationProcessor.getY()) {
+        isInBounds = true;
+      }
+    } else {
+      isInBounds = false;
+    }
+    return isInBounds;
+  }
+
+  private void setDesiredAlignPose() {
+    if (lockID != 0) {
+      double tagYaw = GetTagYaw();
+      if (tagYaw + Math.toRadians(180) > Units.degreesToRadians(180)) {
+        desiredRotation = tagYaw - Math.toRadians(180);
+      } else {
+        desiredRotation = tagYaw + Math.toRadians(180);
+      }
+
+      desiredPoseCenterAlign =
+          new Pose2d(
+              GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredDistFromTag),
+              GetTagTranslation().getY() + (Math.sin(tagYaw) * desiredDistFromTag),
+              new Rotation2d(desiredRotation));
+
+    } else if (lockID == 0 && isInBoundsForProcessor()) {
+      desiredPoseCenterAlign = processorAlignPosition;
+    } else {
+      desiredPoseCenterAlign = Pose2d.kZero;
+    }
   }
 
   public Pose2d getDesiredposeAlgae() {
-    return desiredPoseAlgae;
+    setDesiredAlignPose();
+    return desiredPoseCenterAlign;
   }
 
   public Pose2d getDesiredposeLeft() {
+    if (lockID == 0) {
+      return Pose2d.kZero;
+    }
     var robotTranslationLeft = new Translation2d(robotHalfLength, -distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));
+    angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
+
     desiredPoseRelativeToCenterRotated =
         robotPoseRelativeToCenter.rotateAround(
             reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
@@ -128,30 +180,20 @@ public class Selection extends Vision {
   }
 
   public Pose2d getDesiredposeRight() {
+    if (lockID == 0) {
+      return Pose2d.kZero;
+    }
     var robotTranslationRight = new Translation2d(robotHalfLength, distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationRight, new Rotation2d(Math.toRadians(-180))));
+    angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
+
     desiredPoseRelativeToCenterRotated =
         robotPoseRelativeToCenter.rotateAround(
             reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
+
     return desiredPoseRelativeToCenterRotated;
-  }
-
-  public Command MovePeg(direction direction) {
-    // will have to do trigo, but make sure align works first.
-    switch (direction) {
-      case left:
-        break;
-
-      case right:
-        break;
-
-      default:
-        break;
-    }
-
-    return null;
   }
 
   private void setLockTarget() {
@@ -161,14 +203,17 @@ public class Selection extends Vision {
       if (change.hasTargets()) {
         trackedTarget = change.getBestTarget();
         lockID = trackedTarget.fiducialId;
+        if (reefPegTag.indexOf(lockID) == -1) {
+          lockID = 0;
+        }
       } else {
         lockID = 0;
       }
     }
   }
 
-  private double GetYaw() {
-    if (trackedTarget != null) {
+  private double GetTagYaw() {
+    if (lockID != 0) {
       return tagLayout.getTagPose(lockID).get().getRotation().getZ();
     }
     return 0.0;
@@ -185,24 +230,5 @@ public class Selection extends Vision {
     }
 
     return new Translation2d();
-  }
-
-  public void teleopInit() {
-    var layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-
-    var tagPose = layout.getTagPose(18);
-    var origin =
-        new Pose2d(
-            tagPose.get().getX(), tagPose.get().getY(), tagPose.get().getRotation().toRotation2d());
-
-    var a = Units.inchesToMeters(16.5);
-    var b = Units.inchesToMeters(7);
-    var robotTranslation = new Translation2d(a, b);
-    var robotCenter =
-        origin.transformBy(new Transform2d(robotTranslation, new Rotation2d(Math.toRadians(-180))));
-
-    var reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
-
-    var rotatedCenter = robotCenter.rotateAround(reefCenter, new Rotation2d(Math.toRadians(60)));
   }
 }
