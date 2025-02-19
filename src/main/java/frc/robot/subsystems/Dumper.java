@@ -12,14 +12,23 @@ public class Dumper extends SubsystemBase implements TestBindings {
   private Servo leftServo = new Servo(Constants.SubsystemInfo.kCoralDumperLeftServoID);
   private Servo rightServo = new Servo(Constants.SubsystemInfo.kCoralDumperRightServoID);
 
-  public Dumper() {}
+  public Dumper() {
+    closeDump();
+  }
 
   public void dumpRight() {
-    rightServo.setAngle(60);
+    rightServo.setAngle(85);
+    System.out.println(rightServo.getAngle());
   }
 
   public void dumpLeft() {
-    leftServo.setAngle(60);
+    leftServo.setAngle(55);
+    System.out.println(leftServo.getAngle());
+  }
+
+  public void closeDump() {
+    leftServo.setAngle(85);
+    rightServo.setAngle(55);
   }
 
   @Override
