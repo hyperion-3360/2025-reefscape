@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Selection extends Vision {
@@ -48,59 +49,63 @@ public class Selection extends Vision {
   public Selection(Swerve swerve) {
     this.swerve = swerve;
 
-    var alliance = DriverStation.getAlliance().get();
-    if (alliance == Alliance.Blue) {
-      minimumTranslationProcessor =
-          new Translation2d(Units.inchesToMeters(200.0), Units.inchesToMeters(0.0));
-      maximumTranslationProcessor =
-          new Translation2d(Units.inchesToMeters(270.0), Units.inchesToMeters(50.0));
-      processorAlignPosition =
-          new Pose2d(
-              Units.inchesToMeters(235.643424),
-              Units.inchesToMeters(17.5),
-              new Rotation2d(Units.degreesToRadians(-90)));
+    try {
+      var alliance = DriverStation.getAlliance().get();
+      if (alliance == Alliance.Blue) {
+        minimumTranslationProcessor =
+            new Translation2d(Units.inchesToMeters(200.0), Units.inchesToMeters(0.0));
+        maximumTranslationProcessor =
+            new Translation2d(Units.inchesToMeters(270.0), Units.inchesToMeters(50.0));
+        processorAlignPosition =
+            new Pose2d(
+                Units.inchesToMeters(235.643424),
+                Units.inchesToMeters(17.5),
+                new Rotation2d(Units.degreesToRadians(-90)));
 
-      reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
-      origin =
-          new Pose2d(
-              tagLayout.getTagPose(18).get().getX(),
-              tagLayout.getTagPose(18).get().getY(),
-              tagLayout.getTagPose(18).get().getRotation().toRotation2d());
-      reefPegTag.clear();
-      reefPegTag.add(18);
-      reefPegTag.add(17);
-      reefPegTag.add(22);
-      reefPegTag.add(21);
-      reefPegTag.add(20);
-      reefPegTag.add(19);
+        reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
+        origin =
+            new Pose2d(
+                tagLayout.getTagPose(18).get().getX(),
+                tagLayout.getTagPose(18).get().getY(),
+                tagLayout.getTagPose(18).get().getRotation().toRotation2d());
+        reefPegTag.clear();
+        reefPegTag.add(18);
+        reefPegTag.add(17);
+        reefPegTag.add(22);
+        reefPegTag.add(21);
+        reefPegTag.add(20);
+        reefPegTag.add(19);
 
-    } else if (alliance == Alliance.Red) {
+      } else if (alliance == Alliance.Red) {
 
-      minimumTranslationProcessor =
-          new Translation2d(Units.inchesToMeters(420.0), Units.inchesToMeters(217.0));
-      maximumTranslationProcessor =
-          new Translation2d(Units.inchesToMeters(490.0), Units.inchesToMeters(500));
-      processorAlignPosition =
-          new Pose2d(
-              Units.inchesToMeters(455.15),
-              Units.inchesToMeters(299.455),
-              new Rotation2d(Units.degreesToRadians(90)));
+        minimumTranslationProcessor =
+            new Translation2d(Units.inchesToMeters(420.0), Units.inchesToMeters(217.0));
+        maximumTranslationProcessor =
+            new Translation2d(Units.inchesToMeters(490.0), Units.inchesToMeters(500));
+        processorAlignPosition =
+            new Pose2d(
+                Units.inchesToMeters(455.15),
+                Units.inchesToMeters(299.455),
+                new Rotation2d(Units.degreesToRadians(90)));
 
-      reefCenter = new Translation2d(Units.inchesToMeters(514.14), Units.inchesToMeters(158.5));
-      origin =
-          new Pose2d(
-              tagLayout.getTagPose(7).get().getX(),
-              tagLayout.getTagPose(7).get().getY(),
-              tagLayout.getTagPose(7).get().getRotation().toRotation2d());
-      reefPegTag.clear();
-      reefPegTag.add(7);
-      reefPegTag.add(8);
-      reefPegTag.add(9);
-      reefPegTag.add(10);
-      reefPegTag.add(11);
-      reefPegTag.add(6);
+        reefCenter = new Translation2d(Units.inchesToMeters(514.14), Units.inchesToMeters(158.5));
+        origin =
+            new Pose2d(
+                tagLayout.getTagPose(7).get().getX(),
+                tagLayout.getTagPose(7).get().getY(),
+                tagLayout.getTagPose(7).get().getRotation().toRotation2d());
+        reefPegTag.clear();
+        reefPegTag.add(7);
+        reefPegTag.add(8);
+        reefPegTag.add(9);
+        reefPegTag.add(10);
+        reefPegTag.add(11);
+        reefPegTag.add(6);
+      } else {
+        reefPegTag.clear();
+      }
 
-    } else {
+    } catch (NoSuchElementException e) {
       reefPegTag.clear();
     }
   }
@@ -118,8 +123,6 @@ public class Selection extends Vision {
     SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
     SmartDashboard.putNumber("angle to rotate by", angleToRotateBy);
     SmartDashboard.putNumber("lock ID", lockID);
-
-    System.out.println(lockID);
   }
 
   public boolean isInBoundsForProcessor() {

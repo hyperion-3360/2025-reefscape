@@ -73,7 +73,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kPY = 4.0;
   private final double kPRot = 3.0;
 
-
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
