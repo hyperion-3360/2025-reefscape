@@ -56,7 +56,9 @@ public class Selection extends Vision {
           new Translation2d(Units.inchesToMeters(270.0), Units.inchesToMeters(50.0));
       processorAlignPosition =
           new Pose2d(
-              Units.inchesToMeters(235.643424), Units.inchesToMeters(17.5), new Rotation2d(Units.degreesToRadians(-90)));
+              Units.inchesToMeters(235.643424),
+              Units.inchesToMeters(17.5),
+              new Rotation2d(Units.degreesToRadians(-90)));
 
       reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
       origin =
@@ -80,7 +82,9 @@ public class Selection extends Vision {
           new Translation2d(Units.inchesToMeters(490.0), Units.inchesToMeters(500));
       processorAlignPosition =
           new Pose2d(
-              Units.inchesToMeters(455.15), Units.inchesToMeters(299.455), new Rotation2d(Units.degreesToRadians(90)));
+              Units.inchesToMeters(455.15),
+              Units.inchesToMeters(299.455),
+              new Rotation2d(Units.degreesToRadians(90)));
 
       reefCenter = new Translation2d(Units.inchesToMeters(514.14), Units.inchesToMeters(158.5));
       origin =
@@ -99,19 +103,23 @@ public class Selection extends Vision {
     } else {
       reefPegTag.clear();
     }
-
-    SmartDashboard.putNumber("lock ID", lockID);
   }
 
   @Override
   public void periodic() {
-    getLockTarget();
+    setLockTarget();
     isInBoundsForProcessor();
     SmartDashboard.putNumber("desiredPose x", desiredPoseRelativeToCenterRotated.getX());
     SmartDashboard.putNumber("desiredPose y", desiredPoseRelativeToCenterRotated.getY());
+    SmartDashboard.putNumber("desiredPose x center", desiredPoseCenterAlign.getX());
+    SmartDashboard.putNumber("desiredPose y center", desiredPoseCenterAlign.getY());
+    SmartDashboard.putNumber("current pos x", swerve.getPose().getX());
+    SmartDashboard.putNumber("current pos y", swerve.getPose().getY());
     SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
+    SmartDashboard.putNumber("angle to rotate by", angleToRotateBy);
+    SmartDashboard.putNumber("lock ID", lockID);
 
-    // System.out.println(lockID);
+    System.out.println(lockID);
   }
 
   public boolean isInBoundsForProcessor() {
@@ -137,8 +145,6 @@ public class Selection extends Vision {
         desiredRotation = tagYaw + Math.toRadians(180);
       }
 
-      angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
-
       desiredPoseCenterAlign =
           new Pose2d(
               GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredDistFromTag),
@@ -161,11 +167,12 @@ public class Selection extends Vision {
     if (lockID == 0) {
       return Pose2d.kZero;
     }
-    setDesiredAlignPose();
     var robotTranslationLeft = new Translation2d(robotHalfLength, -distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));
+    angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
+
     desiredPoseRelativeToCenterRotated =
         robotPoseRelativeToCenter.rotateAround(
             reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
@@ -176,27 +183,33 @@ public class Selection extends Vision {
     if (lockID == 0) {
       return Pose2d.kZero;
     }
-    setDesiredAlignPose();
     var robotTranslationRight = new Translation2d(robotHalfLength, distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationRight, new Rotation2d(Math.toRadians(-180))));
+    angleToRotateBy = reefPegTag.indexOf(lockID) * 60;
+
     desiredPoseRelativeToCenterRotated =
         robotPoseRelativeToCenter.rotateAround(
             reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
+
     return desiredPoseRelativeToCenterRotated;
   }
 
-  private int getLockTarget() {
-    lockID = 0;
-    var results = camera.getAllUnreadResults();
-    if (!results.isEmpty()) {
-      var lastResult = results.get(results.size() - 1);
-      if (lastResult.hasTargets()) {
-        lockID = lastResult.getBestTarget().fiducialId;
+  private void setLockTarget() {
+
+    for (var change : camera.getAllUnreadResults()) {
+
+      if (change.hasTargets()) {
+        trackedTarget = change.getBestTarget();
+        lockID = trackedTarget.fiducialId;
+        if (reefPegTag.indexOf(lockID) == -1) {
+          lockID = 0;
+        }
+      } else {
+        lockID = 0;
       }
     }
-    return lockID;
   }
 
   private double GetTagYaw() {
