@@ -253,9 +253,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
 
-    ChassisSpeeds fieldRelativeSpeed =
-        ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
-    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(fieldRelativeSpeed, 0.02);
+    // ChassisSpeeds fieldRelativeSpeed =
+    //     ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
     if (m_debug) {
       // System.out.println(
       //     String.format(
@@ -363,8 +363,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
   /* pathplanner config */
 
   private void configurePathPlanner() {
+
     // TODO make actual configs for autobuilder
-    // try catch to remove parsing error
     AutoBuilder.configure(
         this::getPose,
         this::setPose,

@@ -6,10 +6,10 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,8 +45,10 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
+import java.io.IOException;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import org.json.simple.parser.ParseException;
 
 public class RobotContainer {
 
@@ -305,7 +307,14 @@ public class RobotContainer {
         .leftBumper()
         .onTrue(
             new DeferredCommand(
-                () -> Pathfinding.goThere(new Pose2d(7.3, 3, Rotation2d.fromDegrees(0))),
+                () -> {
+                  try {
+                    return Pathfinding.goThere(PathPlannerPath.fromPathFile("test"));
+                  } catch (FileVersionException | IOException | ParseException e) {
+                    e.printStackTrace();
+                  }
+                  return Commands.none();
+                },
                 Set.of(m_swerve)));
   }
 
