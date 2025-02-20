@@ -51,8 +51,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 4;
-  private static double kMaxAcceleration = 4;
+  private static double kMaxVelocity = 5;
+  private static double kMaxAcceleration = 4.5;
 
   private static double kG = 0.41; // barely moves up
   private static double kA = 0.95;
