@@ -45,9 +45,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
     DONTPOUND
   }
 
-  private static double kP = 6.3;
-  private static double kI = 3.7;
-  private static double kD = 0.03;
+  private static double kP = 20.0;
+  private static double kI = 0.0;
+  private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
