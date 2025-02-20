@@ -23,7 +23,7 @@ public class LowerElevatorCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_shooter.closeBlocker()),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.DONTPOUND))
-            .unless(() -> !m_elevator.getTargetHeight().equals(desiredHeight.L4)),
+            .unless(() -> m_elevator.getTargetHeight().equals(desiredHeight.L1)),
         new WaitCommand(1.4)
             .unless(() -> !m_elevator.getTargetHeight().equals(desiredHeight.DONTPOUND)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),

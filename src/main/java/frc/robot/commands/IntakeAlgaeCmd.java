@@ -31,8 +31,7 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
       AlgaeIntake.elevation angle,
       LEDs m_leds,
       Elevator m_elevator,
-      desiredHeight height,
-      CommandXboxController m_controller) {
+      desiredHeight height) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
@@ -69,7 +68,8 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
       AlgaeIntake.elevation angle,
       LEDs m_leds,
       Elevator m_elevator,
-      desiredHeight height) {
+      desiredHeight height,
+      CommandXboxController m_controller) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
@@ -99,7 +99,8 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     return Commands.sequence(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.DONTPOUND))
+            .unless(() -> m_elevator.getTargetHeight() == desiredHeight.LOW),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
