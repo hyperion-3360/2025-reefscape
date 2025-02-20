@@ -53,6 +53,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   private static double kMaxVelocity = 5;
   private static double kMaxAcceleration = 4.5;
+  private static double kMinVelocity = 1;
+  private static double kMinAcceleration = 4.5;
 
   private static double kG = 0.41; // barely moves up
   private static double kA = 0.95;
@@ -67,11 +69,13 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  private final TrapezoidProfile.Constraints m_constraints =
+  private final TrapezoidProfile.Constraints m_MaxConstraints =
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+  private final TrapezoidProfile.Constraints m_MinConstraints =
+      new TrapezoidProfile.Constraints(kMinVelocity, kMinAcceleration);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
   private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
+      new ProfiledPIDController(kP, kI, kD, m_MaxConstraints, kDt);
 
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
@@ -257,6 +261,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightEnum = desiredHeight.DONTPOUND;
         break;
     }
+    m_controller.setConstraints(height == desiredHeight.LOW ? m_MinConstraints : m_MaxConstraints);
     m_controller.setGoal(heightTarget);
   }
 

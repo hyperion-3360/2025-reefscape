@@ -27,7 +27,7 @@ public class Selection extends Vision {
   Pose2d origin = new Pose2d();
 
   double robotHalfLength = Units.inchesToMeters(17.5);
-  double distTagToPeg = Units.inchesToMeters(7);
+  double distTagToPeg = Units.inchesToMeters(6.75);
 
   Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
   double angleToRotateBy = 0.0;

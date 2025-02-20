@@ -236,7 +236,7 @@ public class RobotContainer {
     m_driverController
         .x()
         .toggleOnTrue(intakeAlgaeFloor)
-        .toggleOnFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+        .toggleOnFalse(intakeAlgaeFloor.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
