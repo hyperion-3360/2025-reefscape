@@ -81,7 +81,13 @@ public class RobotContainer {
   private final SlewRateLimiter climberLimiter = new SlewRateLimiter(3);
 
   private final IntakeAlgaeCmd intakeAlgaeFloor =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.LOW);
+      new IntakeAlgaeCmd(
+          m_algaeIntake,
+          elevation.FLOOR,
+          m_leds,
+          m_elevator,
+          desiredHeight.LOW,
+          m_driverController);
   private final IntakeAlgaeCmd intakeAlgaeL2 =
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL2);
   private final IntakeAlgaeCmd intakeAlgaeL3 =
@@ -233,13 +239,7 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    // m_driverController.rightBumper().onTrue(dumpAuto);
-    // m_driverController.leftBumper().onTrue(dumpAuto.cancelDumper(m_dumper));
-
-    m_driverController
-        .x()
-        .toggleOnTrue(intakeAlgaeFloor)
-        .toggleOnFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+    m_driverController.x().onTrue(intakeAlgaeFloor);
 
     m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
