@@ -21,6 +21,7 @@ import frc.robot.subsystems.leds.LEDs.Pattern;
 public class IntakeAlgaeCmd extends SequentialCommandGroup {
   AlgaeIntake m_algaeIntake;
   private CommandXboxController m_controller;
+  desiredHeight m_height;
 
   // start the intake rollers and wait until the algae is in the intake
   // then reduce the speed of the intake rollers and lift the intake to a preset position
@@ -73,6 +74,7 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
+    m_height = height;
     addCommands(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(height)),
@@ -99,9 +101,13 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     return Commands.sequence(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.DONTPOUND))
+            .unless(() -> m_height == desiredHeight.LOW),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
+        new WaitCommand(0.8).unless(() -> m_height == desiredHeight.LOW),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        new WaitCommand(0.5),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
   }
 }
