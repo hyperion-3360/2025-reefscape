@@ -705,22 +705,18 @@ public class Pathfinding extends Command {
     return pathfindingSequence;
   }
 
-  public static Command fullControl(PathPlannerAuto auto, Command... commands) {
+  public static Command fullControl(PathPlannerAuto auto) {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
+    auto.event("dump").onTrue(pathfindingSequence);
 
-    // once we have the POIs we want, we replace the old list and add them
     try {
       for (PathPlannerPath path : PathPlannerAuto.getPathGroupFromAutoFile(auto.getName())) {
-        Command pathEvents[] = new Command[path.getEventMarkers().size()];
-        for (int i = 0; i < pathEvents.length; i++) {
-          pathEvents[i] = path.getEventMarkers().get(i).command();
-        }
 
         pathfindingSequence.addCommands(AutoBuilder.pathfindThenFollowPath(path, constraints));
       }
     } catch (IOException | ParseException e) {
       e.printStackTrace();
     }
-    return pathfindingSequence.alongWith(new WaitCommand(1.7).andThen(commands[0]));
+    return pathfindingSequence;
   }
 }

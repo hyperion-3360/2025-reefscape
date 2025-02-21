@@ -5,48 +5,33 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Dump_low 45"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.9
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "dumper"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "Dump_low 45"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "feed"
-                }
-              }
-            ]
+            "name": "pathfindToFeed"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "feed"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PathfindToShoot1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot1"
           }
         }
       ]
