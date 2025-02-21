@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
@@ -21,6 +22,7 @@ import frc.lib.util.Joysticks;
 import frc.robot.commands.AutoCmd.AutoDump;
 // import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
+import frc.robot.Auto.Auto;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -156,8 +158,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("dumper", dumpAuto);
     NamedCommands.registerCommand("feed", feed);
     NamedCommands.registerCommand("print", Commands.print("henlllllllo"));
-    // Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
-    // Auto.initAutoWidget();
+    Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
     SmartDashboard.putData(CommandScheduler.getInstance());
