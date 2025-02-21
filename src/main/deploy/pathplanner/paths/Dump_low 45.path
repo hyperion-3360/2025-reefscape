@@ -1,0 +1,88 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.18,
+        "y": 3.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.993642528637036,
+        "y": 2.7075025970871383
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.531356167148899,
+        "y": 3.0
+      },
+      "prevControl": {
+        "x": 6.617906440145608,
+        "y": 2.436402988495308
+      },
+      "nextControl": {
+        "x": 5.065708838282405,
+        "y": 3.241532720101846
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.257688854836129,
+        "y": 2.3322413160994246
+      },
+      "prevControl": {
+        "x": 5.302422268326218,
+        "y": 2.535984696568669
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.4500730014176529,
+      "rotationDegrees": 28.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "print",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "dumper",
+      "waypointRelativePos": 1.1,
+      "endWaypointRelativePos": 1.0,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 400.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 1.0,
+    "rotation": 28.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 2.0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
