@@ -5,80 +5,33 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Dump_low"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.9
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "dumper"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "Dump_low 45"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "feed"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "feed"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "pathfindToFeed"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "shoot1"
-                }
-              }
-            ]
+            "pathName": "feed"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PathfindToShoot1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot1"
           }
         }
       ]

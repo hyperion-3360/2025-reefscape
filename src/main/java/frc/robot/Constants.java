@@ -28,8 +28,8 @@ public final class Constants {
   public static final class Swerve {
     public static final int kGyroCanId = 20;
 
-    public static final double robotLength = Units.inchesToMeters(28.5); // with bumper: 32.5
-    public static final double robotWidth = Units.inchesToMeters(28.5); // with bumper: 32.5
+    public static final double robotLength = Units.inchesToMeters(32.5); // with bumper: 32.5
+    public static final double robotWidth = Units.inchesToMeters(32.5); // with bumper: 32.5
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
@@ -171,8 +171,8 @@ public final class Constants {
 
     public static final PathFollowingController kPathFollowController =
         new PPHolonomicDriveController(
-            new PIDConstants(1.75, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(1.05, 0.0, 0.0) // Rotation PID constants
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             );
   }
 
@@ -204,7 +204,7 @@ public final class Constants {
 
   public static class Feeders {
     public static final Pose2d[] kFeeders = {
-      new Pose2d(0.8382, 0.635, Rotation2d.fromDegrees(234)),
+      new Pose2d(0.8382, 0.635, Rotation2d.fromDegrees(54)),
       new Pose2d(0.8382, 7.3914, Rotation2d.fromDegrees(126)),
     };
   }
