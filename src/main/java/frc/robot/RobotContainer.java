@@ -6,10 +6,10 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
@@ -45,10 +46,8 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
-import java.io.IOException;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import org.json.simple.parser.ParseException;
 
 public class RobotContainer {
 
@@ -160,7 +159,6 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("dumper", dumpAuto);
     NamedCommands.registerCommand("feed", feed);
-    NamedCommands.registerCommand("print", Commands.print("henlllllllo"));
     // Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
     // Auto.initAutoWidget();
 
@@ -305,21 +303,11 @@ public class RobotContainer {
     //     .onFalse(Commands.runOnce(() -> cycleToFeeder.cancel(), m_elevator, m_shooter, m_leds));
     m_coDriverController
         .leftBumper()
-        .onTrue(
-            new DeferredCommand(
-                () -> {
-                  try {
-                    return Pathfinding.goThere(PathPlannerPath.fromPathFile("test"));
-                  } catch (FileVersionException | IOException | ParseException e) {
-                    e.printStackTrace();
-                  }
-                  return Commands.none();
-                },
-                Set.of(m_swerve)));
+        .onTrue(new DeferredCommand(() -> Pathfinding.goThere(POI.FEEDERS), Set.of(m_swerve)));
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.estimatePose();
-    return new PathPlannerAuto("dump");
+    return Pathfinding.goThere(new Pose2d(7.3, 3.0, Rotation2d.fromDegrees(0.0)))
+        .andThen(Pathfinding.fullControl(new PathPlannerAuto("dump"), dumpAuto, feed));
   }
 }
