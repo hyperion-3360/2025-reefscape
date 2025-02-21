@@ -67,11 +67,12 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationMetersPerSecondSquaredX = 2.0;
   private final double kMaxSpeedMetersPerSecondY = 3.5;
   private final double kMaxAccelerationMetersPerSecondSquaredY = 2.0;
-  private final double kMaxSpeedRadiansPerSecond = 1.5;
-  private final double kMaxAccelerationRadiansPerSecondSquared = 1.0;
+  private final double kMaxSpeedRadiansPerSecond = 4.5;
+  private final double kMaxAccelerationRadiansPerSecondSquared = 3.5;
   private final double kPX = 4.0;
   private final double kPY = 4.0;
   private final double kPRot = 3.0;
+  private boolean ambiguousRot = false;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -154,7 +155,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
     if (m_targetModeEnabled) {
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
-      var rot =
+      var rot = 0.0;
+      if (ambiguousRot) {
+        rot = m_rotController.calculate(getRotation2d().getRadians());
+        if (getRotation2d().getDegrees() < -178 && getRotation2d().getDegrees() > 178) {
+          rot = 0;
+        }
+      }
+      rot =
           m_rotController.calculate(
               poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
@@ -200,12 +208,15 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public boolean targetReached() {
     var posX = getPose().getX();
     var posY = getPose().getY();
+    var rot = getRotation2d().getRadians();
     var goalX = m_xController.getGoal().position;
     var goalY = m_yController.getGoal().position;
+    var goalRot = m_rotController.getGoal().position;
 
     return m_targetModeEnabled
         && isAlmostEqual(posX, goalX, 0.05)
-        && isAlmostEqual(posY, goalY, 0.05);
+        && isAlmostEqual(posY, goalY, 0.05)
+        && isAlmostEqual(rot, goalRot, 1);
   }
 
   public void disableDriveToTarget() {
@@ -220,13 +231,28 @@ public class Swerve extends SubsystemBase implements TestBindings {
     if (target == Pose2d.kZero) {
       m_targetModeEnabled = false;
     } else {
+      if (target.getRotation().getDegrees() == 180 || target.getRotation().getDegrees() == -180) {
+        ambiguousRot = true;
+      } else {
+        ambiguousRot = false;
+      }
       m_targetModeEnabled = true;
       m_xController.reset(getPose().getX());
       m_xController.setGoal(target.getX());
       m_yController.reset(getPose().getY());
       m_yController.setGoal(target.getY());
-      m_rotController.reset(getPose().getRotation().getRadians());
-      m_rotController.setGoal(target.getRotation().getRadians());
+      if (ambiguousRot) {
+        if (getPose().getRotation().getDegrees() > 0) {
+          m_rotController.reset(getPose().getRotation().getRadians());
+          m_rotController.setGoal(Units.degreesToRadians(179));
+        } else {
+          m_rotController.reset(getPose().getRotation().getRadians());
+          m_rotController.setGoal(Units.degreesToRadians(-179));
+        }
+      } else {
+        m_rotController.reset(getPose().getRotation().getRadians());
+        m_rotController.setGoal(target.getRotation().getRadians());
+      }
       System.out.println(" Drive to target: " + target.getX() + " " + target.getY());
     }
   }

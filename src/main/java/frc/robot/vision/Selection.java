@@ -26,8 +26,8 @@ public class Selection extends Vision {
   Pose2d desiredPoseCenterAlign = new Pose2d();
   Pose2d origin = new Pose2d();
 
-  double robotHalfLength = Units.inchesToMeters(18);
-  double distTagToPeg = Units.inchesToMeters(6.5);
+  double robotHalfLength = Units.inchesToMeters(20);
+  double distTagToPeg = Units.inchesToMeters(7);
 
   Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
   double angleToRotateBy = 0.0;
@@ -123,6 +123,7 @@ public class Selection extends Vision {
     SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
     SmartDashboard.putNumber("angle to rotate by", angleToRotateBy);
     SmartDashboard.putNumber("lock ID", lockID);
+    SmartDashboard.putNumber("gyro rotation", swerve.getRotation2d().getDegrees());
   }
 
   public boolean isInBoundsForProcessor() {
@@ -170,8 +171,7 @@ public class Selection extends Vision {
     if (lockID == 0) {
       return Pose2d.kZero;
     }
-    var robotTranslationLeft =
-        new Translation2d(robotHalfLength, -distTagToPeg - Units.inchesToMeters(2));
+    var robotTranslationLeft = new Translation2d(robotHalfLength, -distTagToPeg);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));

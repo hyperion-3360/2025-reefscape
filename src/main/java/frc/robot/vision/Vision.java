@@ -55,9 +55,8 @@ public class Vision extends SubsystemBase {
             tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
     photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     photonEstimatorLml2 =
-        new PhotonPoseEstimator(
-            tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml2);
-    photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2);
+    // photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
@@ -70,9 +69,13 @@ public class Vision extends SubsystemBase {
       visionEst = photonEstimatorLml3.update(change);
       updateEstimationStdDevs(visionEst, change.getTargets());
     }
-    for (var change : cameraLml2.getAllUnreadResults()) {
-      visionEst = photonEstimatorLml2.update(change);
-      updateEstimationStdDevs(visionEst, change.getTargets());
+    if (cameraLml3.getAllUnreadResults().isEmpty()) {
+      for (var change : cameraLml2.getAllUnreadResults()) {
+        if (change.hasTargets() && change.getBestTarget().poseAmbiguity < 0.05) {
+          visionEst = photonEstimatorLml2.update(change);
+          updateEstimationStdDevs(visionEst, change.getTargets());
+        }
+      }
     }
     return visionEst;
   }

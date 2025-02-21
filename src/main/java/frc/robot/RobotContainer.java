@@ -233,8 +233,8 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    m_driverController.rightBumper().onTrue(dumpAuto);
-    m_driverController.leftBumper().onTrue(dumpAuto.cancelDumper(m_dumper));
+    // m_driverController.rightBumper().onTrue(dumpAuto);
+    // m_driverController.leftBumper().onTrue(dumpAuto.cancelDumper(m_dumper));
 
     m_driverController
         .x()
