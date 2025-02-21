@@ -107,7 +107,6 @@ public class Pathfinding extends Command {
     private Supplier<Command> event;
     private BooleanSupplier[] conditions;
     // a list that acts like a buffer accepting pose2ds, sorting them and assigning the closest one
-    // to the point to pathfind to. Emptys out after each cyle to accept new arrays of points
     private ArrayList<Pose2d> positionsList = new ArrayList<>();
 
     // I need a list separate from positionsList because I need to keep track of all consumed pois
