@@ -35,7 +35,7 @@ public class Vision extends SubsystemBase {
 
   // (Fake values. Experiment and determine estimation noise on an actual robot.)
   private Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
-  private Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+  private Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(3, 3, 6);
 
   AprilTagFieldLayout tagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);

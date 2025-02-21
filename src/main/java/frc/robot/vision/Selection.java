@@ -26,8 +26,8 @@ public class Selection extends Vision {
   Pose2d desiredPoseCenterAlign = new Pose2d();
   Pose2d origin = new Pose2d();
 
-  double robotHalfLength = Units.inchesToMeters(17.5);
-  double distTagToPeg = Units.inchesToMeters(7);
+  double robotHalfLength = Units.inchesToMeters(18);
+  double distTagToPeg = Units.inchesToMeters(6.5);
 
   Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
   double angleToRotateBy = 0.0;
@@ -55,11 +55,11 @@ public class Selection extends Vision {
         minimumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(200.0), Units.inchesToMeters(0.0));
         maximumTranslationProcessor =
-            new Translation2d(Units.inchesToMeters(270.0), Units.inchesToMeters(50.0));
+            new Translation2d(Units.inchesToMeters(300.0), Units.inchesToMeters(100.0));
         processorAlignPosition =
             new Pose2d(
-                Units.inchesToMeters(235.643424),
-                Units.inchesToMeters(17.5),
+                Units.inchesToMeters(240),
+                Units.inchesToMeters(30),
                 new Rotation2d(Units.degreesToRadians(-90)));
 
         reefCenter = new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
@@ -170,7 +170,8 @@ public class Selection extends Vision {
     if (lockID == 0) {
       return Pose2d.kZero;
     }
-    var robotTranslationLeft = new Translation2d(robotHalfLength, -distTagToPeg);
+    var robotTranslationLeft =
+        new Translation2d(robotHalfLength, -distTagToPeg - Units.inchesToMeters(2));
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));

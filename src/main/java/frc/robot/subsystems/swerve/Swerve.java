@@ -167,6 +167,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
       SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
 
       _drive(new Translation2d(x, y), rot, true, true);
+      if (targetReached()) {
+        m_targetModeEnabled = false;
+      }
+      System.out.println(targetReached());
     }
   }
 
@@ -194,13 +198,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public boolean targetReached() {
-    var pos = getPose().getX();
-    var goal = m_xController.getGoal().position;
+    var posX = getPose().getX();
+    var posY = getPose().getY();
+    var goalX = m_xController.getGoal().position;
+    var goalY = m_yController.getGoal().position;
 
-    SmartDashboard.putNumber("Target mode: goal ", goal);
-    SmartDashboard.putNumber("Target mode pos ", pos);
-
-    return m_targetModeEnabled && isAlmostEqual(pos, goal, 0.1);
+    return m_targetModeEnabled
+        && isAlmostEqual(posX, goalX, 0.05)
+        && isAlmostEqual(posY, goalY, 0.05);
   }
 
   public void disableDriveToTarget() {
