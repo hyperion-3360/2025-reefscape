@@ -11,6 +11,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PointTowardsZone;
 import com.pathplanner.lib.path.RotationTarget;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -63,18 +64,21 @@ public class Pathfinding extends Command {
   public enum POI {
     ALGAE(
         Constants.AlgaeCoralStand.kStands,
+        180,
         () -> Commands.runOnce(() -> System.out.println("Hello Algae")),
         Constants.Priorities.kIntakeCoral,
         true,
         () -> !RobotContainer.m_algaeIntake.sensorTriggered()),
     BRANCHES(
         Constants.Pegs.kPegs,
+        60,
         () -> Commands.runOnce(() -> System.out.println("Hello branch")),
         Constants.Priorities.kShootCoralL4,
         true,
         () -> RobotContainer.m_shooter.isCoralIn()),
     FEEDERS(
         Constants.Feeders.kFeeders,
+        54,
         () -> Commands.runOnce(() -> System.out.println("Hello feeder")),
         Constants.Priorities.kShootCoralL4,
         false,
@@ -109,6 +113,7 @@ public class Pathfinding extends Command {
         () -> RobotContainer.m_shooter.isCoralIn());
 
     private Supplier<Command> event;
+    private double aprilTagAngle;
     private BooleanSupplier[] conditions;
     // a list that acts like a buffer accepting pose2ds, sorting them and assigning the closest one
     // to the point to pathfind to. Emptys out after each cyle to accept new arrays of points
@@ -185,11 +190,13 @@ public class Pathfinding extends Command {
      */
     private POI(
         Pose2d[] xyThetacoordinates,
+        double aprilTagAngle,
         Supplier<Command> event,
         int priority,
         boolean consumable,
         BooleanSupplier... removeCondition) {
       this.poseArray = xyThetacoordinates;
+      this.aprilTagAngle = aprilTagAngle;
       this.consumable = consumable;
       this.conditions = removeCondition;
       this.event = event;
@@ -222,6 +229,10 @@ public class Pathfinding extends Command {
 
     private Pose2d getPose2d() {
       return pose;
+    }
+
+    private double getAprilTagRotation() {
+      return aprilTagAngle;
     }
 
     private Pose2d changePose2d() {
@@ -407,10 +418,8 @@ public class Pathfinding extends Command {
 
     path.add(
         new Waypoint(
-            optimisedPos.getTranslation(),
-            optimisedPos.getTranslation(),
-            lineupPos.getTranslation()));
-    path.add(new Waypoint(lineupPos.getTranslation(), lineupPos.getTranslation(), null));
+            lineupPos.getTranslation(), lineupPos.getTranslation(), optimisedPos.getTranslation()));
+    path.add(new Waypoint(optimisedPos.getTranslation(), optimisedPos.getTranslation(), null));
 
     PathPlannerPath pathToPathfind =
         new PathPlannerPath(
@@ -452,10 +461,9 @@ public class Pathfinding extends Command {
 
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
 
-    double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
-    double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
-    Rotation2d rotation =
-        Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees() + 180);
+    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.0;
+    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2) * 1.0;
+    Rotation2d rotation = Rotation2d.fromDegrees(poiToPathfind.getAprilTagRotation());
 
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
@@ -463,7 +471,7 @@ public class Pathfinding extends Command {
             poiToPathfind.getPose2d().getX() + robotLengthPlusBuffer * rotation.getCos(),
             poiToPathfind.getPose2d().getY() + robotWidthPlusBuffer * rotation.getSin());
 
-    return new Pose2d(widthToBacktrack, rotation.minus(Rotation2d.fromDegrees(180)));
+    return new Pose2d(widthToBacktrack, poiToPathfind.getPose2d().getRotation());
   }
 
   public static Pose2d lineupPoint(Pose2d poiToLineup) {
@@ -651,12 +659,21 @@ public class Pathfinding extends Command {
    */
   public static Command goThere(POI placeToGo) {
 
-    return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo), constraints);
+    return AutoBuilder.pathfindToPose(POICoordinatesOptimisation(placeToGo), constraints);
+    // return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo), constraints);
   }
 
-  public static Command goThere(PathPlannerPath placeToGo) {
+  public static Command goThere(String pathName) {
 
-    return AutoBuilder.pathfindThenFollowPath(placeToGo, constraints);
+    try {
+      return AutoBuilder.pathfindThenFollowPath(
+          PathPlannerPath.fromPathFile(pathName), constraints);
+    } catch (FileVersionException | IOException | ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    System.out.println("no");
+    return Commands.none();
   }
 
   /**

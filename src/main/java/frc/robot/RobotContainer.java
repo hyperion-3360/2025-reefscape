@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
+import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
@@ -41,7 +41,6 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class RobotContainer {
@@ -108,7 +107,9 @@ public class RobotContainer {
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
   private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
-  private final AutoFeast cycleToFeeder = new AutoFeast(m_elevator, m_shooter, m_leds);
+  private final AutoFeast cycleToFeeder = new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds);
+  private final AutoCancel cancelAuto =
+      new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
 
   public enum TestModes {
     NONE,
@@ -292,10 +293,7 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_coDriverController
-        .leftBumper()
-        .whileTrue(new DeferredCommand(() -> cycleToFeeder, Set.of(m_swerve)))
-        .onFalse(Commands.runOnce(() -> cycleToFeeder.cancel()));
+    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {

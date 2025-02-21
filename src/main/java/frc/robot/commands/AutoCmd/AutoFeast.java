@@ -10,9 +10,11 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class AutoFeast extends SequentialCommandGroup {
-  public AutoFeast(Elevator m_elevator, Shooter m_shooter, LEDs m_leds) {
+  public AutoFeast(Swerve m_swerve, Elevator m_elevator, Shooter m_shooter, LEDs m_leds) {
+    addRequirements(m_swerve);
     addRequirements(m_elevator);
     addRequirements(m_shooter);
     addRequirements(m_leds);
