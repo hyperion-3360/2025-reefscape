@@ -17,11 +17,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
+import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
-import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -299,6 +299,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl(new PathPlannerAuto("dump"), dumpAuto); 
+    return Pathfinding.fullControl(new PathPlannerAuto("dump"), dumpAuto);
   }
 }

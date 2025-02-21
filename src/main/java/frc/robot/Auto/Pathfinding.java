@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -713,6 +712,21 @@ public class Pathfinding extends Command {
       for (PathPlannerPath path : PathPlannerAuto.getPathGroupFromAutoFile(auto.getName())) {
 
         pathfindingSequence.addCommands(AutoBuilder.pathfindThenFollowPath(path, constraints));
+      }
+    } catch (IOException | ParseException e) {
+      e.printStackTrace();
+    }
+    return pathfindingSequence;
+  }
+
+  public static Command fullControl(PathPlannerAuto auto, Command command) {
+    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
+    auto.event("dump").onTrue(pathfindingSequence);
+
+    try {
+      for (PathPlannerPath path : PathPlannerAuto.getPathGroupFromAutoFile(auto.getName())) {
+
+        pathfindingSequence.addCommands(AutoBuilder.pathfindThenFollowPath(path, constraints), command);
       }
     } catch (IOException | ParseException e) {
       e.printStackTrace();
