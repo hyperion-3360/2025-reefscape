@@ -651,8 +651,7 @@ public class Pathfinding extends Command {
    */
   public static Command goThere(POI placeToGo) {
 
-    return AutoBuilder.pathfindToPose(placeToGo.getPose2d(), constraints);
-    // return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo), constraints);
+    return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo), constraints);
   }
 
   public static Command goThere(PathPlannerPath placeToGo) {
