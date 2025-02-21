@@ -42,7 +42,8 @@ public class Vision extends SubsystemBase {
   Transform3d robotToCamLml3 =
       new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, 0, 0));
   Transform3d robotToCamLml2 =
-      new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, 0, Units.degreesToRadians(180)));
+      new Transform3d(
+          new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
   /** Creates a new Odometry. */
   public Vision() {
@@ -50,10 +51,12 @@ public class Vision extends SubsystemBase {
     cameraLml3 = new PhotonCamera("lml3");
     cameraLml2 = new PhotonCamera("lml2");
     photonEstimatorLml3 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
+        new PhotonPoseEstimator(
+            tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
     photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     photonEstimatorLml2 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml2);
+        new PhotonPoseEstimator(
+            tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml2);
     photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
@@ -62,7 +65,7 @@ public class Vision extends SubsystemBase {
 
     // for a change in target (latest result), estimation.update with latest
     // update estimation standard deviations with new estimation and new target
-    
+
     for (var change : cameraLml3.getAllUnreadResults()) {
       visionEst = photonEstimatorLml3.update(change);
       updateEstimationStdDevs(visionEst, change.getTargets());
