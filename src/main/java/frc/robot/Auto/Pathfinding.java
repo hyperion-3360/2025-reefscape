@@ -725,7 +725,8 @@ public class Pathfinding extends Command {
     try {
       for (PathPlannerPath path : PathPlannerAuto.getPathGroupFromAutoFile(auto.getName())) {
 
-        pathfindingSequence.addCommands(AutoBuilder.pathfindThenFollowPath(path, constraints), command);
+        pathfindingSequence.addCommands(
+            AutoBuilder.pathfindThenFollowPath(path, constraints), command);
       }
     } catch (IOException | ParseException e) {
       e.printStackTrace();
