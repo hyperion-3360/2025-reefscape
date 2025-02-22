@@ -33,7 +33,7 @@ This is a file to indicate what should be found on the smartdashboard in competi
 - Elevator desired height (string)
 - Lock ID (number)
 
-# Layout
+# Layout driver
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
