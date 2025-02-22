@@ -1,7 +1,6 @@
 package frc.robot.Auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.ConstraintsZone;
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.GoalEndState;
@@ -25,10 +24,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.AutoCmd.AutoDump;
+import frc.robot.commands.AutoCmd.AutoFeast;
+import frc.robot.commands.AutoCmd.AutoProcessor;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
@@ -63,22 +63,22 @@ public class Pathfinding extends Command {
   public enum POI {
     ALGAE(
         Constants.AlgaeCoralStand.kStands,
-        180,
-        () -> Commands.runOnce(() -> System.out.println("Hello Algae")),
+        false,
+        () -> Commands.print("lol you are not used xaxaxa"),
         Constants.Priorities.kIntakeCoral,
         true,
         () -> !RobotContainer.m_algaeIntake.sensorTriggered()),
     BRANCHES(
         Constants.Pegs.kPegs,
-        60,
+        false,
         () -> Commands.runOnce(() -> System.out.println("Hello branch")),
         Constants.Priorities.kShootCoralL4,
         true,
         () -> RobotContainer.m_shooter.isCoralIn()),
     FEEDERS(
         Constants.Feeders.kFeeders,
-        54,
-        () -> Commands.runOnce(() -> System.out.println("Hello feeder")),
+        true,
+        () -> m_feeder,
         Constants.Priorities.kShootCoralL4,
         false,
         () -> !RobotContainer.m_shooter.isCoralIn()),
@@ -86,13 +86,15 @@ public class Pathfinding extends Command {
         5.9875,
         0,
         270.0,
-        () -> Commands.runOnce(() -> System.out.println("Hello processor")),
+        false,
+        () -> processAlgae,
         Constants.Priorities.kShootingProcessor,
         () -> RobotContainer.m_algaeIntake.sensorTriggered()),
     NET(
         8.2722,
         6.1376,
         0.0,
+        false,
         () -> Commands.runOnce(() -> System.out.println("Hello net")),
         Constants.Priorities.kShootNet,
         () -> RobotContainer.m_algaeIntake.sensorTriggered()),
@@ -100,6 +102,7 @@ public class Pathfinding extends Command {
         4.073906,
         4.745482,
         150,
+        false,
         () -> Commands.runOnce(() -> System.out.println("Hello dumping")),
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn()),
@@ -107,12 +110,12 @@ public class Pathfinding extends Command {
         4.185,
         2.218,
         216.715,
+        false,
         () -> m_dump,
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn());
 
     private Supplier<Command> event;
-    private double aprilTagAngle;
     private BooleanSupplier[] conditions;
     // a list that acts like a buffer accepting pose2ds, sorting them and assigning the closest one
     private ArrayList<Pose2d> positionsList = new ArrayList<>();
@@ -124,6 +127,7 @@ public class Pathfinding extends Command {
     private int priority;
     private Pose2d[] poseArray;
     private Pose2d pose;
+    private boolean shouldFlipRobot;
 
     /**
      * constructor stocking all the data we need per poi in variables
@@ -138,6 +142,7 @@ public class Pathfinding extends Command {
         double x_coordinates,
         double y_coordinates,
         double angle,
+        boolean shouldFlipRobot,
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
@@ -145,6 +150,7 @@ public class Pathfinding extends Command {
         new Pose2d(x_coordinates, y_coordinates, Rotation2d.fromDegrees(angle))
       };
       this.event = event;
+      this.shouldFlipRobot = shouldFlipRobot;
       this.conditions = removeCondition;
       this.poseArray = poseArray;
       this.priority = priority;
@@ -162,12 +168,14 @@ public class Pathfinding extends Command {
      */
     private POI(
         Translation2d xy_coordinates,
+        boolean shouldFlipRobot,
         double angle,
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
       Pose2d[] poseArray = {new Pose2d(xy_coordinates, Rotation2d.fromDegrees(angle))};
       this.poseArray = poseArray;
+      this.shouldFlipRobot = shouldFlipRobot;
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
@@ -188,13 +196,13 @@ public class Pathfinding extends Command {
      */
     private POI(
         Pose2d[] xyThetacoordinates,
-        double aprilTagAngle,
+        boolean shouldFlipRobot,
         Supplier<Command> event,
         int priority,
         boolean consumable,
         BooleanSupplier... removeCondition) {
       this.poseArray = xyThetacoordinates;
-      this.aprilTagAngle = aprilTagAngle;
+      this.shouldFlipRobot = shouldFlipRobot;
       this.consumable = consumable;
       this.conditions = removeCondition;
       this.event = event;
@@ -229,10 +237,6 @@ public class Pathfinding extends Command {
       return pose;
     }
 
-    private double getAprilTagRotation() {
-      return aprilTagAngle;
-    }
-
     private Pose2d changePose2d() {
 
       for (Pose2d coordinate : poseArray) {
@@ -255,6 +259,10 @@ public class Pathfinding extends Command {
       positionsList.clear();
       this.pose = pose;
       return pose;
+    }
+
+    private boolean isRobotFlipped() {
+      return this.shouldFlipRobot;
     }
   }
 
@@ -307,6 +315,15 @@ public class Pathfinding extends Command {
   private static Dumper s_dumper;
 
   private static AutoDump m_dump = new AutoDump(RobotContainer.m_dumper);
+  private static AutoFeast m_feeder =
+      new AutoFeast(
+          RobotContainer.m_swerve,
+          RobotContainer.m_elevator,
+          RobotContainer.m_shooter,
+          RobotContainer.m_leds);
+  private static AutoProcessor processAlgae =
+      new AutoProcessor(
+          RobotContainer.m_elevator, RobotContainer.m_algaeIntake, RobotContainer.m_leds);
 
   public static void configurePathfinder(
       Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
@@ -461,7 +478,8 @@ public class Pathfinding extends Command {
 
     double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.0;
     double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2) * 1.0;
-    Rotation2d rotation = Rotation2d.fromDegrees(poiToPathfind.getAprilTagRotation());
+    Rotation2d rotation =
+        Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees() + 180);
 
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
@@ -469,7 +487,11 @@ public class Pathfinding extends Command {
             poiToPathfind.getPose2d().getX() + robotLengthPlusBuffer * rotation.getCos(),
             poiToPathfind.getPose2d().getY() + robotWidthPlusBuffer * rotation.getSin());
 
-    return new Pose2d(widthToBacktrack, poiToPathfind.getPose2d().getRotation());
+    return new Pose2d(
+        widthToBacktrack,
+        poiToPathfind.isRobotFlipped()
+            ? poiToPathfind.getPose2d().getRotation()
+            : poiToPathfind.getPose2d().getRotation().minus(new Rotation2d(180)));
   }
 
   public static Pose2d lineupPoint(Pose2d poiToLineup) {
@@ -694,43 +716,16 @@ public class Pathfinding extends Command {
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
-
-      pathfindingSequence.addCommands(
-          AutoBuilder.pathfindToPose(POICoordinatesOptimisation(poiArrayElement), constraints)
-              .alongWith(poiArrayElement.getEvent()),
-          new WaitUntilCommand(() -> poiArrayElement.getEvent().isFinished()));
+      pathfindingSequence.addCommands(goThere(poiArrayElement).alongWith(poiArrayElement.getEvent()));
     }
     return pathfindingSequence;
   }
 
-  public static Command fullControl(PathPlannerAuto auto) {
-    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
-    auto.event("dump").onTrue(pathfindingSequence);
-
-    try {
-      for (PathPlannerPath path : PathPlannerAuto.getPathGroupFromAutoFile(auto.getName())) {
-
-        pathfindingSequence.addCommands(AutoBuilder.pathfindThenFollowPath(path, constraints));
-      }
-    } catch (IOException | ParseException e) {
-      e.printStackTrace();
-    }
-    return pathfindingSequence;
-  }
-
-  public static Command fullControl(PathPlannerAuto auto, Command command) {
-    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
-    auto.event("dump").onTrue(pathfindingSequence);
-
-    try {
-      for (PathPlannerPath path : PathPlannerAuto.getPathGroupFromAutoFile(auto.getName())) {
-
-        pathfindingSequence.addCommands(
-            AutoBuilder.pathfindThenFollowPath(path, constraints), command);
-      }
-    } catch (IOException | ParseException e) {
-      e.printStackTrace();
-    }
-    return pathfindingSequence;
+  public static boolean isCloseToPOI(POI currentPOI) {
+    return RobotContainer.m_swerve
+            .getPose()
+            .getTranslation()
+            .getDistance(currentPOI.getPose2d().getTranslation())
+        >= 0.4;
   }
 }

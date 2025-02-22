@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,11 +15,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
+import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
-import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -108,7 +106,6 @@ public class RobotContainer {
       new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
-  private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
   private final AutoFeast cycleToFeeder = new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds);
   private final AutoCancel cancelAuto =
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
@@ -155,10 +152,8 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    NamedCommands.registerCommand("dumper", dumpAuto);
-    NamedCommands.registerCommand("feed", feed);
     // Pathfinding.configurePathfinder(m_shooter, m_swerve, m_elevator, m_algaeIntake, m_dumper);
-    // Auto.initAutoWidget();
+    Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -299,6 +294,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl(new PathPlannerAuto("dump"), dumpAuto);
+    return Pathfinding.fullControl();
   }
 }
