@@ -34,7 +34,8 @@ This is a file to indicate what should be found on the smartdashboard in competi
 - Lock ID (number)
 
 # Layout
-
+| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
 | Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
 | Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
