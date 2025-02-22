@@ -35,10 +35,10 @@ This is a file to indicate what should be found on the smartdashboard in competi
 
 # Layout
 
-|Limelight|Limelight|Limelight|Camera|Camera|Camera|Field|Field|Field|Field|
-|Limelight|Limelight|Limelight|Camera|Camera|Camera|Field|Field|Field|Field|
-|Limelight|Limelight|Limelight|Camera|Camera|Camera|Field|Field|Field|Field|
-||||Processor bool|Is aligned|Algae bool|Coral bool||||
+| Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
+| Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
+| Limelight | Limelight | Limelight | Camera | Camera | Camera | Field | Field | Field | Field |
+| | | | Processor bool | Is aligned | Algae bool | Coral bool | | | |
 
 
 

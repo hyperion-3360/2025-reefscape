@@ -121,6 +121,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     // SmartDashboard.putData("Tunable feedforward", m_feedforward);
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
+    
     m_controller.setGoal(0.0);
     // test_heightIndex = 0;
   }
