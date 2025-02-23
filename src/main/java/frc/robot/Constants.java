@@ -349,7 +349,7 @@ public final class Constants {
     public static final double kElevatorFeeder = 0.207;
     public static final double kElevatorAlgaeL2 = 1.30;
     public static final double kElevatorAlgaeL3 = 1.92;
-    public static final double kDontPound = 1.7;
+    public static final double kDontPound = 2;
   }
 
   public static class AlgaeIntakeConstants {
