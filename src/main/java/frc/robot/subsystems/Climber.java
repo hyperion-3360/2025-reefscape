@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,6 +37,7 @@ public class Climber extends SubsystemBase implements TestBindings {
 
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
+  private final DigitalInput m_beamBrake = new DigitalInput(Constants.SubsystemInfo.kClimberBeamBrakeID);
 
   public Climber() {
     // motor configs
@@ -69,6 +71,18 @@ public class Climber extends SubsystemBase implements TestBindings {
           m_direction = Math.signum(val);
           m_deepMotor.set(Math.pow(val, 2) * m_direction);
         });
+  }
+
+  public Command winchDeepClimb(){
+    return this.run(()-> m_deepMotor.set(1));
+  }
+
+  public Command stopDeepClimb(){
+    return this.run(()-> m_deepMotor.set(0));
+  }
+
+  public boolean SensorDetected(){
+    return m_beamBrake.get();
   }
 
   @Override
