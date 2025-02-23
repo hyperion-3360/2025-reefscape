@@ -202,7 +202,7 @@ public class Selection extends Vision {
 
   private void setLockTarget() {
 
-    for (var change : cameraLml3.getAllUnreadResults()) {
+    for (var change : super.unreadResults) {
 
       if (change.hasTargets()) {
         trackedTarget = change.getBestTarget();

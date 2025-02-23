@@ -22,6 +22,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
@@ -31,6 +32,7 @@ public class Vision extends SubsystemBase {
 
   protected final PhotonPoseEstimator photonEstimatorLml3;
   protected final PhotonPoseEstimator photonEstimatorLml2;
+  protected List<PhotonPipelineResult> unreadResults;
 
   protected Matrix<N3, N1> curStdDevs;
 
@@ -41,10 +43,10 @@ public class Vision extends SubsystemBase {
   AprilTagFieldLayout tagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   Transform3d robotToCamLml3 =
-      new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, 0, 0));
+      new Transform3d(new Translation3d(Units.inchesToMeters(2.75), 0.0, 0.0), new Rotation3d(0, 0, 0));
   Transform3d robotToCamLml2 =
       new Transform3d(
-          new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0, 0, Units.degreesToRadians(180)));
+          new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0), new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
   /** Creates a new Odometry. */
   public Vision() {
@@ -65,21 +67,26 @@ public class Vision extends SubsystemBase {
 
     // for a change in target (latest result), estimation.update with latest
     // update estimation standard deviations with new estimation and new target
-
-    var isTooFar = true;
+     unreadResults = cameraLml3.getAllUnreadResults();
     
-    for (var change : cameraLml3.getAllUnreadResults()) {
-      visionEst = photonEstimatorLml3.update(change);
-      updateEstimationStdDevs(visionEst, change.getTargets());
+    for (var changelml3 : unreadResults) {
+      
+      visionEst = photonEstimatorLml3.update(changelml3);
+      updateEstimationStdDevs(visionEst, changelml3.getTargets());
+      
     }
-    if (cameraLml3.getAllUnreadResults().isEmpty()) {
-      for (var change : cameraLml2.getAllUnreadResults()) {
-    if (change.getBestTarget().bestCameraToTarget.getX() > 3 || change.getBestTarget().bestCameraToTarget.getY() > 3)
-        if (change.hasTargets() && change.getBestTarget().poseAmbiguity < 0.05) {
-          visionEst = photonEstimatorLml2.update(change);
-          updateEstimationStdDevs(visionEst, change.getTargets());
+
+    if (unreadResults.isEmpty()) {
+      for (var changelml2 : cameraLml2.getAllUnreadResults()) {
+        if (Math.hypot(changelml2.getBestTarget().getBestCameraToTarget().getX(), changelml2.getBestTarget().getBestCameraToTarget().getY()) > 2) {
+            if (changelml2.hasTargets() && changelml2.getBestTarget().poseAmbiguity < 0.05) {
+              visionEst = photonEstimatorLml2.update(changelml2);
+              updateEstimationStdDevs(visionEst, changelml2.getTargets());
+            }
+          }
         }
-      }
+    } else {
+      cameraLml2.getAllUnreadResults();
     }
     return visionEst;
   }
