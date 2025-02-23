@@ -67,11 +67,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationMetersPerSecondSquaredX = 2.0;
   private final double kMaxSpeedMetersPerSecondY = 3.5;
   private final double kMaxAccelerationMetersPerSecondSquaredY = 2.0;
-  private final double kMaxSpeedRadiansPerSecond = 4.5;
-  private final double kMaxAccelerationRadiansPerSecondSquared = 3.5;
-  private final double kPX = 4.0;
-  private final double kPY = 4.0;
-  private final double kPRot = 3.0;
+  private final double kMaxSpeedRadiansPerSecond = 5.5;
+  private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
+  private final double kPX = 5.0;
+  private final double kPY = 5.0;
+  private final double kPRot = 6.0;
   private boolean ambiguousRot = false;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -83,6 +83,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public Swerve(Vision vision) {
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
     m_field2d = new Field2d();
+
     m_gyro.reset();
     this.vision = vision;
     mSwerveMods =
@@ -214,8 +215,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var goalRot = m_rotController.getGoal().position;
 
     return m_targetModeEnabled
-        && isAlmostEqual(posX, goalX, 0.05)
-        && isAlmostEqual(posY, goalY, 0.05)
+        && isAlmostEqual(posX, goalX, 0.02)
+        && isAlmostEqual(posY, goalY, 0.02)
         && isAlmostEqual(rot, goalRot, 1);
   }
 

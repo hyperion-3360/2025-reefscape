@@ -10,6 +10,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -65,12 +66,15 @@ public class Vision extends SubsystemBase {
     // for a change in target (latest result), estimation.update with latest
     // update estimation standard deviations with new estimation and new target
 
+    var isTooFar = true;
+    
     for (var change : cameraLml3.getAllUnreadResults()) {
       visionEst = photonEstimatorLml3.update(change);
       updateEstimationStdDevs(visionEst, change.getTargets());
     }
     if (cameraLml3.getAllUnreadResults().isEmpty()) {
       for (var change : cameraLml2.getAllUnreadResults()) {
+    if (change.getBestTarget().bestCameraToTarget.getX() > 3 || change.getBestTarget().bestCameraToTarget.getY() > 3)
         if (change.hasTargets() && change.getBestTarget().poseAmbiguity < 0.05) {
           visionEst = photonEstimatorLml2.update(change);
           updateEstimationStdDevs(visionEst, change.getTargets());
