@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,26 +46,26 @@ public class Elevator extends SubsystemBase implements TestBindings {
     DONTPOUND
   }
 
-  private static double kP = 20.0;
-  private static double kI = 0.0;
+  private static double kP = 30.0;
+  private static double kI = 1.0;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 5;
-  private static double kMaxAcceleration = 4.5;
-  private static double kMinVelocity = 1;
-  private static double kMinAcceleration = 4.5;
+  private static double kMaxVelocity = 9;
+  private static double kMaxAcceleration = 8.5;
+  private static double kMinVelocity = 0.2;
+  private static double kMinAcceleration = 2.5;
 
   private static double kG = 0.41; // barely moves up
   private static double kA = 0.95;
-  private static double kV = 4.85;
+  private static double kV = 2.7;
   private static double kS = 0.2;
 
   private static double pulleyDiam = 3;
   private static double pulleyCircumference = Math.PI * Units.inchesToMeters(pulleyDiam);
   private static double toRotations = 1 / (2 * Math.PI);
-  private static double gearRatio = 15.0;
+  private static double gearRatio = 9.0;
   private static double elevatorSlack = 0.0;
 
   // Create a PID controller whose setpoint's change is subject to maximum
@@ -93,6 +94,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private final SlewRateLimiter elevatorLimiter = new SlewRateLimiter(3);
 
   private double elevatorPos;
+  private boolean chronoStarted = false;
+  private double chronoStartTime = 0;
 
   private desiredHeight heightEnum = desiredHeight.LOW;
 
@@ -127,6 +130,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   @Override
   public void periodic() {
+
+    // System.out.println(elevatorPos + " " + Timer.getFPGATimestamp());
+
     if (isElevatorAtBottom()) {
       elevatorSlack =
           (((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
@@ -142,6 +148,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
                     / gearRatio))
                 * 10
             - elevatorSlack;
+
     SmartDashboard.putNumber("elevator position", elevatorPos);
     SmartDashboard.putNumber(
         "elevator raw pos",
@@ -183,6 +190,12 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
       // Run controller and update motor output
       m_rightElevatorMotor.setVoltage(output);
+    }
+
+    if (chronoStarted && (Math.abs(elevatorPos - m_controller.getGoal().position) < 0.01)) {
+      chronoStarted = false;
+      System.out.println(
+          "Elevator arrived in " + (Timer.getFPGATimestamp() - chronoStartTime) + " secs");
     }
   }
 
@@ -263,6 +276,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
     }
     m_controller.setConstraints(height == desiredHeight.LOW ? m_MinConstraints : m_MaxConstraints);
     m_controller.setGoal(heightTarget);
+    chronoStarted = true;
+    chronoStartTime = Timer.getFPGATimestamp();
   }
 
   public Command manualTest(DoubleSupplier speed) {

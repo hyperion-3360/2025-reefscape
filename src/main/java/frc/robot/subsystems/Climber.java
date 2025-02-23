@@ -46,7 +46,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   private TalonFXConfiguration m_climberMotorConfig = new TalonFXConfiguration();
   private TalonFX m_shallowMotor =
       new TalonFX(SubsystemInfo.kClimberShallowMotorID, "CANivore_3360");
-  private TalonFX m_deepMotor = new TalonFX(SubsystemInfo.kClimberDeepMotorID);
+  // private TalonFX m_deepMotor = new TalonFX(SubsystemInfo.kClimberDeepMotorID);
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
@@ -62,7 +62,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
 
   public Climber() {
-    m_deepMotor.setNeutralMode(NeutralModeValue.Brake);
+    // m_deepMotor.setNeutralMode(NeutralModeValue.Brake);
     m_shallowMotor.setNeutralMode(NeutralModeValue.Brake);
     // motor configs
     m_climberMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -71,8 +71,8 @@ public class Climber extends SubsystemBase implements TestBindings {
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     m_shallowMotor.getConfigurator().apply(m_climberMotorConfig);
     m_shallowMotor.set(0);
-    m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
-    m_deepMotor.set(0);
+    // m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
+    // m_deepMotor.set(0);
 
     SendableRegistry.add(this, "Climber", 0);
     SmartDashboard.putData("Climber", this);
@@ -151,7 +151,7 @@ public class Climber extends SubsystemBase implements TestBindings {
         () -> {
           double val = speed.getAsDouble();
           m_direction = Math.signum(val);
-          m_deepMotor.set(Math.pow(val, 2) * m_direction);
+          // m_deepMotor.set(Math.pow(val, 2) * m_direction);
         });
   }
 

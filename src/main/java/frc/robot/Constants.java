@@ -322,6 +322,7 @@ public final class Constants {
     // sensor ids
     public static final int kCoralShooterBeambreakID = 7;
     public static final int kCoralAutoIntakeBeamBrake = 6;
+    public static final int kClimberBeambreak = 4;
 
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
     // no clue if this is a good value but it should be fine to start
@@ -348,7 +349,7 @@ public final class Constants {
     public static final double kElevatorFeeder = 0.207;
     public static final double kElevatorAlgaeL2 = 1.30;
     public static final double kElevatorAlgaeL3 = 1.92;
-    public static final double kDontPound = 0.68;
+    public static final double kDontPound = 1.0;
   }
 
   public static class AlgaeIntakeConstants {
