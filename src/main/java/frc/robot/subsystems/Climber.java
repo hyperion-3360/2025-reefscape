@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +39,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
   private final DigitalInput m_beamBrake = new DigitalInput(Constants.SubsystemInfo.kClimberBeamBrakeID);
+  private final Servo m_penis = new Servo(Constants.SubsystemInfo.kClimberServoID);
 
   public Climber() {
     // motor configs
@@ -64,6 +66,10 @@ public class Climber extends SubsystemBase implements TestBindings {
         });
   }
 
+  public Command raiseServo(){
+    return this.runOnce(() -> m_penis.setAngle(Constants.ClimberConstants.kRaisedAngle));
+  }
+
   public Command deepClimb(DoubleSupplier speed) {
     return this.run(
         () -> {
@@ -74,6 +80,10 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public Command winchDeepClimb(){
+    return this.run(()-> m_deepMotor.set(-1));
+  }
+
+  public Command dewinchDeepClimb(){
     return this.run(()-> m_deepMotor.set(1));
   }
 

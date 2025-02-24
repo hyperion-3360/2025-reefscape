@@ -15,9 +15,10 @@ public class DeepClimbCmd extends SequentialCommandGroup {
         addRequirements(m_leds);
         addCommands(
             Commands.runOnce(()-> m_leds.SetPattern(Pattern.DEEPCLIMB)),
-            Commands.runOnce(() -> m_climber.winchDeepClimb()), 
+            Commands.runOnce(() -> m_climber.winchDeepClimb()),
             new WaitUntilCommand(() -> m_climber.SensorDetected()),
-            Commands.runOnce(()-> m_climber.stopDeepClimb())
+            Commands.runOnce(()-> m_climber.stopDeepClimb()),
+            Commands.runOnce(() -> m_leds.SetPattern(Pattern.CLIMBER))
         );
     }
     
