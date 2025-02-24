@@ -15,7 +15,7 @@ public class AutoDump extends SequentialCommandGroup {
   public AutoDump(Dumper m_dumper) {
     addRequirements(m_dumper);
     addCommands(
-        Pathfinding.goThere("Dump_low 45"),
+        Pathfinding.goThere("Dump_low_angle"),
         Commands.runOnce(
             () -> {
               m_dumper.dumpLeft();

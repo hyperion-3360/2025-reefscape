@@ -29,6 +29,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeed;
 import frc.robot.commands.AutoCmd.AutoProcessor;
+import frc.robot.commands.AutoCmd.ShootAuto;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
@@ -71,7 +72,7 @@ public class Pathfinding extends Command {
     BRANCHES(
         Constants.Pegs.kPegs,
         false,
-        () -> Commands.runOnce(() -> System.out.println("Hello branch")),
+        () -> m_autoShoot,
         Constants.Priorities.kShootCoralL4,
         true,
         () -> RobotContainer.m_shooter.isCoralIn()),
@@ -127,7 +128,6 @@ public class Pathfinding extends Command {
     private int priority;
     private Pose2d[] poseArray;
     private Pose2d pose;
-    private PathPlannerPath path;
     private boolean shouldFlipRobot;
 
     /**
@@ -312,6 +312,12 @@ public class Pathfinding extends Command {
   private static AutoProcessor processAlgae =
       new AutoProcessor(
           RobotContainer.m_elevator, RobotContainer.m_algaeIntake, RobotContainer.m_leds);
+  private static ShootAuto m_autoShoot =
+      new ShootAuto(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve);
 
   public static void configurePathfinder(
       Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
@@ -467,7 +473,9 @@ public class Pathfinding extends Command {
     double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 1.33) * 1.0;
     double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 1.33) * 1.0;
     Rotation2d rotation =
-        Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees() + 180);
+        poiToPathfind.isRobotFlipped()
+            ? Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees())
+            : Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees() + 180);
 
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
@@ -701,10 +709,7 @@ public class Pathfinding extends Command {
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
-      pathfindingSequence.addCommands(goThere(poiArrayElement));
-      if (poiArrayElement.equals(POI.DUMPINGDOWN) || poiArrayElement.equals(POI.DUMPINGUP)) {
-        pathfindingSequence.addCommands(goThere("Dump_low 45"));
-      }
+      pathfindingSequence.addCommands(poiArrayElement.getEvent());
     }
     return pathfindingSequence;
   }

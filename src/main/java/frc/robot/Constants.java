@@ -204,8 +204,8 @@ public final class Constants {
 
   public static class Feeders {
     public static final Pose2d[] kFeeders = {
-      new Pose2d(0.389, 0.935, Rotation2d.fromDegrees(234)),
-      new Pose2d(1.294, 0.371, Rotation2d.fromDegrees(234)),
+      new Pose2d(0.389, 0.935, Rotation2d.fromDegrees(54)),
+      new Pose2d(1.294, 0.371, Rotation2d.fromDegrees(54)),
       new Pose2d(2.175, 7.0, Rotation2d.fromDegrees(306)),
       new Pose2d(0.972, 6.1, Rotation2d.fromDegrees(306)),
     };
