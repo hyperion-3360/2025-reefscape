@@ -7,6 +7,7 @@ package frc.robot.commands.AutoCmd;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Auto.Pathfinding;
 import frc.robot.subsystems.Dumper;
 
 public class AutoDump extends SequentialCommandGroup {
@@ -14,14 +15,12 @@ public class AutoDump extends SequentialCommandGroup {
   public AutoDump(Dumper m_dumper) {
     addRequirements(m_dumper);
     addCommands(
-        Commands.print("soNe-yOuh :)"),
+        Pathfinding.goThere("Dump_low 45"),
         Commands.runOnce(
             () -> {
               m_dumper.dumpLeft();
               m_dumper.dumpRight();
-              System.out.println("this is working but it doesn't get me closer to the truth");
-            }),
-        Commands.print("hello"));
+            }));
   }
 
   public Command cancelDumper(Dumper m_dumper) {

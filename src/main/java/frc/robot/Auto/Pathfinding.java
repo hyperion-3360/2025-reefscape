@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.AutoCmd.AutoDump;
-import frc.robot.commands.AutoCmd.AutoFeast;
+import frc.robot.commands.AutoCmd.AutoFeed;
 import frc.robot.commands.AutoCmd.AutoProcessor;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Dumper;
@@ -99,18 +99,18 @@ public class Pathfinding extends Command {
         Constants.Priorities.kShootNet,
         () -> RobotContainer.m_algaeIntake.sensorTriggered()),
     DUMPINGUP(
-        4.073906,
-        4.745482,
-        150,
-        false,
-        () -> Commands.runOnce(() -> System.out.println("Hello dumping")),
+        7.0,
+        3,
+        180.0,
+        true,
+        () -> m_dump,
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn()),
     DUMPINGDOWN(
-        4.185,
-        2.218,
-        216.715,
-        false,
+        7.0,
+        3,
+        180.0,
+        true,
         () -> m_dump,
         Constants.Priorities.kIntakeCoral,
         () -> RobotContainer.m_shooter.isCoralIn());
@@ -127,6 +127,7 @@ public class Pathfinding extends Command {
     private int priority;
     private Pose2d[] poseArray;
     private Pose2d pose;
+    private PathPlannerPath path;
     private boolean shouldFlipRobot;
 
     /**
@@ -154,7 +155,7 @@ public class Pathfinding extends Command {
       this.conditions = removeCondition;
       this.poseArray = poseArray;
       this.priority = priority;
-      this.pose = changePose2d();
+      changePose2d();
     }
 
     /**
@@ -179,7 +180,7 @@ public class Pathfinding extends Command {
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
-      this.pose = changePose2d();
+      changePose2d();
     }
 
     /**
@@ -207,7 +208,7 @@ public class Pathfinding extends Command {
       this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
-      this.pose = changePose2d();
+      changePose2d();
     }
 
     private Command getEvent() {
@@ -234,10 +235,10 @@ public class Pathfinding extends Command {
     }
 
     private Pose2d getPose2d() {
-      return pose;
+      return this.pose;
     }
 
-    private Pose2d changePose2d() {
+    private void changePose2d() {
 
       for (Pose2d coordinate : poseArray) {
         this.positionsList.add(coordinate);
@@ -258,7 +259,6 @@ public class Pathfinding extends Command {
       }
       positionsList.clear();
       this.pose = pose;
-      return pose;
     }
 
     private boolean isRobotFlipped() {
@@ -269,16 +269,8 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIRSTAUTO(POI.FEEDERS, POI.PROCESSOR, POI.NET),
-    SECONDAUTO(POI.ALGAE, POI.BRANCHES),
-    THIRDAUTO(POI.ALGAE, POI.BRANCHES),
-    FOURTHAUTO(POI.ALGAE, POI.BRANCHES),
-    FIFTHAUTO(POI.PROCESSOR, POI.BRANCHES),
-    SIXTHAUTO(POI.ALGAE, POI.BRANCHES),
-    SEVENTHAUTO(POI.ALGAE, POI.BRANCHES),
-    EIGHTHAUTO(POI.ALGAE, POI.BRANCHES),
-    NINTHUTO(POI.ALGAE, POI.BRANCHES),
-    DUMPING(POI.DUMPINGDOWN);
+    FIVECORALAUTO(POI.DUMPINGDOWN, POI.FEEDERS, POI.BRANCHES),
+    ALGAE(POI.DUMPINGDOWN, POI.FEEDERS);
 
     private POI[] desiredPOIs;
 
@@ -315,12 +307,8 @@ public class Pathfinding extends Command {
   private static Dumper s_dumper;
 
   private static AutoDump m_dump = new AutoDump(RobotContainer.m_dumper);
-  private static AutoFeast m_feeder =
-      new AutoFeast(
-          RobotContainer.m_swerve,
-          RobotContainer.m_elevator,
-          RobotContainer.m_shooter,
-          RobotContainer.m_leds);
+  private static AutoFeed m_feeder =
+      new AutoFeed(RobotContainer.m_elevator, RobotContainer.m_shooter, RobotContainer.m_leds);
   private static AutoProcessor processAlgae =
       new AutoProcessor(
           RobotContainer.m_elevator, RobotContainer.m_algaeIntake, RobotContainer.m_leds);
@@ -476,8 +464,8 @@ public class Pathfinding extends Command {
 
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
 
-    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.0;
-    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2) * 1.0;
+    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 1.33) * 1.0;
+    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 1.33) * 1.0;
     Rotation2d rotation =
         Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees() + 180);
 
@@ -506,19 +494,18 @@ public class Pathfinding extends Command {
 
     double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
     double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
-    double robotHyp = Math.hypot(robotLengthPlusBuffer, robotWidthPlusBuffer);
     Rotation2d rotation = Rotation2d.fromDegrees(poiToPathfind.getRotation().getDegrees() + 180);
 
     // calculates the coordinates to displace the robot actual wanted position relative to the POI
     Translation2d widthToBacktrack =
         new Translation2d(
-            poiToPathfind.getX() + robotHyp * rotation.getCos(),
-            poiToPathfind.getY() + robotHyp * rotation.getSin());
+            poiToPathfind.getX() + robotLengthPlusBuffer * rotation.getCos(),
+            poiToPathfind.getY() + robotWidthPlusBuffer * rotation.getSin());
 
     return new Pose2d(widthToBacktrack, rotation.minus(Rotation2d.fromDegrees(180)));
   }
 
-  // #region Pathfinding Shuffleboard implementation
+  // #region Shuffleboard implementation
   /**
    * creates the chooser widget for the autonomous mode acts like a main shuffleboard method for the
    * Pathfinding class
@@ -678,9 +665,8 @@ public class Pathfinding extends Command {
    * @return A command to pathfind and execute the event
    */
   public static Command goThere(POI placeToGo) {
-
+    placeToGo.changePose2d();
     return AutoBuilder.pathfindToPose(POICoordinatesOptimisation(placeToGo), constraints);
-    // return AutoBuilder.pathfindThenFollowPath(pathBuilder(placeToGo), constraints);
   }
 
   public static Command goThere(String pathName) {
@@ -689,7 +675,6 @@ public class Pathfinding extends Command {
       return AutoBuilder.pathfindThenFollowPath(
           PathPlannerPath.fromPathFile(pathName), constraints);
     } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     System.out.println("no");
@@ -716,7 +701,9 @@ public class Pathfinding extends Command {
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
-      pathfindingSequence.addCommands(goThere(poiArrayElement).alongWith(poiArrayElement.getEvent()));
+      if (poiArrayElement.equals(POI.DUMPINGDOWN) || poiArrayElement.equals(POI.DUMPINGUP)) {
+        pathfindingSequence.addCommands(goThere(poiArrayElement));
+      }
     }
     return pathfindingSequence;
   }

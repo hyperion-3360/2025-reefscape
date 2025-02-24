@@ -187,25 +187,27 @@ public final class Constants {
 
   public static class Pegs {
     public static final Pose2d[] kPegs = {
-      new Pose2d(3.9314751317, 3.2240855, Rotation2d.fromDegrees(60)),
-      new Pose2d(3.657607315, 3.861435, Rotation2d.fromDegrees(60)),
-      new Pose2d(4.6632495, 3.861435, Rotation2d.fromDegrees(0)),
-      new Pose2d(4.6632495, 4.190365, Rotation2d.fromDegrees(0)),
-      new Pose2d(4.2163368683, 4.6632495, Rotation2d.fromDegrees(300)),
-      new Pose2d(3.9314751317, 4.8277145, Rotation2d.fromDegrees(300)),
-      new Pose2d(5.0471708683, 4.8277145, Rotation2d.fromDegrees(240)),
-      new Pose2d(4.7623091317, 4.6632495, Rotation2d.fromDegrees(240)),
-      new Pose2d(5.321046, 4.190365, Rotation2d.fromDegrees(180)),
-      new Pose2d(5.321046, 3.861435, Rotation2d.fromDegrees(180)),
-      new Pose2d(4.7623, 3.4901, Rotation2d.fromDegrees(120)),
-      new Pose2d(5.0471, 3.2240, Rotation2d.fromDegrees(120)),
+      new Pose2d(3.945, 5.275, new Rotation2d(20)),
+      new Pose2d(3.655, 5.100, new Rotation2d(20)),
+      new Pose2d(3.135, 4.175, new Rotation2d(180)),
+      new Pose2d(3.135, 3.850, new Rotation2d(180)),
+      new Pose2d(3.635, 2.960, new Rotation2d(300)),
+      new Pose2d(3.925, 2.790, new Rotation2d(300)),
+      new Pose2d(5.000, 2.780, new Rotation2d(-60)),
+      new Pose2d(5.290, 2.925, new Rotation2d(-60)),
+      new Pose2d(5.845, 4.175, new Rotation2d(-180)),
+      new Pose2d(5.845, 3.850, new Rotation2d(-180)),
+      new Pose2d(5.325, 5.075, new Rotation2d(300)),
+      new Pose2d(5.035, 5.250, new Rotation2d(300)),
     };
   }
 
   public static class Feeders {
     public static final Pose2d[] kFeeders = {
-      new Pose2d(0.8382, 0.635, Rotation2d.fromDegrees(234)),
-      new Pose2d(0.8382, 7.3914, Rotation2d.fromDegrees(306)),
+      new Pose2d(0.389, 0.935, Rotation2d.fromDegrees(234)),
+      new Pose2d(1.294, 0.371, Rotation2d.fromDegrees(234)),
+      new Pose2d(2.175, 7.0, Rotation2d.fromDegrees(306)),
+      new Pose2d(0.972, 6.1, Rotation2d.fromDegrees(306)),
     };
   }
 
