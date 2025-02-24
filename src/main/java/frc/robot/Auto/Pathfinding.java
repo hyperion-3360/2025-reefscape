@@ -269,7 +269,7 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIVECORALAUTO(POI.DUMPINGDOWN, POI.FEEDERS, POI.BRANCHES),
+    FIVECORALAUTO(POI.BRANCHES),
     ALGAE(POI.DUMPINGDOWN, POI.FEEDERS);
 
     private POI[] desiredPOIs;

@@ -16,9 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Auto;
-import frc.robot.Auto.Pathfinding;
+import frc.robot.commands.AutoCmd.AutoBranchShooting;
 import frc.robot.commands.AutoCmd.AutoCancel;
-import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
@@ -105,8 +104,9 @@ public class RobotContainer {
   private final LowerElevatorCmd elevateLOW =
       new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
 
-  private final AutoDump dumpAuto = new AutoDump(m_dumper);
   private final AutoFeast cycleToFeeder = new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds);
+  private final AutoBranchShooting cycleToBranch =
+      new AutoBranchShooting(m_swerve, m_elevator, m_shooter, m_leds);
   private final AutoCancel cancelAuto =
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
 
@@ -290,10 +290,10 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
     m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
-    m_coDriverController.rightBumper().onTrue(intakeCoral);
+    m_coDriverController.rightBumper().whileTrue(cycleToBranch).whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.goThere("Dump_low_angle").andThen(Pathfinding.fullControl());
+    return cycleToBranch;
   }
 }
