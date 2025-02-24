@@ -701,8 +701,9 @@ public class Pathfinding extends Command {
     // once we have the POIs we want, we replace the old list and add them
     for (POI poiArrayElement : tokenReader(chosenPath)) {
       poiList.add(poiArrayElement);
+      pathfindingSequence.addCommands(goThere(poiArrayElement));
       if (poiArrayElement.equals(POI.DUMPINGDOWN) || poiArrayElement.equals(POI.DUMPINGUP)) {
-        pathfindingSequence.addCommands(goThere(poiArrayElement));
+        pathfindingSequence.addCommands(goThere("Dump_low 45"));
       }
     }
     return pathfindingSequence;

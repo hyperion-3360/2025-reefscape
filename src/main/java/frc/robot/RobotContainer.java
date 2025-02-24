@@ -296,7 +296,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.setPose(new Pose2d(6, 3, Rotation2d.fromDegrees(180)));
+    m_swerve.setPose(new Pose2d(7.3, 3, Rotation2d.fromDegrees(180)));
     return Pathfinding.fullControl();
   }
 }
