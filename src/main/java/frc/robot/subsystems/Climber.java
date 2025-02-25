@@ -28,8 +28,6 @@ import java.util.function.DoubleSupplier;
 public class Climber extends SubsystemBase implements TestBindings {
 
   private TalonFXConfiguration m_climberMotorConfig = new TalonFXConfiguration();
-  private TalonFX m_shallowMotor =
-      new TalonFX(SubsystemInfo.kClimberShallowMotorID, "CANivore_3360");
   private TalonFX m_deepMotor = new TalonFX(SubsystemInfo.kClimberDeepMotorID);
 
   private Double m_direction = 0.0;
@@ -39,14 +37,11 @@ public class Climber extends SubsystemBase implements TestBindings {
 
   public Climber() {
     m_deepMotor.setNeutralMode(NeutralModeValue.Brake);
-    m_shallowMotor.setNeutralMode(NeutralModeValue.Brake);
     // motor configs
     m_climberMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_climberMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
-    m_shallowMotor.getConfigurator().apply(m_climberMotorConfig);
-    m_shallowMotor.set(0);
     m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
     m_deepMotor.set(0);
 
@@ -60,7 +55,6 @@ public class Climber extends SubsystemBase implements TestBindings {
         () -> {
           double val = speed.getAsDouble();
           m_direction = Math.signum(val);
-          m_shallowMotor.set(Math.pow(val, 2) * m_direction);
         });
   }
 
