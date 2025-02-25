@@ -298,7 +298,7 @@ public class Pathfinding extends Command {
   protected static List<POI> poiList = new ArrayList<>();
   private static POI bestPOI;
   private static PathConstraints constraints =
-      new PathConstraints(4.0, 3.0, Units.degreesToRadians(360), Units.degreesToRadians(180));
+      new PathConstraints(4.0, 3.0, Units.degreesToRadians(540), Units.degreesToRadians(360));
 
   private static Shooter s_shooter;
   private static Swerve s_swerve;
@@ -470,8 +470,8 @@ public class Pathfinding extends Command {
 
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
 
-    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 1.33) * 1.0;
-    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 1.33) * 1.0;
+    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2.0) * 1.01;
+    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2.0) * 1.01;
     Rotation2d rotation =
         poiToPathfind.isRobotFlipped()
             ? Rotation2d.fromDegrees(poiToPathfind.getPose2d().getRotation().getDegrees())
@@ -673,8 +673,12 @@ public class Pathfinding extends Command {
    * @return A command to pathfind and execute the event
    */
   public static Command goThere(POI placeToGo) {
-    placeToGo.changePose2d();
-    return AutoBuilder.pathfindToPose(POICoordinatesOptimisation(placeToGo), constraints);
+    Supplier<Pose2d> poiSupplier =
+        () -> {
+          placeToGo.changePose2d();
+          return POICoordinatesOptimisation(placeToGo);
+        };
+    return AutoBuilder.pathfindToPose(poiSupplier.get(), constraints);
   }
 
   public static Command goThere(String pathName) {

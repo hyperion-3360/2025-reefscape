@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 public class AutoBranchShooting extends SequentialCommandGroup {
   private List<Pose2d> branchList = new ArrayList<>();
-  private Supplier<Pose2d> currentPose = () -> Constants.Pegs.kPegs[3];
+  private Supplier<Pose2d> currentPoseSupplier = () -> Constants.Pegs.kPegs[0];
   private desiredHeight height = desiredHeight.L4;
 
   public AutoBranchShooting(Swerve m_swerve, Elevator m_elevator, Shooter m_shooter, LEDs m_leds) {
@@ -32,31 +32,33 @@ public class AutoBranchShooting extends SequentialCommandGroup {
     List<Pose2d> L3branchList = branchList;
     List<Pose2d> L2branchList = branchList;
 
+    currentPoseSupplier =
+        () -> {
+          if (!L4branchList.isEmpty()) {
+            height = desiredHeight.L4;
+            var currentPose = m_swerve.getPose().nearest(L4branchList);
+            L4branchList.remove(currentPose);
+            return currentPose;
+          }
+          if (L4branchList.isEmpty()) {
+            height = desiredHeight.L3;
+            var currentPose = m_swerve.getPose().nearest(L3branchList);
+            L3branchList.remove(currentPose);
+            return currentPose;
+          }
+          if (L3branchList.isEmpty()) {
+            height = desiredHeight.L2;
+            var currentPose = m_swerve.getPose().nearest(L2branchList);
+            L2branchList.remove(currentPose);
+            return currentPose;
+          }
+          return m_swerve.getPose();
+        };
+
     addRequirements(m_swerve, m_elevator, m_shooter, m_leds);
     addCommands(
         // I need to change the height and target dynamically so it is called into the command
-        Commands.runOnce(
-                () -> {
-                  height = desiredHeight.L4;
-                  currentPose = () -> m_swerve.getPose().nearest(L4branchList);
-                  L4branchList.remove(currentPose.get());
-                })
-            .onlyIf(() -> !L4branchList.isEmpty()),
-        Commands.runOnce(
-                () -> {
-                  height = desiredHeight.L3;
-                  currentPose = () -> m_swerve.getPose().nearest(L3branchList);
-                  L3branchList.remove(currentPose.get());
-                })
-            .onlyIf(() -> !L3branchList.isEmpty() && L4branchList.isEmpty()),
-        Commands.runOnce(
-                () -> {
-                  height = desiredHeight.L2;
-                  currentPose = () -> m_swerve.getPose().nearest(L2branchList);
-                  L2branchList.remove(currentPose.get());
-                })
-            .onlyIf(() -> !L2branchList.isEmpty() && L3branchList.isEmpty()),
-        Pathfinding.goThere(currentPose.get())
+        Pathfinding.goThere(currentPoseSupplier.get())
             .alongWith(
                 Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
                 new WaitUntilCommand(
@@ -64,7 +66,7 @@ public class AutoBranchShooting extends SequentialCommandGroup {
                             m_swerve
                                     .getPose()
                                     .getTranslation()
-                                    .getDistance(currentPose.get().getTranslation())
+                                    .getDistance(currentPoseSupplier.get().getTranslation())
                                 <= 0.4)
                     .andThen(
                         Commands.sequence(

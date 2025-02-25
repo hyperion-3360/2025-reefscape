@@ -289,11 +289,11 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
-    m_coDriverController.rightBumper().whileTrue(cycleToBranch).whileFalse(cancelAuto);
+    m_driverController.rightTrigger(0.5).whileTrue(cycleToFeeder).whileFalse(cancelAuto);
+    // m_coDriverController.leftTrigger().whileTrue(cycleToBranch).whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {
-    return cycleToBranch;
+    return cycleToFeeder;
   }
 }
