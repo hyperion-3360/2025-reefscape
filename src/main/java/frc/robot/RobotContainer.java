@@ -239,7 +239,6 @@ public class RobotContainer {
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
-    m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
 
     m_climber.setDefaultCommand(m_climberCommand.getSelected());
@@ -296,6 +295,7 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
     m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
+    m_coDriverController.rightBumper().onTrue(intakeCoral);
   }
 
   public Command getAutonomousCommand() {
