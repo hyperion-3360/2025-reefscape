@@ -323,16 +323,15 @@ public final class Constants {
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;
-    public static final double kElevatorL2 = 1.24;
-    public static final double kElevatorL3 = 1.90;
-    public static final double kElevatorL4 = 2.85;
+    public static final double kElevatorL2 = 1.16;
+    public static final double kElevatorL3 = 1.80;
+    public static final double kElevatorL4 = 2.8;
     public static final double kElevatorNet = 2.86;
     public static final double kElevatorProcessor = 0.177;
     public static final double kElevatorAlgaeLow = 0.0;
-    public static final double kElevatorFeeder = 0.207;
+    public static final double kElevatorFeeder = 0.247;
     public static final double kElevatorAlgaeL2 = 1.30;
     public static final double kElevatorAlgaeL3 = 1.92;
-    public static final double kDontPound = 0.68;
   }
 
   public static class AlgaeIntakeConstants {
