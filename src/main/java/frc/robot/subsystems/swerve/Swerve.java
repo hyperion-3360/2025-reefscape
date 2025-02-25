@@ -69,8 +69,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationMetersPerSecondSquaredY = 2.0;
   private final double kMaxSpeedRadiansPerSecond = 5.5;
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
-  private final double kPX = 5.0;
-  private final double kPY = 5.0;
+  private final double kPTranslation = 6.0;
   private final double kPRot = 6.0;
   private boolean ambiguousRot = false;
 
@@ -110,11 +109,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_xConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
-    m_xController = new ProfiledPIDController(kPX, 0, 0, m_xConstraints);
+    m_xController = new ProfiledPIDController(kPTranslation, 0, 0, m_xConstraints);
     m_yConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY);
-    m_yController = new ProfiledPIDController(kPY, 0, 0, m_yConstraints);
+    m_yController = new ProfiledPIDController(kPTranslation, 0, 0, m_yConstraints);
     m_rotConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);

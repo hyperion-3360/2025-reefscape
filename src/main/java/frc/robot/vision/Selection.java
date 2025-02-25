@@ -27,7 +27,7 @@ public class Selection extends Vision {
   Pose2d origin = new Pose2d();
 
   double robotHalfLength = Units.inchesToMeters(19);
-  double distTagToPeg = Units.inchesToMeters(7.5);
+  double distTagToPeg = Units.inchesToMeters(6.5);
 
   Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
   double angleToRotateBy = 0.0;
@@ -202,7 +202,7 @@ public class Selection extends Vision {
 
   private void setLockTarget() {
 
-    for (var change : super.unreadResults) {
+    for (var change : cameraLml3.getAllUnreadResults()) {
 
       if (change.hasTargets()) {
         trackedTarget = change.getBestTarget();
