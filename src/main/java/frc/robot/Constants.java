@@ -299,8 +299,9 @@ public final class Constants {
     // sensor ids
     public static final int kCoralShooterBeambreakID = 7;
     public static final int kCoralAutoIntakeBeamBrake = 6;
-    public static final int kClimberBeamBrakeID = 0;
-    public static final int kClimberServoID =0;
+    public static final int kClimberBeamBrakeID = 4;
+    public static final int kClimberPenisID = 6;
+    public static final int kClimberFingerID = 2;
 
     public static final InvertedValue kElevatorMotorInversion = InvertedValue.Clockwise_Positive;
     // no clue if this is a good value but it should be fine to start
@@ -310,7 +311,7 @@ public final class Constants {
   }
 
   public static class ClimberConstants {
-    public static final double kRaisedAngle = 90; 
+    public static final double kRaisedAngle = 90;
   }
 
   public static class ElevatorConstants {

@@ -89,8 +89,8 @@ public class LEDs extends SubsystemBase {
         break;
 
       case DEEPCLIMB:
-      m_currentPattern = LEDPattern.solid(Color.kYellow).blink(Second.of(0.1));
-      m_isMovingPattern = true;
+        m_currentPattern = LEDPattern.solid(Color.kYellow).blink(Second.of(0.1));
+        m_isMovingPattern = true;
     }
     m_isApplied = false;
   }

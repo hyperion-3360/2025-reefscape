@@ -27,6 +27,7 @@ import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
 import frc.robot.commands.LowerElevatorCmd;
 import frc.robot.commands.NetAlgaeShootCmd;
+import frc.robot.commands.ReadyClimbCmd;
 import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
@@ -106,6 +107,7 @@ public class RobotContainer {
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
   private final LowerElevatorCmd elevateLOW =
       new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
+  private final ReadyClimbCmd readyclimb = new ReadyClimbCmd(m_climber, m_leds, m_algaeIntake);
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
   private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
@@ -237,30 +239,38 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
+    m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
+
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
-    m_driverController.a().onTrue(intakeCoral);
-    m_driverController.b().onTrue(shootAlgae);
+    m_driverController.a().onTrue(intakeCoral.unless(m_climber::isClimberActivated));
+    m_driverController.b().onTrue(shootAlgae.unless(m_climber::isClimberActivated));
 
     m_climber.setDefaultCommand(m_climberCommand.getSelected());
 
-    m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.y().onTrue(shootAlgaeNet);
+    m_coDriverController.a().onTrue(shootCoral.unless(m_climber::isClimberActivated));
+    m_driverController.y().onTrue(shootAlgaeNet.unless(m_climber::isClimberActivated));
 
     m_coDriverController
         .y()
-        .whileTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+        .whileTrue(intakeAlgaeL2.unless(m_climber::isClimberActivated))
+        .onFalse(
+            intakeAlgaeL2
+                .NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds)
+                .unless(m_climber::isClimberActivated));
     m_coDriverController
         .x()
-        .whileTrue(intakeAlgaeL3)
-        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+        .whileTrue(intakeAlgaeL3.unless(m_climber::isClimberActivated))
+        .onFalse(
+            intakeAlgaeL3
+                .NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds)
+                .unless(m_climber::isClimberActivated));
 
-    m_coDriverController.povUp().onTrue(elevateL4);
-    m_coDriverController.povDown().onTrue(elevateL1);
-    m_coDriverController.povLeft().onTrue(elevateL3);
-    m_coDriverController.povRight().onTrue(elevateL2);
-    m_coDriverController.b().onTrue(elevateLOW);
+    m_coDriverController.povUp().onTrue(elevateL4.unless(m_climber::isClimberActivated));
+    m_coDriverController.povDown().onTrue(elevateL1.unless(m_climber::isClimberActivated));
+    m_coDriverController.povLeft().onTrue(elevateL3.unless(m_climber::isClimberActivated));
+    m_coDriverController.povRight().onTrue(elevateL2.unless(m_climber::isClimberActivated));
+    m_coDriverController.b().onTrue(elevateLOW.unless(m_climber::isClimberActivated));
 
     m_driverController
         .povUp()
@@ -277,6 +287,7 @@ public class RobotContainer {
         .leftBumper()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeLeft()))
+                .unless(m_climber::isClimberActivated)
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
@@ -288,6 +299,7 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
+                .unless(m_climber::isClimberActivated)
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
@@ -295,7 +307,10 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
+    m_coDriverController
+        .leftBumper()
+        .whileTrue(cycleToFeeder.unless(m_climber::isClimberActivated))
+        .whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {

@@ -111,6 +111,9 @@ public class Shooter extends SubsystemBase implements TestBindings {
       closeBlocker();
     } else m_shooter.set(m_shooterSpeed);
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
+    if (Climber.climberActivated()) {
+      return;
+    }
   }
 
   /**

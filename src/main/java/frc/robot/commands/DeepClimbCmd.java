@@ -9,17 +9,16 @@ import frc.robot.subsystems.leds.LEDs.Pattern;
 
 public class DeepClimbCmd extends SequentialCommandGroup {
 
-    DeepClimbCmd(Climber m_climber, LEDs m_leds){
+  DeepClimbCmd(Climber m_climber, LEDs m_leds) {
 
-        addRequirements(m_climber);
-        addRequirements(m_leds);
-        addCommands(
-            Commands.runOnce(()-> m_leds.SetPattern(Pattern.DEEPCLIMB)),
-            Commands.runOnce(() -> m_climber.winchDeepClimb()),
-            new WaitUntilCommand(() -> m_climber.SensorDetected()),
-            Commands.runOnce(()-> m_climber.stopDeepClimb()),
-            Commands.runOnce(() -> m_leds.SetPattern(Pattern.CLIMBER))
-        );
-    }
-    
+    addRequirements(m_climber);
+    addRequirements(m_leds);
+    addCommands(
+        Commands.runOnce(() -> m_climber.setClimberActivated()),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.DEEPCLIMB)),
+        Commands.runOnce(() -> m_climber.winchDeepClimb()),
+        new WaitUntilCommand(() -> m_climber.SensorDetected()),
+        Commands.runOnce(() -> m_climber.stopDeepClimb()),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.CLIMBER)));
+  }
 }
