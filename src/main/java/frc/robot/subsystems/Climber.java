@@ -36,6 +36,8 @@ public class Climber extends SubsystemBase implements TestBindings {
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
 
   public Climber() {
+    m_deepMotor.setNeutralMode(NeutralModeValue.Brake);
+    m_shallowMotor.setNeutralMode(NeutralModeValue.Brake);
     // motor configs
     m_climberMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     m_climberMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
