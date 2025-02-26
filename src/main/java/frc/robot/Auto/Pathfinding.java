@@ -310,12 +310,6 @@ public class Pathfinding extends Command {
   private static PathConstraints constraints =
       new PathConstraints(4.0, 3.0, Units.degreesToRadians(540), Units.degreesToRadians(360));
 
-  private static Shooter s_shooter;
-  private static Swerve s_swerve;
-  private static Elevator s_elevator;
-  private static AlgaeIntake s_algaeIntake;
-  private static Dumper s_dumper;
-
   private static AutoDump m_dump = new AutoDump(RobotContainer.m_dumper);
   private static AutoFeed m_feeder =
       new AutoFeed(RobotContainer.m_elevator, RobotContainer.m_shooter, RobotContainer.m_leds);
@@ -335,26 +329,6 @@ public class Pathfinding extends Command {
           RobotContainer.m_elevator,
           RobotContainer.m_shooter,
           RobotContainer.m_leds);
-
-  public static void configurePathfinder(
-      Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
-    Shooter s_shooter = shooter;
-    Swerve s_swerve = swerve;
-    Elevator s_elevator = elevator;
-    AlgaeIntake s_algaeIntake = algaeIntake;
-    Dumper s_dumper = dumper;
-
-    try {
-      assert s_algaeIntake != null;
-      assert s_swerve != null;
-      assert s_elevator != null;
-      assert s_shooter != null;
-      assert s_dumper != null;
-    } catch (AssertionError e) {
-      System.out.println(
-          e.getMessage() + " are you sure you configured the pathfinding before using it?");
-    }
-  }
 
   // #endregion
 
