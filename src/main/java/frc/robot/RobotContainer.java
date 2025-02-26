@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Auto;
+import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.AutoCmd.AutoBranchShooting;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoFeast;
@@ -232,6 +233,8 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
+    m_coDriverController.rightBumper().onTrue(intakeCoral);
+
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
     m_driverController.b().onTrue(shootAlgae);
@@ -294,6 +297,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return cycleToFeeder;
+    return Pathfinding.fullControl().andThen(cancelAuto);
   }
 }

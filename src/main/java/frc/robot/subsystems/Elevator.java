@@ -132,7 +132,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     // SmartDashboard.putData("Tunable feedforward", m_feedforward);
     SendableRegistry.add(this, "TunableElevator", 0);
     SmartDashboard.putData("ElevatorTuning", this);
-    m_controller.setGoal(0.0);
+    SetHeight(desiredHeight.LOW);
     // test_heightIndex = 0;
   }
 
@@ -170,7 +170,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
     if (DriverStation.isDisabled()) {
       m_controller.reset(0.01);
-      m_controller.setGoal(0.01);
+      SetHeight(desiredHeight.LOW);
       return;
     }
 
@@ -348,6 +348,10 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   public desiredHeight getTargetHeight() {
     return heightEnum;
+  }
+
+  public boolean isElevatorAtSetPoint() {
+    return m_controller.atGoal();
   }
 
   public boolean isElevatorAtBottom() {

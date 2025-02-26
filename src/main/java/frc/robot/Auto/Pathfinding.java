@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.AutoCmd.AutoBranchShooting;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeed;
 import frc.robot.commands.AutoCmd.AutoProcessor;
@@ -73,6 +74,13 @@ public class Pathfinding extends Command {
         Constants.Pegs.kPegs,
         false,
         () -> m_autoShoot,
+        Constants.Priorities.kShootCoralL4,
+        true,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    STARTINGBRANCH(
+        Constants.Pegs.kPegs,
+        false,
+        () -> m_startingAutoShoot,
         Constants.Priorities.kShootCoralL4,
         true,
         () -> RobotContainer.m_shooter.isCoralIn()),
@@ -269,7 +277,7 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIVECORALAUTO(POI.BRANCHES),
+    FIVECORALAUTO(POI.STARTINGBRANCH),
     ALGAE(POI.DUMPINGDOWN, POI.FEEDERS);
 
     private POI[] desiredPOIs;
@@ -312,12 +320,19 @@ public class Pathfinding extends Command {
   private static AutoProcessor processAlgae =
       new AutoProcessor(
           RobotContainer.m_elevator, RobotContainer.m_algaeIntake, RobotContainer.m_leds);
-  private static ShootAuto m_autoShoot =
+  private static ShootAuto m_startingAutoShoot =
       new ShootAuto(
           RobotContainer.m_shooter,
           RobotContainer.m_elevator,
           RobotContainer.m_leds,
           RobotContainer.m_swerve);
+
+  private static AutoBranchShooting m_autoShoot =
+      new AutoBranchShooting(
+          RobotContainer.m_swerve,
+          RobotContainer.m_elevator,
+          RobotContainer.m_shooter,
+          RobotContainer.m_leds);
 
   public static void configurePathfinder(
       Shooter shooter, Swerve swerve, Elevator elevator, AlgaeIntake algaeIntake, Dumper dumper) {
@@ -715,6 +730,7 @@ public class Pathfinding extends Command {
       poiList.add(poiArrayElement);
       pathfindingSequence.addCommands(poiArrayElement.getEvent());
     }
+
     return pathfindingSequence;
   }
 

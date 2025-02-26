@@ -19,22 +19,26 @@ import frc.robot.subsystems.swerve.Swerve;
 
 public class ShootAuto extends SequentialCommandGroup {
   public ShootAuto(Shooter m_shooter, Elevator m_elevator, LEDs m_leds, Swerve m_swerve) {
+    addRequirements(m_elevator, m_leds, m_swerve, m_shooter);
     addCommands(
         Pathfinding.goThere(new Pose2d(5.293, 2.626, Rotation2d.fromDegrees(120)))
             .alongWith(
                 Commands.sequence(
-                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
                     Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
-                    new WaitCommand(1.5),
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)))),
+        new WaitUntilCommand(() -> Pathfinding.isCloseToPOI(POI.BRANCHES)),
         Commands.runOnce(
-                () -> m_swerve.drivetoTarget(RobotContainer.m_selector.getDesiredposeRight()))
+                () -> m_swerve.drivetoTarget(RobotContainer.m_selector.getDesiredposeLeft()))
             .alongWith(
                 Commands.runOnce(() -> m_shooter.openBlocker()),
                 Commands.sequence(
                     new WaitUntilCommand(() -> Pathfinding.isCloseToPOI(POI.BRANCHES)),
                     Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
-                    new WaitCommand(1.5),
-                    Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.L4)))));
+                    new WaitUntilCommand(() -> m_elevator.isElevatorAtSetPoint()),
+                    Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.L4)),
+                    new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
+                    new WaitCommand(0.2),
+                    Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
+                    Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
   }
 }
