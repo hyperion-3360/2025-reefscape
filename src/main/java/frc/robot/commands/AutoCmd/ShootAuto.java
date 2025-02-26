@@ -26,7 +26,6 @@ public class ShootAuto extends SequentialCommandGroup {
                 Commands.sequence(
                     Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)))),
-        new WaitUntilCommand(() -> Pathfinding.isCloseToPOI(POI.BRANCHES)),
         Commands.runOnce(
                 () -> m_swerve.drivetoTarget(RobotContainer.m_selector.getDesiredposeLeft()))
             .alongWith(
@@ -37,8 +36,12 @@ public class ShootAuto extends SequentialCommandGroup {
                     new WaitUntilCommand(() -> m_elevator.isElevatorAtSetPoint()),
                     Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.L4)),
                     new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
-                    new WaitCommand(0.2),
-                    Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
-                    Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
+                    new WaitCommand(0.2)))
+            .finallyDo(
+                () ->
+                    Commands.sequence(
+                        Commands.runOnce(() -> m_swerve.disableDriveToTarget()),
+                        Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
+                        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
   }
 }

@@ -277,7 +277,7 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIVECORALAUTO(POI.STARTINGBRANCH),
+    FIVECORALAUTO(POI.FEEDERS, POI.FEEDERS),
     ALGAE(POI.DUMPINGDOWN, POI.FEEDERS);
 
     private POI[] desiredPOIs;
@@ -687,13 +687,8 @@ public class Pathfinding extends Command {
    * @param placeToGo The poi to go to
    * @return A command to pathfind and execute the event
    */
-  public static Command goThere(POI placeToGo) {
-    Supplier<Pose2d> poiSupplier =
-        () -> {
-          placeToGo.changePose2d();
-          return POICoordinatesOptimisation(placeToGo);
-        };
-    return AutoBuilder.pathfindToPose(poiSupplier.get(), constraints);
+  public static Command goThere(Supplier<POI> placeToGo) {
+    return AutoBuilder.pathfindToPose(placeToGo.get().getPose2d(), constraints);
   }
 
   public static Command goThere(String pathName) {

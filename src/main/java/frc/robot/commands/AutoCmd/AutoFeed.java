@@ -2,7 +2,6 @@ package frc.robot.commands.AutoCmd;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Auto.Pathfinding;
 import frc.robot.Auto.Pathfinding.POI;
@@ -18,7 +17,7 @@ public class AutoFeed extends SequentialCommandGroup {
     addRequirements(m_shooter);
     addRequirements(m_leds);
     addCommands(
-        Pathfinding.goThere(POI.FEEDERS)
+        Pathfinding.goThere(() -> POI.FEEDERS)
             .alongWith(
                 Commands.sequence(
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
@@ -27,9 +26,11 @@ public class AutoFeed extends SequentialCommandGroup {
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
                     Commands.runOnce(() -> m_shooter.setIntake()),
                     new WaitUntilCommand(() -> m_shooter.isCoralIn()),
-                    new WaitCommand(0.6),
-                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)))),
-        Commands.runOnce(() -> m_shooter.stop()),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)));
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY))))
+            .finallyDo(
+                () ->
+                    Commands.sequence(
+                        Commands.runOnce(() -> m_shooter.stop()),
+                        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
   }
 }

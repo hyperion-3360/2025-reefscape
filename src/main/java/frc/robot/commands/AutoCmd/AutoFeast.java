@@ -19,7 +19,7 @@ public class AutoFeast extends SequentialCommandGroup {
     addRequirements(m_shooter);
     addRequirements(m_leds);
     addCommands(
-        Pathfinding.goThere(POI.FEEDERS)
+        Pathfinding.goThere(() -> POI.FEEDERS)
             .alongWith(
                 Commands.sequence(
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
