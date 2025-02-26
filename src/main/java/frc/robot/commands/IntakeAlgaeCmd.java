@@ -50,7 +50,6 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
                   m_algaeIntake.setShootingSpeed(shooting.STORED);
                   m_algaeIntake.setShootingAngle(elevation.STORED);
                   m_leds.SetPattern(Pattern.IDLE);
-                  this.cancel();
                 })
             .onlyIf(() -> m_controller.x().getAsBoolean()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
@@ -100,11 +99,9 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     return Commands.sequence(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
-        new WaitCommand(0.8).unless(() -> m_height == desiredHeight.LOW),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
-        new WaitCommand(0.5),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
   }
 }
