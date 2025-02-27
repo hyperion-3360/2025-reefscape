@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.commands.AutoCmd.AutoBranchShooting;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoFeast;
@@ -297,6 +300,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl().andThen(cancelAuto);
+    m_swerve.setPose(new Pose2d(7, 5, Rotation2d.fromDegrees(180)));
+    return Pathfinding.goThere(() -> POI.FEEDERS);
   }
 }

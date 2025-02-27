@@ -187,25 +187,27 @@ public final class Constants {
 
   public static class Pegs {
     public static final Pose2d[] kPegs = {
-      new Pose2d(3.9314751317, 3.2240855, Rotation2d.fromDegrees(60)),
-      new Pose2d(3.657607315, 3.861435, Rotation2d.fromDegrees(60)),
-      new Pose2d(4.6632495, 3.861435, Rotation2d.fromDegrees(0)),
-      new Pose2d(4.6632495, 4.190365, Rotation2d.fromDegrees(0)),
-      new Pose2d(4.2163368683, 4.6632495, Rotation2d.fromDegrees(300)),
-      new Pose2d(3.9314751317, 4.8277145, Rotation2d.fromDegrees(300)),
-      new Pose2d(5.0471708683, 4.8277145, Rotation2d.fromDegrees(240)),
-      new Pose2d(4.7623091317, 4.6632495, Rotation2d.fromDegrees(240)),
-      new Pose2d(5.321046, 4.190365, Rotation2d.fromDegrees(180)),
-      new Pose2d(5.321046, 3.861435, Rotation2d.fromDegrees(180)),
-      new Pose2d(4.7623, 3.4901, Rotation2d.fromDegrees(120)),
-      new Pose2d(5.0471, 3.2240, Rotation2d.fromDegrees(120)),
+      new Pose2d(4.136, 3.076, Rotation2d.fromDegrees(60)),
+      new Pose2d(3.866, 3.319, Rotation2d.fromDegrees(60)),
+      new Pose2d(3.578, 3.869, Rotation2d.fromDegrees(0)),
+      new Pose2d(3.578, 4.183, Rotation2d.fromDegrees(0)),
+      new Pose2d(3.930, 4.695, Rotation2d.fromDegrees(300)),
+      new Pose2d(4.172, 4.825, Rotation2d.fromDegrees(300)),
+      new Pose2d(4.781, 4.845, Rotation2d.fromDegrees(240)),
+      new Pose2d(5.097, 4.717, Rotation2d.fromDegrees(240)),
+      new Pose2d(5.370, 4.194, Rotation2d.fromDegrees(180)),
+      new Pose2d(5.370, 3.874, Rotation2d.fromDegrees(180)),
+      new Pose2d(5.066, 3.367, Rotation2d.fromDegrees(120)),
+      new Pose2d(4.775, 3.185, Rotation2d.fromDegrees(120)),
     };
   }
 
   public static class Feeders {
     public static final Pose2d[] kFeeders = {
-      new Pose2d(0.8382, 0.635, Rotation2d.fromDegrees(54)),
-      new Pose2d(0.8382, 7.3914, Rotation2d.fromDegrees(126)),
+      new Pose2d(0.457, 0.991, Rotation2d.fromDegrees(54)),
+      new Pose2d(1.246, 0.399, Rotation2d.fromDegrees(54)),
+      new Pose2d(1.246, 7.673, Rotation2d.fromDegrees(306)),
+      new Pose2d(0.457, 7.113, Rotation2d.fromDegrees(306)),
     };
   }
 

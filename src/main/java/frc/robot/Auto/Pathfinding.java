@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -39,6 +40,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -484,7 +486,7 @@ public class Pathfinding extends Command {
   }
 
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
-
+    // adds a 1 percent buffer to the robot size
     double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2.0) * 1.01;
     double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2.0) * 1.01;
     Rotation2d rotation =
@@ -501,8 +503,8 @@ public class Pathfinding extends Command {
     return new Pose2d(
         widthToBacktrack,
         poiToPathfind.isRobotFlipped()
-            ? poiToPathfind.getPose2d().getRotation()
-            : poiToPathfind.getPose2d().getRotation().minus(new Rotation2d(180)));
+            ? poiToPathfind.getPose2d().getRotation().minus(Rotation2d.k180deg)
+            : poiToPathfind.getPose2d().getRotation());
   }
 
   public static Pose2d lineupPoint(Pose2d poiToLineup) {
@@ -688,7 +690,13 @@ public class Pathfinding extends Command {
    * @return A command to pathfind and execute the event
    */
   public static Command goThere(Supplier<POI> placeToGo) {
-    return AutoBuilder.pathfindToPose(placeToGo.get().getPose2d(), constraints);
+    return new DeferredCommand(
+        () ->
+            Commands.runOnce(() -> placeToGo.get().changePose2d())
+                .andThen(
+                    AutoBuilder.pathfindToPose(
+                        POICoordinatesOptimisation(placeToGo.get()), constraints)),
+        Set.of());
   }
 
   public static Command goThere(String pathName) {
@@ -734,6 +742,6 @@ public class Pathfinding extends Command {
             .getPose()
             .getTranslation()
             .getDistance(currentPOI.getPose2d().getTranslation())
-        >= 0.4;
+        <= 0.4;
   }
 }
