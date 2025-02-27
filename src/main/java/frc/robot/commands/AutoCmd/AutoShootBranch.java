@@ -30,6 +30,12 @@ public class AutoShootBranch extends SequentialCommandGroup {
                 new WaitUntilCommand(() -> m_elevator.isElevatorAtSetPoint()),
                 Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.L4)),
                 new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
-                new WaitCommand(0.2)));
+                new WaitCommand(0.2))
+            .finallyDo(
+                () ->
+                    Commands.sequence(
+                        Commands.runOnce(() -> m_swerve.disableDriveToTarget()),
+                        Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
+                        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
   }
 }
