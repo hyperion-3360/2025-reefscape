@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Auto.Pathfinding;
+import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.subsystems.Dumper;
 
 public class AutoDump extends SequentialCommandGroup {
@@ -15,7 +16,7 @@ public class AutoDump extends SequentialCommandGroup {
   public AutoDump(Dumper m_dumper) {
     addRequirements(m_dumper);
     addCommands(
-        Pathfinding.goThere("Dump_low_angle"),
+        Pathfinding.goThere(() -> POI.DUMPINGDOWN),
         Commands.runOnce(
             () -> {
               m_dumper.dumpLeft();
