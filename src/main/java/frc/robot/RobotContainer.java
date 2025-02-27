@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.Auto;
 import frc.robot.Auto.Pathfinding;
-import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.commands.AutoCmd.AutoBranchShooting;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoFeast;
@@ -300,7 +299,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    m_swerve.setPose(new Pose2d(7, 5, Rotation2d.fromDegrees(180)));
-    return Pathfinding.goThere(() -> POI.FEEDERS);
+    m_swerve.setPose(new Pose2d(7, 3, Rotation2d.fromDegrees(180)));
+    return Pathfinding.fullControl().andThen(cancelAuto);
   }
 }

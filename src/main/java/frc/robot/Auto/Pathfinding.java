@@ -4,11 +4,15 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
+import com.pathplanner.lib.util.FlippingUtil;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +26,7 @@ import frc.robot.commands.AutoCmd.AutoBranchShooting;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeed;
 import frc.robot.commands.AutoCmd.AutoProcessor;
+import frc.robot.commands.AutoCmd.AutoShootBranch;
 import frc.robot.commands.AutoCmd.ShootAuto;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,6 +69,90 @@ public class Pathfinding extends Command {
         () -> m_autoShoot,
         Constants.Priorities.kShootCoralL4,
         true,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_A(
+        Constants.Pegs.kPegs[0].getTranslation(),
+        Constants.Pegs.kPegs[0].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootA,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_B(
+        Constants.Pegs.kPegs[1].getTranslation(),
+        Constants.Pegs.kPegs[1].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootB,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_C(
+        Constants.Pegs.kPegs[2].getTranslation(),
+        Constants.Pegs.kPegs[2].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootC,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_D(
+        Constants.Pegs.kPegs[3].getTranslation(),
+        Constants.Pegs.kPegs[3].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootD,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_E(
+        Constants.Pegs.kPegs[4].getTranslation(),
+        Constants.Pegs.kPegs[4].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootE,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_F(
+        Constants.Pegs.kPegs[5].getTranslation(),
+        Constants.Pegs.kPegs[5].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootF,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_G(
+        Constants.Pegs.kPegs[6].getTranslation(),
+        Constants.Pegs.kPegs[6].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootG,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_H(
+        Constants.Pegs.kPegs[7].getTranslation(),
+        Constants.Pegs.kPegs[7].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootH,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_I(
+        Constants.Pegs.kPegs[8].getTranslation(),
+        Constants.Pegs.kPegs[8].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootI,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_J(
+        Constants.Pegs.kPegs[9].getTranslation(),
+        Constants.Pegs.kPegs[9].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootJ,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_K(
+        Constants.Pegs.kPegs[10].getTranslation(),
+        Constants.Pegs.kPegs[10].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootK,
+        Constants.Priorities.kShootCoralL4,
+        () -> RobotContainer.m_shooter.isCoralIn()),
+    BRANCH_L(
+        Constants.Pegs.kPegs[11].getTranslation(),
+        Constants.Pegs.kPegs[11].getRotation().getDegrees(),
+        false,
+        () -> m_autoShootL,
+        Constants.Priorities.kShootCoralL4,
         () -> RobotContainer.m_shooter.isCoralIn()),
     STARTINGBRANCH(
         Constants.Pegs.kPegs,
@@ -162,8 +251,8 @@ public class Pathfinding extends Command {
      */
     private POI(
         Translation2d xy_coordinates,
-        boolean shouldFlipRobot,
         double angle,
+        boolean shouldFlipRobot,
         Supplier<Command> event,
         int priority,
         BooleanSupplier... removeCondition) {
@@ -246,7 +335,7 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIVECORALAUTO(POI.FEEDERS, POI.FEEDERS),
+    FIVECORALAUTO(POI.STARTINGBRANCH, POI.FEEDERS, POI.BRANCH_A),
     ALGAE(POI.DUMPINGDOWN, POI.FEEDERS);
 
     private POI[] desiredPOIs;
@@ -295,6 +384,91 @@ public class Pathfinding extends Command {
           RobotContainer.m_elevator,
           RobotContainer.m_shooter,
           RobotContainer.m_leds);
+
+  private static AutoShootBranch m_autoShootA =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_A);
+  private static AutoShootBranch m_autoShootB =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_B);
+  private static AutoShootBranch m_autoShootC =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_C);
+  private static AutoShootBranch m_autoShootD =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_D);
+  private static AutoShootBranch m_autoShootE =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_E);
+  private static AutoShootBranch m_autoShootF =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_F);
+  private static AutoShootBranch m_autoShootG =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_G);
+  private static AutoShootBranch m_autoShootH =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_H);
+  private static AutoShootBranch m_autoShootI =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_I);
+  private static AutoShootBranch m_autoShootJ =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_J);
+  private static AutoShootBranch m_autoShootK =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_K);
+  private static AutoShootBranch m_autoShootL =
+      new AutoShootBranch(
+          RobotContainer.m_shooter,
+          RobotContainer.m_elevator,
+          RobotContainer.m_leds,
+          RobotContainer.m_swerve,
+          POI.BRANCH_L);
 
   // #endregion
 
@@ -411,6 +585,9 @@ public class Pathfinding extends Command {
         e.printStackTrace();
         System.out.println("error in POI reading no POI matched the value " + currentString);
       }
+    }
+    if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+     readPOIs.forEach(poi -> {FlippingUtil.flipFieldPose(poi.getPose2d());}); 
     }
     return readPOIs;
   }
