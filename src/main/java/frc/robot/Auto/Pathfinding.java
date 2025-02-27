@@ -1,23 +1,14 @@
 package frc.robot.Auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.ConstraintsZone;
-import com.pathplanner.lib.path.EventMarker;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PointTowardsZone;
-import com.pathplanner.lib.path.RotationTarget;
-import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,11 +23,6 @@ import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeed;
 import frc.robot.commands.AutoCmd.AutoProcessor;
 import frc.robot.commands.AutoCmd.ShootAuto;
-import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.Dumper;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.swerve.Swerve;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,9 +113,7 @@ public class Pathfinding extends Command {
         () -> RobotContainer.m_shooter.isCoralIn());
 
     private Supplier<Command> event;
-    private BooleanSupplier[] conditions;
     // a list that acts like a buffer accepting pose2ds, sorting them and assigning the closest one
-    private ArrayList<Pose2d> positionsList = new ArrayList<>();
 
     // I need a list separate from positionsList because I need to keep track of all consumed pois
     // even after a cycle
@@ -162,7 +146,6 @@ public class Pathfinding extends Command {
       };
       this.event = event;
       this.shouldFlipRobot = shouldFlipRobot;
-      this.conditions = removeCondition;
       this.poseArray = poseArray;
       this.priority = priority;
       changePose2d();
@@ -187,7 +170,6 @@ public class Pathfinding extends Command {
       Pose2d[] poseArray = {new Pose2d(xy_coordinates, Rotation2d.fromDegrees(angle))};
       this.poseArray = poseArray;
       this.shouldFlipRobot = shouldFlipRobot;
-      this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
       changePose2d();
@@ -215,7 +197,6 @@ public class Pathfinding extends Command {
       this.poseArray = xyThetacoordinates;
       this.shouldFlipRobot = shouldFlipRobot;
       this.consumable = consumable;
-      this.conditions = removeCondition;
       this.event = event;
       this.priority = priority;
       changePose2d();
@@ -229,29 +210,16 @@ public class Pathfinding extends Command {
       return this.priority;
     }
 
-    private boolean getConditionStatus() {
-      boolean allCondionsTrue = false;
-      byte trueConditions = 0;
-      for (BooleanSupplier condition : conditions) {
-        if (condition.getAsBoolean() == true) {
-          trueConditions += 1;
-        }
-        if (trueConditions == conditions.length) {
-          allCondionsTrue = true;
-        }
-      }
-
-      return allCondionsTrue;
-    }
-
     private Pose2d getPose2d() {
       return this.pose;
     }
 
     private void changePose2d() {
 
+      ArrayList<Pose2d> positionsList = new ArrayList<>();
+
       for (Pose2d coordinate : poseArray) {
-        this.positionsList.add(coordinate);
+        positionsList.add(coordinate);
       }
 
       // gets the closest poi from the robot
@@ -267,7 +235,6 @@ public class Pathfinding extends Command {
         // removes point we already went to
         consumedPOIs.add(pose);
       }
-      positionsList.clear();
       this.pose = pose;
     }
 
@@ -306,7 +273,6 @@ public class Pathfinding extends Command {
       Shuffleboard.getTab(tabName).add("path", chosenPath).getEntry();
 
   protected static List<POI> poiList = new ArrayList<>();
-  private static POI bestPOI;
   private static PathConstraints constraints =
       new PathConstraints(4.0, 3.0, Units.degreesToRadians(540), Units.degreesToRadians(360));
 
@@ -332,133 +298,6 @@ public class Pathfinding extends Command {
 
   // #endregion
 
-  /**
-   * gives the value of the given POI based on multiple factors
-   *
-   * @param poi the poi to which we want to calculate the value
-   * @return the reward in points per meter or another similar unit which must at leas involve
-   *     meters and points
-   */
-  public static Double POIValue(POI poi) {
-    double actionTime = 0.0;
-
-    switch (poi) {
-      case BRANCHES:
-        actionTime = Constants.TimeToAction.kShootCoralL4;
-        break;
-      case PROCESSOR:
-        actionTime = Constants.TimeToAction.kShootAlgaeProcessor;
-        break;
-      case NET:
-        actionTime = Constants.TimeToAction.kShootNet;
-        break;
-      case DUMPINGUP:
-        break;
-      case DUMPINGDOWN:
-        break;
-      case ALGAE:
-        break;
-      default:
-        break;
-    }
-    double timeLeft =
-        DriverStation.isFMSAttached()
-            ? DriverStation.getMatchTime() - 145
-            : 15 - DriverStation.getMatchTime(); // gets time left in auto no matter
-    double timeDelta = timeLeft - actionTime;
-    double distanceRobotToPoint =
-        poi.getPose2d()
-            .getTranslation()
-            .getDistance(RobotContainer.m_swerve.getPose().getTranslation());
-    double pointRatio = (poi.getPriority() * timeDelta) / distanceRobotToPoint;
-    if (DriverStation.isTest()) {
-      System.out.println(pointRatio + " of " + poi.toString());
-    }
-    return pointRatio;
-  }
-
-  /**
-   * filters a raw poi array and returns a pose2d object of the most advantageous point
-   *
-   * @param raw_poi a list of POIs to filter through
-   * @return The {@link Pose2d} of the most advantageous point
-   */
-  private static PathPlannerPath FilterPOIs(List<POI> raw_poi) {
-    // filters and gets the best POI in the raw_poi list
-    POI bestPOI =
-        raw_poi.stream()
-            // removes the POI we are already at
-            .filter(poiHead -> Pathfinding.bestPOI != poiHead)
-            .filter(poiToCheck -> poiToCheck.getConditionStatus() == true)
-            .sorted((p1, p2) -> POIValue(p2).compareTo(POIValue(p1)))
-            .findFirst()
-            .get();
-    // this is to prevent the rechecking of the best POI when trying to get it's event.
-    Pathfinding.bestPOI = bestPOI;
-    if (DriverStation.isTest()) {
-      System.out.println("chosen poi " + bestPOI);
-    }
-    // uses the coordinates and angle of the first point
-    return pathBuilder(bestPOI);
-  }
-
-  private static PathPlannerPath pathBuilder(POI raw_poi) {
-    List<Waypoint> path = new ArrayList<>();
-    List<RotationTarget> rotationTargetList = new ArrayList<>();
-    List<PointTowardsZone> pointTowardsZoneList = new ArrayList<>();
-    List<ConstraintsZone> contrainstZoneList = new ArrayList<>();
-    List<EventMarker> eventMarkerList = new ArrayList<>();
-    IdealStartingState startingState = new IdealStartingState(3, raw_poi.getPose2d().getRotation());
-    GoalEndState endState = new GoalEndState(0, raw_poi.getPose2d().getRotation());
-
-    eventMarkerList.add(new EventMarker("event", 0, raw_poi.getEvent()));
-
-    Pose2d optimisedPos = POICoordinatesOptimisation(raw_poi);
-    Pose2d lineupPos = lineupPoint(optimisedPos);
-
-    path.add(
-        new Waypoint(
-            lineupPos.getTranslation(), lineupPos.getTranslation(), optimisedPos.getTranslation()));
-    path.add(new Waypoint(optimisedPos.getTranslation(), optimisedPos.getTranslation(), null));
-
-    PathPlannerPath pathToPathfind =
-        new PathPlannerPath(
-            path,
-            rotationTargetList,
-            pointTowardsZoneList,
-            contrainstZoneList,
-            eventMarkerList,
-            constraints,
-            startingState,
-            endState,
-            false);
-
-    return pathToPathfind;
-  }
-
-  private static List<Waypoint> convertToWaypoints(Pose2d pose) {
-    List<Waypoint> path = new ArrayList<>();
-
-    Pose2d optimisedPos = POICoordinatesOptimisation(pose);
-    Pose2d lineupPos = lineupPoint(optimisedPos);
-
-    path.add(
-        new Waypoint(
-            optimisedPos.getTranslation(),
-            optimisedPos.getTranslation(),
-            lineupPos.getTranslation()));
-    path.add(new Waypoint(lineupPos.getTranslation(), lineupPos.getTranslation(), null));
-
-    if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
-      for (Waypoint waypoint : path) {
-        waypoint.flip();
-      }
-    }
-
-    // uses the coordinates and angle of the first point
-    return path;
-  }
-
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
     // adds a 1 percent buffer to the robot size
     double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2.0) * 1.01;
@@ -479,29 +318,6 @@ public class Pathfinding extends Command {
         poiToPathfind.isRobotFlipped()
             ? poiToPathfind.getPose2d().getRotation().minus(Rotation2d.k180deg)
             : poiToPathfind.getPose2d().getRotation());
-  }
-
-  public static Pose2d lineupPoint(Pose2d poiToLineup) {
-
-    return new Pose2d(
-        poiToLineup.getTranslation().getX() - 0.1 * poiToLineup.getRotation().getCos(),
-        poiToLineup.getTranslation().getY() - 0.1 * poiToLineup.getRotation().getSin(),
-        poiToLineup.getRotation());
-  }
-
-  private static Pose2d POICoordinatesOptimisation(Pose2d poiToPathfind) {
-
-    double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
-    double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
-    Rotation2d rotation = Rotation2d.fromDegrees(poiToPathfind.getRotation().getDegrees() + 180);
-
-    // calculates the coordinates to displace the robot actual wanted position relative to the POI
-    Translation2d widthToBacktrack =
-        new Translation2d(
-            poiToPathfind.getX() + robotLengthPlusBuffer * rotation.getCos(),
-            poiToPathfind.getY() + robotWidthPlusBuffer * rotation.getSin());
-
-    return new Pose2d(widthToBacktrack, rotation.minus(Rotation2d.fromDegrees(180)));
   }
 
   // #region Shuffleboard implementation
@@ -637,24 +453,6 @@ public class Pathfinding extends Command {
   }
 
   // #endregion
-
-  /**
-   * executes the pathfinding command meaning that the robot should go to all chosen POIs
-   *
-   * @return the command to pathfind to a specified point
-   */
-  public static Command doPathfinding() {
-
-    // once we have the POIs we want, we replace the old list and add them
-    for (POI poiArrayElement : tokenReader(chosenPath)) {
-      poiList.add(poiArrayElement);
-    }
-
-    return AutoBuilder.pathfindThenFollowPath(FilterPOIs(poiList), constraints)
-        .andThen(bestPOI.getEvent())
-        .repeatedly()
-        .until(() -> DriverStation.isTeleop());
-  }
 
   /**
    * A simple command to go to a specified POI in order to execute a command. This should only be
