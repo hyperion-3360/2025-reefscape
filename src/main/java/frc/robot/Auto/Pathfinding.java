@@ -4,8 +4,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
-import com.pathplanner.lib.util.FlippingUtil;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,7 +25,6 @@ import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeed;
 import frc.robot.commands.AutoCmd.AutoProcessor;
 import frc.robot.commands.AutoCmd.AutoShootBranch;
-import frc.robot.commands.AutoCmd.ShootAuto;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,13 +150,6 @@ public class Pathfinding extends Command {
         false,
         () -> m_autoShootL,
         Constants.Priorities.kShootCoralL4,
-        () -> RobotContainer.m_shooter.isCoralIn()),
-    STARTINGBRANCH(
-        Constants.Pegs.kPegs,
-        false,
-        () -> m_startingAutoShoot,
-        Constants.Priorities.kShootCoralL4,
-        true,
         () -> RobotContainer.m_shooter.isCoralIn()),
     FEEDERS(
         Constants.Feeders.kFeeders,
@@ -308,7 +298,17 @@ public class Pathfinding extends Command {
       ArrayList<Pose2d> positionsList = new ArrayList<>();
 
       for (Pose2d coordinate : poseArray) {
+        // if (!DriverStation.getAlliance().isPresent()) {
+        //   System.out.println("alliance is not present!!!");
+        // if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+        //   FlippingUtil.flipFieldPose(coordinate);
+        // }
+        // positionsList.add(
+        //     DriverStation.getAlliance().get().equals(Alliance.Red)
+        //         ? FlippingUtil.flipFieldPose(coordinate)
+        //         : coordinate);
         positionsList.add(coordinate);
+        // }
       }
 
       // gets the closest poi from the robot
@@ -319,11 +319,12 @@ public class Pathfinding extends Command {
                   positionsList.stream()
                       .filter(poseHead -> !consumedPOIs.contains(poseHead))
                       .toList());
-
       if (this.consumable == true) {
         // removes point we already went to
         consumedPOIs.add(pose);
       }
+      if (DriverStation.getAlliance().get().equals(Alliance.Red)) {}
+
       this.pose = pose;
     }
 
@@ -335,7 +336,7 @@ public class Pathfinding extends Command {
   // #endregion
 
   enum CustomAuto {
-    FIVECORALAUTO(POI.STARTINGBRANCH, POI.FEEDERS, POI.BRANCH_A),
+    FIVECORALAUTO(POI.BRANCH_K),
     ALGAE(POI.DUMPINGDOWN, POI.FEEDERS);
 
     private POI[] desiredPOIs;
@@ -371,12 +372,6 @@ public class Pathfinding extends Command {
   private static AutoProcessor processAlgae =
       new AutoProcessor(
           RobotContainer.m_elevator, RobotContainer.m_algaeIntake, RobotContainer.m_leds);
-  private static ShootAuto m_startingAutoShoot =
-      new ShootAuto(
-          RobotContainer.m_shooter,
-          RobotContainer.m_elevator,
-          RobotContainer.m_leds,
-          RobotContainer.m_swerve);
 
   private static AutoBranchShooting m_autoShoot =
       new AutoBranchShooting(
@@ -586,9 +581,12 @@ public class Pathfinding extends Command {
         System.out.println("error in POI reading no POI matched the value " + currentString);
       }
     }
-    if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
-     readPOIs.forEach(poi -> {FlippingUtil.flipFieldPose(poi.getPose2d());}); 
-    }
+    // if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+    //   readPOIs.forEach(
+    //       poi -> {
+    //         FlippingUtil.flipFieldPose(poi.getPose2d());
+    //       });
+    // }
     return readPOIs;
   }
 

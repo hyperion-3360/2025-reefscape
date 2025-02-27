@@ -3,6 +3,7 @@ package frc.robot.commands.AutoCmd;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Auto.Pathfinding;
 import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.subsystems.Elevator;
@@ -27,6 +28,7 @@ public class AutoFeast extends SequentialCommandGroup {
                     Commands.runOnce(() -> m_shooter.closeBlocker()),
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
                     Commands.runOnce(() -> m_shooter.setIntake()),
+                    new WaitUntilCommand(() -> m_shooter.isCoralIn()),
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
                     new WaitCommand(0.6),
                     Commands.runOnce(() -> m_shooter.stop()),
