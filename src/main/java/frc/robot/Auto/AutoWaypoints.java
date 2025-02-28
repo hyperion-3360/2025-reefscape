@@ -68,12 +68,24 @@ public class AutoWaypoints {
 
             public class pegWaypoints {
 
-                Pose2d branchB = new Pose2d(Units.inchesToMeters(158.5 - 6.5), Units.inchesToMeters(144 - 19), Rotation2d.fromDegrees(0));
-                Pose2d branchC = new Pose2d();
-                Pose2d branchD = new Pose2d();
-                Pose2d branchE = new Pose2d();
-                Pose2d branchF = new Pose2d();
-                Pose2d branchG = new Pose2d();
+                Pose2d branchB = origin.transformBy(
+                    new Transform2d(robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180)))).rotateAround(
+                                            reefCenter, new Rotation2d(Math.toRadians(0)));
+                Pose2d branchC = origin.transformBy(
+                    new Transform2d(robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180)))).rotateAround(
+                                            reefCenter, new Rotation2d(Math.toRadians(60)));
+                Pose2d branchD = origin.transformBy(
+                    new Transform2d(robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180)))).rotateAround(
+                                            reefCenter, new Rotation2d(Math.toRadians(60)));
+                Pose2d branchE = origin.transformBy(
+                    new Transform2d(robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180)))).rotateAround(
+                                            reefCenter, new Rotation2d(Math.toRadians(120)));
+                Pose2d branchF = origin.transformBy(
+                    new Transform2d(robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180)))).rotateAround(
+                                            reefCenter, new Rotation2d(Math.toRadians(120)));
+                Pose2d branchG = origin.transformBy(
+                    new Transform2d(robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180)))).rotateAround(
+                                            reefCenter, new Rotation2d(Math.toRadians(180)));
 
             }
 
