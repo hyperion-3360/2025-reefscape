@@ -21,6 +21,7 @@ import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
+import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.DeepClimbCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
@@ -64,6 +65,7 @@ public class RobotContainer {
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
   public static final Selection m_selector = new Selection(m_swerve);
+  public static final PathfindingV2 m_pathfinding = new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve);
   private static SendableChooser<Command> m_climberCommand = new SendableChooser<>();
 
   // Joystick axis declarations
@@ -302,6 +304,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("this is not a path/auto");
+    return m_pathfinding.auto();
   }
 }
