@@ -26,6 +26,7 @@ public class AutoFeed extends SequentialCommandGroup {
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
                     Commands.runOnce(() -> m_shooter.setIntake()),
                     new WaitUntilCommand(() -> m_shooter.isCoralIn()),
+                    Commands.runOnce(() -> m_shooter.stop()),
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY))))
             .finallyDo(
                 () ->

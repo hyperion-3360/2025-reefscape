@@ -4,8 +4,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Auto.Pathfinding;
-import frc.robot.Auto.Pathfinding.POI;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Elevator;
@@ -23,7 +21,7 @@ public class AutoNet extends SequentialCommandGroup {
                 Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.NET)),
                 new WaitCommand(0.5),
                 Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
-                new WaitUntilCommand(() -> Pathfinding.isCloseToPOI(POI.NET)),
+                // new WaitUntilCommand(() -> Pathfinding.isCloseToPOI(POI.NET)),
                 Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
                 Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),
                 Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),

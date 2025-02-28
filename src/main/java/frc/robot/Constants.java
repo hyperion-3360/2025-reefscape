@@ -187,18 +187,18 @@ public final class Constants {
 
   public static class Pegs {
     public static final Pose2d[] kPegs = {
-      new Pose2d(4.136, 3.076, Rotation2d.fromDegrees(60)),
-      new Pose2d(3.866, 3.319, Rotation2d.fromDegrees(60)),
-      new Pose2d(3.578, 3.869, Rotation2d.fromDegrees(0)),
-      new Pose2d(3.578, 4.183, Rotation2d.fromDegrees(0)),
-      new Pose2d(3.930, 4.695, Rotation2d.fromDegrees(300)),
-      new Pose2d(4.172, 4.825, Rotation2d.fromDegrees(300)),
-      new Pose2d(4.781, 4.845, Rotation2d.fromDegrees(240)),
-      new Pose2d(5.097, 4.717, Rotation2d.fromDegrees(240)),
-      new Pose2d(5.370, 4.194, Rotation2d.fromDegrees(180)),
-      new Pose2d(5.370, 3.874, Rotation2d.fromDegrees(180)),
-      new Pose2d(5.066, 3.367, Rotation2d.fromDegrees(120)),
-      new Pose2d(4.775, 3.185, Rotation2d.fromDegrees(120)),
+      new Pose2d(4.136, 3.076, Rotation2d.fromDegrees(240)),
+      new Pose2d(3.866, 3.319, Rotation2d.fromDegrees(240)),
+      new Pose2d(3.578, 3.869, Rotation2d.fromDegrees(180)),
+      new Pose2d(3.578, 4.183, Rotation2d.fromDegrees(180)),
+      new Pose2d(3.930, 4.695, Rotation2d.fromDegrees(120)),
+      new Pose2d(4.172, 4.825, Rotation2d.fromDegrees(120)),
+      new Pose2d(4.781, 4.845, Rotation2d.fromDegrees(60)),
+      new Pose2d(5.097, 4.717, Rotation2d.fromDegrees(60)),
+      new Pose2d(5.370, 4.194, Rotation2d.fromDegrees(0)),
+      new Pose2d(5.370, 3.874, Rotation2d.fromDegrees(0)),
+      new Pose2d(5.066, 3.367, Rotation2d.fromDegrees(300)),
+      new Pose2d(4.825, 3.110, Rotation2d.fromDegrees(300)),
     };
   }
 
