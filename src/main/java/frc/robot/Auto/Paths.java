@@ -23,5 +23,4 @@ public class Paths {
 
     PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0, Rotation2d.fromDegrees(0)));
 
-    
 }
