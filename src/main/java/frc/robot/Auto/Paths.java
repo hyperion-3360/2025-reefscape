@@ -4,23 +4,22 @@
 
 package frc.robot.Auto;
 
-import java.util.List;
-
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.List;
 
 /** Add your docs here. */
 public class Paths {
 
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(new Pose2d(0, 0, new Rotation2d()));
+  List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(new Pose2d(0, 0, new Rotation2d()));
 
-    PathConstraints constraints = new PathConstraints(1.0, 1.0, 1, 2);
+  PathConstraints constraints = new PathConstraints(1.0, 1.0, 1, 2);
 
-    PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0, Rotation2d.fromDegrees(0)));
-
+  PathPlannerPath path =
+      new PathPlannerPath(
+          waypoints, constraints, null, new GoalEndState(0, Rotation2d.fromDegrees(0)));
 }

@@ -1,7 +1,6 @@
 package frc.robot.Auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,12 +13,12 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.swerve.Swerve;
 
-public class PathfindingV2 extends Command{
-    public PathfindingV2(Shooter m_shooter, Elevator m_elevator, LEDs m_leds, Swerve m_swerve) {
-        addRequirements(m_shooter, m_elevator, m_leds, m_swerve);
-    }
-    
-    private static Pose2d POICoordinatesOptimisation(Pose2d poiToPathfind) {
+public class PathfindingV2 extends Command {
+  public PathfindingV2(Shooter m_shooter, Elevator m_elevator, LEDs m_leds, Swerve m_swerve) {
+    addRequirements(m_shooter, m_elevator, m_leds, m_swerve);
+  }
+
+  private static Pose2d POICoordinatesOptimisation(Pose2d poiToPathfind) {
 
     double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.0;
     double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2) * 1.0;
@@ -34,7 +33,7 @@ public class PathfindingV2 extends Command{
     return new Pose2d(widthToBacktrack, poiToPathfind.getRotation());
   }
 
-public Command auto() {
+  public Command auto() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     pathfindingSequence.addCommands(AutoBuilder.pathfindToPose(null, null));
     return pathfindingSequence;
