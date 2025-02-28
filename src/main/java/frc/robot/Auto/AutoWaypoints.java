@@ -19,6 +19,7 @@ public class AutoWaypoints {
   double distanceRobotCenterToReef = 1.5;
   double distanceRotbotCenterTag = 0.0;
 
+  //#region BLUE alliance
   public class BlueAlliance {
 
     Translation2d reefCenter =
@@ -30,6 +31,7 @@ public class AutoWaypoints {
             tagLayout.getTagPose(18).get().getY(),
             tagLayout.getTagPose(18).get().getRotation().toRotation2d());
 
+    //#region Left
     public class LeftSide {
 
       public class pegWaypoints {
@@ -75,6 +77,7 @@ public class AutoWaypoints {
       public class feederWaypoints {}
     }
 
+    //#region Right
     public class RightSide {
 
       public class pegWaypoints {
@@ -120,6 +123,7 @@ public class AutoWaypoints {
       public class feederWaypoints {}
     }
 
+    //#region Stop
     public class stopPathplannerWaypoint {
 
       Pose2d sideOne =
@@ -172,7 +176,7 @@ public class AutoWaypoints {
               .rotateAround(reefCenter, new Rotation2d(Math.toRadians(300)));
     }
   }
-
+  //#region RED alliance
   public class RedAlliance {
 
     Translation2d reefCenter =
@@ -184,6 +188,7 @@ public class AutoWaypoints {
             tagLayout.getTagPose(10).get().getY(),
             tagLayout.getTagPose(10).get().getRotation().toRotation2d());
 
+    //#region Left
     public class LeftSide {
 
       public class pegWaypoints {
@@ -228,7 +233,7 @@ public class AutoWaypoints {
 
       public class feederWaypoints {}
     }
-
+    //#region Right
     public class RightSide {
 
       public class pegWaypoints {
@@ -274,6 +279,7 @@ public class AutoWaypoints {
       public class feederWaypoints {}
     }
 
+    //#region Stop
     public class stopPathplannerWaypoint {
 
       Pose2d sideOne =
