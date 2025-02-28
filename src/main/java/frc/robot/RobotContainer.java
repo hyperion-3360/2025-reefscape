@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
-import frc.robot.Auto.Pathfinding;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
@@ -303,6 +302,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl(new PathPlannerAuto("dump"), dumpAuto);
+    return new PathPlannerAuto("this is not a path/auto");
   }
 }

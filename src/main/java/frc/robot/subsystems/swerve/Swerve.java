@@ -3,6 +3,8 @@ package frc.robot.subsystems.swerve;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -102,7 +104,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
       m_orchestra.addInstrument(mod.getDriveMotor());
       m_orchestra.addInstrument(mod.getRotationMotor());
     }
-    configurePathPlanner();
+
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
@@ -118,6 +120,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new TrapezoidProfile.Constraints(
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
+    configurePathPlanner();
   }
 
   /* periodic */
@@ -401,7 +404,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
         this::setPose,
         this::getSpeeds,
         this::driveRobotRelative,
-        Constants.AutoConstants.kPathFollowController,
+        new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0)),
         Constants.AutoConstants.kRobotConfig,
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
