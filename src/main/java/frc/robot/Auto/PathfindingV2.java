@@ -57,20 +57,10 @@ public class PathfindingV2 extends Command {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     pathfindingSequence.addCommands(
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideOne, 2.0),
-        new InstantCommand(
-            () -> m_swerve.setPose(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideOne)),
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideTwo, 2.0),
-        new InstantCommand(
-            () -> m_swerve.setPose(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideTwo)),
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideThree, 2.0),
-        new InstantCommand(
-            () -> m_swerve.setPose(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideThree)),
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideFour, 2.0),
-        new InstantCommand(
-            () -> m_swerve.setPose(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideFour)),
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideFive, 2.0),
-        new InstantCommand(
-            () -> m_swerve.setPose(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideFive)),
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideSix, 2.0));
 
         return pathfindingSequence;
