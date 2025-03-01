@@ -128,6 +128,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   @Override
   public void periodic() {
 
+    var reached = targetReached();
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
@@ -142,17 +143,21 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     if (m_debug) {
       // smartdashboardDebug();
-      for (SwerveModule mod : mSwerveMods) {
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-      }
+      // for (SwerveModule mod : mSwerveMods) {
+      // SmartDashboard.putNumber(
+      // "Mod " + mod.moduleNumber + " CTRE Mag encoder",
+      // mod.getMagEncoderPos().getDegrees());
+      // SmartDashboard.putNumber(
+      // "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+      // SmartDashboard.putNumber(
+      // "Mod " + mod.moduleNumber + " Velocity",
+      // mod.getState().speedMetersPerSecond);
+      // }
+    }
 
-      SmartDashboard.putNumber("currentpose X", poseEstimator.getEstimatedPosition().getX());
-      SmartDashboard.putNumber("currentpose Y", poseEstimator.getEstimatedPosition().getY());
+    if (DriverStation.isDisabled()) {
+      m_targetModeEnabled = false;
+      drive(0);
     }
 
     if (m_targetModeEnabled) {
@@ -169,20 +174,19 @@ public class Swerve extends SubsystemBase implements TestBindings {
           m_rotController.calculate(
               poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
-      SmartDashboard.putNumber("swerve target pose X", m_xController.getGoal().position);
-      SmartDashboard.putNumber("current pose X", getPose().getX());
-      SmartDashboard.putNumber("swerve target pose Y", m_yController.getGoal().position);
-      SmartDashboard.putNumber("current pose Y", getPose().getY());
-      SmartDashboard.putNumber(
-          "target pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
-      SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
-
       _drive(new Translation2d(x, y), rot, true, true);
-      if (targetReached()) {
+      if (reached) {
         m_targetModeEnabled = false;
       }
-      System.out.println(targetReached());
     }
+    SmartDashboard.putNumber("Goal pose X", m_xController.getGoal().position);
+    SmartDashboard.putNumber("current pose X", getPose().getX());
+    SmartDashboard.putNumber("Goal pose Y", m_yController.getGoal().position);
+    SmartDashboard.putNumber("current pose Y", getPose().getY());
+    SmartDashboard.putNumber(
+        "Goal pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
+    SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
+    SmartDashboard.putBoolean("Target reached", reached);
   }
 
   /* thread */
@@ -216,8 +220,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
 
-    return m_targetModeEnabled
-        && isAlmostEqual(posX, goalX, 0.02)
+    return isAlmostEqual(posX, goalX, 0.02)
         && isAlmostEqual(posY, goalY, 0.02)
         && isAlmostEqual(rot, goalRot, Units.degreesToRadians(3));
   }
@@ -298,9 +301,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
       //         targetSpeeds.vxMetersPerSecond,
       //         targetSpeeds.vyMetersPerSecond));
 
-      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
-      SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
-      SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
+      //      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
+      //     SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
+      //    SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
     }
 
     SwerveModuleState[] targetStates =
