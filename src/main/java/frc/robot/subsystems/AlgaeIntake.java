@@ -100,6 +100,11 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
       m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
       m_SpeedTarget = 0.0;
     }
+
+    if (Climber.climberActivated()) {
+      return;
+    }
+
     m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     m_intakeRight.set(m_SpeedTarget);
 

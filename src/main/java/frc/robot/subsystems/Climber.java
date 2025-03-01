@@ -10,9 +10,12 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -34,6 +37,14 @@ public class Climber extends SubsystemBase implements TestBindings {
 
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final SlewRateLimiter climberSpeedLimiter = new SlewRateLimiter(3);
+  private final DigitalInput m_beamBrake =
+      new DigitalInput(Constants.SubsystemInfo.kClimberBeamBrakeID);
+  private final Servo m_penis =
+      new Servo(Constants.SubsystemInfo.kClimberPenisID); // 90 ouvert commence 0
+  // private final Servo m_finger =
+  //     new Servo(Constants.SubsystemInfo.kClimberFingerID); // 90 est ouvert
+
+  private static boolean isClimberActivated = false;
 
   public Climber() {
     m_deepMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -44,42 +55,62 @@ public class Climber extends SubsystemBase implements TestBindings {
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
     m_deepMotor.set(0);
+    // m_finger.setAngle(88);
+    m_penis.setAngle(0);
+    m_deepMotor.setPosition(0.0);
 
     SendableRegistry.add(this, "Climber", 0);
     SmartDashboard.putData("Climber", this);
   }
 
-  // This is for test mode
-  public Command shallowClimb(DoubleSupplier speed) {
-    return this.run(
-        () -> {
-          double val = speed.getAsDouble();
-          m_direction = Math.signum(val);
-        });
+  public void periodic() {
+    SmartDashboard.putNumber("climber encoder", m_deepMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putBoolean("climber beambreak", m_beamBrake.get());
+    SmartDashboard.putBoolean("is climber actrivate", isClimberActivated);
+  }
+
+  public void Penis90() {
+    m_penis.setAngle(90);
+  }
+
+  public void Penis0() {
+    m_penis.setAngle(0);
   }
 
   public Command deepClimb(DoubleSupplier speed) {
     return this.run(
         () -> {
+          isClimberActivated = true;
           double val = speed.getAsDouble();
+          double motorspeed = Math.pow(val, 2) * m_direction;
           m_direction = Math.signum(val);
-          m_deepMotor.set(Math.pow(val, 2) * m_direction);
+          m_deepMotor.set(motorspeed);
         });
+  }
+
+  // public void fingerOpen() {
+  //   m_finger.setAngle(88);
+  // }
+
+  // public void fingerClose() {
+  //   m_finger.setAngle(74);
+  // }
+
+  public void winchDeepClimb() {
+    m_deepMotor.set(0.2);
+  }
+
+  public void stopDeepClimb() {
+    m_deepMotor.set(0);
+  }
+
+  public boolean SensorDetected() {
+    return m_beamBrake.get();
   }
 
   @Override
   public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
 
-    moduleTrigger
-        .and(controller.leftBumper())
-        .whileTrue(
-            this.shallowClimb(
-                () ->
-                    Joysticks.conditionJoystick(
-                        () -> controller.getRawAxis(translationAxis),
-                        climberSpeedLimiter,
-                        Constants.stickDeadband,
-                        true)));
     moduleTrigger
         .and(controller.rightBumper())
         .whileTrue(
@@ -90,5 +121,27 @@ public class Climber extends SubsystemBase implements TestBindings {
                         climberSpeedLimiter,
                         Constants.stickDeadband,
                         true)));
+  }
+
+  private boolean isAtPose() {
+    return m_deepMotor.getPosition().getValueAsDouble() <= -90;
+  }
+
+  public Command winchAutomatic() {
+    return Commands.run(() -> m_deepMotor.set(-0.4)) // - dewinch, + winch
+        .until(this::isAtPose)
+        .andThen(() -> m_deepMotor.set(0));
+  }
+
+  public boolean isClimberActivated() {
+    return isClimberActivated;
+  }
+
+  public void setClimberActivated() {
+    isClimberActivated = true;
+  }
+
+  public static boolean climberActivated() {
+    return isClimberActivated;
   }
 }
