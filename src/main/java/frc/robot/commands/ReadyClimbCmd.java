@@ -20,7 +20,7 @@ public class ReadyClimbCmd extends SequentialCommandGroup {
         new WaitCommand(.5),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.DEEPCLIMB)),
         Commands.runOnce(() -> m_climber.Penis90()),
-        m_climber.goForthChild(),
+        m_climber.winchAutomatic(),
         Commands.runOnce(() -> m_climber.stopDeepClimb()),
         // Commands.runOnce(() -> m_climber.fingerClose()),
         Commands.runOnce(() -> m_climber.setClimberActivated()));

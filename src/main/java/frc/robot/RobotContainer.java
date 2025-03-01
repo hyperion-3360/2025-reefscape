@@ -234,7 +234,7 @@ public class RobotContainer {
   public void configureBindingsTeleop() {
 
     m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
-    // m_coDriverController.leftBumper().onTrue(deepclimb);
+    // m_coDriverController.leftBumper().onTrue(deepclimb); TODO mettre un vrai boutton
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
@@ -271,6 +271,7 @@ public class RobotContainer {
         .povUp()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
+                .unless(m_climber::isClimberActivated)
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
@@ -302,12 +303,12 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
     m_coDriverController.rightBumper().onTrue(intakeCoral);
-    //     m_coDriverController
-    //         .leftBumper()
-    //         .whileTrue(cycleToFeeder.unless(m_climber::isClimberActivated))
-    //         .whileFalse(cancelAuto);
+
+    m_coDriverController
+        .leftBumper()
+        .whileTrue(cycleToFeeder.unless(m_climber::isClimberActivated))
+        .whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {
