@@ -73,7 +73,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
   private final double kPRot = 6.0;
-  private boolean ambiguousRot = false;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -120,6 +119,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new TrapezoidProfile.Constraints(
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
+    m_rotController.enableContinuousInput(-Math.PI, Math.PI);
     configurePathPlanner();
   }
 
@@ -164,12 +164,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
       var rot = 0.0;
-      if (ambiguousRot) {
-        rot = m_rotController.calculate(getRotation2d().getRadians());
-        if (getRotation2d().getDegrees() < -178 && getRotation2d().getDegrees() > 178) {
-          rot = 0;
-        }
-      }
       rot =
           m_rotController.calculate(
               poseEstimator.getEstimatedPosition().getRotation().getRadians());
@@ -215,7 +209,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public boolean targetReached() {
     var posX = getPose().getX();
     var posY = getPose().getY();
-    var rot = getRotation2d().getRadians();
+    var rot = getPose().getRotation().getRadians();
     var goalX = m_xController.getGoal().position;
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
@@ -237,29 +231,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
     if (target == Pose2d.kZero) {
       m_targetModeEnabled = false;
     } else {
-      if (target.getRotation().getDegrees() == 180 || target.getRotation().getDegrees() == -180) {
-        ambiguousRot = true;
-      } else {
-        ambiguousRot = false;
-      }
       m_targetModeEnabled = true;
       m_xController.reset(getPose().getX());
       m_xController.setGoal(target.getX());
       m_yController.reset(getPose().getY());
       m_yController.setGoal(target.getY());
-      if (ambiguousRot) {
-        if (getPose().getRotation().getDegrees() > 0) {
-          m_rotController.reset(getPose().getRotation().getRadians());
-          m_rotController.setGoal(Units.degreesToRadians(179));
-        } else {
-          m_rotController.reset(getPose().getRotation().getRadians());
-          m_rotController.setGoal(Units.degreesToRadians(-179));
-        }
-      } else {
-        m_rotController.reset(getPose().getRotation().getRadians());
-        m_rotController.setGoal(target.getRotation().getRadians());
-      }
-      System.out.println(" Drive to target: " + target.getX() + " " + target.getY());
+      m_rotController.reset(getPose().getRotation().getRadians());
+      m_rotController.setGoal(target.getRotation().getRadians());
     }
   }
 
