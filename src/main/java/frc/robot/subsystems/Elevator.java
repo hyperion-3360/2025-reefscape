@@ -46,15 +46,17 @@ public class Elevator extends SubsystemBase implements TestBindings {
   // private static double kP = 20.0;
   // private static double kI = 1.0;
   // private static double kD = 0.0;
-  private static double kP = 10; // 4?
+  private static double kP = 4; // 4?
   private static double kI = 0;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 10;
-  private static double kMaxAcceleration = 10; // 5.75 dont jump
-  private static double kMinVelocity = 1.5; // 1.5
+  private static double kMaxVelocity = 15;
+  private static double kMaxAcceleration = 11; // 5.75 dont jump
+  private static double kMidVelocity = 8;
+  private static double kMidAcceleration = 6; // 5.75 dont jump
+  private static double kMinVelocity = 2.0; // 1.5
   private static double kMinAcceleration = 2.5; // 2.5
 
   // private static double kG = 0.41; // barely moves up
@@ -69,7 +71,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   private static double kG = 0.41; // barely moves up
   private static double kA = 0.0;
-  private static double kV = 3.0285; // 2.1?
+  private static double kV = 2.5; // 2.1?
   private static double kS = 0.14;
 
   private static double pulleyDiam = 3;
@@ -82,6 +84,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   // velocity and acceleration constraints.
   private final TrapezoidProfile.Constraints m_MaxConstraints =
       new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+  private final TrapezoidProfile.Constraints m_MidConstraints =
+      new TrapezoidProfile.Constraints(kMidVelocity, kMidAcceleration);
   private final TrapezoidProfile.Constraints m_MinConstraints =
       new TrapezoidProfile.Constraints(kMinVelocity, kMinAcceleration);
   private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV, kA);
@@ -104,6 +108,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private boolean chronoStarted = false;
   private double chronoStartTime = 0;
   private boolean lowElevatorHeight = true;
+  private boolean midHeight = false;
 
   private desiredHeight heightEnum = desiredHeight.LOW;
 
@@ -197,7 +202,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
       m_rightElevatorMotor.setVoltage(output);
     }
 
-    if (chronoStarted && (Math.abs(elevatorPos - m_controller.getGoal().position) < 0.01)) {
+    if (chronoStarted && (Math.abs(elevatorPos - m_controller.getGoal().position) < 0.02)) {
       chronoStarted = false;
       System.out.println(
           "Elevator arrived in " + (Timer.getFPGATimestamp() - chronoStartTime) + " secs");
@@ -216,13 +221,15 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorDown;
         heightEnum = desiredHeight.LOW;
         lowElevatorHeight = true;
+        midHeight = false;
         break;
 
       case L1:
         // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorL1;
         heightEnum = desiredHeight.L1;
-        lowElevatorHeight = false;
+        lowElevatorHeight = true;
+        midHeight = false;
         break;
 
       case L2:
@@ -230,6 +237,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorL2;
         heightEnum = desiredHeight.L2;
         lowElevatorHeight = false;
+        midHeight = true;
         break;
 
       case L3:
@@ -237,6 +245,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorL3;
         heightEnum = desiredHeight.L3;
         lowElevatorHeight = false;
+        midHeight = true;
         break;
 
       case L4:
@@ -244,6 +253,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorL4;
         heightEnum = desiredHeight.L4;
         lowElevatorHeight = false;
+        midHeight = false;
         break;
 
       case PROCESSOR:
@@ -251,6 +261,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorProcessor;
         heightEnum = desiredHeight.PROCESSOR;
         lowElevatorHeight = true;
+        midHeight = false;
         break;
 
       case NET:
@@ -258,6 +269,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorNet;
         heightEnum = desiredHeight.NET;
         lowElevatorHeight = false;
+        midHeight = false;
         break;
 
       case ALGAELOW:
@@ -265,6 +277,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeLow;
         heightEnum = desiredHeight.ALGAELOW;
         lowElevatorHeight = true;
+        midHeight = false;
         break;
 
       case FEEDER:
@@ -272,13 +285,15 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorFeeder;
         heightEnum = desiredHeight.FEEDER;
         lowElevatorHeight = true;
+        midHeight = false;
         break;
 
       case ALGAEL2:
         // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL2;
         heightEnum = desiredHeight.ALGAEL2;
-        lowElevatorHeight = true;
+        lowElevatorHeight = false;
+        midHeight = true;
         break;
 
       case ALGAEL3:
@@ -286,11 +301,14 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
         heightEnum = desiredHeight.ALGAEL3;
         lowElevatorHeight = false;
+        midHeight = false;
         break;
     }
 
     if (lowElevatorHeight) {
       m_controller.setConstraints(m_MinConstraints);
+    } else if (midHeight) {
+      m_controller.setConstraints(m_MidConstraints);
     } else {
       m_controller.setConstraints(m_MaxConstraints);
     }
