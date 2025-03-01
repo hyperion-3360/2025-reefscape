@@ -302,6 +302,8 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
+    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
+    m_coDriverController.rightBumper().onTrue(intakeCoral);
     //     m_coDriverController
     //         .leftBumper()
     //         .whileTrue(cycleToFeeder.unless(m_climber::isClimberActivated))
