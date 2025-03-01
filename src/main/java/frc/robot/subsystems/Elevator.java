@@ -151,9 +151,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
                   / gearRatio)
               * 5;
     }
-    if (Climber.climberActivated()) {
-      return;
-    }
     var setPointPosition = m_controller.getSetpoint().position;
     // elevatorPos is changed periodically
     elevatorPos =
@@ -201,8 +198,14 @@ public class Elevator extends SubsystemBase implements TestBindings {
           "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
       SmartDashboard.putNumber("error", m_controller.getPositionError());
 
-      // Run controller and update motor output
-      m_rightElevatorMotor.setVoltage(output);
+      if (Climber.climberActivated()) {
+        m_controller.reset(0.0);
+        m_rightElevatorMotor.setVoltage(0.0);
+        System.out.println(Climber.climberActivated());
+      } else {
+        // Run controller and update motor output
+        m_rightElevatorMotor.setVoltage(output);
+      }
     }
 
     if (chronoStarted && (Math.abs(elevatorPos - m_controller.getGoal().position) < 0.02)) {

@@ -80,7 +80,6 @@ public class Climber extends SubsystemBase implements TestBindings {
   public Command deepClimb(DoubleSupplier speed) {
     return this.run(
         () -> {
-          isClimberActivated = true;
           double val = speed.getAsDouble();
           double motorspeed = Math.pow(val, 2) * m_direction;
           m_direction = Math.signum(val);
