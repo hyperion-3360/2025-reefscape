@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.lib.util.Conversions;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
@@ -42,14 +44,19 @@ public class PathfindingV2 extends Command {
   public Command auto() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     pathfindingSequence.addCommands(
-        goThere(new Pose2d(7.3, 3, Rotation2d.k180deg), 2.0),
-        new InstantCommand(() -> m_swerve.setPose(new Pose2d(7.3, 3, Rotation2d.k180deg))),
-        new PrintCommand(
-            "Position: "
-                + m_swerve.getPose().getTranslation().getX()
-                + ", "
-                + m_swerve.getPose().getTranslation().getY()),
-        goThere(new Pose2d(7, 6, Rotation2d.kZero), 2.0));
+        goThere(new Pose2d(7.3, 3, Rotation2d.k180deg), 1.0),
+        new InstantCommand(
+            () ->
+                m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE)),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new PrintCommand("Dropping coral to L4"),
+        goThere(new Pose2d(1, 1, Rotation2d.kZero), 1.0),
+        new InstantCommand(
+            () ->
+                m_swerve.drivetoTarget(
+                    Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get()))),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new PrintCommand("Feeding coral"));
     return pathfindingSequence;
   }
 
@@ -63,6 +70,6 @@ public class PathfindingV2 extends Command {
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideFive, 2.0),
         goThere(AutoWaypoints.BlueAlliance.stopPathplannerWaypoint.sideSix, 2.0));
 
-        return pathfindingSequence;
+    return pathfindingSequence;
   }
 }
