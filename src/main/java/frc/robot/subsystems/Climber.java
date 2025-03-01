@@ -41,8 +41,8 @@ public class Climber extends SubsystemBase implements TestBindings {
       new DigitalInput(Constants.SubsystemInfo.kClimberBeamBrakeID);
   private final Servo m_penis =
       new Servo(Constants.SubsystemInfo.kClimberPenisID); // 90 ouvert commence 0
-  private final Servo m_finger =
-      new Servo(Constants.SubsystemInfo.kClimberFingerID); // 90 est ouvert
+  // private final Servo m_finger =
+  //     new Servo(Constants.SubsystemInfo.kClimberFingerID); // 90 est ouvert
 
   private static boolean isClimberActivated = false;
 
@@ -55,10 +55,9 @@ public class Climber extends SubsystemBase implements TestBindings {
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
     m_deepMotor.set(0);
-    m_finger.setAngle(88);
+    // m_finger.setAngle(88);
     m_penis.setAngle(0);
     m_deepMotor.setPosition(0.0);
-    m_shallowMotor.setPosition(0.0);
 
     SendableRegistry.add(this, "Climber", 0);
     SmartDashboard.putData("Climber", this);
@@ -66,18 +65,8 @@ public class Climber extends SubsystemBase implements TestBindings {
 
   public void periodic() {
     SmartDashboard.putNumber("climber encoder", m_deepMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putBoolean("climber beambreak", !m_beamBrake.get());
+    SmartDashboard.putBoolean("climber beambreak", m_beamBrake.get());
     SmartDashboard.putBoolean("is climber actrivate", isClimberActivated);
-  }
-
-  // This is for test mode
-  public Command shallowClimb(DoubleSupplier speed) {
-    return this.run(
-        () -> {
-          double val = speed.getAsDouble();
-          isClimberActivated = true;
-          m_direction = Math.signum(val);
-        });
   }
 
   public void Penis90() {
@@ -99,20 +88,16 @@ public class Climber extends SubsystemBase implements TestBindings {
         });
   }
 
-  public void fingerOpen() {
-    m_finger.setAngle(88);
-  }
+  // public void fingerOpen() {
+  //   m_finger.setAngle(88);
+  // }
 
-  public void fingerClose() {
-    m_finger.setAngle(74);
-  }
+  // public void fingerClose() {
+  //   m_finger.setAngle(74);
+  // }
 
   public void winchDeepClimb() {
-    m_deepMotor.set(1);
-  }
-
-  public void dewinchDeepClimb() {
-    m_deepMotor.set(-1);
+    m_deepMotor.set(0.2);
   }
 
   public void stopDeepClimb() {
@@ -120,22 +105,12 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public boolean SensorDetected() {
-    return !m_beamBrake.get();
+    return m_beamBrake.get();
   }
 
   @Override
   public void setupTestBindings(Trigger moduleTrigger, CommandXboxController controller) {
 
-    moduleTrigger
-        .and(controller.leftBumper())
-        .whileTrue(
-            this.shallowClimb(
-                () ->
-                    Joysticks.conditionJoystick(
-                        () -> controller.getRawAxis(translationAxis),
-                        climberSpeedLimiter,
-                        Constants.stickDeadband,
-                        true)));
     moduleTrigger
         .and(controller.rightBumper())
         .whileTrue(
@@ -153,7 +128,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public Command goForthChild() {
-    return Commands.run(() -> m_deepMotor.set(-0.1)) // - dewinch, + winch
+    return Commands.run(() -> m_deepMotor.set(-0.4)) // - dewinch, + winch
         .until(this::isAtPose)
         .andThen(() -> m_deepMotor.set(0));
   }

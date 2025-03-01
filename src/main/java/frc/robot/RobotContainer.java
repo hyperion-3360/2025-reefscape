@@ -22,6 +22,7 @@ import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
+import frc.robot.commands.DeepClimbCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -114,6 +115,7 @@ public class RobotContainer {
   private final AutoFeast cycleToFeeder = new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds);
   private final AutoCancel cancelAuto =
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
+  private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
 
   public enum TestModes {
     NONE,
@@ -171,15 +173,7 @@ public class RobotContainer {
     SmartDashboard.putData("Algae Intake", setAlgaeIntakeMode());
     SmartDashboard.putData("Swerve", setSwerveMode());
     SmartDashboard.putData("Dumper", setDumperMode());
-    m_climberCommand.addOption(
-        "Shallow",
-        m_climber.shallowClimb(
-            () ->
-                Joysticks.conditionJoystick(
-                    () -> m_coDriverController.getLeftY(),
-                    climberLimiter,
-                    Constants.stickDeadband,
-                    true)));
+
     m_climberCommand.setDefaultOption(
         "Deep",
         m_climber.deepClimb(
@@ -240,6 +234,7 @@ public class RobotContainer {
   public void configureBindingsTeleop() {
 
     m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
+    m_coDriverController.leftBumper().onTrue(deepclimb);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
@@ -307,10 +302,10 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_coDriverController
-        .leftBumper()
-        .whileTrue(cycleToFeeder.unless(m_climber::isClimberActivated))
-        .whileFalse(cancelAuto);
+    //     m_coDriverController
+    //         .leftBumper()
+    //         .whileTrue(cycleToFeeder.unless(m_climber::isClimberActivated))
+    //         .whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {

@@ -22,7 +22,7 @@ public class ReadyClimbCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_climber.Penis90()),
         m_climber.goForthChild(),
         Commands.runOnce(() -> m_climber.stopDeepClimb()),
-        Commands.runOnce(() -> m_climber.fingerClose()),
+        // Commands.runOnce(() -> m_climber.fingerClose()),
         Commands.runOnce(() -> m_climber.setClimberActivated()));
   }
 }

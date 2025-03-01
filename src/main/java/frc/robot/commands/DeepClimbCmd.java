@@ -9,7 +9,7 @@ import frc.robot.subsystems.leds.LEDs.Pattern;
 
 public class DeepClimbCmd extends SequentialCommandGroup {
 
-  DeepClimbCmd(Climber m_climber, LEDs m_leds) {
+  public DeepClimbCmd(Climber m_climber, LEDs m_leds) {
 
     addRequirements(m_climber);
     addRequirements(m_leds);
