@@ -66,13 +66,16 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public void periodic() {
+    maxStatorCurrent = Math.max(maxStatorCurrent, m_deepMotor.getStatorCurrent().getValueAsDouble());
+    maxVoltage = Math.max(maxVoltage, m_deepMotor.getMotorVoltage().getValueAsDouble());
+
     SmartDashboard.putNumber("climber encoder", m_deepMotor.getPosition().getValueAsDouble());
     SmartDashboard.putBoolean("climber beambreak", m_beamBrake.get());
     SmartDashboard.putBoolean("is climber actrivate", isClimberActivated);
     SmartDashboard.putNumber("climber voltage", m_deepMotor.getMotorVoltage().getValueAsDouble());
     SmartDashboard.putNumber("climber current", m_deepMotor.getTorqueCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("maximum climber current", Math.max(maxStatorCurrent, m_deepMotor.getTorqueCurrent().getValueAsDouble()));
-    SmartDashboard.putNumber("maximum climber voltage", Math.max(maxVoltage, m_deepMotor.getMotorVoltage().getValueAsDouble()));
+    SmartDashboard.putNumber("maximum climber current", maxVoltage);
+    SmartDashboard.putNumber("maximum climber voltage", maxStatorCurrent);
   }
 
   public void Penis90() {
