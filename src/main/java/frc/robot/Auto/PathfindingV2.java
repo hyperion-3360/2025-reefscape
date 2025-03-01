@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.util.Conversions;
+import frc.robot.Constants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
@@ -22,7 +24,7 @@ public class PathfindingV2 extends Command {
   LEDs m_leds;
   Swerve m_swerve;
 
-  PathConstraints constraints = new PathConstraints(1.0, 1.0, 1, 2);
+  PathConstraints constraints = new PathConstraints(5.0, 4.0, 1, 2);
 
   public PathfindingV2(Shooter shooter, Elevator elevator, LEDs leds, Swerve swerve) {
     m_shooter = shooter;
@@ -41,22 +43,68 @@ public class PathfindingV2 extends Command {
     return AutoBuilder.pathfindToPose(pose, constraints, goalEndVelocity);
   }
 
+  private Pose2d computeRobotOffset(Pose2d pose) {
+    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.1;
+    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2) * 1.1;
+
+    Rotation2d rotation = pose.getRotation();
+
+    // calculates the coordinates to displace the robot actual wanted position
+    // relative to the POI
+    Translation2d widthToBacktrack =
+        new Translation2d(
+            pose.getX() + robotLengthPlusBuffer * rotation.getCos(),
+            pose.getY() + robotWidthPlusBuffer * rotation.getSin());
+
+    return new Pose2d(widthToBacktrack, rotation);
+  }
+
   public Command auto() {
+    var branchERot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE.getRotation();
+    var feederRot = AutoWaypoints.tagLayout.getTagPose(12).get().getRotation().toRotation2d();
+    var branchDRot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD.getRotation();
+    var branchCRot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC.getRotation();
+
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     pathfindingSequence.addCommands(
-        goThere(new Pose2d(7.3, 3, Rotation2d.k180deg), 1.0),
+        goThere(new Pose2d(6, 1.5, branchERot), 3.0),
         new InstantCommand(
             () ->
                 m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE)),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new PrintCommand("Dropping coral to L4"),
-        goThere(new Pose2d(1, 1, Rotation2d.kZero), 1.0),
+        goThere(new Pose2d(2.5, 1.75, feederRot), 3.0),
         new InstantCommand(
             () ->
                 m_swerve.drivetoTarget(
-                    Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get()))),
+                    computeRobotOffset(
+                        Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())))),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new PrintCommand("Feeding coral"));
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new PrintCommand("Feeding coral"),
+        goThere(new Pose2d(2.5, 1.75, branchDRot), 3.0),
+        new InstantCommand(
+            () ->
+                m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD)),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        goThere(new Pose2d(2.5, 1.75, feederRot), 3.0),
+        new InstantCommand(
+            () ->
+                m_swerve.drivetoTarget(
+                    computeRobotOffset(
+                        Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())))),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new PrintCommand("Feeding coral"),
+        goThere(new Pose2d(2.5, 1.75, branchCRot), 3.0),
+        new InstantCommand(
+            () ->
+                m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC)),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new PrintCommand("Dropping coral to L4"));
     return pathfindingSequence;
   }
 

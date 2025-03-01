@@ -128,7 +128,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   @Override
   public void periodic() {
 
-    var reached = targetReached();
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
@@ -169,9 +168,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
               poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
       _drive(new Translation2d(x, y), rot, true, true);
-      if (reached) {
-        m_targetModeEnabled = false;
-      }
     }
     SmartDashboard.putNumber("Goal pose X", m_xController.getGoal().position);
     SmartDashboard.putNumber("current pose X", getPose().getX());
@@ -180,7 +176,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber(
         "Goal pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
     SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
-    SmartDashboard.putBoolean("Target reached", reached);
   }
 
   /* thread */

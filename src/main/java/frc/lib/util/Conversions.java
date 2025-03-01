@@ -2,8 +2,6 @@ package frc.lib.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 
 public class Conversions {
 
@@ -48,15 +46,6 @@ public class Conversions {
   }
 
   /**
-   * @brief Converts a Rotation3d to a Rotation2d by removing the Z component
-   * @param Rotation3d
-   * @return Rotation2d
-   */
-  public static Rotation2d Rotation2dToRotation3d(Rotation3d rotation) {
-    return new Rotation2d(rotation.getX(), rotation.getY());
-  }
-
-  /**
    * @brief Converts a Pose3d to a Pose2d by removing the Z component
    * @param pose Pose3d
    * @return Pose2d
@@ -65,6 +54,6 @@ public class Conversions {
     return new Pose2d(
         pose.getTranslation().getX(),
         pose.getTranslation().getY(),
-        Rotation2dToRotation3d(pose.getRotation()));
+        pose.getRotation().toRotation2d());
   }
 }
