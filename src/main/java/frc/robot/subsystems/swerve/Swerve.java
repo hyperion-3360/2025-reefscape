@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -34,8 +35,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.SwerveElevatorSlowDownFunc;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
+import frc.robot.subsystems.Elevator;
 import frc.robot.vision.Vision;
 import java.io.File;
 import java.util.List;
@@ -73,6 +76,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
   private final double kPRot = 6.0;
+  private boolean ambiguousRot = false;
+  private Elevator m_elevator;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -80,7 +85,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
   // vision estimation of robot pose
   Optional<EstimatedRobotPose> visionEst;
 
-  public Swerve(Vision vision) {
+  public Swerve(Vision vision, Elevator elevator) {
+    m_elevator = elevator;
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
     m_field2d = new Field2d();
 
@@ -160,6 +166,51 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
 
     if (m_targetModeEnabled) {
+
+      m_xController.setConstraints(
+          new Constraints(
+              kMaxSpeedMetersPerSecondX
+                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
+              kMaxAccelerationMetersPerSecondSquaredX
+                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+      m_yController.setConstraints(
+          new Constraints(
+              kMaxSpeedMetersPerSecondY
+                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
+              kMaxAccelerationMetersPerSecondSquaredY
+                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+      m_rotController.setConstraints(
+          new Constraints(
+              kMaxSpeedRadiansPerSecond
+                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
+              kMaxAccelerationRadiansPerSecondSquared
+                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+
+      SmartDashboard.putNumber(
+          "max speed x",
+          kMaxSpeedMetersPerSecondX
+              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+      SmartDashboard.putNumber(
+          "max acceleration x",
+          kMaxAccelerationMetersPerSecondSquaredX
+              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+      SmartDashboard.putNumber(
+          "max speed y",
+          kMaxSpeedMetersPerSecondY
+              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+      SmartDashboard.putNumber(
+          "max acceleration y",
+          kMaxAccelerationMetersPerSecondSquaredY
+              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+      SmartDashboard.putNumber(
+          "max speed rotation",
+          kMaxSpeedRadiansPerSecond
+              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+      SmartDashboard.putNumber(
+          "max acceleration rotation",
+          kMaxAccelerationRadiansPerSecondSquared
+              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
       var rot = 0.0;
