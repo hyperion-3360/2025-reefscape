@@ -5,14 +5,16 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.util.Conversions;
-import frc.robot.Constants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
@@ -23,6 +25,8 @@ public class PathfindingV2 extends Command {
   Elevator m_elevator;
   LEDs m_leds;
   Swerve m_swerve;
+  public static final double robotLength = Units.inchesToMeters(35.0); // with bumper: 32.5
+  public static final double robotWidth = Units.inchesToMeters(35.0); // with bumper: 32.5
 
   PathConstraints constraints = new PathConstraints(5.0, 4.0, 1, 2);
 
@@ -44,8 +48,8 @@ public class PathfindingV2 extends Command {
   }
 
   private Pose2d computeRobotOffset(Pose2d pose) {
-    double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.1;
-    double robotWidthPlusBuffer = (Constants.Swerve.robotWidth / 2) * 1.1;
+    double robotLengthPlusBuffer = (robotLength / 2) * 1.1;
+    double robotWidthPlusBuffer = (robotWidth / 2) * 1.1;
 
     Rotation2d rotation = pose.getRotation();
 
@@ -76,24 +80,35 @@ public class PathfindingV2 extends Command {
   }
 
   private Command driveAndShootCycle(Pose2d targetPos) {
-    var approachPose = offsetPose(targetPos, -0.1);
+    var approachPose = offsetPose(targetPos, -0.15);
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
     shootSequence.addCommands(
         goThere(approachPose, 0.0),
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new PrintCommand("goThere for shoot Complete"),
+        new ParallelDeadlineGroup(
+            new WaitCommand(1.2), // will be elevatecmd(L4) later
+            // new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
+            new SequentialCommandGroup(
+                new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+                new WaitUntilCommand(() -> m_swerve.targetReached()))),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new PrintCommand("Dropping coral to L4"));
+        new PrintCommand("Shooting coral to L4"));
     return shootSequence;
   }
 
   private Command driveAndIntakeCycle(Pose2d targetPos) {
-    var approachPose = offsetPose(targetPos, 0.1);
+    var approachPose = offsetPose(targetPos, (robotLength / 2) + 0.15);
+    var touchPose = offsetPose(targetPos, (robotLength / 2) - 0.06);
+
     SequentialCommandGroup intakeSequence = new SequentialCommandGroup(Commands.none());
     intakeSequence.addCommands(
         goThere(approachPose, 0.0),
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new PrintCommand("goThere for intake Complete"),
+        new ParallelDeadlineGroup(
+            new WaitCommand(1.0), // will be elevatecmd(L4) later
+            new SequentialCommandGroup(
+                new InstantCommand(() -> m_swerve.drivetoTarget(touchPose)),
+                new WaitUntilCommand(() -> m_swerve.targetReached()))),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new PrintCommand("Feeding coral"));
 
