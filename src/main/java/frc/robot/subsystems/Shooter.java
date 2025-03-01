@@ -41,7 +41,8 @@ public class Shooter extends SubsystemBase implements TestBindings {
     L2,
     L3,
     L4,
-    STOP
+    STOP,
+    INTAKE
   }
 
   private void setSpeed(shootSpeed speed) {
@@ -65,6 +66,10 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
       case STOP:
         m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
+        break;
+
+      case INTAKE:
+        m_shooterSpeed = Constants.CoralShooterVariables.kIntakeSpeed;
         break;
     }
   }
@@ -111,6 +116,9 @@ public class Shooter extends SubsystemBase implements TestBindings {
       closeBlocker();
     } else m_shooter.set(m_shooterSpeed);
     SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
+    if (Climber.climberActivated()) {
+      return;
+    }
   }
 
   /**

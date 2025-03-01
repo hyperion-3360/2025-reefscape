@@ -151,6 +151,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
                   / gearRatio)
               * 5;
     }
+    if (Climber.climberActivated()) {
+      return;
+    }
     var setPointPosition = m_controller.getSetpoint().position;
     // elevatorPos is changed periodically
     elevatorPos =
