@@ -9,13 +9,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.lib.util.Conversions;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.swerve.Swerve;
@@ -47,22 +48,6 @@ public class PathfindingV2 extends Command {
     return AutoBuilder.pathfindToPose(pose, constraints, goalEndVelocity);
   }
 
-  private Pose2d computeRobotOffset(Pose2d pose) {
-    double robotLengthPlusBuffer = (robotLength / 2) * 1.1;
-    double robotWidthPlusBuffer = (robotWidth / 2) * 1.1;
-
-    Rotation2d rotation = pose.getRotation();
-
-    // calculates the coordinates to displace the robot actual wanted position
-    // relative to the POI
-    Translation2d widthToBacktrack =
-        new Translation2d(
-            pose.getX() + robotLengthPlusBuffer * rotation.getCos(),
-            pose.getY() + robotWidthPlusBuffer * rotation.getSin());
-
-    return new Pose2d(widthToBacktrack, rotation);
-  }
-
   public Pose2d offsetPose(Pose2d originalPose, double offset) {
     // Offset by 0.05 meters in the direction of the current angle
     double offsetX =
@@ -79,20 +64,28 @@ public class PathfindingV2 extends Command {
     return new Pose2d(offsetTranslation, sameRotation);
   }
 
+  public boolean isCloseTo(Pose2d pose, double distance) {
+    return m_swerve.getPose().getTranslation().getDistance(pose.getTranslation()) < distance;
+  }
+
   private Command driveAndShootCycle(Pose2d targetPos) {
     var approachPose = offsetPose(targetPos, -0.15);
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
     shootSequence.addCommands(
-        goThere(approachPose, 0.0),
-        new PrintCommand("goThere for shoot Complete"),
-        new ParallelDeadlineGroup(
-            new WaitCommand(1.2), // will be elevatecmd(L4) later
-            // new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
+        new ParallelCommandGroup(
+            goThere(approachPose, 0.0),
             new SequentialCommandGroup(
-                new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+                new WaitUntilCommand(() -> isCloseTo(approachPose, 0.5)),
+                Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)))),
+        new SequentialCommandGroup(
+            new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+            new ParallelDeadlineGroup(
+                new WaitCommand(1.0), // will be elevatecmd(L4) later
                 new WaitUntilCommand(() -> m_swerve.targetReached()))),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new PrintCommand("Shooting coral to L4"));
+        new PrintCommand("Shooting coral to L4"),
+        new WaitCommand(0.2), // will be elevatecmd(L4) later
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.FEEDER)));
     return shootSequence;
   }
 
@@ -118,13 +111,13 @@ public class PathfindingV2 extends Command {
   public Command auto() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
     pathfindingSequence.addCommands(
-        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE),
-        driveAndIntakeCycle(
-            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
-        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD),
-        driveAndIntakeCycle(
-            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
-        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC));
+        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE));
+    //        driveAndIntakeCycle(
+    //            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+    //        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD),
+    //        driveAndIntakeCycle(
+    //            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+    //        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC));
 
     return pathfindingSequence;
   }
