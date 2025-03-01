@@ -234,7 +234,7 @@ public class RobotContainer {
   public void configureBindingsTeleop() {
 
     m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
-    m_coDriverController.leftBumper().onTrue(deepclimb);
+    // m_coDriverController.leftBumper().onTrue(deepclimb);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
