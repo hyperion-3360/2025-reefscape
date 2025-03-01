@@ -31,7 +31,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
   public enum elevation {
     NET,
     FLOOR,
-    STORED
+    STORED,
+    PROCESSOR
   }
 
   public enum shooting {
@@ -157,6 +158,10 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
 
       case STORED:
         this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
+        break;
+
+        case PROCESSOR:
+        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kProcessorAngle;
         break;
     }
   }
