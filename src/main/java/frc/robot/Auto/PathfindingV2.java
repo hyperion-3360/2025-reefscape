@@ -59,6 +59,22 @@ public class PathfindingV2 extends Command {
     return new Pose2d(widthToBacktrack, rotation);
   }
 
+  public Pose2d offsetPose(Pose2d originalPose, double offset) {
+    // Offset by 0.05 meters in the direction of the current angle
+    double offsetX =
+        originalPose.getTranslation().getX()
+            + offset * Math.cos(originalPose.getRotation().getRadians());
+    double offsetY =
+        originalPose.getTranslation().getY()
+            + offset * Math.sin(originalPose.getRotation().getRadians());
+
+    // Create a new Pose2d with the offset translation and the same rotation
+    Translation2d offsetTranslation = new Translation2d(offsetX, offsetY);
+    Rotation2d sameRotation = originalPose.getRotation();
+
+    return new Pose2d(offsetTranslation, sameRotation);
+  }
+
   public Command auto() {
     var branchERot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE.getRotation();
     var feederRot = AutoWaypoints.tagLayout.getTagPose(12).get().getRotation().toRotation2d();
