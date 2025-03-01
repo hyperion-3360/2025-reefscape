@@ -75,52 +75,42 @@ public class PathfindingV2 extends Command {
     return new Pose2d(offsetTranslation, sameRotation);
   }
 
-  public Command auto() {
-    var branchERot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE.getRotation();
-    var feederRot = AutoWaypoints.tagLayout.getTagPose(12).get().getRotation().toRotation2d();
-    var branchDRot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD.getRotation();
-    var branchCRot = AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC.getRotation();
-
-    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
-    pathfindingSequence.addCommands(
-        goThere(new Pose2d(6, 1.5, branchERot), 3.0),
-        new InstantCommand(
-            () ->
-                m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE)),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new PrintCommand("Dropping coral to L4"),
-        goThere(new Pose2d(2.5, 1.75, feederRot), 3.0),
-        new InstantCommand(
-            () ->
-                m_swerve.drivetoTarget(
-                    computeRobotOffset(
-                        Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())))),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new PrintCommand("Feeding coral"),
-        goThere(new Pose2d(2.5, 1.75, branchDRot), 3.0),
-        new InstantCommand(
-            () ->
-                m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD)),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        goThere(new Pose2d(2.5, 1.75, feederRot), 3.0),
-        new InstantCommand(
-            () ->
-                m_swerve.drivetoTarget(
-                    computeRobotOffset(
-                        Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())))),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new PrintCommand("Feeding coral"),
-        goThere(new Pose2d(2.5, 1.75, branchCRot), 3.0),
-        new InstantCommand(
-            () ->
-                m_swerve.drivetoTarget(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC)),
+  private Command driveAndShootCycle(Pose2d targetPos) {
+    var approachPose = offsetPose(targetPos, -0.1);
+    SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
+    shootSequence.addCommands(
+        goThere(approachPose, 0.0),
+        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new PrintCommand("Dropping coral to L4"));
+    return shootSequence;
+  }
+
+  private Command driveAndIntakeCycle(Pose2d targetPos) {
+    var approachPose = offsetPose(targetPos, 0.1);
+    SequentialCommandGroup intakeSequence = new SequentialCommandGroup(Commands.none());
+    intakeSequence.addCommands(
+        goThere(approachPose, 0.0),
+        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new PrintCommand("Feeding coral"));
+
+    return intakeSequence;
+  }
+
+  public Command auto() {
+    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
+    pathfindingSequence.addCommands(
+        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC));
+
     return pathfindingSequence;
   }
 
