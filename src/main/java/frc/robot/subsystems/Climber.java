@@ -45,6 +45,8 @@ public class Climber extends SubsystemBase implements TestBindings {
   //     new Servo(Constants.SubsystemInfo.kClimberFingerID); // 90 est ouvert
 
   private static boolean isClimberActivated = false;
+  private double maxVoltage = 0.0;
+  private double maxStatorCurrent = 0.0;
 
   public Climber() {
     m_deepMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -67,6 +69,10 @@ public class Climber extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("climber encoder", m_deepMotor.getPosition().getValueAsDouble());
     SmartDashboard.putBoolean("climber beambreak", m_beamBrake.get());
     SmartDashboard.putBoolean("is climber actrivate", isClimberActivated);
+    SmartDashboard.putNumber("climber voltage", m_deepMotor.getMotorVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("climber current", m_deepMotor.getTorqueCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("maximum climber current", Math.max(maxStatorCurrent, m_deepMotor.getTorqueCurrent().getValueAsDouble()));
+    SmartDashboard.putNumber("maximum climber voltage", Math.max(maxVoltage, m_deepMotor.getMotorVoltage().getValueAsDouble()));
   }
 
   public void Penis90() {
