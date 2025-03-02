@@ -12,7 +12,8 @@ public class SwerveElevatorSlowDownFunc {
    * @return a percentage of the slow down clamped at a minimum of 20 percent
    */
   public static double calculate(DoubleSupplier elevatorPos) {
+    // speed slow down so that the elevator does not break when going at high speed
     return MathUtil.clamp(
-        (Math.pow(-1.5 * elevatorPos.getAsDouble(), 3) / Constants.Swerve.maxSpeed) + 1, 0.2, 1);
+        (Math.pow(-0.47 * elevatorPos.getAsDouble(), 5) / Constants.Swerve.maxSpeed) + 1, 0.4, 1);
   }
 }
