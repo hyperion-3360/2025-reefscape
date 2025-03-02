@@ -3,6 +3,8 @@ package frc.robot.subsystems.swerve;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -71,7 +73,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
   private final double kPRot = 6.0;
-  private boolean ambiguousRot = false;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
@@ -102,7 +103,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
       m_orchestra.addInstrument(mod.getDriveMotor());
       m_orchestra.addInstrument(mod.getRotationMotor());
     }
-    configurePathPlanner();
+
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
@@ -118,6 +119,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new TrapezoidProfile.Constraints(
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
+    m_rotController.enableContinuousInput(-Math.PI, Math.PI);
+    configurePathPlanner();
   }
 
   /* periodic */
@@ -139,47 +142,40 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     if (m_debug) {
       // smartdashboardDebug();
-      for (SwerveModule mod : mSwerveMods) {
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-        SmartDashboard.putNumber(
-            "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-      }
+      // for (SwerveModule mod : mSwerveMods) {
+      // SmartDashboard.putNumber(
+      // "Mod " + mod.moduleNumber + " CTRE Mag encoder",
+      // mod.getMagEncoderPos().getDegrees());
+      // SmartDashboard.putNumber(
+      // "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+      // SmartDashboard.putNumber(
+      // "Mod " + mod.moduleNumber + " Velocity",
+      // mod.getState().speedMetersPerSecond);
+      // }
+    }
 
-      SmartDashboard.putNumber("currentpose X", poseEstimator.getEstimatedPosition().getX());
-      SmartDashboard.putNumber("currentpose Y", poseEstimator.getEstimatedPosition().getY());
+    if (DriverStation.isDisabled()) {
+      m_targetModeEnabled = false;
+      drive(0);
     }
 
     if (m_targetModeEnabled) {
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
       var rot = 0.0;
-      if (ambiguousRot) {
-        rot = m_rotController.calculate(getRotation2d().getRadians());
-        if (getRotation2d().getDegrees() < -178 && getRotation2d().getDegrees() > 178) {
-          rot = 0;
-        }
-      }
       rot =
           m_rotController.calculate(
               poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
-      SmartDashboard.putNumber("swerve target pose X", m_xController.getGoal().position);
-      SmartDashboard.putNumber("current pose X", getPose().getX());
-      SmartDashboard.putNumber("swerve target pose Y", m_yController.getGoal().position);
-      SmartDashboard.putNumber("current pose Y", getPose().getY());
-      SmartDashboard.putNumber(
-          "target pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
-      SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
-
       _drive(new Translation2d(x, y), rot, true, true);
-      if (targetReached()) {
-        m_targetModeEnabled = false;
-      }
-      System.out.println(targetReached());
     }
+    SmartDashboard.putNumber("Goal pose X", m_xController.getGoal().position);
+    SmartDashboard.putNumber("current pose X", getPose().getX());
+    SmartDashboard.putNumber("Goal pose Y", m_yController.getGoal().position);
+    SmartDashboard.putNumber("current pose Y", getPose().getY());
+    SmartDashboard.putNumber(
+        "Goal pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
+    SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
   }
 
   /* thread */
@@ -208,13 +204,12 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public boolean targetReached() {
     var posX = getPose().getX();
     var posY = getPose().getY();
-    var rot = getRotation2d().getRadians();
+    var rot = getPose().getRotation().getRadians();
     var goalX = m_xController.getGoal().position;
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
 
-    return m_targetModeEnabled
-        && isAlmostEqual(posX, goalX, 0.02)
+    return isAlmostEqual(posX, goalX, 0.02)
         && isAlmostEqual(posY, goalY, 0.02)
         && isAlmostEqual(rot, goalRot, Units.degreesToRadians(3));
   }
@@ -231,29 +226,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
     if (target == Pose2d.kZero) {
       m_targetModeEnabled = false;
     } else {
-      if (target.getRotation().getDegrees() == 180 || target.getRotation().getDegrees() == -180) {
-        ambiguousRot = true;
-      } else {
-        ambiguousRot = false;
-      }
       m_targetModeEnabled = true;
       m_xController.reset(getPose().getX());
       m_xController.setGoal(target.getX());
       m_yController.reset(getPose().getY());
       m_yController.setGoal(target.getY());
-      if (ambiguousRot) {
-        if (getPose().getRotation().getDegrees() > 0) {
-          m_rotController.reset(getPose().getRotation().getRadians());
-          m_rotController.setGoal(Units.degreesToRadians(179));
-        } else {
-          m_rotController.reset(getPose().getRotation().getRadians());
-          m_rotController.setGoal(Units.degreesToRadians(-179));
-        }
-      } else {
-        m_rotController.reset(getPose().getRotation().getRadians());
-        m_rotController.setGoal(target.getRotation().getRadians());
-      }
-      System.out.println(" Drive to target: " + target.getX() + " " + target.getY());
+      m_rotController.reset(getPose().getRotation().getRadians());
+      m_rotController.setGoal(target.getRotation().getRadians());
     }
   }
 
@@ -295,9 +274,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
       //         targetSpeeds.vxMetersPerSecond,
       //         targetSpeeds.vyMetersPerSecond));
 
-      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
-      SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
-      SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
+      //      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
+      //     SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
+      //    SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
     }
 
     SwerveModuleState[] targetStates =
@@ -401,7 +380,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
         this::setPose,
         this::getSpeeds,
         this::driveRobotRelative,
-        Constants.AutoConstants.kPathFollowController,
+        new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0)),
         Constants.AutoConstants.kRobotConfig,
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance

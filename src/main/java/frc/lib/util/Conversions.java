@@ -1,5 +1,8 @@
 package frc.lib.util;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+
 public class Conversions {
 
   /**
@@ -40,5 +43,17 @@ public class Conversions {
   public static double metersToRotations(double wheelMeters, double circumference) {
     double wheelRotations = wheelMeters / circumference;
     return wheelRotations;
+  }
+
+  /**
+   * @brief Converts a Pose3d to a Pose2d by removing the Z component
+   * @param pose Pose3d
+   * @return Pose2d
+   */
+  public static Pose2d Pose3dToPose2d(Pose3d pose) {
+    return new Pose2d(
+        pose.getTranslation().getX(),
+        pose.getTranslation().getY(),
+        pose.getRotation().toRotation2d());
   }
 }

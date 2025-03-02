@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
-import frc.robot.Auto.Pathfinding;
+import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
@@ -65,6 +64,8 @@ public class RobotContainer {
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
   public static final Selection m_selector = new Selection(m_swerve);
+  public static final PathfindingV2 m_pathfinding =
+      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve);
   private static SendableChooser<Command> m_climberCommand = new SendableChooser<>();
 
   // Joystick axis declarations
@@ -303,6 +304,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Pathfinding.fullControl(new PathPlannerAuto("dump"), dumpAuto);
+    return m_pathfinding.auto();
   }
 }
