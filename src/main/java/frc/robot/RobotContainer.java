@@ -93,7 +93,7 @@ public class RobotContainer {
       new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL3);
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =
-      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator);
+      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve);
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
@@ -249,17 +249,11 @@ public class RobotContainer {
     m_coDriverController
         .y()
         .whileTrue(intakeAlgaeL2)
-        .onFalse(
-            intakeAlgaeL2
-                .NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds)
-                );
+        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
         .whileTrue(intakeAlgaeL3)
-        .onFalse(
-            intakeAlgaeL3
-                .NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds)
-                );
+        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);
     m_coDriverController.povDown().onTrue(elevateL1);
@@ -271,7 +265,7 @@ public class RobotContainer {
         .povUp()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
-                
+
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
@@ -295,7 +289,7 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
-                
+
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
@@ -305,10 +299,7 @@ public class RobotContainer {
 
     m_coDriverController.rightBumper().onTrue(intakeCoral);
 
-    m_coDriverController
-        .leftBumper()
-        .whileTrue(cycleToFeeder)
-        .whileFalse(cancelAuto);
+    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {
