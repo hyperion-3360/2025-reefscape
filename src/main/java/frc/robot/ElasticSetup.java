@@ -100,21 +100,21 @@ public class ElasticSetup {
   public void setUpDashboardComp() {
 
     // driver tab
-    driverTab.add(swerve.m_field2d).withPosition(5, 0).withSize(6, 4);
+    driverTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
     driverTab
         .addCamera("limelight", "limelight", "mjpg:http://10.33.60.11:1182/?action=stream")
         .withPosition(3, 0)
         .withSize(3, 3);
     driverTab
-        .addCamera("driverCam", "driverCam", "mjpg:http://10.33.60.2:1181/?action=stream")
+        .addCamera("driverCam", "driverCam", "mjpg:http://10.33.60.2:1181")
         .withPosition(0, 0)
         .withSize(3, 3);
-    driverTab.addBoolean("has algae", () -> algaeIntake.sensorTriggered());
-    driverTab.addBoolean("climber acivated", () -> climber.isClimberActivated());
-    driverTab.addBoolean("climbed", () -> climber.SensorDetected());
-    driverTab.addBoolean("has coral", () -> shooter.isCoralIn());
-    driverTab.addBoolean("is in bounds for processor", () -> selector.isInBoundsForProcessor());
-    driverTab.addNumber("lock Tag id", () -> selector.getLockID());
+    driverTab.addBoolean("has algae", () -> algaeIntake.sensorTriggered()).withPosition(0, 3).withSize(1, 1);
+    driverTab.addBoolean("climber acivated", () -> climber.isClimberActivated()).withPosition(1, 3).withSize(1, 1);
+    driverTab.addBoolean("climbed", () -> climber.SensorDetected()).withPosition(2, 3).withSize(1, 1);
+    driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(3, 3).withSize(1, 1);
+    driverTab.addBoolean("is in bounds for processor", () -> selector.isInBoundsForProcessor()).withPosition(4, 3).withSize(1, 1);
+    driverTab.addNumber("lock Tag id", () -> selector.getLockID()).withPosition(5, 3).withSize(1, 1);
 
     // technician tab
 
