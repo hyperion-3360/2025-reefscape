@@ -172,27 +172,26 @@ public class Elevator extends SubsystemBase implements TestBindings {
       m_controller.reset(0.0);
       m_rightElevatorMotor.setVoltage(0.0);
     } else {
-
-      var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
-      var feedback = m_controller.calculate(elevatorPos);
-      SmartDashboard.putNumber("elevator feedback", feedback);
-      var setPointVelocity = m_controller.getSetpoint().velocity;
-      var feedforward = m_feedforward.calculate(setPointVelocity);
-      SmartDashboard.putNumber("elevator feedforward", feedforward);
-      var output = feedback + feedforward;
-
-      SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
-      SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
-      SmartDashboard.putNumber("output voltage", output);
-      SmartDashboard.putNumber(
-          "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
-      SmartDashboard.putNumber("error", m_controller.getPositionError());
-
       if (Climber.climberActivated()) {
         m_controller.reset(0.0);
         m_rightElevatorMotor.setVoltage(0.0);
         System.out.println(Climber.climberActivated());
       } else {
+        var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
+        var feedback = m_controller.calculate(elevatorPos);
+        SmartDashboard.putNumber("elevator feedback", feedback);
+        var setPointVelocity = m_controller.getSetpoint().velocity;
+        var feedforward = m_feedforward.calculate(setPointVelocity);
+        SmartDashboard.putNumber("elevator feedforward", feedforward);
+        var output = feedback + feedforward;
+
+        SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
+        SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
+        SmartDashboard.putNumber("output voltage", output);
+        SmartDashboard.putNumber(
+            "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("error", m_controller.getPositionError());
+
         // Run controller and update motor output
         m_rightElevatorMotor.setVoltage(output);
       }
