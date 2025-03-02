@@ -245,7 +245,8 @@ public class RobotContainer {
     m_climber.setDefaultCommand(m_climberCommand.getSelected());
 
     m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.y().onTrue(shootAlgaeNet).onFalse(cancelAuto);
+    // m_driverController.y().onTrue(shootAlgaeNet).onFalse(cancelAuto);
+    m_driverController.y().onTrue(shootAlgaeNet);
 
     m_coDriverController
         .y()
