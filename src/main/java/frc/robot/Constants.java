@@ -245,6 +245,7 @@ public final class Constants {
     public static final double kStartingAngle = 0.1;
     public static final double kFloorIntakeAngle = -22.0;
     public static final double kNetAngle = -5.0;
+    public static final double kProcessorAngle = -15;
     // auto intake bcuz of the little tower thing
     public static final double kAutoIntakeAngle = 0.0;
     public static final double kCurrentLimit = 15.0;
@@ -323,15 +324,15 @@ public final class Constants {
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;
-    public static final double kElevatorL2 = 1.16;
-    public static final double kElevatorL3 = 1.80;
-    public static final double kElevatorL4 = 2.8;
+    public static final double kElevatorL2 = 1.166;
+    public static final double kElevatorL3 = 1.82;
+    public static final double kElevatorL4 = 2.86;
     public static final double kElevatorNet = 2.86;
-    public static final double kElevatorProcessor = 0.26;
-    public static final double kElevatorAlgaeLow = 0.0;
+    public static final double kElevatorProcessor = 0.20;
+    public static final double kElevatorAlgaeLow = 0.05;
     public static final double kElevatorFeeder = 0.247;
-    public static final double kElevatorAlgaeL2 = 1.30;
-    public static final double kElevatorAlgaeL3 = 1.92;
+    public static final double kElevatorAlgaeL2 = 1.25;
+    public static final double kElevatorAlgaeL3 = 1.87;
   }
 
   public static class AlgaeIntakeConstants {
