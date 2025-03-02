@@ -46,33 +46,23 @@ public class Elevator extends SubsystemBase implements TestBindings {
   // private static double kP = 20.0;
   // private static double kI = 1.0;
   // private static double kD = 0.0;
-  private static double kP = 4; // 4?
+  private static double kP = 40.5; // 4?
   private static double kI = 0;
   private static double kD = 0.0;
 
   private static double kDt = 0.02;
 
-  private static double kMaxVelocity = 15;
-  private static double kMaxAcceleration = 11; // 5.75 dont jump
+  private static double kMaxVelocity = 20;
+  private static double kMaxAcceleration = 6.05;
   private static double kMidVelocity = 8;
-  private static double kMidAcceleration = 6; // 5.75 dont jump
-  private static double kMinVelocity = 2.0; // 1.5
-  private static double kMinAcceleration = 2.5; // 2.5
-
-  // private static double kG = 0.41; // barely moves up
-  // private static double kA = 0.95;
-  // private static double kV = 2.7;
-  // private static double kS = 0.2;
-
-  // private static double kG = 0.3; // barely moves up
-  // private static double kA = 12.2;
-  // private static double kV = 3.3;
-  // private static double kS = 0.0;
+  private static double kMidAcceleration = 4;
+  private static double kMinVelocity = 1.5;
+  private static double kMinAcceleration = 2.5;
 
   private static double kG = 0.41; // barely moves up
-  private static double kA = 0.0;
-  private static double kV = 2.5; // 2.1?
-  private static double kS = 0.14;
+  private static double kA = 1.5;
+  private static double kV = 4.3;
+  private static double kS = 0.0;
 
   private static double pulleyDiam = 3;
   private static double pulleyCircumference = Math.PI * Units.inchesToMeters(pulleyDiam);
