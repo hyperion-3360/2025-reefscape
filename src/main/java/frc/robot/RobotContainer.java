@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
@@ -154,6 +155,8 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
+    // warms up the pathfinding so that the first path calculation is faster
+    PathfindingCommand.warmupCommand();
 
     NamedCommands.registerCommand("dumper", dumpAuto);
     NamedCommands.registerCommand("feed", feed);
