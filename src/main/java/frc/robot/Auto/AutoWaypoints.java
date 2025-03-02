@@ -74,7 +74,10 @@ public class AutoWaypoints {
                 .rotateAround(reefCenter, new Rotation2d(Math.toRadians(180)));
       }
 
-      public static class feederWaypoints {}
+      public static class feederWaypoints {
+        public static Pose2d feederRight = new Pose2d(1.450, 7.400, Rotation2d.fromDegrees(306));
+        public static Pose2d feederLeft = new Pose2d(0.666, 6.839, Rotation2d.fromDegrees(306));
+      }
     }
 
     // #region Right
@@ -120,7 +123,10 @@ public class AutoWaypoints {
                 .rotateAround(reefCenter, new Rotation2d(Math.toRadians(180)));
       }
 
-      public static class feederWaypoints {}
+      public static class feederWaypoints {
+        public static Pose2d feederRight = new Pose2d(1.450, 0.614, Rotation2d.fromDegrees(54));
+        public static Pose2d feederLeft = new Pose2d(0.666, 1.192, Rotation2d.fromDegrees(54));
+      }
     }
 
     // #region Stop

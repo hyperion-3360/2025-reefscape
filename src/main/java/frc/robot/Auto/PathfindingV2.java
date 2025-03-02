@@ -20,6 +20,7 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.swerve.Swerve;
+import java.util.function.Supplier;
 
 public class PathfindingV2 extends Command {
   Shooter m_shooter;
@@ -42,6 +43,10 @@ public class PathfindingV2 extends Command {
 
   public Command goThere(Pose2d pose) {
     return goThere(pose, 0);
+  }
+
+  public Command goThere(Supplier<Pose2d> pose) {
+    return goThere(pose.get(), 0);
   }
 
   public Command goThere(Pose2d pose, double goalEndVelocity) {

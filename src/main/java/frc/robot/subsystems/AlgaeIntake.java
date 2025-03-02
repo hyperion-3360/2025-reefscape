@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,7 +32,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
   public enum elevation {
     NET,
     FLOOR,
-    STORED
+    STORED,
+    PROCESSOR
   }
 
   public enum shooting {
@@ -42,8 +44,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     STORED // this is resting speed or 0
   }
 
-  private static final double kP = 0.01;
-  private static final double kI = 0.003;
+  private static final double kP = 0.020;
+  private static final double kI = 0.006;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
 
@@ -158,6 +160,10 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
       case STORED:
         this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kStartingAngle;
         break;
+
+      case PROCESSOR:
+        this.m_AnglesTarget = Constants.AlgaeIntakeVariables.kProcessorAngle;
+        break;
     }
   }
 
@@ -165,8 +171,14 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     return m_intakeLeft.getForwardLimitSwitch().isPressed();
   }
 
-  public boolean isAtAngle() {
-    return m_pid.atSetpoint();
+  /**
+   * checks if the angle of the algae intake is close enough
+   *
+   * @param tolerance the tolerance of the angle
+   * @return if the angle is close enough to the target
+   */
+  public boolean isAtAngle(double tolerance) {
+    return MathUtil.isNear(m_AnglesTarget, m_pivotMotor.getEncoder().getPosition(), 0.3);
   }
 
   public Command setAngle(DoubleSupplier angle) {
