@@ -43,10 +43,10 @@ public class Vision extends SubsystemBase {
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   Transform3d robotToCamLml3 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-2.75), 0.0, 0.0), new Rotation3d(0, 0, 0));
+          new Translation3d(Units.inchesToMeters(-2.75), 0.0, Units.inchesToMeters(33.5)), new Rotation3d(0, Units.degreesToRadians(15), 0));
   Transform3d robotToCamLml2 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0),
+          new Translation3d(Units.inchesToMeters(-4.75), 0.0, Units.inchesToMeters(35)),
           new Rotation3d(0, 0, Units.degreesToRadians(180)));
 
   /** Creates a new Odometry. */
