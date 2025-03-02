@@ -296,7 +296,7 @@ public class RobotContainer {
 
     m_coDriverController.rightBumper().onTrue(intakeCoral);
 
-    m_coDriverController.leftBumper().whileTrue(cycleToFeeder).whileFalse(cancelAuto);
+    m_driverController.rightTrigger(0.5).whileTrue(cycleToFeeder).whileFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {
