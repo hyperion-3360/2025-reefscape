@@ -298,7 +298,7 @@ public class Pathfinding extends Command {
   protected static List<POI> poiList = new ArrayList<>();
   private static POI bestPOI;
   private static PathConstraints constraints =
-      new PathConstraints(4.0, 3.0, Units.degreesToRadians(360), Units.degreesToRadians(180));
+      new PathConstraints(4.0, 3.5, Units.degreesToRadians(540), Units.degreesToRadians(360));
 
   private static Shooter s_shooter;
   private static Swerve s_swerve;
@@ -681,12 +681,8 @@ public class Pathfinding extends Command {
    * @param placeToGo The pose2d we want to go to
    * @return A command to pathfind to a specified point
    */
-  public static Command goThere(Pose2d placeToGo) {
-    Double[] pose2d = {placeToGo.getX(), placeToGo.getY(), placeToGo.getRotation().getDegrees()};
-    SmartDashboard.putNumber("swerve pathfinding target x", pose2d[0]);
-    SmartDashboard.putNumber("swerve pathfinding target y", pose2d[1]);
-    SmartDashboard.putNumber("swerve pathfinding target theta", pose2d[2]);
-    return AutoBuilder.pathfindToPose(placeToGo, constraints);
+  public static Command goThere(Supplier<Pose2d> placeToGo) {
+    return AutoBuilder.pathfindToPose(placeToGo.get(), constraints);
   }
 
   public static Command fullControl() {
@@ -732,5 +728,10 @@ public class Pathfinding extends Command {
       e.printStackTrace();
     }
     return pathfindingSequence;
+  }
+
+  public static boolean isCloseTo(Pose2d pose, double distance) {
+    return RobotContainer.m_swerve.getPose().getTranslation().getDistance(pose.getTranslation())
+        < distance;
   }
 }
