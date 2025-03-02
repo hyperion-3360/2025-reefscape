@@ -62,13 +62,4 @@ public class TunableElevatorFF /*implements Sendable*/ {
   public double calculate(double currentVelocity, double nextVelocity) {
     return m_feedForward.calculateWithVelocities(currentVelocity, nextVelocity);
   }
-
-  // @Override
-  // public void initSendable(SendableBuilder builder) {
-  //   System.out.println("initSendable, TunableElevatorFF");
-  //   builder.setSmartDashboardType("RobotPreferences");
-  //   builder.addDoubleProperty("Kv", this::getV, this::setV);
-  //   builder.addDoubleProperty("Kg", this::getG, this::setG);
-  //   builder.addDoubleProperty("Ka", this::getA, this::setA);
-  // }
 }

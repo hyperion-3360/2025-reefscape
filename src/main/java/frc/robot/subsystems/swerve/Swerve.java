@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -49,7 +48,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
   private final Pigeon2 m_gyro;
-  private final Field2d m_field2d;
+  public Field2d m_field2d = new Field2d();
   // public SwerveDriveOdometry m_odometry;
   private boolean m_debug = true;
   private Vision vision;
@@ -58,9 +57,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   ShuffleboardTab VisionSwerveTab = Shuffleboard.getTab("vision and swerve");
   private boolean hasStartedEstimation = false;
   private Orchestra m_orchestra = new Orchestra();
-  private Pose2d startPose = new Pose2d();
-  private Pose2d endPose = new Pose2d();
-  private List<Translation2d> waypoints = List.of();
   private boolean m_targetModeEnabled = false;
   private ProfiledPIDController m_xController;
   TrapezoidProfile.Constraints m_xConstraints;
@@ -76,7 +72,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
   private final double kPRot = 6.0;
-  private boolean ambiguousRot = false;
   private Elevator m_elevator;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -88,7 +83,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
-    m_field2d = new Field2d();
 
     m_gyro.reset();
     this.vision = vision;
@@ -102,7 +96,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     positions = new SwerveModulePosition[4];
     for (SwerveModule mod : mSwerveMods) {
       positions[mod.moduleNumber] = mod.getPosition();
-      SmartDashboard.putData(m_field2d);
     }
 
     for (SwerveModule mod : mSwerveMods) {
@@ -146,19 +139,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
 
-    if (m_debug) {
-      // smartdashboardDebug();
-      // for (SwerveModule mod : mSwerveMods) {
-      // SmartDashboard.putNumber(
-      // "Mod " + mod.moduleNumber + " CTRE Mag encoder",
-      // mod.getMagEncoderPos().getDegrees());
-      // SmartDashboard.putNumber(
-      // "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-      // SmartDashboard.putNumber(
-      // "Mod " + mod.moduleNumber + " Velocity",
-      // mod.getState().speedMetersPerSecond);
-      // }
-    }
+    if (m_debug) {}
 
     if (DriverStation.isDisabled()) {
       m_targetModeEnabled = false;
@@ -186,31 +167,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
               kMaxAccelerationRadiansPerSecondSquared
                   * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
 
-      SmartDashboard.putNumber(
-          "max speed x",
-          kMaxSpeedMetersPerSecondX
-              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-      SmartDashboard.putNumber(
-          "max acceleration x",
-          kMaxAccelerationMetersPerSecondSquaredX
-              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-      SmartDashboard.putNumber(
-          "max speed y",
-          kMaxSpeedMetersPerSecondY
-              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-      SmartDashboard.putNumber(
-          "max acceleration y",
-          kMaxAccelerationMetersPerSecondSquaredY
-              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-      SmartDashboard.putNumber(
-          "max speed rotation",
-          kMaxSpeedRadiansPerSecond
-              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-      SmartDashboard.putNumber(
-          "max acceleration rotation",
-          kMaxAccelerationRadiansPerSecondSquared
-              * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
       var rot = 0.0;
@@ -220,13 +176,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
       _drive(new Translation2d(x, y), rot, true, true);
     }
-    SmartDashboard.putNumber("Goal pose X", m_xController.getGoal().position);
-    SmartDashboard.putNumber("current pose X", getPose().getX());
-    SmartDashboard.putNumber("Goal pose Y", m_yController.getGoal().position);
-    SmartDashboard.putNumber("current pose Y", getPose().getY());
-    SmartDashboard.putNumber(
-        "Goal pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
-    SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
   }
 
   /* thread */
@@ -317,18 +266,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // ChassisSpeeds fieldRelativeSpeed =
     //     ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
-    if (m_debug) {
-      // System.out.println(
-      //     String.format(
-      //         "driveRobotRelative: omega: %f, vx: %f, vy : %f",
-      //         targetSpeeds.omegaRadiansPerSecond,
-      //         targetSpeeds.vxMetersPerSecond,
-      //         targetSpeeds.vyMetersPerSecond));
-
-      //      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
-      //     SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
-      //    SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
-    }
 
     SwerveModuleState[] targetStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);

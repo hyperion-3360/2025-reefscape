@@ -9,13 +9,9 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AutoCmd.AutoCancel;
@@ -44,7 +40,6 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
-import java.util.function.BooleanSupplier;
 
 public class RobotContainer {
 
@@ -66,8 +61,17 @@ public class RobotContainer {
   public static final Selection m_selector = new Selection(m_swerve);
   public static final PathfindingV2 m_pathfinding =
       new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve);
-  private static SendableChooser<Command> m_climberCommand = new SendableChooser<>();
 
+  public ElasticSetup setup =
+      new ElasticSetup(
+          m_swerve,
+          m_shooter,
+          m_climber,
+          m_selector,
+          m_algaeIntake,
+          m_elevator,
+          m_dumper,
+          m_coDriverController);
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -114,49 +118,16 @@ public class RobotContainer {
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
 
-  public enum TestModes {
-    NONE,
-    ELEVATOR,
-    CLIMBER,
-    ALGAE_INTAKE,
-    SWERVE,
-    DUMPER,
-    CORAL_SHOOTER
-  }
-
-  private TestModes m_testMode = TestModes.NONE;
-
-  Command setElevatorMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.ELEVATOR);
-  }
-
-  Command setClimberMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.CLIMBER);
-  }
-
-  Command setCoralShooterMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.CORAL_SHOOTER);
-  }
-
-  Command setAlgaeIntakeMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.ALGAE_INTAKE);
-  }
-
-  Command setSwerveMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.SWERVE);
-  }
-
-  Command setDumperMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.DUMPER);
-  }
-
-  BooleanSupplier isMode(TestModes mode) {
-    return () -> m_testMode == mode;
-  }
+  private boolean m_debug = false;
 
   public RobotContainer() {
     // warms up the pathfinding so that the first path calculation is faster
     PathfindingCommand.warmupCommand();
+
+    setup.setUpDashboardComp();
+    if (m_debug) {
+      setup.setUpDashboardDebug();
+    }
 
     NamedCommands.registerCommand("dumper", dumpAuto);
     NamedCommands.registerCommand("feed", feed);
@@ -164,17 +135,8 @@ public class RobotContainer {
     // Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
-    SmartDashboard.putData(CommandScheduler.getInstance());
 
-    SmartDashboard.putData("Climber", setClimberMode());
-    SmartDashboard.putData("Elevator", setElevatorMode());
-    SmartDashboard.putData("Coral Shooter", setCoralShooterMode());
-    SmartDashboard.putData("Algae Intake", setAlgaeIntakeMode());
-    SmartDashboard.putData("Swerve", setSwerveMode());
-    SmartDashboard.putData("Dumper", setDumperMode());
-
-    m_climberCommand.setDefaultOption(
-        "Deep",
+    m_climber.setDefaultCommand(
         m_climber.deepClimb(
             () ->
                 Joysticks.conditionJoystick(
@@ -182,8 +144,6 @@ public class RobotContainer {
                     climberLimiter,
                     Constants.stickDeadband,
                     true)));
-
-    SmartDashboard.putData("Climber Mode", m_climberCommand);
 
     PathPlannerLogging.logCurrentPose(m_swerve.getPose());
 
@@ -215,19 +175,9 @@ public class RobotContainer {
   }
 
   public void configureBindingsTest() {
-
-    m_shooter.setupTestBindings(new Trigger(isMode(TestModes.CORAL_SHOOTER)), m_coDriverController);
-
-    m_elevator.setupTestBindings(new Trigger(isMode(TestModes.ELEVATOR)), m_coDriverController);
-
-    m_climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), m_coDriverController);
-
-    m_dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), m_coDriverController);
-
-    m_algaeIntake.setupTestBindings(
-        new Trigger(isMode(TestModes.ALGAE_INTAKE)), m_coDriverController);
-
-    m_swerve.setupTestBindings(new Trigger(isMode(TestModes.SWERVE)), m_coDriverController);
+    if (m_debug) {
+      setup.setUpDashboardSubsystemTest();
+    }
   }
 
   public void configureBindingsTeleop() {
@@ -239,8 +189,6 @@ public class RobotContainer {
 
     m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
-
-    m_climber.setDefaultCommand(m_climberCommand.getSelected());
 
     m_coDriverController.a().onTrue(shootCoral);
     // m_driverController.y().onTrue(shootAlgaeNet).onFalse(cancelAuto);

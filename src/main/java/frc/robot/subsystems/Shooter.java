@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
-import frc.robot.commands.Wait;
 import java.util.function.DoubleSupplier;
 
 public class Shooter extends SubsystemBase implements TestBindings {
@@ -31,9 +29,6 @@ public class Shooter extends SubsystemBase implements TestBindings {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
 
   private boolean getShooterIR = m_shooterIR.get();
-  private double CoralShooterSpeed = m_shooter.get();
-  private double TestSpeed = 0.0;
-  private double SpeedTestTime = 0.0;
   private double m_shooterSpeed = Constants.CoralShooterVariables.kShootNo;
 
   public enum shootSpeed {
@@ -82,18 +77,6 @@ public class Shooter extends SubsystemBase implements TestBindings {
     m_shooter.configContinuousCurrentLimit(
         Constants.CoralShooterVariables.kCoralShooterCurrentLimit);
     m_shooter.enableCurrentLimit(false);
-
-    // SmartDashboard
-    SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
-    SmartDashboard.putNumber("Coral shooter speed", CoralShooterSpeed);
-    SmartDashboard.putNumber("Shooter test speed", TestSpeed);
-    SmartDashboard.putNumber("Shooter test time", SpeedTestTime);
-  }
-
-  public void testSpeed() {
-    m_shooter.set(SmartDashboard.getNumber(getName(), CoralShooterSpeed));
-    Wait.waitSecs(SmartDashboard.getNumber(getName(), SpeedTestTime));
-    stop();
   }
 
   public void stop() {
@@ -115,7 +98,6 @@ public class Shooter extends SubsystemBase implements TestBindings {
       m_shooter.set(0.0);
       closeBlocker();
     } else m_shooter.set(m_shooterSpeed);
-    SmartDashboard.putBoolean("Coral shooter has note", !getShooterIR);
     if (Climber.climberActivated()) {
       return;
     }

@@ -9,11 +9,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,15 +56,12 @@ public class Climber extends SubsystemBase implements TestBindings {
     // m_finger.setAngle(88);
     m_penis.setAngle(0);
     m_deepMotor.setPosition(0.0);
-
-    SendableRegistry.add(this, "Climber", 0);
-    SmartDashboard.putData("Climber", this);
   }
 
-  public void periodic() {
-    SmartDashboard.putNumber("climber encoder", m_deepMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putBoolean("climber beambreak", m_beamBrake.get());
-    SmartDashboard.putBoolean("is climber actrivate", isClimberActivated);
+  public void periodic() {}
+
+  public double getEncoderPosition() {
+    return m_deepMotor.getPosition().getValueAsDouble();
   }
 
   public void Penis90() {

@@ -13,11 +13,9 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -99,7 +97,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private double chronoStartTime = 0;
   private boolean lowElevatorHeight = true;
   private boolean midHeight = false;
-
+  private double elevatorVelocity;
+  private double elevatorSetpoint;
   private desiredHeight heightEnum = desiredHeight.LOW;
 
   public Elevator() {
@@ -123,10 +122,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
     m_rightElevatorMotor.setPosition(0.0);
     m_leftElevatorMotor.setPosition(0.0);
 
-    // SmartDashboard.putData("Elevator PID", m_feedback);
-    // SmartDashboard.putData("Tunable feedforward", m_feedforward);
-    SendableRegistry.add(this, "TunableElevator", 0);
-    SmartDashboard.putData("ElevatorTuning", this);
     m_controller.setGoal(0.0);
     // test_heightIndex = 0;
   }
@@ -141,7 +136,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
                   / gearRatio)
               * 5;
     }
-    var setPointPosition = m_controller.getSetpoint().position;
+    elevatorSetpoint = m_controller.getSetpoint().position;
     // elevatorPos is changed periodically
     elevatorPos =
         ((((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
@@ -149,19 +144,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
                     / gearRatio))
                 * 10
             - elevatorSlack;
-
-    SmartDashboard.putNumber(
-        "elevator raw pos",
-        (((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
-                    * pulleyCircumference)
-                / gearRatio)
-            * 10);
-    SmartDashboard.putNumber(
-        "elevator encoder position", m_rightElevatorMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("elevator slack", elevatorSlack);
-    SmartDashboard.putNumber("setpoint position", setPointPosition);
-    SmartDashboard.putBoolean("elevator sensor", m_sensor.get() >= 0.3);
-    SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
     if (DriverStation.isDisabled()) {
       m_controller.reset(0.01);
       m_controller.setGoal(0.01);
@@ -173,25 +155,15 @@ public class Elevator extends SubsystemBase implements TestBindings {
       m_rightElevatorMotor.setVoltage(0.0);
     } else {
 
-      var elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
+      elevatorVelocity = m_rightElevatorMotor.getMotorVoltage().getValueAsDouble();
       var feedback = m_controller.calculate(elevatorPos);
-      SmartDashboard.putNumber("elevator feedback", feedback);
       var setPointVelocity = m_controller.getSetpoint().velocity;
       var feedforward = m_feedforward.calculate(setPointVelocity);
-      SmartDashboard.putNumber("elevator feedforward", feedforward);
       var output = feedback + feedforward;
-
-      SmartDashboard.putNumber("elevator velocity", elevatorVelocity);
-      SmartDashboard.putNumber("setpoint velocity", setPointVelocity);
-      SmartDashboard.putNumber("output voltage", output);
-      SmartDashboard.putNumber(
-          "output current", m_rightElevatorMotor.getStatorCurrent().getValueAsDouble());
-      SmartDashboard.putNumber("error", m_controller.getPositionError());
 
       if (Climber.climberActivated()) {
         m_controller.reset(0.0);
         m_rightElevatorMotor.setVoltage(0.0);
-        System.out.println(Climber.climberActivated());
       } else {
         // Run controller and update motor output
         m_rightElevatorMotor.setVoltage(output);
@@ -204,7 +176,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
           "Elevator arrived in " + (Timer.getFPGATimestamp() - chronoStartTime) + " secs");
     }
 
-    SmartDashboard.putNumber("elevator position", elevatorPos);
     // System.out.println(elevatorPos);
   }
 
@@ -313,6 +284,14 @@ public class Elevator extends SubsystemBase implements TestBindings {
     chronoStartTime = Timer.getFPGATimestamp();
   }
 
+  public double getElevatorPos() {
+    return elevatorPos;
+  }
+
+  public double getElevatorSetpoint() {
+    return elevatorSetpoint;
+  }
+
   public Command manualTest(DoubleSupplier speed) {
     return run(
         () -> {
@@ -340,6 +319,10 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   public double getEncoderPos() {
     return elevatorPos;
+  }
+
+  public double elevatorVel() {
+    return elevatorVelocity;
   }
 
   @Override
