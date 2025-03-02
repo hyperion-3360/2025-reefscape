@@ -71,7 +71,8 @@ public class RobotContainer {
           m_algaeIntake,
           m_elevator,
           m_dumper,
-          m_coDriverController);
+          m_coDriverController,
+          m_vision);
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;

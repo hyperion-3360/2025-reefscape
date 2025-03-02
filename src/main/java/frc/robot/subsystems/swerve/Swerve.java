@@ -178,6 +178,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
   }
 
+  public boolean isGyroCalibrated() {
+    return m_gyro.isConnected();
+  }
+
   /* thread */
 
   public void estimatePose() {

@@ -18,6 +18,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
+import frc.robot.vision.Vision;
 import java.util.function.BooleanSupplier;
 
 /** Add your docs here. */
@@ -71,6 +72,7 @@ public class ElasticSetup {
   private Elevator elevator;
   private Dumper dumper;
   private CommandXboxController codriver;
+  private Vision vision;
 
   ShuffleboardTab driverTab = Shuffleboard.getTab("driverTab");
   ShuffleboardTab techTab = Shuffleboard.getTab("techTab");
@@ -85,7 +87,8 @@ public class ElasticSetup {
       AlgaeIntake algaeIntake,
       Elevator elevator,
       Dumper dumper,
-      CommandXboxController codriver) {
+      CommandXboxController codriver,
+      Vision vision) {
 
     this.swerve = swerve;
     this.shooter = shooter;
@@ -95,6 +98,7 @@ public class ElasticSetup {
     this.elevator = elevator;
     this.dumper = dumper;
     this.codriver = codriver;
+    this.vision = vision;
   }
 
   public void setUpDashboardComp() {
@@ -109,15 +113,34 @@ public class ElasticSetup {
         .addCamera("driverCam", "driverCam", "mjpg:http://10.33.60.2:1181")
         .withPosition(0, 0)
         .withSize(3, 3);
-    driverTab.addBoolean("has algae", () -> algaeIntake.sensorTriggered()).withPosition(0, 3).withSize(1, 1);
-    driverTab.addBoolean("climber acivated", () -> climber.isClimberActivated()).withPosition(1, 3).withSize(1, 1);
-    driverTab.addBoolean("climbed", () -> climber.SensorDetected()).withPosition(2, 3).withSize(1, 1);
+    driverTab
+        .addBoolean("has algae", () -> algaeIntake.sensorTriggered())
+        .withPosition(0, 3)
+        .withSize(1, 1);
+    driverTab
+        .addBoolean("climber acivated", () -> climber.isClimberActivated())
+        .withPosition(1, 3)
+        .withSize(1, 1);
+    driverTab
+        .addBoolean("climbed", () -> climber.SensorDetected())
+        .withPosition(2, 3)
+        .withSize(1, 1);
     driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(3, 3).withSize(1, 1);
-    driverTab.addBoolean("is in bounds for processor", () -> selector.isInBoundsForProcessor()).withPosition(4, 3).withSize(1, 1);
-    driverTab.addNumber("lock Tag id", () -> selector.getLockID()).withPosition(5, 3).withSize(1, 1);
+    driverTab
+        .addBoolean("is in bounds for processor", () -> selector.isInBoundsForProcessor())
+        .withPosition(4, 3)
+        .withSize(1, 1);
+    driverTab
+        .addNumber("lock Tag id", () -> selector.getLockID())
+        .withPosition(5, 3)
+        .withSize(1, 1);
 
     // technician tab
+    //     - Autonomous mode (chooser)
 
+    techTab.addBoolean("gyro calibrated", () -> swerve.isGyroCalibrated());
+    techTab.addBoolean("limelight 2 active", () -> vision.limelight2Active());
+    techTab.addBoolean("limelight 3 active", () -> vision.limelight3Active());
   }
 
   public void setUpDashboardSubsystemTest() {

@@ -71,6 +71,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
 
   /** 1 TalonFX controlling 2 BAGs, 1 Servo and 1 beambreak */
   public Shooter() {
+
     // Srx config (directly on the srx because srxconfig object is kinda limited)
     m_shooter.configFactoryDefault();
     m_shooter.setNeutralMode(Constants.CoralShooterVariables.kCoralShooterNeutralMode);
