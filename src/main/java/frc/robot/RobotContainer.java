@@ -32,7 +32,6 @@ import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
@@ -82,16 +81,11 @@ public class RobotContainer {
 
   private final IntakeAlgaeCmd intakeAlgaeFloor =
       new IntakeAlgaeCmd(
-          m_algaeIntake,
-          elevation.FLOOR,
-          m_leds,
-          m_elevator,
-          desiredHeight.LOW,
-          m_driverController);
+          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAELOW, m_driverController);
   private final IntakeAlgaeCmd intakeAlgaeL2 =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL2);
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2);
   private final IntakeAlgaeCmd intakeAlgaeL3 =
-      new IntakeAlgaeCmd(m_algaeIntake, elevation.FLOOR, m_leds, m_elevator, desiredHeight.ALGAEL3);
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3);
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =
       new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve);
@@ -113,7 +107,8 @@ public class RobotContainer {
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
   private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
-  private final AutoFeast cycleToFeeder = new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds);
+  private final AutoFeast cycleToFeeder =
+      new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds, m_pathfinding);
   private final AutoCancel cancelAuto =
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
