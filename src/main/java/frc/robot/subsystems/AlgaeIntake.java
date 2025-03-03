@@ -16,7 +16,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -109,16 +108,10 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
 
     m_pivotMotor.set(m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
     m_intakeRight.set(m_SpeedTarget);
+  }
 
-    SmartDashboard.putNumber(
-        "Output du pid", m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
-    SmartDashboard.putNumber("Current", m_intakeRight.getOutputCurrent());
-    SmartDashboard.putNumber("AlgaeEncoder", m_pivotMotor.getEncoder().getPosition());
-    SmartDashboard.putNumber("error", m_pid.getError());
-    SmartDashboard.putNumber(
-        "pid Calculation",
-        m_pid.calculate(m_pivotMotor.getEncoder().getPosition(), m_AnglesTarget));
-    SmartDashboard.putBoolean("sensor left", m_intakeLeft.getForwardLimitSwitch().isPressed());
+  public double getEncoderPosition() {
+    return m_pivotMotor.getEncoder().getPosition();
   }
 
   public void setShootingSpeed(shooting speed) {

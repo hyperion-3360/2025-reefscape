@@ -63,6 +63,14 @@ public class Vision extends SubsystemBase {
     // photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
   }
 
+  public boolean limelight2Active() {
+    return cameraLml2.isConnected();
+  }
+
+  public boolean limelight3Active() {
+    return cameraLml3.isConnected();
+  }
+
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
 
