@@ -193,14 +193,15 @@ public class Swerve extends SubsystemBase implements TestBindings {
                 kMaxAccelerationRadiansPerSecondSquared
                     * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
 
-      var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
-      var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
-      var rot = 0.0;
-      rot =
-          m_rotController.calculate(
-              poseEstimator.getEstimatedPosition().getRotation().getRadians());
+        var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
+        var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
+        var rot = 0.0;
+        rot =
+            m_rotController.calculate(
+                poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
-      _drive(new Translation2d(x, y), rot, true, true);
+        _drive(new Translation2d(x, y), rot, true, true);
+      }
     }
   }
 
@@ -212,7 +213,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public void estimatePose() {
 
-    // if vision estimation is present, create method est to add vision measurment to
+    // if vision estimation is present, create method est to add vision measurment
+    // to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
 
     visionEst.ifPresent(
@@ -294,7 +296,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
 
     // ChassisSpeeds fieldRelativeSpeed =
-    //     ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
+    // ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
 
     SwerveModuleState[] targetStates =
@@ -338,7 +340,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public Pose2d getPose() {
     var curPos = poseEstimator.getEstimatedPosition();
-    // System.out.println(String.format("x: %f y:%f", curPos.getX(), curPos.getY()));
+    // System.out.println(String.format("x: %f y:%f", curPos.getX(),
+    // curPos.getY()));
     return curPos;
   }
 
@@ -401,7 +404,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0)),
         Constants.AutoConstants.kRobotConfig,
         () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
