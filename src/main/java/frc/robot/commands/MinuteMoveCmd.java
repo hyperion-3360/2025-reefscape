@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class MinuteMoveCmd extends SequentialCommandGroup {
-  enum OffsetDir {
+  public static enum OffsetDir {
     FRONT,
     BACK,
     LEFT,
