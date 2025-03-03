@@ -119,15 +119,14 @@ public class ElasticSetup {
     public void setUpDashboardComp() {
   
       // driver tab
-      driverTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
       driverTab
           .addCamera("limelight", "limelight", "mjpg:http://10.33.60.11:1182/?action=stream")
-          .withPosition(3, 0)
-          .withSize(3, 3);
+          .withPosition(6, 0)
+          .withSize(6, 4);
       driverTab
           .addCamera("driverCam", "driverCam", "mjpg:http://10.33.60.2:1181")
           .withPosition(0, 0)
-          .withSize(3, 3);
+          .withSize(6, 4);
       driverTab
           .addBoolean("has algae", () -> algaeIntake.sensorTriggered())
           .withPosition(0, 3)
@@ -152,9 +151,9 @@ public class ElasticSetup {
   
       // technician tab
       //     - Autonomous mode (chooser)
-  
-      techTab.addBoolean("limelight 2 active", () -> vision.limelight2Active());
-      techTab.addBoolean("limelight 3 active", () -> vision.limelight3Active());
+      techTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
+      techTab.addBoolean("limelight 2 active", () -> vision.limelight2Active()).withPosition(0, 0).withSize(1, 1);
+      techTab.addBoolean("limelight 3 active", () -> vision.limelight3Active()).withPosition(1, 0).withSize(1, 1);
     }
   
     public void setUpDashboardSubsystemTest() {
