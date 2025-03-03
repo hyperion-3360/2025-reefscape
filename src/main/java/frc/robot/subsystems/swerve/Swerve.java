@@ -262,9 +262,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
 
-    return isAlmostEqual(posX, goalX, 0.02)
-        && isAlmostEqual(posY, goalY, 0.02)
-        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(3));
+    return isAlmostEqual(posX, goalX, 0.01)
+        && isAlmostEqual(posY, goalY, 0.01)
+        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
   }
 
   public void disableDriveToTarget() {
