@@ -251,6 +251,11 @@ public class RobotContainer {
     m_driverController.rightTrigger(0.5).whileTrue(cycleToFeeder).whileFalse(cancelAuto);
   }
 
+  public void teleopInit() {
+    // Running this in case our Auto sequence got cancelled early.
+    m_swerve.regularConstraints();
+  }
+
   public Command getAutonomousCommand() {
     return m_pathfinding.auto();
   }
