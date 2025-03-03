@@ -203,11 +203,11 @@ public class RobotContainer {
 
     m_coDriverController
         .y()
-        .whileTrue(intakeAlgaeL2)
+        .onTrue(intakeAlgaeL2)
         .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
-        .whileTrue(intakeAlgaeL3)
+        .onTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);
