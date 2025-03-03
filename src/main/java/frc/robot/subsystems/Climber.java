@@ -12,6 +12,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,7 +59,8 @@ public class Climber extends SubsystemBase implements TestBindings {
     m_deepMotor.setPosition(0.0);
   }
 
-  public void periodic() {}
+  public void periodic() {
+  }
 
   public double getEncoderPosition() {
     return m_deepMotor.getPosition().getValueAsDouble();

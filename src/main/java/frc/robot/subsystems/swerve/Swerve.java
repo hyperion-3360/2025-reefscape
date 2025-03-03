@@ -150,6 +150,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_rotController.setConstraints(m_rotConstraints);
   }
 
+  public double getGyroZ(){
+    return m_gyro.getAccumGyroZ().getValueAsDouble();
+  }
+
   /* periodic */
 
   @Override
