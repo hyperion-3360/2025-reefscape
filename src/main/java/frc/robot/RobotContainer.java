@@ -73,7 +73,8 @@ public class RobotContainer {
           m_elevator,
           m_dumper,
           m_coDriverController,
-          m_vision, m_pathfinding);
+          m_vision,
+          m_pathfinding);
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -122,7 +123,6 @@ public class RobotContainer {
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
 
   private boolean m_debug = false;
-
 
   public RobotContainer() {
     // warms up the pathfinding so that the first path calculation is faster
