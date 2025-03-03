@@ -328,7 +328,7 @@ public final class Constants {
     public static final double kElevatorL3 = 1.82;
     public static final double kElevatorL4 = 2.84;
     public static final double kElevatorNet = 2.86;
-    public static final double kElevatorProcessor = 0.20;
+    public static final double kElevatorProcessor = 0.28;
     public static final double kElevatorAlgaeLow = 0.05;
     public static final double kElevatorFeeder = 0.247;
     public static final double kElevatorAlgaeL2 = 1.25;
