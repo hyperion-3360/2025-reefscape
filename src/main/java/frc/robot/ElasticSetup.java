@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -138,7 +139,6 @@ public class ElasticSetup {
     // technician tab
     //     - Autonomous mode (chooser)
 
-    techTab.addBoolean("gyro calibrated", () -> swerve.isGyroCalibrated());
     techTab.addBoolean("limelight 2 active", () -> vision.limelight2Active());
     techTab.addBoolean("limelight 3 active", () -> vision.limelight3Active());
   }

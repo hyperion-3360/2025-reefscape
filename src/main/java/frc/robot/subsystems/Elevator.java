@@ -145,7 +145,6 @@ public class Elevator extends SubsystemBase implements TestBindings {
                 * 10
             - elevatorSlack;
     if (DriverStation.isDisabled()) {
-      m_controller.reset(0.01);
       SetHeight(desiredHeight.LOW);
       return;
     }

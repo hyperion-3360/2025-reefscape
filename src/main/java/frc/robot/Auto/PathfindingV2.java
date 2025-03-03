@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -24,12 +25,19 @@ import frc.robot.subsystems.swerve.Swerve;
 import java.util.function.Supplier;
 
 public class PathfindingV2 extends Command {
+
+  enum Alliance {
+    Blue,
+    Red
+  }
   Shooter m_shooter;
   Elevator m_elevator;
   LEDs m_leds;
   Swerve m_swerve;
   public static final double robotLength = Units.inchesToMeters(35.0); // with bumper: 32.5
   public static final double robotWidth = Units.inchesToMeters(35.0); // with bumper: 32.5
+
+  private Alliance currentAlliance = Alliance.Blue;
 
   PathConstraints constraints = new PathConstraints(5.0, 4.0, 1, 2);
 
@@ -40,6 +48,12 @@ public class PathfindingV2 extends Command {
     m_swerve = swerve;
 
     addRequirements(m_shooter, m_elevator, m_leds, m_swerve);
+
+    if (DriverStation.getAlliance().get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
+      currentAlliance = Alliance.Blue;
+    } else if (DriverStation.getAlliance().get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Red){
+      currentAlliance = Alliance.Red;
+    }
   }
 
   public Command goThere(Pose2d pose) {
@@ -74,32 +88,33 @@ public class PathfindingV2 extends Command {
     return m_swerve.getPose().getTranslation().getDistance(pose.getTranslation()) < distance;
   }
 
-  private Command driveWaitAndShoot(Pose2d targetPos, double waitTime) {
-    var approachPose = offsetPose(targetPos, -1);
-    SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
-    shootSequence.addCommands(
-        new InstantCommand(() -> m_swerve.drivetoTarget(approachPose)),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new WaitCommand(waitTime),
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
-        new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.L4)),
-        new InstantCommand(() -> m_shooter.openBlocker()),
-        new ParallelDeadlineGroup(
-            new WaitCommand(1.0), // will be elevatecmd(L4) later
-            new WaitUntilCommand(() -> m_swerve.targetReached())),
-        new WaitCommand(1.0), // will be elevatecmd(L4) later
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4)),
-        new WaitCommand(0.4),
-        new InstantCommand(() -> m_shooter.stop()),
-        new InstantCommand(() -> m_shooter.closeBlocker()),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.FEEDER)));
-    return shootSequence;
-  }
+  // private Command driveWaitAndShoot(Pose2d targetPos, double waitTime) {
+  //   var approachPose = offsetPose(targetPos, -1);
+  //   SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
+  //   shootSequence.addCommands(
+  //       new InstantCommand(() -> m_swerve.drivetoTarget(approachPose)),
+  //       new WaitUntilCommand(() -> m_swerve.targetReached()),
+  //       new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+  //       new WaitCommand(waitTime),
+  //       new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+  //       new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.L4)),
+  //       new InstantCommand(() -> m_shooter.openBlocker()),
+  //       new ParallelDeadlineGroup(
+  //           new WaitCommand(1.0), // will be elevatecmd(L4) later
+  //           new WaitUntilCommand(() -> m_swerve.targetReached())),
+  //       new WaitCommand(1.0), // will be elevatecmd(L4) later
+  //       new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+  //       new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4)),
+  //       new WaitCommand(0.4),
+  //       new InstantCommand(() -> m_shooter.stop()),
+  //       new InstantCommand(() -> m_shooter.closeBlocker()),
+  //       Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.FEEDER)));
+  //   return shootSequence;
+  // }
 
   private Command driveAndShootCycle(Pose2d targetPos, double elevatorRaiseDistance) {
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
+    
     shootSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance)),
@@ -136,7 +151,9 @@ public class PathfindingV2 extends Command {
   public Command ThreeCoralRightBlue() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
 
-    pathfindingSequence.addCommands(
+    switch (currentAlliance) {
+      case Blue:
+      pathfindingSequence.addCommands(
         new InstantCommand(() -> m_swerve.regularConstraints()),
         driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE, 1.5),
         driveAndIntakeCycle(
@@ -155,6 +172,33 @@ public class PathfindingV2 extends Command {
                 new InstantCommand(() -> m_shooter.stop())),
             driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC, 1.5)),
         new InstantCommand(() -> m_swerve.regularConstraints()));
+        break;
+      case Red:
+      pathfindingSequence.addCommands(
+        new InstantCommand(() -> m_swerve.regularConstraints()),
+        driveAndShootCycle(AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchE, 1.5),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(2).get())),
+        new InstantCommand(() -> m_swerve.boostedConstraints()),
+        new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), // will be elevatecmd(L4) later
+                new InstantCommand(() -> m_shooter.stop())),
+            driveAndShootCycle(AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchD, 1.5)),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(2).get())),
+        new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), // will be elevatecmd(L4) later
+                new InstantCommand(() -> m_shooter.stop())),
+            driveAndShootCycle(AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchC, 1.5)),
+        new InstantCommand(() -> m_swerve.regularConstraints()));
+        break;
+      default:
+        break;
+      
+    }
+    
 
     return pathfindingSequence;
   }
@@ -162,26 +206,59 @@ public class PathfindingV2 extends Command {
   public Command ThreeCoralLeftBlue() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
 
-    pathfindingSequence.addCommands(
+    switch (currentAlliance) {
+      case Blue:
+
+      pathfindingSequence.addCommands(
         new InstantCommand(() -> m_swerve.regularConstraints()),
-        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE, 1.5),
+        driveAndShootCycle(AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchJ, 1.5),
         driveAndIntakeCycle(
-            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(13).get())),
         new InstantCommand(() -> m_swerve.boostedConstraints()),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.2), // will be elevatecmd(L4) later
                 new InstantCommand(() -> m_shooter.stop())),
-            driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD, 1.5)),
+            driveAndShootCycle(AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchK, 1.5)),
         driveAndIntakeCycle(
-            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(13).get())),
         new ParallelCommandGroup(
             new SequentialCommandGroup(
                 new WaitCommand(0.2), // will be elevatecmd(L4) later
                 new InstantCommand(() -> m_shooter.stop())),
-            driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC, 1.5)),
+            driveAndShootCycle(AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchL, 1.5)),
         new InstantCommand(() -> m_swerve.regularConstraints()));
 
+        break;
+      case Red:
+
+      pathfindingSequence.addCommands(
+        new InstantCommand(() -> m_swerve.regularConstraints()),
+        driveAndShootCycle(AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchJ, 1.5),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(1).get())),
+        new InstantCommand(() -> m_swerve.boostedConstraints()),
+        new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), // will be elevatecmd(L4) later
+                new InstantCommand(() -> m_shooter.stop())),
+            driveAndShootCycle(AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchK, 1.5)),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(1).get())),
+        new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), // will be elevatecmd(L4) later
+                new InstantCommand(() -> m_shooter.stop())),
+            driveAndShootCycle(AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchL, 1.5)),
+        new InstantCommand(() -> m_swerve.regularConstraints()));
+
+        break;
+      default:
+      
+        break;
+      
+    }
+    
     return pathfindingSequence;
   }
 }
