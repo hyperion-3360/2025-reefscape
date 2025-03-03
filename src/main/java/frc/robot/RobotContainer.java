@@ -61,7 +61,7 @@ public class RobotContainer {
   public static final Dumper m_dumper = new Dumper();
   public static final Selection m_selector = new Selection(m_swerve);
   public static final PathfindingV2 m_pathfinding =
-      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve);
+      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake);
 
   public ElasticSetup setup =
       new ElasticSetup(

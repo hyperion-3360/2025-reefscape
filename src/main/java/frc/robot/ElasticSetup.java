@@ -38,7 +38,8 @@ public class ElasticSetup {
 
   public enum Auto {
     ThreeCoralLeft,
-    ThreeCoralRight
+    ThreeCoralRight,
+    OneCoralThenAlgae
   }
 
   private static SendableChooser<Auto> autoChooser = new SendableChooser<>();
@@ -114,6 +115,7 @@ public class ElasticSetup {
     autoChooser.setDefaultOption("null", null);
     autoChooser.addOption("three coral auto left", Auto.ThreeCoralLeft);
     autoChooser.addOption("three coral auto right", Auto.ThreeCoralRight);
+    autoChooser.addOption("straight pipe coral then algae", Auto.ThreeCoralLeft);
   }
 
   public void setUpDashboardComp() {
@@ -226,6 +228,9 @@ public class ElasticSetup {
         break;
       case ThreeCoralRight:
         autoCmd = pathfinder.ThreeCoralRight();
+        break;
+      case OneCoralThenAlgae:
+        autoCmd = pathfinder.coralAndAlgae();
         break;
       default:
         autoCmd = Commands.none();
