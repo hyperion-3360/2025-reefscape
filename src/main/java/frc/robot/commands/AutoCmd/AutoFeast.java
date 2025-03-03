@@ -1,6 +1,8 @@
 package frc.robot.commands.AutoCmd;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Auto.AutoWaypoints;
@@ -13,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AutoFeast extends SequentialCommandGroup {
-  List<Pose2d> feederWaypoints = new ArrayList<>();
+  private List<Pose2d> feederWaypoints = new ArrayList<>();
+  private Alliance currentAlliance = Alliance.Blue;
 
   public AutoFeast(
       Swerve m_swerve,
@@ -24,11 +27,26 @@ public class AutoFeast extends SequentialCommandGroup {
     addRequirements(m_swerve);
     // addRequirements(m_elevator);
     // addRequirements(m_shooter);
-    feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederLeft);
+    if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+      currentAlliance = Alliance.Blue;
+    }else if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+      currentAlliance = Alliance.Red;
+    }
+    if (currentAlliance.equals(Alliance.Blue)) {
+     feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederLeft);
     feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederRight);
     feederWaypoints.add(AutoWaypoints.BlueAlliance.LeftSide.feederWaypoints.feederLeft);
     feederWaypoints.add(AutoWaypoints.BlueAlliance.LeftSide.feederWaypoints.feederRight);
-    addCommands(
+    }else if (currentAlliance.equals(Alliance.Red))
+     {
+      feederWaypoints.add(AutoWaypoints.RedAlliance.RightSide.feederWaypoints.feederLeft);
+    feederWaypoints.add(AutoWaypoints.RedAlliance.RightSide.feederWaypoints.feederRight);
+    feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederLeft);
+    feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederRight);
+ 
+
+    }
+        addCommands(
         new DeferredCommand(
             () -> m_pathfinding.goThere(() -> m_swerve.getPose().nearest(feederWaypoints)),
             getRequirements()));
