@@ -164,7 +164,6 @@ public class RobotContainer {
     // Auto.initAutoWidget();
 
     m_swerve.resetModulesToAbsolute();
-    SmartDashboard.putData(CommandScheduler.getInstance());
 
     SmartDashboard.putData("Climber", setClimberMode());
     SmartDashboard.putData("Elevator", setElevatorMode());
