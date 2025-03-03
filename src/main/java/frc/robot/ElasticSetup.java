@@ -207,6 +207,7 @@ public class ElasticSetup {
     // climber
 
     debugTab.add("climber encoder", climber.getEncoderPosition());
+    debugTab.add("gyro z",swerve.getGyroZ());
 
     // elevator
 
