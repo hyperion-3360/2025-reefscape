@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
-import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -87,8 +83,6 @@ public class ElasticSetup {
   private Vision vision;
   private static PathfindingV2 pathfinder;
 
-  UsbCamera cam;
-
   ShuffleboardTab driverTab = Shuffleboard.getTab("driverTab");
   ShuffleboardTab techTab = Shuffleboard.getTab("techTab");
   ShuffleboardTab TestSubsystemTab = Shuffleboard.getTab("testSubsystemTab");
@@ -124,16 +118,15 @@ public class ElasticSetup {
 
   public void setUpDashboardComp() {
 
-    cam = CameraServer.startAutomaticCapture();
-    cam.setVideoMode(PixelFormat.kMJPEG, 320, 200, 10);
-    cam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-
     // driver tab
     driverTab
         .addCamera("limelight", "limelight", "mjpg:http://10.33.60.11:1182/?action=stream")
         .withPosition(6, 0)
         .withSize(6, 4);
-    driverTab.add(cam).withPosition(0, 0).withSize(6, 4);
+    driverTab
+        .addCamera("driver cam", "driver cam", "mjpg:http://10.33.60.2:1181/?action=stream")
+        .withPosition(0, 0)
+        .withSize(6, 4);
     driverTab
         .addBoolean("has algae", () -> algaeIntake.sensorTriggered())
         .withPosition(0, 4)
