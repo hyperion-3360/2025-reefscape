@@ -41,8 +41,8 @@ public class Climber extends SubsystemBase implements TestBindings {
       new DigitalInput(Constants.SubsystemInfo.kClimberBeamBrakeID);
   private final Servo m_penis =
       new Servo(Constants.SubsystemInfo.kClimberPenisID); // 90 ouvert commence 0
-  // private final Servo m_finger =
-  //     new Servo(Constants.SubsystemInfo.kClimberFingerID); // 90 est ouvert
+  private final Servo m_finger =
+      new Servo(Constants.SubsystemInfo.kClimberFingerID); // 90 est ouvert
 
   private static boolean isClimberActivated = false;
 
@@ -55,7 +55,7 @@ public class Climber extends SubsystemBase implements TestBindings {
     m_climberMotorConfig.CurrentLimits.SupplyCurrentLimit = 30.0;
     m_deepMotor.getConfigurator().apply(m_climberMotorConfig);
     m_deepMotor.set(0);
-    // m_finger.setAngle(88);
+    m_finger.setAngle(88);
     m_penis.setAngle(0);
     m_deepMotor.setPosition(0.0);
 
@@ -87,13 +87,13 @@ public class Climber extends SubsystemBase implements TestBindings {
         });
   }
 
-  // public void fingerOpen() {
-  //   m_finger.setAngle(88);
-  // }
+  public void fingerOpen() {
+    m_finger.setAngle(88);
+  }
 
-  // public void fingerClose() {
-  //   m_finger.setAngle(74);
-  // }
+  public void fingerClose() {
+    m_finger.setAngle(60);
+  }
 
   public void winchDeepClimb() {
     m_deepMotor.set(0.2);
@@ -126,7 +126,7 @@ public class Climber extends SubsystemBase implements TestBindings {
     return m_deepMotor.getPosition().getValueAsDouble() <= -90;
   }
 
-  public Command winchAutomatic() {
+  public Command goForthChild() {
     return Commands.run(() -> m_deepMotor.set(-0.4)) // - dewinch, + winch
         .until(this::isAtPose)
         .andThen(() -> m_deepMotor.set(0));

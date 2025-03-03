@@ -8,6 +8,7 @@ import frc.robot.subsystems.AlgaeIntake.shooting;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 
@@ -19,6 +20,7 @@ public class LowerElevatorCmd extends SequentialCommandGroup {
     addRequirements(m_shooter);
     addRequirements(m_algaeIntake);
     addCommands(
+        Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_shooter.closeBlocker()),

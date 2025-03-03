@@ -28,6 +28,7 @@ import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
 import frc.robot.commands.LowerElevatorCmd;
 import frc.robot.commands.NetAlgaeShootCmd;
+import frc.robot.commands.ReReadyClimbCmd;
 import frc.robot.commands.ReadyClimbCmd;
 import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
@@ -113,6 +114,7 @@ public class RobotContainer {
   private final AutoCancel cancelAuto =
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
+  private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
 
   public enum TestModes {
     NONE,
@@ -233,11 +235,15 @@ public class RobotContainer {
   public void configureBindingsTeleop() {
 
     m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
-    // m_coDriverController.leftBumper().onTrue(deepclimb); TODO mettre un vrai boutton
+    m_coDriverController
+        .leftTrigger()
+        .and(m_coDriverController.rightTrigger())
+        .and(() -> m_climber.isClimberActivated())
+        .onTrue(deepclimb);
+    m_coDriverController.start().and(m_coDriverController.back()).and(() -> m_climber.isClimberActivated()).onTrue(unguckClimb);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
-    m_driverController.a().onTrue(intakeCoral);
     m_driverController.b().onTrue(shootAlgae);
 
     m_climber.setDefaultCommand(m_climberCommand.getSelected());
@@ -262,7 +268,7 @@ public class RobotContainer {
     m_coDriverController.b().onTrue(elevateLOW);
 
     m_driverController
-        .povUp()
+        .leftTrigger(0.3)
         .onTrue(
             Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
 
@@ -299,7 +305,7 @@ public class RobotContainer {
 
     m_coDriverController.rightBumper().onTrue(intakeCoral);
 
-    m_driverController.rightTrigger(0.5).whileTrue(cycleToFeeder).whileFalse(cancelAuto);
+    m_driverController.rightTrigger(0.3).whileTrue(cycleToFeeder).onFalse(cancelAuto);
   }
 
   public Command getAutonomousCommand() {
