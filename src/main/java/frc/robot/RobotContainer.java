@@ -172,6 +172,7 @@ public class RobotContainer {
     SmartDashboard.putData("Algae Intake", setAlgaeIntakeMode());
     SmartDashboard.putData("Swerve", setSwerveMode());
     SmartDashboard.putData("Dumper", setDumperMode());
+    SmartDashboard.putData(CommandScheduler.getInstance());
 
     m_climberCommand.setDefaultOption(
         "Deep",
