@@ -148,24 +148,25 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     if (m_targetModeEnabled) {
 
-      m_xController.setConstraints(
-          new Constraints(
-              kMaxSpeedMetersPerSecondX
-                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
-              kMaxAccelerationMetersPerSecondSquaredX
-                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
-      m_yController.setConstraints(
-          new Constraints(
-              kMaxSpeedMetersPerSecondY
-                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
-              kMaxAccelerationMetersPerSecondSquaredY
-                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
-      m_rotController.setConstraints(
-          new Constraints(
-              kMaxSpeedRadiansPerSecond
-                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
-              kMaxAccelerationRadiansPerSecondSquared
-                  * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+      if (!DriverStation.isAutonomous()) {
+        m_xController.setConstraints(
+            new Constraints(
+                kMaxSpeedMetersPerSecondX
+                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
+                kMaxAccelerationMetersPerSecondSquaredX
+                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+        m_yController.setConstraints(
+            new Constraints(
+                kMaxSpeedMetersPerSecondY
+                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
+                kMaxAccelerationMetersPerSecondSquaredY
+                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+        m_rotController.setConstraints(
+            new Constraints(
+                kMaxSpeedRadiansPerSecond
+                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
+                kMaxAccelerationRadiansPerSecondSquared
+                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
 
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
