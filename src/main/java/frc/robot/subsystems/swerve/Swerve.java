@@ -87,6 +87,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
 
     m_gyro.reset();
+    m_gyro.getAccumGyroZ(true);
     this.vision = vision;
     mSwerveMods =
         new SwerveModule[] {
@@ -150,7 +151,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_rotController.setConstraints(m_rotConstraints);
   }
 
-  public double getGyroZ(){
+  public double getGyroZ() {
     return m_gyro.getAccumGyroZ().getValueAsDouble();
   }
 
@@ -163,6 +164,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
     visionEst = vision.getEstimatedGlobalPose();
+
+    SmartDashboard.putNumber("gyro z", getGyroZ());
 
     if (visionEst.isPresent() && !hasStartedEstimation) {
       hasStartedEstimation = true;
