@@ -106,20 +106,45 @@ public class Swerve extends SubsystemBase implements TestBindings {
     poseEstimator =
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
-    m_xConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
+
     m_xController = new ProfiledPIDController(kPTranslation, 0, 0, m_xConstraints);
-    m_yConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY);
     m_yController = new ProfiledPIDController(kPTranslation, 0, 0, m_yConstraints);
+    m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
+    m_rotController.enableContinuousInput(-Math.PI, Math.PI);
+
+    configurePathPlanner();
+  }
+
+  public void boostedConstraints() {
     m_rotConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
-    m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
-    m_rotController.enableContinuousInput(-Math.PI, Math.PI);
-    configurePathPlanner();
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY + 1, kMaxAccelerationMetersPerSecondSquaredY + 2);
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX + 1, kMaxAccelerationMetersPerSecondSquaredX + 2);
+
+    m_xController.setConstraints(m_xConstraints);
+    m_yController.setConstraints(m_yConstraints);
+    m_rotController.setConstraints(m_rotConstraints);
+  }
+
+  public void regularConstraints() {
+    m_rotConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY + 0.5, kMaxAccelerationMetersPerSecondSquaredY + 1);
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX + 0.5, kMaxAccelerationMetersPerSecondSquaredX + 1);
+
+    m_xController.setConstraints(m_xConstraints);
+    m_yController.setConstraints(m_yConstraints);
+    m_rotController.setConstraints(m_rotConstraints);
   }
 
   /* periodic */
@@ -214,9 +239,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
 
-    return isAlmostEqual(posX, goalX, 0.02)
-        && isAlmostEqual(posY, goalY, 0.02)
-        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(3));
+    return isAlmostEqual(posX, goalX, 0.01)
+        && isAlmostEqual(posY, goalY, 0.01)
+        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
   }
 
   public void disableDriveToTarget() {
