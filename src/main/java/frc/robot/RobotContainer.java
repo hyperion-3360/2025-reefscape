@@ -234,7 +234,7 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
+    m_coDriverController.start().and(m_coDriverController.back()).and(() -> !m_climber.isClimberActivated()).onTrue(readyclimb);
     m_coDriverController
         .leftTrigger()
         .and(m_coDriverController.rightTrigger())
