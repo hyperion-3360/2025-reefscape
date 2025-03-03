@@ -241,7 +241,6 @@ public class AutoWaypoints {
       public static class feederWaypoints {
         public static Pose2d feederRight = new Pose2d(16.835, 6.716, Rotation2d.fromDegrees(234));
         public static Pose2d feederLeft = new Pose2d(15.970, 7.354, Rotation2d.fromDegrees(234));
-
       }
     }
 
@@ -291,7 +290,7 @@ public class AutoWaypoints {
       public static class feederWaypoints {
         public static Pose2d feederRight = new Pose2d(15.959, 0.666, Rotation2d.fromDegrees(126));
         public static Pose2d feederLeft = new Pose2d(16.873, 1.365, Rotation2d.fromDegrees(126));
-}
+      }
     }
 
     // #region Stop

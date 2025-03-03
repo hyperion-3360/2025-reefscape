@@ -29,24 +29,21 @@ public class AutoFeast extends SequentialCommandGroup {
     // addRequirements(m_shooter);
     if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
       currentAlliance = Alliance.Blue;
-    }else if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+    } else if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
       currentAlliance = Alliance.Red;
     }
     if (currentAlliance.equals(Alliance.Blue)) {
-     feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederLeft);
-    feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederRight);
-    feederWaypoints.add(AutoWaypoints.BlueAlliance.LeftSide.feederWaypoints.feederLeft);
-    feederWaypoints.add(AutoWaypoints.BlueAlliance.LeftSide.feederWaypoints.feederRight);
-    }else if (currentAlliance.equals(Alliance.Red))
-     {
+      feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederLeft);
+      feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederRight);
+      feederWaypoints.add(AutoWaypoints.BlueAlliance.LeftSide.feederWaypoints.feederLeft);
+      feederWaypoints.add(AutoWaypoints.BlueAlliance.LeftSide.feederWaypoints.feederRight);
+    } else if (currentAlliance.equals(Alliance.Red)) {
       feederWaypoints.add(AutoWaypoints.RedAlliance.RightSide.feederWaypoints.feederLeft);
-    feederWaypoints.add(AutoWaypoints.RedAlliance.RightSide.feederWaypoints.feederRight);
-    feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederLeft);
-    feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederRight);
- 
-
+      feederWaypoints.add(AutoWaypoints.RedAlliance.RightSide.feederWaypoints.feederRight);
+      feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederLeft);
+      feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederRight);
     }
-        addCommands(
+    addCommands(
         new DeferredCommand(
             () -> m_pathfinding.goThere(() -> m_swerve.getPose().nearest(feederWaypoints)),
             getRequirements()));
