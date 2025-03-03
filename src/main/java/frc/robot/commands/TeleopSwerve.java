@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -55,6 +56,12 @@ public class TeleopSwerve extends Command {
 
     translationVal *= SwerveSpeedSlow(elevatorHeightVal);
     strafeVal *= SwerveSpeedSlow(elevatorHeightVal);
+
+    if (Climber.climberActivated()) {
+      translationVal *= 0.1;
+      strafeVal *= 0.1;
+      rotationVal *= 0.1;
+    }
 
     SmartDashboard.putNumber("translation v", translationVal);
     SmartDashboard.putNumber("strafe v", strafeVal);

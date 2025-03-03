@@ -164,7 +164,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("elevator sensor reading", m_sensor.get());
     if (DriverStation.isDisabled()) {
       m_controller.reset(0.01);
-      m_controller.setGoal(0.01);
+      SetHeight(desiredHeight.LOW);
       return;
     }
 
