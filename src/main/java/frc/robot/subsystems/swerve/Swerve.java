@@ -193,14 +193,15 @@ public class Swerve extends SubsystemBase implements TestBindings {
                 kMaxAccelerationRadiansPerSecondSquared
                     * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
 
-      var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
-      var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
-      var rot = 0.0;
-      rot =
-          m_rotController.calculate(
-              poseEstimator.getEstimatedPosition().getRotation().getRadians());
+        var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
+        var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
+        var rot = 0.0;
+        rot =
+            m_rotController.calculate(
+                poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
-      _drive(new Translation2d(x, y), rot, true, true);
+        _drive(new Translation2d(x, y), rot, true, true);
+      }
     }
   }
 

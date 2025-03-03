@@ -191,7 +191,11 @@ public class RobotContainer {
         .and(m_coDriverController.rightTrigger())
         .and(() -> m_climber.isClimberActivated())
         .onTrue(deepclimb);
-    m_coDriverController.start().and(m_coDriverController.back()).and(() -> m_climber.isClimberActivated()).onTrue(unguckClimb);
+    m_coDriverController
+        .start()
+        .and(m_coDriverController.back())
+        .and(() -> m_climber.isClimberActivated())
+        .onTrue(unguckClimb);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
@@ -258,6 +262,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return m_pathfinding.auto();
+    return m_pathfinding.ThreeCoralRightBlue();
   }
 }

@@ -133,7 +133,33 @@ public class PathfindingV2 extends Command {
     return intakeSequence;
   }
 
-  public Command auto() {
+  public Command ThreeCoralRightBlue() {
+    SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
+
+    pathfindingSequence.addCommands(
+        new InstantCommand(() -> m_swerve.regularConstraints()),
+        driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE, 1.5),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+        new InstantCommand(() -> m_swerve.boostedConstraints()),
+        new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), // will be elevatecmd(L4) later
+                new InstantCommand(() -> m_shooter.stop())),
+            driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD, 1.5)),
+        driveAndIntakeCycle(
+            Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+        new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new WaitCommand(0.2), // will be elevatecmd(L4) later
+                new InstantCommand(() -> m_shooter.stop())),
+            driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC, 1.5)),
+        new InstantCommand(() -> m_swerve.regularConstraints()));
+
+    return pathfindingSequence;
+  }
+
+  public Command ThreeCoralLeftBlue() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
 
     pathfindingSequence.addCommands(
