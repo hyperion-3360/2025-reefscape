@@ -177,7 +177,6 @@ public final class Constants {
   }
 
   public static final class AlgaeCoralStand {
-    // TODO add actual values not approximates using pathplanner
     public static final Pose2d[] kStands = {
       new Pose2d(1.225, 5.855, Rotation2d.fromDegrees(180)),
       new Pose2d(1.225, 4.025, Rotation2d.fromDegrees(180)),
@@ -210,7 +209,6 @@ public final class Constants {
   }
 
   public static class Priorities {
-    // TODO add actual priorities
     public static final int kShootCoralL4 = 7;
     public static final int kShootNet = 1;
     public static final int kIntakeCoral = 5;
@@ -218,7 +216,6 @@ public final class Constants {
   }
 
   public static class TimeToAction {
-    // TODO add actual time
     public static final double kShootCoralL1 = 1;
     public static final double kShootCoralL4 = 3;
     public static final double kShootAlgaeProcessor = 4;
@@ -227,7 +224,6 @@ public final class Constants {
   }
 
   public static class CoralIntakeVariables {
-    // TODO: modify angles and speeds
 
     // elbow angles in º
     public static final double kHandoffAngle = 0;
@@ -239,7 +235,6 @@ public final class Constants {
   }
 
   public static class AlgaeIntakeVariables {
-    // TODO: modify angles and wheel speeds
 
     // in º
     public static final double kStartingAngle = 0.1;
@@ -259,7 +254,6 @@ public final class Constants {
   }
 
   public static class CoralShooterVariables {
-    // TODO: Find actual speed
     public static final double kShootNo = 0.0;
     public static final double kShootL1 = -0.3;
     public static final double kShootL2 = -0.85;
@@ -271,20 +265,17 @@ public final class Constants {
     public static final int kCoralShooterCurrentLimit = 30;
     public static final double kCoralShooterRamprate = 0.5;
 
-    // TODO: Find angles
     // angles in º
     public static final double kCoralShooterClosed = 10.0;
     public static final double kCoralShooterOpen = 113.0;
   }
 
   public static class LEDConstants {
-    // TODO: update port when robot is built
     public static final int kLEDPWMPort = 5;
     public static final int kLEDLength = 30;
   }
 
   public static class SubsystemInfo {
-    // TODO: change ids to right ones and change names to more accurate, and add sensors and
     // encoders
     // motor ids
     public static final int kAlgaeGrabberLeftMotorID = 15;

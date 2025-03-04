@@ -433,7 +433,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   private void configurePathPlanner() {
 
-    // TODO make actual configs for autobuilder
     AutoBuilder.configure(
         this::getPose,
         this::setPose,

@@ -21,7 +21,6 @@ public class ShootCoralCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     addRequirements(m_elevator);
 
-    // TODO fix shooter still turning when disabled
     this.addCommands(
         Commands.runOnce(() -> m_shooter.openBlocker()),
         new WaitCommand(0.3),
