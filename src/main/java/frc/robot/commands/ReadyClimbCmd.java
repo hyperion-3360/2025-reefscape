@@ -16,13 +16,13 @@ public class ReadyClimbCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     addRequirements(m_algaeintake);
     addCommands(
+        Commands.runOnce(() -> m_climber.fingerOpen()),
         Commands.runOnce(() -> m_algaeintake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         new WaitCommand(.5),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.DEEPCLIMB)),
         Commands.runOnce(() -> m_climber.Penis90()),
-        m_climber.winchAutomatic(),
+        m_climber.goForthChild(),
         Commands.runOnce(() -> m_climber.stopDeepClimb()),
-        // Commands.runOnce(() -> m_climber.fingerClose()),
         Commands.runOnce(() -> m_climber.setClimberActivated()));
   }
 }
