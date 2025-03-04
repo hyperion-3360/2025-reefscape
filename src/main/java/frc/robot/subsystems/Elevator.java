@@ -38,7 +38,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
     L3,
     L4,
     ALGAEL2,
-    ALGAEL3
+    ALGAEL3,
+    LOLLYPOP
   }
 
   // private static double kP = 20.0;
@@ -267,6 +268,14 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorAlgaeL3;
         heightEnum = desiredHeight.ALGAEL3;
         lowElevatorHeight = false;
+        midHeight = false;
+        break;
+
+      case LOLLYPOP:
+        // slowDownWhenDescent(Constants.ElevatorConstants.kElevatorDown);
+        heightTarget = Constants.ElevatorConstants.kElevatorLollypop;
+        heightEnum = desiredHeight.ALGAEL3;
+        lowElevatorHeight = true;
         midHeight = false;
         break;
     }
