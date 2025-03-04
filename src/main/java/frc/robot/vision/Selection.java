@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -114,16 +113,6 @@ public class Selection extends Vision {
   public void periodic() {
     setLockTarget();
     isInBoundsForProcessor();
-    SmartDashboard.putNumber("desiredPose x", desiredPoseRelativeToCenterRotated.getX());
-    SmartDashboard.putNumber("desiredPose y", desiredPoseRelativeToCenterRotated.getY());
-    SmartDashboard.putNumber("desiredPose x center", desiredPoseCenterAlign.getX());
-    SmartDashboard.putNumber("desiredPose y center", desiredPoseCenterAlign.getY());
-    SmartDashboard.putNumber("current pos x", swerve.getPose().getX());
-    SmartDashboard.putNumber("current pos y", swerve.getPose().getY());
-    SmartDashboard.putBoolean("in Bounds For Processor", isInBounds);
-    SmartDashboard.putNumber("angle to rotate by", angleToRotateBy);
-    SmartDashboard.putNumber("lock ID", lockID);
-    SmartDashboard.putNumber("gyro rotation", swerve.getRotation2d().getDegrees());
   }
 
   public boolean isInBoundsForProcessor() {
@@ -138,6 +127,10 @@ public class Selection extends Vision {
       isInBounds = false;
     }
     return isInBounds;
+  }
+
+  public double getLockID() {
+    return lockID;
   }
 
   private void setDesiredAlignPose() {
