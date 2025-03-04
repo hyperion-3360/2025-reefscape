@@ -54,7 +54,7 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
             .onlyIf(() -> m_controller.x().getAsBoolean()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
         Commands.runOnce(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED), m_algaeIntake),
+            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.NET), m_algaeIntake),
         new WaitUntilCommand(() -> m_algaeIntake.isAtAngle(0.3)),
