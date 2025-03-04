@@ -96,6 +96,10 @@ public class RobotContainer {
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2);
   private final IntakeAlgaeCmd intakeAlgaeL3 =
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3);
+
+  private final IntakeAlgaeCmd intakeAlgaeLollypop =
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
+
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =
       new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve);
@@ -223,9 +227,12 @@ public class RobotContainer {
         .x()
         .onTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+    m_coDriverController
+        .povDown()
+        .onTrue(intakeAlgaeLollypop)
+        .onFalse(intakeAlgaeLollypop.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);
-    m_coDriverController.povDown().onTrue(elevateL1);
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
