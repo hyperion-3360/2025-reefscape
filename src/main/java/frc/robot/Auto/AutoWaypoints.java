@@ -206,6 +206,14 @@ public class AutoWaypoints {
     // #region Left
     public static class LeftSide {
 
+      public static class AlgaeWaypoint {
+        static Pose2d AlgaeHG = new Pose2d(11.753, 4, new Rotation2d(Math.toRadians(0)));
+      }
+
+      public static class NetWaypoint {
+        static Pose2d net = new Pose2d(10.020, 5.157, new Rotation2d(Math.toRadians(180)));
+      }
+
       public class pegWaypoints {
 
         static Pose2d branchA =

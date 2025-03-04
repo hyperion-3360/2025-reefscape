@@ -196,7 +196,7 @@ public class PathfindingV2 extends Command {
         new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.L4)),
         new InstantCommand(() -> m_shooter.openBlocker()),
         new ParallelDeadlineGroup(
-            new WaitCommand(2.2), // will be elevatecmd(L4) later
+            new WaitCommand(1.2), // will be elevatecmd(L4) later
             new WaitUntilCommand(() -> m_swerve.targetReached())),
         // new WaitCommand(1.0), // will be elevatecmd(L4) later
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
@@ -348,6 +348,15 @@ public class PathfindingV2 extends Command {
         break;
 
       case Red:
+        pathfindingSequence.addCommands(
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+            driveAndShootCycle(AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH, 1.0),
+            new InstantCommand(() -> m_swerve.regularConstraints()),
+            driveAndIntakeAlgae(
+                AutoWaypoints.BlueAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
+                1.0,
+                desiredHeight.ALGAEL2),
+            driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4));
         break;
 
       default:
