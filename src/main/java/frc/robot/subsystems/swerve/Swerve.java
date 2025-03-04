@@ -23,9 +23,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -48,13 +47,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
   public SwerveModulePosition[] positions;
   private final Pigeon2 m_gyro;
-  public Field2d m_field2d = new Field2d();
+  public final Field2d m_field2d = new Field2d();
   // public SwerveDriveOdometry m_odometry;
-  private boolean m_debug = true;
   private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
   Thread thread = new Thread();
-  ShuffleboardTab VisionSwerveTab = Shuffleboard.getTab("vision and swerve");
   private boolean hasStartedEstimation = false;
   private Orchestra m_orchestra = new Orchestra();
   private boolean m_targetModeEnabled = false;
@@ -85,6 +82,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
 
     m_gyro.reset();
+    m_gyro.getAccumGyroZ(true);
     this.vision = vision;
     mSwerveMods =
         new SwerveModule[] {
@@ -147,6 +145,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_rotController.setConstraints(m_rotConstraints);
   }
 
+  public double getGyroZ() {
+    return m_gyro.getAccumGyroZ().getValueAsDouble();
+  }
+
   /* periodic */
 
   @Override
@@ -157,14 +159,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     visionEst = vision.getEstimatedGlobalPose();
 
+    SmartDashboard.putNumber("gyro z", getGyroZ());
+
     if (visionEst.isPresent() && !hasStartedEstimation) {
       hasStartedEstimation = true;
       estimatePose();
     }
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
-
-    if (m_debug) {}
 
     if (DriverStation.isDisabled()) {
       m_targetModeEnabled = false;
@@ -193,20 +195,49 @@ public class Swerve extends SubsystemBase implements TestBindings {
                 kMaxAccelerationRadiansPerSecondSquared
                     * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
 
-        var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
-        var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
-        var rot = 0.0;
-        rot =
-            m_rotController.calculate(
-                poseEstimator.getEstimatedPosition().getRotation().getRadians());
+        SmartDashboard.putNumber(
+            "max speed x",
+            kMaxSpeedMetersPerSecondX
+                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+        SmartDashboard.putNumber(
+            "max acceleration x",
+            kMaxAccelerationMetersPerSecondSquaredX
+                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+        SmartDashboard.putNumber(
+            "max speed y",
+            kMaxSpeedMetersPerSecondY
+                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+        SmartDashboard.putNumber(
+            "max acceleration y",
+            kMaxAccelerationMetersPerSecondSquaredY
+                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+        SmartDashboard.putNumber(
+            "max speed rotation",
+            kMaxSpeedRadiansPerSecond
+                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+        SmartDashboard.putNumber(
+            "max acceleration rotation",
+            kMaxAccelerationRadiansPerSecondSquared
+                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+      }
+      var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
+      var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
+      var rot = 0.0;
+      rot =
+          m_rotController.calculate(
+              poseEstimator.getEstimatedPosition().getRotation().getRadians());
 
         _drive(new Translation2d(x, y), rot, true, true);
       }
     }
-  }
 
-  public boolean isGyroCalibrated() {
-    return m_gyro.isConnected();
+    SmartDashboard.putNumber("Goal pose X", m_xController.getGoal().position);
+    SmartDashboard.putNumber("current pose X", getPose().getX());
+    SmartDashboard.putNumber("Goal pose Y", m_yController.getGoal().position);
+    SmartDashboard.putNumber("current pose Y", getPose().getY());
+    SmartDashboard.putNumber(
+        "Goal pose rot", Units.radiansToDegrees(m_rotController.getGoal().position));
+    SmartDashboard.putNumber("current pose rot ", getPose().getRotation().getDegrees());
   }
 
   /* thread */

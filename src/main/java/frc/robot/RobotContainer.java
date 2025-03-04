@@ -63,7 +63,7 @@ public class RobotContainer {
   public static final Dumper m_dumper = new Dumper();
   public static final Selection m_selector = new Selection(m_swerve);
   public static final PathfindingV2 m_pathfinding =
-      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve);
+      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake);
 
   public ElasticSetup setup =
       new ElasticSetup(
@@ -75,7 +75,8 @@ public class RobotContainer {
           m_elevator,
           m_dumper,
           m_coDriverController,
-          m_vision);
+          m_vision,
+          m_pathfinding);
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -202,16 +203,15 @@ public class RobotContainer {
     m_driverController.b().onTrue(shootAlgae);
 
     m_coDriverController.a().onTrue(shootCoral);
-    // m_driverController.y().onTrue(shootAlgaeNet).onFalse(cancelAuto);
     m_driverController.y().onTrue(shootAlgaeNet);
 
     m_coDriverController
         .y()
-        .whileTrue(intakeAlgaeL2)
+        .onTrue(intakeAlgaeL2)
         .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .x()
-        .whileTrue(intakeAlgaeL3)
+        .onTrue(intakeAlgaeL3)
         .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
     m_coDriverController.povUp().onTrue(elevateL4);
@@ -270,6 +270,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return m_pathfinding.auto();
+    return ElasticSetup.SelectedAuto();
   }
 }

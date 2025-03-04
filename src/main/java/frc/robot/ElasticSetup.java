@@ -6,11 +6,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Auto.PathfindingV2;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
@@ -34,6 +36,13 @@ public class ElasticSetup {
     CORAL_SHOOTER
   }
 
+  public enum Auto {
+    ThreeCoralLeft,
+    ThreeCoralRight,
+    OneCoralThenAlgae
+  }
+
+  private static SendableChooser<Auto> autoChooser = new SendableChooser<>();
   private TestModes m_testMode = TestModes.NONE;
 
   private Command setElevatorMode() {
@@ -73,6 +82,7 @@ public class ElasticSetup {
   private Dumper dumper;
   private CommandXboxController codriver;
   private Vision vision;
+  private static PathfindingV2 pathfinder;
 
   ShuffleboardTab driverTab = Shuffleboard.getTab("driverTab");
   ShuffleboardTab techTab = Shuffleboard.getTab("techTab");
@@ -88,7 +98,8 @@ public class ElasticSetup {
       Elevator elevator,
       Dumper dumper,
       CommandXboxController codriver,
-      Vision vision) {
+      Vision vision,
+      PathfindingV2 pathfinder) {
 
     this.swerve = swerve;
     this.shooter = shooter;
@@ -99,48 +110,60 @@ public class ElasticSetup {
     this.dumper = dumper;
     this.codriver = codriver;
     this.vision = vision;
+    ElasticSetup.pathfinder = pathfinder;
+
+    autoChooser.setDefaultOption("null", null);
+    autoChooser.addOption("three coral auto left", Auto.ThreeCoralLeft);
+    autoChooser.addOption("three coral auto right", Auto.ThreeCoralRight);
+    autoChooser.addOption("straight pipe coral then algae", Auto.ThreeCoralLeft);
   }
 
   public void setUpDashboardComp() {
 
     // driver tab
-    driverTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
     driverTab
         .addCamera("limelight", "limelight", "mjpg:http://10.33.60.11:1182/?action=stream")
-        .withPosition(3, 0)
-        .withSize(3, 3);
+        .withPosition(6, 0)
+        .withSize(6, 4);
     driverTab
-        .addCamera("driverCam", "driverCam", "mjpg:http://10.33.60.2:1181")
+        .addCamera("driver cam", "driver cam", "mjpg:http://10.33.60.2:1181/?action=stream")
         .withPosition(0, 0)
-        .withSize(3, 3);
+        .withSize(6, 4);
     driverTab
         .addBoolean("has algae", () -> algaeIntake.sensorTriggered())
-        .withPosition(0, 3)
+        .withPosition(0, 4)
         .withSize(1, 1);
     driverTab
         .addBoolean("climber acivated", () -> climber.isClimberActivated())
-        .withPosition(1, 3)
+        .withPosition(1, 4)
         .withSize(1, 1);
     driverTab
         .addBoolean("climbed", () -> climber.SensorDetected())
-        .withPosition(2, 3)
+        .withPosition(2, 4)
         .withSize(1, 1);
-    driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(3, 3).withSize(1, 1);
+    driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(3, 4).withSize(1, 1);
     driverTab
         .addBoolean("is in bounds for processor", () -> selector.isInBoundsForProcessor())
-        .withPosition(4, 3)
+        .withPosition(4, 4)
         .withSize(1, 1);
     driverTab
         .addNumber("lock Tag id", () -> selector.getLockID())
-        .withPosition(5, 3)
+        .withPosition(5, 4)
         .withSize(1, 1);
 
     // technician tab
     //     - Autonomous mode (chooser)
+    techTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
+    techTab
+        .addBoolean("limelight 2 active", () -> vision.limelight2Active())
+        .withPosition(0, 0)
+        .withSize(1, 1);
+    techTab
+        .addBoolean("limelight 3 active", () -> vision.limelight3Active())
+        .withPosition(1, 0)
+        .withSize(1, 1);
 
-    techTab.addBoolean("gyro calibrated", () -> swerve.isGyroCalibrated());
-    techTab.addBoolean("limelight 2 active", () -> vision.limelight2Active());
-    techTab.addBoolean("limelight 3 active", () -> vision.limelight3Active());
+    techTab.add("auto chooser", autoChooser).withPosition(0, 1).withSize(3, 1);
   }
 
   public void setUpDashboardSubsystemTest() {
@@ -186,6 +209,7 @@ public class ElasticSetup {
     // climber
 
     debugTab.add("climber encoder", climber.getEncoderPosition());
+    debugTab.add("gyro z", swerve.getGyroZ());
 
     // elevator
 
@@ -193,5 +217,25 @@ public class ElasticSetup {
     debugTab.add("elevator vel", elevator.elevatorVel());
     debugTab.add("elevator switch", elevator.isElevatorAtBottom());
     debugTab.add("elevator setpoint", elevator.getElevatorSetpoint());
+  }
+
+  public static Command SelectedAuto() {
+    var selectedAuto = autoChooser.getSelected();
+    var autoCmd = Commands.none();
+    switch (selectedAuto) {
+      case ThreeCoralLeft:
+        autoCmd = pathfinder.ThreeCoralLeft();
+        break;
+      case ThreeCoralRight:
+        autoCmd = pathfinder.ThreeCoralRight();
+        break;
+      case OneCoralThenAlgae:
+        autoCmd = pathfinder.coralAndAlgae();
+        break;
+      default:
+        autoCmd = Commands.none();
+        break;
+    }
+    return autoCmd;
   }
 }

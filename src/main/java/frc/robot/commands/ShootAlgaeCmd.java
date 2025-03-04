@@ -30,7 +30,7 @@ public class ShootAlgaeCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.PROCESSOR)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.PROCESSOR)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
         new WaitCommand(0.8),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
         new WaitCommand(0.5),
