@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,32 +22,38 @@ public class MinuteMoveCmd extends SequentialCommandGroup {
 
   private Pose2d computeNewPose(double offset, OffsetDir dir) {
     // 0 deg in front of the robot
-    var originalX = m_swerve.getPose().getX();
-    var originalY = m_swerve.getPose().getY();
-    var originalRot = m_swerve.getPose().getRotation();
-
+    var currentPose = m_swerve.getPose();
+    double translationX = 0.0;
+    double translationY = 0.0;
     switch (dir) {
       case FRONT:
-        originalY += offset;
+        translationX += offset;
         break;
       case BACK:
-        originalY -= offset;
+        translationX -= offset;
         break;
       case LEFT:
-        originalX -= offset;
+        translationY += offset;
         break;
       case RIGHT:
-        originalX += offset;
+        translationY -= offset;
         break;
     }
-    return new Pose2d(new Translation2d(originalX, originalY).rotateBy(originalRot), originalRot);
+    var translation =
+        currentPose
+            .getTranslation()
+            .plus(
+                new Translation2d(translationX, translationY).rotateBy(currentPose.getRotation()));
+    return new Pose2d(translation, currentPose.getRotation());
   }
 
   public MinuteMoveCmd(Swerve swerve, double waitTime, double offset, OffsetDir dir) {
     m_swerve = swerve;
     addRequirements(m_swerve);
     addCommands(
-        new InstantCommand(() -> m_swerve.drivetoTarget(computeNewPose(offset, dir))),
+        new DeferredCommand(
+            () -> new InstantCommand(() -> m_swerve.drivetoTarget(computeNewPose(offset, dir))),
+            getRequirements()),
         new ParallelDeadlineGroup(
             new WaitCommand(waitTime), // Deadline command
             new WaitUntilCommand(() -> swerve.targetReached())),

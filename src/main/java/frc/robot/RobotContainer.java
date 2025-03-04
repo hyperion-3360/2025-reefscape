@@ -127,10 +127,14 @@ public class RobotContainer {
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
-  private final MinuteMoveCmd MinutieMoveLeft = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.LEFT);
-  private final MinuteMoveCmd MinutieMoveRight = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.RIGHT);
-  private final MinuteMoveCmd MinutieMoveFront = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.FRONT);
-  private final MinuteMoveCmd MinutieMoveBack = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.BACK);
+  private final MinuteMoveCmd MinutieMoveLeft =
+      new MinuteMoveCmd(m_swerve, 0.3, 0.05, OffsetDir.LEFT);
+  private final MinuteMoveCmd MinutieMoveRight =
+      new MinuteMoveCmd(m_swerve, 0.3, 0.05, OffsetDir.RIGHT);
+  private final MinuteMoveCmd MinutieMoveFront =
+      new MinuteMoveCmd(m_swerve, 0.3, 0.05, OffsetDir.FRONT);
+  private final MinuteMoveCmd MinutieMoveBack =
+      new MinuteMoveCmd(m_swerve, 0.3, 0.05, OffsetDir.BACK);
 
   private boolean m_debug = false;
 
