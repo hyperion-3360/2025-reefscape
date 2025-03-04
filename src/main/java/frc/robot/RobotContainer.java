@@ -39,6 +39,7 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
+import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
@@ -59,7 +60,6 @@ public class RobotContainer {
   public static final Elevator m_elevator = new Elevator();
   public static final Swerve m_swerve = new Swerve(m_vision, m_elevator);
   public static final LEDs m_leds = new LEDs();
-  public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
   public static final Selection m_selector = new Selection(m_swerve);
   public static final PathfindingV2 m_pathfinding =
@@ -196,91 +196,14 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    m_coDriverController
-        .start()
-        .and(m_coDriverController.back())
-        .and(() -> !m_climber.isClimberActivated())
-        .onTrue(readyclimb);
-    m_coDriverController
-        .leftTrigger()
-        .and(m_coDriverController.rightTrigger())
-        .and(() -> m_climber.isClimberActivated())
-        .onTrue(deepclimb);
-    m_coDriverController
-        .start()
-        .and(m_coDriverController.back())
-        .and(() -> m_climber.isClimberActivated())
-        .onTrue(unguckClimb);
-
-    m_driverController.x().onTrue(intakeAlgaeFloor);
-
-    m_driverController.b().onTrue(shootAlgae);
-
-    m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.y().onTrue(shootAlgaeNet);
-
-    m_coDriverController
-        .y()
-        .onTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
-    m_coDriverController
-        .x()
-        .onTrue(intakeAlgaeL3)
-        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
-    m_coDriverController
-        .povDown()
-        .onTrue(intakeAlgaeLollypop)
-        .onFalse(intakeAlgaeLollypop.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
-
-    m_coDriverController.povUp().onTrue(elevateL4);
-    m_coDriverController.povLeft().onTrue(elevateL3);
-    m_coDriverController.povRight().onTrue(elevateL2);
-    m_coDriverController.b().onTrue(elevateLOW);
-
-    m_driverController
-        .leftTrigger(0.3)
-        .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
-
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
-
-    m_driverController.povLeft().onTrue(MinutieMoveLeft);
-    m_driverController.povRight().onTrue(MinutieMoveRight);
-    m_driverController.povUp().onTrue(MinutieMoveFront);
-    m_driverController.povDown().onTrue(MinutieMoveBack);
-
-    m_driverController
-        .leftBumper()
-        .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeLeft()))
-                .unless(m_climber::isClimberActivated)
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
-
-    m_driverController
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
-
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
-
-    m_coDriverController.rightBumper().onTrue(intakeCoral);
-
-    m_driverController.rightTrigger(0.3).whileTrue(cycleToFeeder).onFalse(cancelAuto);
+    m_driverController.a().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.DEEPCLIMB)));
+    m_driverController.b().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.CLIMBER)));
+    m_driverController.x().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)));
+    m_driverController.y().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
+    m_driverController.povDown().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)));
+    m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)));
+    m_driverController.povRight().onTrue(Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)));
+   
   }
 
   public void teleopInit() {
