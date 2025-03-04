@@ -125,6 +125,8 @@ public class RobotContainer {
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
   private final MinuteMoveCmd MinutieMoveLeft = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.LEFT);
   private final MinuteMoveCmd MinutieMoveRight = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.RIGHT);
+  private final MinuteMoveCmd MinutieMoveFront = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.FRONT);
+  private final MinuteMoveCmd MinutieMoveBack = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.BACK);
 
   private boolean m_debug = false;
 
@@ -190,13 +192,21 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    m_coDriverController.start().and(m_coDriverController.back()).and(() -> !m_climber.isClimberActivated()).onTrue(readyclimb);
+    m_coDriverController
+        .start()
+        .and(m_coDriverController.back())
+        .and(() -> !m_climber.isClimberActivated())
+        .onTrue(readyclimb);
     m_coDriverController
         .leftTrigger()
         .and(m_coDriverController.rightTrigger())
         .and(() -> m_climber.isClimberActivated())
         .onTrue(deepclimb);
-    m_coDriverController.start().and(m_coDriverController.back()).and(() -> m_climber.isClimberActivated()).onTrue(unguckClimb);
+    m_coDriverController
+        .start()
+        .and(m_coDriverController.back())
+        .and(() -> m_climber.isClimberActivated())
+        .onTrue(unguckClimb);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
@@ -234,6 +244,8 @@ public class RobotContainer {
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
+    m_driverController.povUp().onTrue(MinutieMoveFront);
+    m_driverController.povDown().onTrue(MinutieMoveBack);
 
     m_driverController
         .leftBumper()
