@@ -55,7 +55,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
   Thread thread = new Thread();
-  ShuffleboardTab VisionSwerveTab = Shuffleboard.getTab("vision and swerve");
   private boolean hasStartedEstimation = false;
   private Orchestra m_orchestra = new Orchestra();
   private boolean m_targetModeEnabled = false;

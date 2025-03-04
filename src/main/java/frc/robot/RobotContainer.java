@@ -203,7 +203,6 @@ public class RobotContainer {
     m_driverController.b().onTrue(shootAlgae);
 
     m_coDriverController.a().onTrue(shootCoral);
-    // m_driverController.y().onTrue(shootAlgaeNet).onFalse(cancelAuto);
     m_driverController.y().onTrue(shootAlgaeNet);
 
     m_coDriverController
