@@ -6,6 +6,7 @@ import frc.robot.subsystems.Climber;
 
 public class ReReadyClimbCmd extends SequentialCommandGroup {
   public ReReadyClimbCmd(Climber m_climber) {
+    addRequirements(m_climber);
     addCommands(
         Commands.runOnce(() -> m_climber.fingerOpen()),
         // we need to winch a bit so that the finger can actually open

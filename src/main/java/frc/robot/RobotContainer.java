@@ -23,6 +23,8 @@ import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
 import frc.robot.commands.LowerElevatorCmd;
+import frc.robot.commands.MinuteMoveCmd;
+import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.commands.NetAlgaeShootCmd;
 import frc.robot.commands.ReReadyClimbCmd;
 import frc.robot.commands.ReadyClimbCmd;
@@ -121,6 +123,8 @@ public class RobotContainer {
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
+  private final MinuteMoveCmd MinutieMoveLeft = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.LEFT);
+  private final MinuteMoveCmd MinutieMoveRight = new MinuteMoveCmd(m_swerve, 1, 2, OffsetDir.RIGHT);
 
   private boolean m_debug = false;
 
@@ -186,17 +190,13 @@ public class RobotContainer {
 
   public void configureBindingsTeleop() {
 
-    m_coDriverController.start().and(m_coDriverController.back()).onTrue(readyclimb);
+    m_coDriverController.start().and(m_coDriverController.back()).and(() -> !m_climber.isClimberActivated()).onTrue(readyclimb);
     m_coDriverController
         .leftTrigger()
         .and(m_coDriverController.rightTrigger())
         .and(() -> m_climber.isClimberActivated())
         .onTrue(deepclimb);
-    m_coDriverController
-        .start()
-        .and(m_coDriverController.back())
-        .and(() -> m_climber.isClimberActivated())
-        .onTrue(unguckClimb);
+    m_coDriverController.start().and(m_coDriverController.back()).and(() -> m_climber.isClimberActivated()).onTrue(unguckClimb);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
@@ -232,6 +232,9 @@ public class RobotContainer {
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
+    m_driverController.povLeft().onTrue(MinutieMoveLeft);
+    m_driverController.povRight().onTrue(MinutieMoveRight);
+
     m_driverController
         .leftBumper()
         .onTrue(
@@ -259,6 +262,11 @@ public class RobotContainer {
     m_coDriverController.rightBumper().onTrue(intakeCoral);
 
     m_driverController.rightTrigger(0.3).whileTrue(cycleToFeeder).onFalse(cancelAuto);
+  }
+
+  public void teleopInit() {
+    // Running this in case our Auto sequence got cancelled early.
+    m_swerve.regularConstraints();
   }
 
   public Command getAutonomousCommand() {
