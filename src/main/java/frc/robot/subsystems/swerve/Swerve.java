@@ -49,7 +49,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final Pigeon2 m_gyro;
   public final Field2d m_field2d = new Field2d();
   // public SwerveDriveOdometry m_odometry;
-  private boolean m_debug = true;
   private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
   Thread thread = new Thread();
@@ -70,7 +69,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
   private final double kPRot = 6.0;
-  private boolean ambiguousRot = false;
   private Elevator m_elevator;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -96,7 +94,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     positions = new SwerveModulePosition[4];
     for (SwerveModule mod : mSwerveMods) {
       positions[mod.moduleNumber] = mod.getPosition();
-      SmartDashboard.putData(m_field2d);
     }
 
     for (SwerveModule mod : mSwerveMods) {
@@ -170,20 +167,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
-
-    if (m_debug) {
-      // smartdashboardDebug();
-      // for (SwerveModule mod : mSwerveMods) {
-      // SmartDashboard.putNumber(
-      // "Mod " + mod.moduleNumber + " CTRE Mag encoder",
-      // mod.getMagEncoderPos().getDegrees());
-      // SmartDashboard.putNumber(
-      // "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-      // SmartDashboard.putNumber(
-      // "Mod " + mod.moduleNumber + " Velocity",
-      // mod.getState().speedMetersPerSecond);
-      // }
-    }
 
     if (DriverStation.isDisabled()) {
       m_targetModeEnabled = false;
@@ -346,18 +329,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // ChassisSpeeds fieldRelativeSpeed =
     // ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
-    if (m_debug) {
-      // System.out.println(
-      //     String.format(
-      //         "driveRobotRelative: omega: %f, vx: %f, vy : %f",
-      //         targetSpeeds.omegaRadiansPerSecond,
-      //         targetSpeeds.vxMetersPerSecond,
-      //         targetSpeeds.vyMetersPerSecond));
-
-      //      SmartDashboard.putNumber("target x velocity", targetSpeeds.vxMetersPerSecond);
-      //     SmartDashboard.putNumber("target y velocity", targetSpeeds.vyMetersPerSecond);
-      //    SmartDashboard.putNumber("target theta velocity", targetSpeeds.omegaRadiansPerSecond);
-    }
 
     SwerveModuleState[] targetStates =
         Constants.Swerve.swerveKinematics.toSwerveModuleStates(targetSpeeds);
