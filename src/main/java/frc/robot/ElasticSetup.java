@@ -115,7 +115,7 @@ public class ElasticSetup {
     autoChooser.setDefaultOption("null", null);
     autoChooser.addOption("three coral auto left", Auto.ThreeCoralLeft);
     autoChooser.addOption("three coral auto right", Auto.ThreeCoralRight);
-    autoChooser.addOption("straight pipe coral then algae", Auto.ThreeCoralLeft);
+    autoChooser.addOption("straight pipe coral then algae", Auto.OneCoralThenAlgae);
   }
 
   public void setUpDashboardComp() {

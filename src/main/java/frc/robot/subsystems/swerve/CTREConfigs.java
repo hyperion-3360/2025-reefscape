@@ -23,7 +23,6 @@ public final class CTREConfigs {
     swerveAngleFXConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     /* Current Limiting */
-    // TODO made changes because old variables no longer exist check if breaks
     swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimitEnable =
         Constants.Swerve.angleEnableCurrentLimit;
     swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.angleCurrentLimit;
@@ -50,7 +49,6 @@ public final class CTREConfigs {
     swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
 
     /* Current Limiting */
-    // TODO made changes because old variables no longer exist check if breaks
     swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable =
         Constants.Swerve.driveEnableCurrentLimit;
     swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.driveCurrentLimit;

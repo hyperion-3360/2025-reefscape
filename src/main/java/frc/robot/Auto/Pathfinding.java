@@ -667,7 +667,6 @@ public class Pathfinding extends Command {
       return AutoBuilder.pathfindThenFollowPath(
           PathPlannerPath.fromPathFile(pathName), constraints);
     } catch (FileVersionException | IOException | ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     System.out.println("no");

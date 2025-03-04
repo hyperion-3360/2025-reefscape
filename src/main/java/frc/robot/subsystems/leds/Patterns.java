@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.util.Color;
 public class Patterns {
   /** Solid colors */
   public class solids {
-    // TODO: Check which colors drive team wants
-    // TODO: Remove unused colors
     LEDPattern orange = LEDPattern.solid(Color.kOrangeRed);
     LEDPattern white = LEDPattern.solid(Color.kWhite);
     LEDPattern blue = LEDPattern.solid(Color.kBlue);
