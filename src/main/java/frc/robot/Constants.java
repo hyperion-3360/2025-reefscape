@@ -262,7 +262,7 @@ public final class Constants {
     // TODO: Find actual speed
     public static final double kShootNo = 0.0;
     public static final double kShootL1 = -0.3;
-    public static final double kShootL2 = -1.0;
+    public static final double kShootL2 = -0.85;
     public static final double kShootL3 = -1.0;
     public static final double kShootL4 = -0.9;
     public static final double kIntakeSpeed = -0.6;
