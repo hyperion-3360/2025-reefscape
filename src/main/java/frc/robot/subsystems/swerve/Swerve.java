@@ -145,6 +145,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_rotController.setConstraints(m_rotConstraints);
   }
 
+  public void lessenedConstraints() {
+    m_rotConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedRadiansPerSecond - 1.0, kMaxAccelerationRadiansPerSecondSquared - 1.5);
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY - 1.0, kMaxAccelerationMetersPerSecondSquaredY - 1.5);
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX - 1.0, kMaxAccelerationMetersPerSecondSquaredX - 1.0);
+
+    m_xController.setConstraints(m_xConstraints);
+    m_yController.setConstraints(m_yConstraints);
+    m_rotController.setConstraints(m_rotConstraints);
+  }
+
   public double getGyroZ() {
     return m_gyro.getAccumGyroZ().getValueAsDouble();
   }

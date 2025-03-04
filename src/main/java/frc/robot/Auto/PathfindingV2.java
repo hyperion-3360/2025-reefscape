@@ -177,10 +177,10 @@ public class PathfindingV2 extends Command {
         new ParallelDeadlineGroup(
             new WaitCommand(0.5), new WaitUntilCommand(() -> m_swerve.targetReached())),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.INTAKE)),
-        new WaitCommand(0.2),
+        new WaitCommand(0.9),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.NET)),
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
-        new WaitCommand(0.1),
+        new WaitCommand(0.4),
         new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.LOW)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.STORED)));
@@ -196,7 +196,7 @@ public class PathfindingV2 extends Command {
         new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.L4)),
         new InstantCommand(() -> m_shooter.openBlocker()),
         new ParallelDeadlineGroup(
-            new WaitCommand(1.2), // will be elevatecmd(L4) later
+            new WaitCommand(2.2), // will be elevatecmd(L4) later
             new WaitUntilCommand(() -> m_swerve.targetReached())),
         // new WaitCommand(1.0), // will be elevatecmd(L4) later
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
@@ -336,13 +336,14 @@ public class PathfindingV2 extends Command {
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+            driveAndShootCycle(AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH, 1.0),
             new InstantCommand(() -> m_swerve.regularConstraints()),
-            driveAndShootCycle(AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchG, 1.5),
             driveAndIntakeAlgae(
                 AutoWaypoints.BlueAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
                 1.0,
                 desiredHeight.ALGAEL2),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 1.5));
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4));
 
         break;
 

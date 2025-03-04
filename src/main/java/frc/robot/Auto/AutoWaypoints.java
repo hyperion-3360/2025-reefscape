@@ -39,7 +39,7 @@ public class AutoWaypoints {
       }
 
       public static class NetWaypoint {
-        static Pose2d net = new Pose2d(7.435, 5.157, new Rotation2d(Math.toRadians(0)));
+        static Pose2d net = new Pose2d(7.360, 5.157, new Rotation2d(Math.toRadians(0)));
       }
 
       public static class pegWaypoints {
