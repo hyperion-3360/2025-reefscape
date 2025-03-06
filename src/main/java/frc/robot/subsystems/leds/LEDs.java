@@ -64,12 +64,12 @@ public class LEDs extends SubsystemBase {
         break;
 
       case INTAKE:
-        m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.1));
+        m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.5));
         m_isMovingPattern = true;
         break;
 
       case ELEVATOR:
-        m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.1));
+        m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.5));
         m_isMovingPattern = true;
         break;
 
@@ -79,17 +79,17 @@ public class LEDs extends SubsystemBase {
         break;
 
       case SHOOTER:
-        m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.05));
+        m_currentPattern = LEDPattern.solid(Color.kWhite).blink(Second.of(0.5));
         m_isMovingPattern = true;
         break;
 
       case CLIMBER:
-        m_currentPattern = LEDPattern.solid(Color.kRed).blink(Second.of(0.05));
+        m_currentPattern = LEDPattern.solid(Color.kRed).blink(Second.of(0.5));
         m_isMovingPattern = true;
         break;
 
       case DEEPCLIMB:
-        m_currentPattern = LEDPattern.solid(Color.kYellow).blink(Second.of(0.1));
+        m_currentPattern = LEDPattern.solid(Color.kYellow).blink(Second.of(0.5));
         m_isMovingPattern = true;
     }
     m_isApplied = false;

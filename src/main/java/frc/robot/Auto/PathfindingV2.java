@@ -270,7 +270,7 @@ public class PathfindingV2 extends Command {
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootCycle(
-                AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchE,
+                AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchJ,
                 1.5,
                 desiredHeight.L4,
                 1.2),
@@ -282,10 +282,10 @@ public class PathfindingV2 extends Command {
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
                     new InstantCommand(() -> m_shooter.stop())),
                 driveAndShootCycle(
-                    AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchD,
+                    AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchK,
                     2.0,
                     desiredHeight.NET,
-                    1.2)),
+                    0.6)),
             driveAndIntakeCycle(
                 Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(2).get())),
             new ParallelCommandGroup(
@@ -293,10 +293,10 @@ public class PathfindingV2 extends Command {
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
                     new InstantCommand(() -> m_shooter.stop())),
                 driveAndShootCycle(
-                    AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchC,
+                    AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchL,
                     2.0,
                     desiredHeight.NET,
-                    1.2)),
+                    0.6)),
             new InstantCommand(() -> m_swerve.regularConstraints()));
         break;
       default:
@@ -348,7 +348,7 @@ public class PathfindingV2 extends Command {
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootCycle(
-                AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchJ,
+                AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchE,
                 1.5,
                 desiredHeight.L4,
                 1.2),
@@ -360,10 +360,10 @@ public class PathfindingV2 extends Command {
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
                     new InstantCommand(() -> m_shooter.stop())),
                 driveAndShootCycle(
-                    AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchK,
+                    AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchD,
                     2.0,
                     desiredHeight.NET,
-                    0.6)),
+                    1.2)),
             driveAndIntakeCycle(
                 Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(1).get())),
             new ParallelCommandGroup(
@@ -371,12 +371,11 @@ public class PathfindingV2 extends Command {
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
                     new InstantCommand(() -> m_shooter.stop())),
                 driveAndShootCycle(
-                    AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchL,
+                    AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchC,
                     2.0,
                     desiredHeight.NET,
-                    0.6)),
+                    1.2)),
             new InstantCommand(() -> m_swerve.regularConstraints()));
-
         break;
       default:
         break;
@@ -409,13 +408,13 @@ public class PathfindingV2 extends Command {
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootCycle(
-                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
+                AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 1.0,
                 desiredHeight.L4,
                 1.2),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
-                AutoWaypoints.BlueAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
+                AutoWaypoints.RedAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
                 1.0,
                 desiredHeight.ALGAEL2),
             driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4));

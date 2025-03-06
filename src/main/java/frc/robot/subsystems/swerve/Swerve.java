@@ -116,13 +116,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void boostedConstraints() {
     m_rotConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
+            kMaxSpeedRadiansPerSecond - 0.05, kMaxAccelerationRadiansPerSecondSquared - 0.05);
     m_yConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondY + 1, kMaxAccelerationMetersPerSecondSquaredY + 2);
+            kMaxSpeedMetersPerSecondY - 1, kMaxAccelerationMetersPerSecondSquaredY - 1);
     m_xConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondX + 1, kMaxAccelerationMetersPerSecondSquaredX + 2);
+            kMaxSpeedMetersPerSecondX - 1, kMaxAccelerationMetersPerSecondSquaredX - 1);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -245,6 +245,33 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
       _drive(new Translation2d(x, y), rot, true, true);
     }
+
+    for (SwerveModule mod : mSwerveMods) {
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+    }
+  }
+
+  public Command resetOdometryBlueSide() {
+    return this.runOnce(
+        () ->
+            poseEstimator.resetPosition(
+                m_gyro.getRotation2d(),
+                getModulePositions(),
+                new Pose2d(2.1, 5, Rotation2d.fromDegrees(-180))));
+  }
+
+  public Command resetOdometryRedSide() {
+    return this.runOnce(
+        () ->
+            poseEstimator.resetPosition(
+                m_gyro.getRotation2d(),
+                getModulePositions(),
+                new Pose2d(14.4, 5, Rotation2d.fromDegrees(180))));
   }
 
   /* thread */
