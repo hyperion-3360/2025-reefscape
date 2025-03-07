@@ -256,8 +256,8 @@ public final class Constants {
   public static class CoralShooterVariables {
     public static final double kShootNo = 0.0;
     public static final double kShootL1 = -0.3;
-    public static final double kShootL2 = -0.85;
-    public static final double kShootL3 = -0.90;
+    public static final double kShootL2 = -0.80;
+    public static final double kShootL3 = -0.85;
     public static final double kShootL4 = -0.90;
     public static final double kOther = -0.80;
     public static final double kIntakeSpeed = -0.6;
@@ -316,9 +316,9 @@ public final class Constants {
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;
-    public static final double kElevatorL2 = 1.2;
-    public static final double kElevatorL3 = 1.84;
-    public static final double kElevatorL4 = 2.82;
+    public static final double kElevatorL2 = 1.19;
+    public static final double kElevatorL3 = 1.82;
+    public static final double kElevatorL4 = 2.80;
     public static final double kElevatorNet = 2.86;
     public static final double kElevatorProcessor = 0.36;
     public static final double kElevatorAlgaeLow = 0.05;
