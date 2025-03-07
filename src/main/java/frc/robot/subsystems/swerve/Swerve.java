@@ -68,7 +68,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxSpeedRadiansPerSecond = 5.5;
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
-  private final double kPRot = 6.0;
+  private final double kPRot = 6.2;
   private Elevator m_elevator;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
