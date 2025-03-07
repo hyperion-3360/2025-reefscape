@@ -17,8 +17,8 @@ public class AutoDump extends SequentialCommandGroup {
         Commands.print("soNe-yOuh :)"),
         Commands.runOnce(
             () -> {
-              m_dumper.dumpLeft();
-              m_dumper.dumpRight();
+              // m_dumper.dumpLeft();
+              // m_dumper.dumpRight();
               System.out.println("this is working but it doesn't get me closer to the truth");
             }),
         Commands.print("hello"));
@@ -28,7 +28,7 @@ public class AutoDump extends SequentialCommandGroup {
     addRequirements(m_dumper);
     return Commands.runOnce(
         () -> {
-          m_dumper.closeDump();
+          // m_dumper.closeDump();
         });
   }
 }

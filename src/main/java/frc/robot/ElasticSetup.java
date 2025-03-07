@@ -182,7 +182,7 @@ public class ElasticSetup {
 
     climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), codriver);
 
-    dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), codriver);
+    // dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), codriver);
 
     algaeIntake.setupTestBindings(new Trigger(isMode(TestModes.ALGAE_INTAKE)), codriver);
 
