@@ -18,6 +18,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     CameraServer.startAutomaticCapture();
     CameraServer.startAutomaticCapture().setFPS(30);
+    CameraServer.startAutomaticCapture().setResolution(320, 200);
   }
 
   @Override
