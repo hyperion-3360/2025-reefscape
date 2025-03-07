@@ -165,7 +165,7 @@ public class Selection extends Vision {
       return Pose2d.kZero;
     }
     var robotTranslationLeft =
-        new Translation2d(robotHalfLength, -distTagToPeg + Units.inchesToMeters(0.5));
+        new Translation2d(robotHalfLength, -distTagToPeg + Units.inchesToMeters(2.5));
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));
@@ -182,7 +182,7 @@ public class Selection extends Vision {
       return Pose2d.kZero;
     }
     var robotTranslationRight =
-        new Translation2d(robotHalfLength, distTagToPeg + Units.inchesToMeters(2));
+        new Translation2d(robotHalfLength, distTagToPeg + Units.inchesToMeters(3));
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationRight, new Rotation2d(Math.toRadians(-180))));

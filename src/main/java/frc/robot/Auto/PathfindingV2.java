@@ -214,7 +214,7 @@ public class PathfindingV2 extends Command {
   }
 
   private Command driveAndIntakeCycle(Pose2d targetPos) {
-    var approachPose = offsetPose(targetPos, (robotLength / 2) - 0.075);
+    var approachPose = offsetPose(targetPos, (robotLength / 2) - 0.12);
     SequentialCommandGroup intakeSequence = new SequentialCommandGroup(Commands.none());
     intakeSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(approachPose)),
