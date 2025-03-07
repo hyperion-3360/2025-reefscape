@@ -258,7 +258,8 @@ public final class Constants {
     public static final double kShootL1 = -0.3;
     public static final double kShootL2 = -0.85;
     public static final double kShootL3 = -0.90;
-    public static final double kShootL4 = -0.9;
+    public static final double kShootL4 = -0.90;
+    public static final double kOther = -0.80;
     public static final double kIntakeSpeed = -0.6;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;

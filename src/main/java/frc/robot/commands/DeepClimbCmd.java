@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.leds.LEDs;
@@ -19,6 +20,7 @@ public class DeepClimbCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.DEEPCLIMB)),
         Commands.runOnce(() -> m_climber.winchDeepClimb()),
         new WaitUntilCommand(() -> m_climber.SensorDetected()),
+        new WaitCommand(0.2),
         Commands.runOnce(() -> m_climber.stopDeepClimb()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.CLIMBER)));
   }
