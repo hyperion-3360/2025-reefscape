@@ -91,7 +91,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public void winchDeepClimb() {
-    m_deepMotor.set(0.4);
+    m_deepMotor.set(0.2);
   }
 
   public void stopDeepClimb() {
