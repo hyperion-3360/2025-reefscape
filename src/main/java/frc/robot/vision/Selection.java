@@ -26,7 +26,7 @@ public class Selection extends Vision {
   Pose2d origin = new Pose2d();
 
   double robotHalfLength = Units.inchesToMeters(18);
-  double distTagToPeg = Units.inchesToMeters(6.5);
+  double distTagToPeg = Units.inchesToMeters(6.25);
 
   Pose2d desiredPoseRelativeToCenterRotated = new Pose2d();
   double angleToRotateBy = 0.0;
@@ -180,7 +180,8 @@ public class Selection extends Vision {
     if (lockID == 0) {
       return Pose2d.kZero;
     }
-    var robotTranslationRight = new Translation2d(robotHalfLength, distTagToPeg);
+    var robotTranslationRight =
+        new Translation2d(robotHalfLength, distTagToPeg + Units.inchesToMeters(1));
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationRight, new Rotation2d(Math.toRadians(-180))));

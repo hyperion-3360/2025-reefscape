@@ -58,18 +58,17 @@ public class TeleopSwerve extends Command {
     double translationVal =
         MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband)
             * allianceinverter;
-    double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
-    double rotationVal =
-        MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband)
-            * allianceinverter;
+    double strafeVal =
+        MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband) * allianceinverter;
+    double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
     double elevatorHeightVal = elevatorHeight.getAsDouble();
 
     translationVal *= SwerveSpeedSlow(elevatorHeightVal);
     strafeVal *= SwerveSpeedSlow(elevatorHeightVal);
 
     if (Climber.climberActivated()) {
-      translationVal *= 0.1;
-      strafeVal *= 0.1;
+      translationVal *= 0.2;
+      strafeVal *= 0.2;
       rotationVal *= 0.1;
     }
 

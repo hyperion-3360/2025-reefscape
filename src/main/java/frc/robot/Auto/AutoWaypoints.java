@@ -35,7 +35,7 @@ public class AutoWaypoints {
     public static class LeftSide {
 
       public static class AlgaeWaypoint {
-        static Pose2d AlgaeHG = new Pose2d(5.842, 4, new Rotation2d(Math.toRadians(180)));
+        static Pose2d AlgaeHG = new Pose2d(5.242, 4, new Rotation2d(Math.toRadians(180)));
       }
 
       public static class NetWaypoint {
