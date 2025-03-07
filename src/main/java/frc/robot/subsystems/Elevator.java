@@ -84,10 +84,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
   private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, false);
-  private TalonFX m_rightElevatorMotor =
-      new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID, "CANivore_3360");
-  private TalonFX m_leftElevatorMotor =
-      new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
+  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID);
+  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID);
 
   private AnalogPotentiometer m_sensor = new AnalogPotentiometer(0);
 

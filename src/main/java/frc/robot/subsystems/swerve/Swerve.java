@@ -79,7 +79,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
-    m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
+    m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId);
 
     m_gyro.reset();
     m_gyro.getAccumGyroZ(true);
