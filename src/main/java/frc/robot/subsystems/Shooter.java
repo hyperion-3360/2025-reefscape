@@ -69,7 +69,7 @@ public class Shooter extends SubsystemBase implements TestBindings {
         break;
 
       case OTHER:
-        m_shooterSpeed = -0.7;
+        m_shooterSpeed = Constants.CoralShooterVariables.kOther;
 
         break;
     }
