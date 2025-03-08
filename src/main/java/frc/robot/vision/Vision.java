@@ -56,8 +56,8 @@ public class Vision extends SubsystemBase {
     cameraLml3 = new PhotonCamera("lml3");
     cameraLml2 = new PhotonCamera("lml2");
     photonEstimatorLml3 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml3);
-    // tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
+        new PhotonPoseEstimator(
+            tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
     photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     photonEstimatorLml2 =
         new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2);

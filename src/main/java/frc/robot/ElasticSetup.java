@@ -39,7 +39,8 @@ public class ElasticSetup {
   public enum Auto {
     ThreeCoralLeft,
     ThreeCoralRight,
-    OneCoralThenAlgae
+    OneCoralThenAlgae,
+    Line
   }
 
   private static SendableChooser<Auto> autoChooser = new SendableChooser<>();
@@ -232,6 +233,8 @@ public class ElasticSetup {
       case OneCoralThenAlgae:
         autoCmd = pathfinder.coralAndAlgae();
         break;
+      case Line:
+        autoCmd = pathfinder.straightLine();
       default:
         autoCmd = Commands.none();
         break;

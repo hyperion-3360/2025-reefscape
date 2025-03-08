@@ -116,13 +116,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void boostedConstraints() {
     m_rotConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedRadiansPerSecond - 0.05, kMaxAccelerationRadiansPerSecondSquared - 0.05);
+            kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_yConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondY - 1, kMaxAccelerationMetersPerSecondSquaredY - 1);
+            kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY);
     m_xConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondX - 1, kMaxAccelerationMetersPerSecondSquaredX - 1);
+            kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);

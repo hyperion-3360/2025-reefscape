@@ -426,4 +426,29 @@ public class PathfindingV2 extends Command {
     }
     return pathfindingSequence;
   }
+
+  public Command straightLine() {
+    var line = Commands.none();
+    switch (currentAlliance) {
+      case Blue:
+        line =
+            Commands.sequence(
+                Commands.run(() -> m_swerve.drive(new Translation2d(-1, 0), 0, false, false)),
+                new WaitCommand(1),
+                Commands.run(() -> m_swerve.drive(new Translation2d(0, 0), 0, false, false)));
+        break;
+      case Red:
+        line =
+            Commands.sequence(
+                Commands.run(() -> m_swerve.drive(new Translation2d(1, 0), 0, false, false)),
+                new WaitCommand(1),
+                Commands.run(() -> m_swerve.drive(new Translation2d(0, 0), 0, false, false)));
+
+        break;
+      default:
+        break;
+    }
+
+    return line;
+  }
 }
