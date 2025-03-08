@@ -174,6 +174,13 @@ public final class Constants {
             new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
             new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             );
+
+    public enum Sequence {
+      ThreeCoralLeft,
+      ThreeCoralRight,
+      OneCoralThenAlgae,
+      Line
+    }
   }
 
   public static final class AlgaeCoralStand {

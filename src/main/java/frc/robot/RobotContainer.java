@@ -136,6 +136,11 @@ public class RobotContainer {
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
 
+  private Command m_autoThreeCoralLeftAuto;
+  private Command m_autoThreeCoralRightAuto;
+  private Command m_autoOneCoralThenAlgae;
+  private Command m_autoLine;
+
   private boolean m_debug = false;
 
   public RobotContainer() {
@@ -190,6 +195,13 @@ public class RobotContainer {
             () -> m_elevator.getEncoderPos());
 
     m_swerve.setDefaultCommand(teleopCmd);
+  }
+
+  public void configureAutos() {
+    m_autoThreeCoralLeftAuto = m_pathfinding.ThreeCoralLeft();
+    m_autoThreeCoralRightAuto = m_pathfinding.ThreeCoralRight();
+    m_autoOneCoralThenAlgae = m_pathfinding.coralAndAlgae();
+    m_autoLine = m_pathfinding.straightLine();
   }
 
   public void configureBindingsTest() {
@@ -293,6 +305,17 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return ElasticSetup.SelectedAuto();
+    var selected = ElasticSetup.SelectedAuto();
+    if (selected == Constants.AutoConstants.Sequence.OneCoralThenAlgae) {
+      return m_autoOneCoralThenAlgae;
+    } else if (selected == Constants.AutoConstants.Sequence.ThreeCoralLeft) {
+      return m_autoThreeCoralLeftAuto;
+    } else if (selected == Constants.AutoConstants.Sequence.ThreeCoralRight) {
+      return m_autoThreeCoralRightAuto;
+    } else if (selected == Constants.AutoConstants.Sequence.Line) {
+      return m_autoLine;
+    } else {
+      return Commands.none();
+    }
   }
 }
