@@ -68,7 +68,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxSpeedRadiansPerSecond = 5.5;
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
-  private final double kPRot = 6.0;
+  private final double kPRot = 6.2;
   private Elevator m_elevator;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -79,7 +79,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
-    m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId, "CANivore_3360");
+    m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId);
 
     m_gyro.reset();
     m_gyro.getAccumGyroZ(true);
@@ -119,10 +119,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
             kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
     m_yConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondY + 1, kMaxAccelerationMetersPerSecondSquaredY + 2);
+            kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY);
     m_xConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondX + 1, kMaxAccelerationMetersPerSecondSquaredX + 2);
+            kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -245,6 +245,33 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
       _drive(new Translation2d(x, y), rot, true, true);
     }
+
+    for (SwerveModule mod : mSwerveMods) {
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " CTRE Mag encoder", mod.getMagEncoderPos().getDegrees());
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+      SmartDashboard.putNumber(
+          "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+    }
+  }
+
+  public Command resetOdometryBlueSide() {
+    return this.runOnce(
+        () ->
+            poseEstimator.resetPosition(
+                m_gyro.getRotation2d(),
+                getModulePositions(),
+                new Pose2d(2.1, 5, Rotation2d.fromDegrees(-180))));
+  }
+
+  public Command resetOdometryRedSide() {
+    return this.runOnce(
+        () ->
+            poseEstimator.resetPosition(
+                m_gyro.getRotation2d(),
+                getModulePositions(),
+                new Pose2d(14.4, 5, Rotation2d.fromDegrees(180))));
   }
 
   /* thread */

@@ -36,13 +36,8 @@ public class ElasticSetup {
     CORAL_SHOOTER
   }
 
-  public enum Auto {
-    ThreeCoralLeft,
-    ThreeCoralRight,
-    OneCoralThenAlgae
-  }
-
-  private static SendableChooser<Auto> autoChooser = new SendableChooser<>();
+  private static SendableChooser<Constants.AutoConstants.Sequence> autoChooser =
+      new SendableChooser<>();
   private TestModes m_testMode = TestModes.NONE;
 
   private Command setElevatorMode() {
@@ -113,9 +108,12 @@ public class ElasticSetup {
     ElasticSetup.pathfinder = pathfinder;
 
     autoChooser.setDefaultOption("null", null);
-    autoChooser.addOption("three coral auto left", Auto.ThreeCoralLeft);
-    autoChooser.addOption("three coral auto right", Auto.ThreeCoralRight);
-    autoChooser.addOption("straight pipe coral then algae", Auto.OneCoralThenAlgae);
+    autoChooser.addOption("three coral auto left", Constants.AutoConstants.Sequence.ThreeCoralLeft);
+    autoChooser.addOption(
+        "three coral auto right", Constants.AutoConstants.Sequence.ThreeCoralRight);
+    autoChooser.addOption(
+        "straight pipe coral then algae", Constants.AutoConstants.Sequence.OneCoralThenAlgae);
+    autoChooser.addOption("Line (if no vision)", Constants.AutoConstants.Sequence.Line);
   }
 
   public void setUpDashboardComp() {
@@ -182,7 +180,7 @@ public class ElasticSetup {
 
     climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), codriver);
 
-    dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), codriver);
+    // dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), codriver);
 
     algaeIntake.setupTestBindings(new Trigger(isMode(TestModes.ALGAE_INTAKE)), codriver);
 
@@ -219,23 +217,28 @@ public class ElasticSetup {
     debugTab.add("elevator setpoint", elevator.getElevatorSetpoint());
   }
 
-  public static Command SelectedAuto() {
-    var selectedAuto = autoChooser.getSelected();
-    var autoCmd = Commands.none();
-    switch (selectedAuto) {
-      case ThreeCoralLeft:
-        autoCmd = pathfinder.ThreeCoralLeft();
-        break;
-      case ThreeCoralRight:
-        autoCmd = pathfinder.ThreeCoralRight();
-        break;
-      case OneCoralThenAlgae:
-        autoCmd = pathfinder.coralAndAlgae();
-        break;
-      default:
-        autoCmd = Commands.none();
-        break;
-    }
-    return autoCmd;
+  // public static Command SelectedAuto() {
+  // var selectedAuto = autoChooser.getSelected();
+  // var autoCmd = Commands.none();
+  // switch (selectedAuto) {
+  //   case ThreeCoralLeft:
+  //     autoCmd = pathfinder.ThreeCoralLeft();
+  //     break;
+  //   case ThreeCoralRight:
+  //     autoCmd = pathfinder.ThreeCoralRight();
+  //     break;
+  //   case OneCoralThenAlgae:
+  //     autoCmd = pathfinder.coralAndAlgae();
+  //     break;
+  //   case Line:
+  //     autoCmd = pathfinder.straightLine();
+  //   default:
+  //     autoCmd = Commands.none();
+  //     break;
+  // }
+  // return autoCmd;
+  // }
+  public static Constants.AutoConstants.Sequence SelectedAuto() {
+    return autoChooser.getSelected();
   }
 }

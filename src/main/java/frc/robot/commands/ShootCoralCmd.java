@@ -47,7 +47,7 @@ public class ShootCoralCmd extends SequentialCommandGroup {
         speed = shootSpeed.L3;
         break;
       case L4:
-        speed = shootSpeed.L4;
+        speed = shootSpeed.L4TELEOP;
         break;
       default:
         speed = shootSpeed.STOP;

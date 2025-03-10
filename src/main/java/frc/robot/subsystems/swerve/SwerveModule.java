@@ -44,10 +44,10 @@ public class SwerveModule {
     //       RobotContainer.ctreConfigs.dutyCycleRangeMin,
     // RobotContainer.ctreConfigs.dutyCycleRangeMax);
     /* Angle Motor Config */
-    mAngleMotor = new TalonFX(moduleConstants.angleMotorID, "CANivore_3360");
+    mAngleMotor = new TalonFX(moduleConstants.angleMotorID);
     mAngleMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveAngleFXConfig);
     /* Drive Motor Config */
-    mDriveMotor = new TalonFX(moduleConstants.driveMotorID, "CANivore_3360");
+    mDriveMotor = new TalonFX(moduleConstants.driveMotorID);
     mDriveMotor.getConfigurator().apply(RobotContainer.ctreConfigs.swerveDriveFXConfig);
     mDriveMotor.getConfigurator().setPosition(0.0);
     // prevents the robot from tipping over when the elevator is raised

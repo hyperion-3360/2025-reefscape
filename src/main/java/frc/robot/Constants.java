@@ -174,6 +174,13 @@ public final class Constants {
             new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
             new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
             );
+
+    public enum Sequence {
+      ThreeCoralLeft,
+      ThreeCoralRight,
+      OneCoralThenAlgae,
+      Line
+    }
   }
 
   public static final class AlgaeCoralStand {
@@ -256,9 +263,11 @@ public final class Constants {
   public static class CoralShooterVariables {
     public static final double kShootNo = 0.0;
     public static final double kShootL1 = -0.3;
-    public static final double kShootL2 = -0.85;
-    public static final double kShootL3 = -1.0;
-    public static final double kShootL4 = -0.9;
+    public static final double kShootL2 = -0.80;
+    public static final double kShootL3 = -0.85;
+    public static final double kShootL4 = -0.6;
+    // we need a different speed for teleop to compensate for angle
+    public static final double kShootL4Teleop = -0.85;
     public static final double kIntakeSpeed = -0.6;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
@@ -315,9 +324,9 @@ public final class Constants {
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;
-    public static final double kElevatorL2 = 1.166;
+    public static final double kElevatorL2 = 1.19;
     public static final double kElevatorL3 = 1.82;
-    public static final double kElevatorL4 = 2.84;
+    public static final double kElevatorL4 = 2.80;
     public static final double kElevatorNet = 2.86;
     public static final double kElevatorProcessor = 0.36;
     public static final double kElevatorAlgaeLow = 0.05;

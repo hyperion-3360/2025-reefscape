@@ -35,11 +35,11 @@ public class AutoWaypoints {
     public static class LeftSide {
 
       public static class AlgaeWaypoint {
-        static Pose2d AlgaeHG = new Pose2d(5.842, 4, new Rotation2d(Math.toRadians(180)));
+        static Pose2d AlgaeHG = new Pose2d(5.242, 4, new Rotation2d(Math.toRadians(180)));
       }
 
       public static class NetWaypoint {
-        static Pose2d net = new Pose2d(7.360, 5.157, new Rotation2d(Math.toRadians(0)));
+        static Pose2d net = new Pose2d(7.000, 5.157, new Rotation2d(Math.toRadians(0)));
       }
 
       public static class pegWaypoints {
@@ -199,19 +199,19 @@ public class AutoWaypoints {
 
     static Pose2d origin =
         new Pose2d(
-            tagLayout.getTagPose(10).get().getX(),
-            tagLayout.getTagPose(10).get().getY(),
-            tagLayout.getTagPose(10).get().getRotation().toRotation2d());
+            tagLayout.getTagPose(7).get().getX(),
+            tagLayout.getTagPose(7).get().getY(),
+            tagLayout.getTagPose(7).get().getRotation().toRotation2d());
 
     // #region Left
     public static class LeftSide {
 
       public static class AlgaeWaypoint {
-        static Pose2d AlgaeHG = new Pose2d(11.753, 4, new Rotation2d(Math.toRadians(0)));
+        static Pose2d AlgaeHG = new Pose2d(12.307, 4, new Rotation2d(Math.toRadians(0)));
       }
 
       public static class NetWaypoint {
-        static Pose2d net = new Pose2d(10.020, 5.157, new Rotation2d(Math.toRadians(180)));
+        static Pose2d net = new Pose2d(10.220, 3.157, new Rotation2d(Math.toRadians(180)));
       }
 
       public class pegWaypoints {
@@ -227,25 +227,25 @@ public class AutoWaypoints {
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(300)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(60)));
         static Pose2d branchK =
             origin
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(300)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(60)));
         static Pose2d branchJ =
             origin
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(240)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(120)));
         static Pose2d branchI =
             origin
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(240)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(120)));
         static Pose2d branchH =
             origin
                 .transformBy(
@@ -276,25 +276,25 @@ public class AutoWaypoints {
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(60)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(300)));
         static Pose2d branchD =
             origin
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(60)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(300)));
         static Pose2d branchE =
             origin
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(120)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(240)));
         static Pose2d branchF =
             origin
                 .transformBy(
                     new Transform2d(
                         robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
-                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(120)));
+                .rotateAround(reefCenter, new Rotation2d(Math.toRadians(240)));
         static Pose2d branchG =
             origin
                 .transformBy(

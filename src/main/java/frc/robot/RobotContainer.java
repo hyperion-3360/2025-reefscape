@@ -128,13 +128,18 @@ public class RobotContainer {
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
   private final MinuteMoveCmd MinutieMoveLeft =
-      new MinuteMoveCmd(m_swerve, 0.3, 0.10, OffsetDir.LEFT);
+      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.LEFT);
   private final MinuteMoveCmd MinutieMoveRight =
-      new MinuteMoveCmd(m_swerve, 0.3, 0.10, OffsetDir.RIGHT);
+      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.RIGHT);
   private final MinuteMoveCmd MinutieMoveFront =
-      new MinuteMoveCmd(m_swerve, 0.3, 0.10, OffsetDir.FRONT);
+      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
-      new MinuteMoveCmd(m_swerve, 0.3, 0.10, OffsetDir.BACK);
+      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
+
+  private Command m_autoThreeCoralLeftAuto;
+  private Command m_autoThreeCoralRightAuto;
+  private Command m_autoOneCoralThenAlgae;
+  private Command m_autoLine;
 
   private boolean m_debug = false;
 
@@ -190,6 +195,13 @@ public class RobotContainer {
             () -> m_elevator.getEncoderPos());
 
     m_swerve.setDefaultCommand(teleopCmd);
+  }
+
+  public void configureAutos() {
+    m_autoThreeCoralLeftAuto = m_pathfinding.ThreeCoralLeft();
+    m_autoThreeCoralRightAuto = m_pathfinding.ThreeCoralRight();
+    m_autoOneCoralThenAlgae = m_pathfinding.coralAndAlgae();
+    m_autoLine = m_pathfinding.straightLine();
   }
 
   public void configureBindingsTest() {
@@ -293,6 +305,17 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return ElasticSetup.SelectedAuto();
+    var selected = ElasticSetup.SelectedAuto();
+    if (selected == Constants.AutoConstants.Sequence.OneCoralThenAlgae) {
+      return m_autoOneCoralThenAlgae;
+    } else if (selected == Constants.AutoConstants.Sequence.ThreeCoralLeft) {
+      return m_autoThreeCoralLeftAuto;
+    } else if (selected == Constants.AutoConstants.Sequence.ThreeCoralRight) {
+      return m_autoThreeCoralRightAuto;
+    } else if (selected == Constants.AutoConstants.Sequence.Line) {
+      return m_autoLine;
+    } else {
+      return Commands.none();
+    }
   }
 }

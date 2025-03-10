@@ -26,8 +26,8 @@ public class DumperCMD extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_dumper.dumpLeft();
-    m_dumper.dumpRight();
+    // m_dumper.dumpLeft();
+    // m_dumper.dumpRight();
   }
 
   // Called once the command ends or is interrupted.

@@ -55,8 +55,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double kMaxAcceleration = 6.05;
   private static double kMidVelocity = 8;
   private static double kMidAcceleration = 4;
-  private static double kMinVelocity = 8;
-  private static double kMinAcceleration = 4;
+  private static double kMinVelocity = 6;
+  private static double kMinAcceleration = 3;
 
   private static double kG = 0.41; // barely moves up
   private static double kA = 1.5;
@@ -84,10 +84,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private TalonFXConfiguration m_rightMotorConfig = new TalonFXConfiguration();
   private TalonFXConfiguration m_leftMotorConfig = new TalonFXConfiguration();
   private Follower m_follower = new Follower(Constants.SubsystemInfo.kRightElevatorMotorID, false);
-  private TalonFX m_rightElevatorMotor =
-      new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID, "CANivore_3360");
-  private TalonFX m_leftElevatorMotor =
-      new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID, "CANivore_3360");
+  private TalonFX m_rightElevatorMotor = new TalonFX(Constants.SubsystemInfo.kRightElevatorMotorID);
+  private TalonFX m_leftElevatorMotor = new TalonFX(Constants.SubsystemInfo.kLeftElevatorMotorID);
 
   private AnalogPotentiometer m_sensor = new AnalogPotentiometer(0);
 

@@ -122,7 +122,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public Command goForthChild() {
-    return Commands.run(() -> m_deepMotor.set(-0.4)) // - dewinch, + winch
+    return Commands.run(() -> m_deepMotor.set(-0.6)) // - dewinch, + winch
         .until(this::isAtPose)
         .andThen(() -> m_deepMotor.set(0));
   }

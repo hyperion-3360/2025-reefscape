@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -17,6 +19,7 @@ public class TeleopSwerve extends Command {
   private DoubleSupplier rotationSup;
   private BooleanSupplier robotCentricSup;
   private DoubleSupplier elevatorHeight;
+  private double allianceinverter = 1;
 
   /**
    * Swerve drive command for teleoperation
@@ -47,10 +50,16 @@ public class TeleopSwerve extends Command {
 
   @Override
   public void execute() {
+
+    if (DriverStation.getAlliance().get() == Alliance.Red) {
+      allianceinverter = -1;
+    }
     /* Get Values, Deadband*/
     double translationVal =
-        MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
-    double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
+        MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband)
+            * allianceinverter;
+    double strafeVal =
+        MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband) * allianceinverter;
     double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
     double elevatorHeightVal = elevatorHeight.getAsDouble();
 

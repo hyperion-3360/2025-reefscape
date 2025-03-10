@@ -36,14 +36,15 @@ public class Vision extends SubsystemBase {
   protected Matrix<N3, N1> curStdDevs;
 
   // (Fake values. Experiment and determine estimation noise on an actual robot.)
-  private Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
+  private Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(3.8, 3.8, 7.6);
   private Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(3, 3, 6);
 
   AprilTagFieldLayout tagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   Transform3d robotToCamLml3 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-2.75), 0.0, 0.0), new Rotation3d(0, 0, 0));
+          new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(-1), 0.0),
+          new Rotation3d(0, 0, 0));
   Transform3d robotToCamLml2 =
       new Transform3d(
           new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0),
@@ -55,8 +56,8 @@ public class Vision extends SubsystemBase {
     cameraLml3 = new PhotonCamera("lml3");
     cameraLml2 = new PhotonCamera("lml2");
     photonEstimatorLml3 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml3);
-    // tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
+        new PhotonPoseEstimator(
+            tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
     photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     photonEstimatorLml2 =
         new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2);
