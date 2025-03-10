@@ -205,7 +205,7 @@ public class PathfindingV2 extends Command {
             new WaitUntilCommand(() -> m_swerve.targetReached())),
         // new WaitCommand(1.0), // will be elevatecmd(L4) later
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4)),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
         new WaitCommand(0.4),
         new InstantCommand(() -> m_shooter.stop()),
         new InstantCommand(() -> m_shooter.closeBlocker()),
