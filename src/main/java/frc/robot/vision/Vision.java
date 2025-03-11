@@ -36,8 +36,6 @@ public class Vision extends SubsystemBase {
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2;
 
-
-
   // (Fake values. Experiment and determine estimation noise on an actual robot.)
   private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(3.8, 3.8, 7.6);
   private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
@@ -60,7 +58,6 @@ public class Vision extends SubsystemBase {
           new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.25), 0.0),
           new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(70.5)));
 
-
   /** Creates a new Odometry. */
   public Vision() {
 
@@ -77,7 +74,7 @@ public class Vision extends SubsystemBase {
     photonEstimatorLml2Left =
         new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Left);
   }
-  
+
   public boolean limelight2LeftActive() {
     return cameraLml2Left.isConnected();
   }
@@ -245,6 +242,7 @@ public class Vision extends SubsystemBase {
   public Matrix<N3, N1> getEstimationStdDevsLml3() {
     return curStdDevsLml3;
   }
+
   public Matrix<N3, N1> getEstimationStdDevsLml2() {
     return curStdDevsLml2;
   }

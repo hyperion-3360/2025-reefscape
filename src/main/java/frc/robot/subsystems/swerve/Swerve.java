@@ -79,7 +79,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   Optional<EstimatedRobotPose> visionEstLml2R;
   Optional<EstimatedRobotPose> visionEstLml2L;
 
-
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId);
@@ -180,10 +179,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
     visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
     visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
 
-
     SmartDashboard.putNumber("gyro z", getGyroZ());
 
-    if (visionEstLml3.isPresent() ||visionEstLml2R.isPresent()||visionEstLml2L.isPresent()  && !hasStartedEstimation) {
+    if (visionEstLml3.isPresent()
+        || visionEstLml2R.isPresent()
+        || visionEstLml2L.isPresent() && !hasStartedEstimation) {
       hasStartedEstimation = true;
       estimatePose();
     }
@@ -277,19 +277,19 @@ public class Swerve extends SubsystemBase implements TestBindings {
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
 
-        visionEstLml2R.ifPresent(
-          est -> {
-            var estStdDevs = vision.getEstimationStdDevsLml2();
-            poseEstimator.addVisionMeasurement(
-                est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-          });
+    visionEstLml2R.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevsLml2();
+          poseEstimator.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
 
-          visionEstLml2L.ifPresent(
-            est -> {
-              var estStdDevs = vision.getEstimationStdDevsLml2();
-              poseEstimator.addVisionMeasurement(
-                  est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-            });
+    visionEstLml2L.ifPresent(
+        est -> {
+          var estStdDevs = vision.getEstimationStdDevsLml2();
+          poseEstimator.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
 
     hasStartedEstimation = false;
   }
