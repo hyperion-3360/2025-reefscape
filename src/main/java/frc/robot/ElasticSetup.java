@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
@@ -74,10 +73,8 @@ public class ElasticSetup {
   private Selection selector;
   private AlgaeIntake algaeIntake;
   private Elevator elevator;
-  private Dumper dumper;
   private CommandXboxController codriver;
   private Vision vision;
-  private static PathfindingV2 pathfinder;
 
   ShuffleboardTab driverTab = Shuffleboard.getTab("driverTab");
   ShuffleboardTab techTab = Shuffleboard.getTab("techTab");
@@ -91,7 +88,6 @@ public class ElasticSetup {
       Selection selector,
       AlgaeIntake algaeIntake,
       Elevator elevator,
-      Dumper dumper,
       CommandXboxController codriver,
       Vision vision,
       PathfindingV2 pathfinder) {
@@ -102,10 +98,8 @@ public class ElasticSetup {
     this.selector = selector;
     this.algaeIntake = algaeIntake;
     this.elevator = elevator;
-    this.dumper = dumper;
     this.codriver = codriver;
     this.vision = vision;
-    ElasticSetup.pathfinder = pathfinder;
 
     autoChooser.setDefaultOption("null", null);
     autoChooser.addOption("three coral auto left", Constants.AutoConstants.Sequence.ThreeCoralLeft);

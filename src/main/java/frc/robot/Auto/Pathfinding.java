@@ -18,7 +18,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -300,12 +299,6 @@ public class Pathfinding extends Command {
   private static PathConstraints constraints =
       new PathConstraints(4.0, 3.5, Units.degreesToRadians(540), Units.degreesToRadians(360));
 
-  private static Shooter s_shooter;
-  private static Swerve s_swerve;
-  private static Elevator s_elevator;
-  private static AlgaeIntake s_algaeIntake;
-  private static Dumper s_dumper;
-
   private static AutoDump m_dump = new AutoDump(RobotContainer.m_dumper);
 
   public static void configurePathfinder(
@@ -434,29 +427,6 @@ public class Pathfinding extends Command {
     return pathToPathfind;
   }
 
-  private static List<Waypoint> convertToWaypoints(Pose2d pose) {
-    List<Waypoint> path = new ArrayList<>();
-
-    Pose2d optimisedPos = POICoordinatesOptimisation(pose);
-    Pose2d lineupPos = lineupPoint(optimisedPos);
-
-    path.add(
-        new Waypoint(
-            optimisedPos.getTranslation(),
-            optimisedPos.getTranslation(),
-            lineupPos.getTranslation()));
-    path.add(new Waypoint(lineupPos.getTranslation(), lineupPos.getTranslation(), null));
-
-    if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
-      for (Waypoint waypoint : path) {
-        waypoint.flip();
-      }
-    }
-
-    // uses the coordinates and angle of the first point
-    return path;
-  }
-
   private static Pose2d POICoordinatesOptimisation(POI poiToPathfind) {
 
     double robotLengthPlusBuffer = (Constants.Swerve.robotLength / 2) * 1.0;
@@ -478,22 +448,6 @@ public class Pathfinding extends Command {
         poiToLineup.getTranslation().getX() - 0.1 * poiToLineup.getRotation().getCos(),
         poiToLineup.getTranslation().getY() - 0.1 * poiToLineup.getRotation().getSin(),
         poiToLineup.getRotation());
-  }
-
-  private static Pose2d POICoordinatesOptimisation(Pose2d poiToPathfind) {
-
-    double robotLengthPlusBuffer = Constants.Swerve.robotLength * 1.01;
-    double robotWidthPlusBuffer = Constants.Swerve.robotWidth * 1.01;
-    double robotHyp = Math.hypot(robotLengthPlusBuffer, robotWidthPlusBuffer);
-    Rotation2d rotation = Rotation2d.fromDegrees(poiToPathfind.getRotation().getDegrees() + 180);
-
-    // calculates the coordinates to displace the robot actual wanted position relative to the POI
-    Translation2d widthToBacktrack =
-        new Translation2d(
-            poiToPathfind.getX() + robotHyp * rotation.getCos(),
-            poiToPathfind.getY() + robotHyp * rotation.getSin());
-
-    return new Pose2d(widthToBacktrack, rotation.minus(Rotation2d.fromDegrees(180)));
   }
 
   // #region Pathfinding Shuffleboard implementation

@@ -36,7 +36,6 @@ public class Vision extends SubsystemBase {
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2;
 
-  // (Fake values. Experiment and determine estimation noise on an actual robot.)
   private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(3.8, 3.8, 7.6);
   private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
 

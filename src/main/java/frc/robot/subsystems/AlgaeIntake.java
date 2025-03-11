@@ -14,7 +14,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -186,12 +185,6 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
         () -> {
           m_intakeRight.set(speed.getAsDouble());
         });
-  }
-
-  private double currentInterpolation(double current) {
-    double startPoint = Constants.AlgaeIntakeVariables.kCurrentLimit;
-    double linearInterpolate = -0.86 * (12.5 - RobotController.getBatteryVoltage()) + startPoint;
-    return linearInterpolate;
   }
 
   public Command pivotAlgae(elevation angle) {
