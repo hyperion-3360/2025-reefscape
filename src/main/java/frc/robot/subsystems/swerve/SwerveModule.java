@@ -52,6 +52,7 @@ public class SwerveModule {
     mDriveMotor.getConfigurator().setPosition(0.0);
     // prevents the robot from tipping over when the elevator is raised
     mDriveMotor.setNeutralMode(NeutralModeValue.Coast);
+    mAngleMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {

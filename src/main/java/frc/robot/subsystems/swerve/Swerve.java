@@ -172,6 +172,20 @@ public class Swerve extends SubsystemBase implements TestBindings {
   @Override
   public void periodic() {
 
+    for (SwerveModule module : mSwerveMods) {
+      SmartDashboard.putNumber(
+          "drive encoder pos" + module.moduleNumber,
+          module.getDriveMotor().getPosition().getValueAsDouble());
+      SmartDashboard.putNumber(
+          "rotation encoder pos" + module.moduleNumber,
+          module.getRotationMotor().getPosition().getValueAsDouble());
+    }
+    SmartDashboard.putNumber("estimated x", poseEstimator.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("estimated y", poseEstimator.getEstimatedPosition().getY());
+    SmartDashboard.putNumber(
+        "estimated rotation", poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putNumber("gyro rotation", m_gyro.getRotation2d().getDegrees());
+
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 

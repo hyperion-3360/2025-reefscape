@@ -13,6 +13,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class AutoFeast extends SequentialCommandGroup {
   private List<Pose2d> feederWaypoints = new ArrayList<>();
@@ -27,11 +28,16 @@ public class AutoFeast extends SequentialCommandGroup {
     addRequirements(m_swerve);
     // addRequirements(m_elevator);
     // addRequirements(m_shooter);
-    if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+    try {
+      if (DriverStation.getAlliance().get().equals(Alliance.Blue)) {
+        currentAlliance = Alliance.Blue;
+      } else if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+        currentAlliance = Alliance.Red;
+      }
+    } catch (NoSuchElementException e) {
       currentAlliance = Alliance.Blue;
-    } else if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
-      currentAlliance = Alliance.Red;
     }
+
     if (currentAlliance.equals(Alliance.Blue)) {
       feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederLeft);
       feederWaypoints.add(AutoWaypoints.BlueAlliance.RightSide.feederWaypoints.feederRight);
