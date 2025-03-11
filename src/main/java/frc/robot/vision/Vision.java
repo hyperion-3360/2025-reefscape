@@ -21,7 +21,6 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
@@ -33,28 +32,33 @@ public class Vision extends SubsystemBase {
   protected final PhotonPoseEstimator photonEstimatorLml3;
   protected final PhotonPoseEstimator photonEstimatorLml2Right;
   protected final PhotonPoseEstimator photonEstimatorLml2Left;
-  protected List<PhotonPipelineResult> unreadResults;
 
-  protected Matrix<N3, N1> curStdDevs;
+  protected Matrix<N3, N1> curStdDevsLml3;
+  protected Matrix<N3, N1> curStdDevsLml2;
+
+
 
   // (Fake values. Experiment and determine estimation noise on an actual robot.)
-  private Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(3.8, 3.8, 7.6);
-  private Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(3, 3, 6);
+  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(3.8, 3.8, 7.6);
+  private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
+
+  private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
+  private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
 
   AprilTagFieldLayout tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(-1), 0.0),
+          new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(0), 0.0),
           new Rotation3d(0, 0, 0));
   Transform3d robotToCamLml2Right =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0),
-          new Rotation3d(0, 0, Units.degreesToRadians(180)));
+          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(-11.25), 0.0),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-70.5)));
   Transform3d robotToCamLml2Left =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0),
-          new Rotation3d(0, 0, Units.degreesToRadians(180)));
+          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.25), 0.0),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(70.5)));
 
 
   /** Creates a new Odometry. */
@@ -71,8 +75,7 @@ public class Vision extends SubsystemBase {
     photonEstimatorLml2Right =
         new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
     photonEstimatorLml2Left =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
-    // photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
+        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Left);
   }
   
   public boolean limelight2LeftActive() {
@@ -87,50 +90,69 @@ public class Vision extends SubsystemBase {
     return cameraLml3.isConnected();
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml3() {
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
 
     // for a change in target (latest result), estimation.update with latest
     // update estimation standard deviations with new estimation and new target
-    unreadResults = cameraLml3.getAllUnreadResults();
+    var unreadResults = cameraLml3.getAllUnreadResults();
 
     for (var changelml3 : unreadResults) {
       if (changelml3.hasTargets()) {
 
         visionEst = photonEstimatorLml3.update(changelml3);
-        updateEstimationStdDevs(visionEst, changelml3.getTargets());
+        updateEstimationStdDevsLml3(visionEst, changelml3.getTargets());
       }
     }
 
-    if (unreadResults.isEmpty()) {
-      for (var changelml2 : cameraLml2Right.getAllUnreadResults()) {
-        if (changelml2.hasTargets()) {
-          if (Math.hypot(
-                  changelml2.getBestTarget().getBestCameraToTarget().getX(),
-                  changelml2.getBestTarget().getBestCameraToTarget().getY())
-              > 2) {
-            if (changelml2.hasTargets() && changelml2.getBestTarget().poseAmbiguity < 0.05) {
-              visionEst = photonEstimatorLml2Right.update(changelml2);
-              updateEstimationStdDevs(visionEst, changelml2.getTargets());
-            }
-          }
-        }
-      }
-    } else {
-      cameraLml2Right.getAllUnreadResults();
-    }
     return visionEst;
   }
 
-  protected void updateEstimationStdDevs(
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Right() {
+    Optional<EstimatedRobotPose> visionEst = Optional.empty();
+
+    // for a change in target (latest result), estimation.update with latest
+    // update estimation standard deviations with new estimation and new target
+    var unreadResults = cameraLml2Right.getAllUnreadResults();
+
+    for (var changelml2R : unreadResults) {
+      if (changelml2R.hasTargets()) {
+
+        visionEst = photonEstimatorLml2Right.update(changelml2R);
+        updateEstimationStdDevsLml2(visionEst, changelml2R.getTargets());
+      }
+    }
+
+    return visionEst;
+  }
+
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Left() {
+    Optional<EstimatedRobotPose> visionEst = Optional.empty();
+
+    // for a change in target (latest result), estimation.update with latest
+    // update estimation standard deviations with new estimation and new target
+    var unreadResults = cameraLml2Left.getAllUnreadResults();
+
+    for (var changelml2L : unreadResults) {
+      if (changelml2L.hasTargets()) {
+
+        visionEst = photonEstimatorLml2Left.update(changelml2L);
+        updateEstimationStdDevsLml2(visionEst, changelml2L.getTargets());
+      }
+    }
+
+    return visionEst;
+  }
+
+  protected void updateEstimationStdDevsLml3(
       Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
 
     if (estimatedPose.isEmpty()) {
-      curStdDevs = singleTagStdDevs;
+      curStdDevsLml3 = singleTagStdDevsLml3;
     } else {
 
       // pose preswnt, start running heuristic
-      var estStdDevs = singleTagStdDevs;
+      var estStdDevs = singleTagStdDevsLml3;
       int numTags = 0;
       double avgDist = 0;
 
@@ -149,14 +171,14 @@ public class Vision extends SubsystemBase {
 
       if (numTags == 0) {
         // no visiblw tags default to single tag
-        curStdDevs = singleTagStdDevs;
+        curStdDevsLml3 = singleTagStdDevsLml3;
       } else {
         // more tags, run full heuristic
         avgDist /= numTags;
 
         // decrase std devs if multiple visible
         if (numTags > 1) {
-          estStdDevs = multiTagStdDevs;
+          estStdDevs = multiTagStdDevsLml3;
         }
 
         // increase std devs based on "avg" dist
@@ -166,12 +188,64 @@ public class Vision extends SubsystemBase {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
         }
 
-        curStdDevs = estStdDevs;
+        curStdDevsLml3 = estStdDevs;
       }
     }
   }
 
-  public Matrix<N3, N1> getEstimationStdDevs() {
-    return curStdDevs;
+  protected void updateEstimationStdDevsLml2(
+      Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+
+    if (estimatedPose.isEmpty()) {
+      curStdDevsLml2 = singleTagStdDevsLml2;
+    } else {
+
+      // pose preswnt, start running heuristic
+      var estStdDevs = singleTagStdDevsLml2;
+      int numTags = 0;
+      double avgDist = 0;
+
+      // precalc (how mny tags, avg dist metric)
+      for (var tgt : targets) {
+        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
+        if (tagPose.isEmpty()) continue;
+        numTags++;
+        avgDist +=
+            tagPose
+                .get()
+                .toPose2d()
+                .getTranslation()
+                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
+
+      if (numTags == 0) {
+        // no visiblw tags default to single tag
+        curStdDevsLml2 = singleTagStdDevsLml2;
+      } else {
+        // more tags, run full heuristic
+        avgDist /= numTags;
+
+        // decrase std devs if multiple visible
+        if (numTags > 1) {
+          estStdDevs = multiTagStdDevsLml2;
+        }
+
+        // increase std devs based on "avg" dist
+        if (numTags == 1 && avgDist > 4) {
+          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        } else {
+          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        }
+
+        curStdDevsLml2 = estStdDevs;
+      }
+    }
+  }
+
+  public Matrix<N3, N1> getEstimationStdDevsLml3() {
+    return curStdDevsLml3;
+  }
+  public Matrix<N3, N1> getEstimationStdDevsLml2() {
+    return curStdDevsLml2;
   }
 }

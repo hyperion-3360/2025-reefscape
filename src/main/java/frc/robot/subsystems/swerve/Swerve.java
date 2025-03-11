@@ -75,7 +75,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
   // vision estimation of robot pose
-  Optional<EstimatedRobotPose> visionEst;
+  Optional<EstimatedRobotPose> visionEstLml3;
+  Optional<EstimatedRobotPose> visionEstLml2R;
+  Optional<EstimatedRobotPose> visionEstLml2L;
+
 
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
@@ -173,11 +176,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
-    visionEst = vision.getEstimatedGlobalPose();
+    visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
+    visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
+    visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
+
 
     SmartDashboard.putNumber("gyro z", getGyroZ());
 
-    if (visionEst.isPresent() && !hasStartedEstimation) {
+    if (visionEstLml3.isPresent() ||visionEstLml2R.isPresent()||visionEstLml2L.isPresent()  && !hasStartedEstimation) {
       hasStartedEstimation = true;
       estimatePose();
     }
@@ -256,24 +262,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
   }
 
-  public Command resetOdometryBlueSide() {
-    return this.runOnce(
-        () ->
-            poseEstimator.resetPosition(
-                m_gyro.getRotation2d(),
-                getModulePositions(),
-                new Pose2d(2.1, 5, Rotation2d.fromDegrees(-180))));
-  }
-
-  public Command resetOdometryRedSide() {
-    return this.runOnce(
-        () ->
-            poseEstimator.resetPosition(
-                m_gyro.getRotation2d(),
-                getModulePositions(),
-                new Pose2d(14.4, 5, Rotation2d.fromDegrees(180))));
-  }
-
   /* thread */
 
   public void estimatePose() {
@@ -282,12 +270,26 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
 
-    visionEst.ifPresent(
+    visionEstLml3.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevs();
+          var estStdDevs = vision.getEstimationStdDevsLml3();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
+
+        visionEstLml2R.ifPresent(
+          est -> {
+            var estStdDevs = vision.getEstimationStdDevsLml2();
+            poseEstimator.addVisionMeasurement(
+                est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+          });
+
+          visionEstLml2L.ifPresent(
+            est -> {
+              var estStdDevs = vision.getEstimationStdDevsLml2();
+              poseEstimator.addVisionMeasurement(
+                  est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+            });
 
     hasStartedEstimation = false;
   }
