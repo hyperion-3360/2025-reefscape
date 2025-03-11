@@ -101,7 +101,7 @@ public class RobotContainer {
 
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =
-      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve);
+      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
