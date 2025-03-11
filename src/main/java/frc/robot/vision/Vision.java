@@ -27,10 +27,12 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 public class Vision extends SubsystemBase {
 
   protected final PhotonCamera cameraLml3;
-  protected final PhotonCamera cameraLml2;
+  protected final PhotonCamera cameraLml2Right;
+  protected final PhotonCamera cameraLml2Left;
 
   protected final PhotonPoseEstimator photonEstimatorLml3;
-  protected final PhotonPoseEstimator photonEstimatorLml2;
+  protected final PhotonPoseEstimator photonEstimatorLml2Right;
+  protected final PhotonPoseEstimator photonEstimatorLml2Left;
   protected List<PhotonPipelineResult> unreadResults;
 
   protected Matrix<N3, N1> curStdDevs;
@@ -45,27 +47,40 @@ public class Vision extends SubsystemBase {
       new Transform3d(
           new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(-1), 0.0),
           new Rotation3d(0, 0, 0));
-  Transform3d robotToCamLml2 =
+  Transform3d robotToCamLml2Right =
       new Transform3d(
           new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0),
           new Rotation3d(0, 0, Units.degreesToRadians(180)));
+  Transform3d robotToCamLml2Left =
+      new Transform3d(
+          new Translation3d(Units.inchesToMeters(-4.75), 0.0, 0.0),
+          new Rotation3d(0, 0, Units.degreesToRadians(180)));
+
 
   /** Creates a new Odometry. */
   public Vision() {
 
     cameraLml3 = new PhotonCamera("lml3");
-    cameraLml2 = new PhotonCamera("lml2");
+    cameraLml2Right = new PhotonCamera("lml2");
+    // TODO change lml name
+    cameraLml2Left = new PhotonCamera("lml2");
     photonEstimatorLml3 =
         new PhotonPoseEstimator(
             tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
     photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    photonEstimatorLml2 =
-        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2);
+    photonEstimatorLml2Right =
+        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
+    photonEstimatorLml2Left =
+        new PhotonPoseEstimator(tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
     // photonEstimatorLml2.setMultiTagFallbackStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
   }
+  
+  public boolean limelight2LeftActive() {
+    return cameraLml2Left.isConnected();
+  }
 
-  public boolean limelight2Active() {
-    return cameraLml2.isConnected();
+  public boolean limelight2RightActive() {
+    return cameraLml2Right.isConnected();
   }
 
   public boolean limelight3Active() {
@@ -88,21 +103,21 @@ public class Vision extends SubsystemBase {
     }
 
     if (unreadResults.isEmpty()) {
-      for (var changelml2 : cameraLml2.getAllUnreadResults()) {
+      for (var changelml2 : cameraLml2Right.getAllUnreadResults()) {
         if (changelml2.hasTargets()) {
           if (Math.hypot(
                   changelml2.getBestTarget().getBestCameraToTarget().getX(),
                   changelml2.getBestTarget().getBestCameraToTarget().getY())
               > 2) {
             if (changelml2.hasTargets() && changelml2.getBestTarget().poseAmbiguity < 0.05) {
-              visionEst = photonEstimatorLml2.update(changelml2);
+              visionEst = photonEstimatorLml2Right.update(changelml2);
               updateEstimationStdDevs(visionEst, changelml2.getTargets());
             }
           }
         }
       }
     } else {
-      cameraLml2.getAllUnreadResults();
+      cameraLml2Right.getAllUnreadResults();
     }
     return visionEst;
   }

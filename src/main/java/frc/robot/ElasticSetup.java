@@ -153,7 +153,7 @@ public class ElasticSetup {
     //     - Autonomous mode (chooser)
     techTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
     techTab
-        .addBoolean("limelight 2 active", () -> vision.limelight2Active())
+        .addBoolean("limelight 2 active", () -> vision.limelight2RightActive())
         .withPosition(0, 0)
         .withSize(1, 1);
     techTab
