@@ -3,6 +3,7 @@ package frc.lib.util;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.Swerve;
 
 /* Contains values and required settings for common COTS swerve modules. */
 public class COTSTalonFXSwerveConstants {
@@ -129,7 +130,7 @@ public class COTSTalonFXSwerveConstants {
     public static final class SwerveXFlipped {
       /** West Coast Products - SwerveX Flipped (Falcon 500) */
       public static final COTSTalonFXSwerveConstants Falcon500(double driveGearRatio) {
-        double wheelDiameter = Units.inchesToMeters(3.85);
+        double wheelDiameter = Swerve.kWheelDiameter;
 
         /** (468 / 35) : 1 */
         //        double angleGearRatio = ((468.0 / 35.0) / 1.0);
@@ -156,7 +157,7 @@ public class COTSTalonFXSwerveConstants {
 
       /** West Coast Products - SwerveX Flipped (Kraken X60) */
       public static final COTSTalonFXSwerveConstants KrakenX60(double driveGearRatio) {
-        double wheelDiameter = Units.inchesToMeters(4.0);
+        double wheelDiameter = Swerve.kWheelDiameter;
 
         /** (468 / 35) : 1 */
         double angleGearRatio = ((468.0 / 35.0) / 1.0);

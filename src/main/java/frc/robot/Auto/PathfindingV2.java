@@ -25,6 +25,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.swerve.Swerve;
+import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 public class PathfindingV2 extends Command {
@@ -56,11 +57,15 @@ public class PathfindingV2 extends Command {
 
     addRequirements(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake);
 
-    if (DriverStation.getAlliance().get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
+    try {
+      if (DriverStation.getAlliance().get() == edu.wpi.first.wpilibj.DriverStation.Alliance.Blue) {
+        currentAlliance = Alliance.Blue;
+      } else if (DriverStation.getAlliance().get()
+          == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
+        currentAlliance = Alliance.Red;
+      }
+    } catch (NoSuchElementException e) {
       currentAlliance = Alliance.Blue;
-    } else if (DriverStation.getAlliance().get()
-        == edu.wpi.first.wpilibj.DriverStation.Alliance.Red) {
-      currentAlliance = Alliance.Red;
     }
   }
 
