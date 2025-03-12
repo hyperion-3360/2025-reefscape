@@ -50,20 +50,19 @@ public class Vision extends SubsystemBase {
           new Rotation3d(0, 0, 0));
   Transform3d robotToCamLml2Right =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(-11.25), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-70.5)));
+          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(-11.125), 0.0),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.95)));
   Transform3d robotToCamLml2Left =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.25), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(70.5)));
+          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.125), 0.0),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.96)));
 
   /** Creates a new Odometry. */
   public Vision() {
 
     cameraLml3 = new PhotonCamera("lml3");
-    cameraLml2Right = new PhotonCamera("lml2");
-    // TODO change lml name
-    cameraLml2Left = new PhotonCamera("lml2");
+    cameraLml2Right = new PhotonCamera("lml2R");
+    cameraLml2Left = new PhotonCamera("lml2L");
     photonEstimatorLml3 =
         new PhotonPoseEstimator(
             tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
