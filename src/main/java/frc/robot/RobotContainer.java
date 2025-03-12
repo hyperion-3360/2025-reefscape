@@ -73,7 +73,6 @@ public class RobotContainer {
           m_selector,
           m_algaeIntake,
           m_elevator,
-          m_dumper,
           m_coDriverController,
           m_vision,
           m_pathfinding);
@@ -107,8 +106,6 @@ public class RobotContainer {
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final ElevateCmd elevateL1 =
-      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L1);
   private final ElevateCmd elevateL2 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
   private final ElevateCmd elevateL3 =
