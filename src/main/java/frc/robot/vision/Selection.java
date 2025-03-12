@@ -39,6 +39,9 @@ public class Selection extends Vision {
   Translation2d maximumTranslationProcessor = new Translation2d();
   Pose2d processorAlignPosition = new Pose2d();
   boolean isInBounds = false;
+  boolean lml3NoTarget = true;
+  boolean lml2LNoTarget = true;
+  boolean lml2RNoTarget = true;
 
   public enum direction {
     left,
@@ -113,6 +116,7 @@ public class Selection extends Vision {
   public void periodic() {
     setLockTarget();
     isInBoundsForProcessor();
+    System.out.println(lockID);
   }
 
   public boolean isInBoundsForProcessor() {
@@ -200,14 +204,47 @@ public class Selection extends Vision {
     for (var change : cameraLml3.getAllUnreadResults()) {
 
       if (change.hasTargets()) {
+        lml3NoTarget = false;
         trackedTarget = change.getBestTarget();
         lockID = trackedTarget.fiducialId;
         if (reefPegTag.indexOf(lockID) == -1) {
-          lockID = 0;
+          lml3NoTarget = true;
         }
       } else {
-        lockID = 0;
+        lml3NoTarget = true;
       }
+    }
+
+    for (var change : cameraLml2Left.getAllUnreadResults()) {
+
+      if (change.hasTargets()) {
+        lml2LNoTarget = false;
+        trackedTarget = change.getBestTarget();
+        lockID = trackedTarget.fiducialId;
+        if (reefPegTag.indexOf(lockID) == -1) {
+          lml2LNoTarget = true;
+        }
+      } else {
+        lml2LNoTarget = true;
+      }
+    }
+
+    for (var change : cameraLml2Right.getAllUnreadResults()) {
+
+      if (change.hasTargets()) {
+        lml2RNoTarget = false;
+        trackedTarget = change.getBestTarget();
+        lockID = trackedTarget.fiducialId;
+        if (reefPegTag.indexOf(lockID) == -1) {
+          lml2RNoTarget = true;
+        }
+      } else {
+        lml2RNoTarget = true;
+      }
+    }
+
+    if (lml3NoTarget && lml2LNoTarget && lml2RNoTarget) {
+      lockID = 0;
     }
   }
 
