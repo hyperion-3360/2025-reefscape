@@ -92,12 +92,12 @@ public class RobotContainer {
       new IntakeAlgaeCmd(
           m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAELOW, m_driverController);
   private final IntakeAlgaeCmd intakeAlgaeL2 =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2);
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_selector);
   private final IntakeAlgaeCmd intakeAlgaeL3 =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3);
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3, m_swerve, m_selector);
 
   private final IntakeAlgaeCmd intakeAlgaeLollypop =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP, m_swerve, m_selector);
 
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =

@@ -22,7 +22,10 @@ public class Selection extends Vision {
 
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
+  // we want to be close to the reef to intake an algae but we don't want to slam into the reef
+  double desiredCloseUpDistFromTag = 0.4;
   Pose2d desiredPoseCenterAlign = new Pose2d();
+  Pose2d desiredPoseCloseCenterAlign = new Pose2d();
   Pose2d origin = new Pose2d();
 
   double robotHalfLength = Units.inchesToMeters(18);
@@ -151,6 +154,13 @@ public class Selection extends Vision {
               GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(tagYaw) * desiredDistFromTag),
               new Rotation2d(desiredRotation));
+              
+      desiredPoseCloseCenterAlign =
+          new Pose2d(
+              GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredCloseUpDistFromTag),
+              GetTagTranslation().getY() + (Math.sin(tagYaw) * desiredCloseUpDistFromTag),
+              new Rotation2d(desiredRotation));
+
 
     } else if (lockID == 0 && isInBoundsForProcessor()) {
       desiredPoseCenterAlign = processorAlignPosition;
@@ -162,6 +172,11 @@ public class Selection extends Vision {
   public Pose2d getDesiredposeAlgae() {
     setDesiredAlignPose();
     return desiredPoseCenterAlign;
+  }
+  
+  public Pose2d getDesiredCloseUpPoseAlgae() {
+    setDesiredAlignPose();
+    return desiredPoseCloseCenterAlign;
   }
 
   public Pose2d getDesiredposeLeft() {
