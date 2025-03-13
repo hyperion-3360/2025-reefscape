@@ -2,8 +2,12 @@ package frc.robot.Auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,6 +46,7 @@ public class PathfindingV2 extends Command {
   AlgaeIntake m_algaeIntake;
   public static final double robotLength = Units.inchesToMeters(35.0); // with bumper: 32.5
   public static final double robotWidth = Units.inchesToMeters(35.0); // with bumper: 32.5
+  private final double distanceToBackTrack = 1.2; 
 
   private Alliance currentAlliance = Alliance.Blue;
 
@@ -126,30 +131,36 @@ public class PathfindingV2 extends Command {
   // }
 
   private Command driveAndIntakeAlgae(
-      Pose2d targetPos, double elevatorRaiseDistance, desiredHeight algaeHeight) {
+      AprilTag targetID, double elevatorRaiseDistance, desiredHeight algaeHeight) {
+// adjusts tag pose for robot length so that robot doesn't smash into the reef      
+    Pose2d targetPos =
+        Conversions.Pose3dToPose2d(targetID.pose)
+            .plus(
+                new Transform2d(
+                    targetID.pose.getX()
+                        + (robotLength
+                            * Math.cos(
+                                Units.radiansToDegrees(targetID.pose.getRotation().getAngle()))),
+                    targetID.pose.getY()
+                        + (robotLength
+                            * Math.cos(
+                                Units.radiansToDegrees(targetID.pose.getRotation().getAngle()))),
+                    Rotation2d.fromRadians(targetID.pose.getRotation().getAngle())));
+
     SequentialCommandGroup algaeIntakeSequence = new SequentialCommandGroup(Commands.none());
-    Pose2d backTrackedPose =
-        new Pose2d(
-            targetPos
-                .getTranslation()
-                .plus(new Translation2d(currentAlliance.equals(Alliance.Blue) ? 1 : -1, 0)),
-            targetPos.getRotation());
 
-    // sets the backtracked position depending on the alliance
-    // Pose2d backTrackedPose =
-    //     switch (currentAlliance) {
-    //       case Blue:
-    //         yield backTrackedPose =
-    //             new Pose2d(
-    //                 targetPos.getTranslation().plus(new Translation2d(1, 0)),
-    //                 targetPos.getRotation());
-    //       case Red:
-    //         yield backTrackedPose =
-    //             new Pose2d(
-    //                 targetPos.getTranslation().minus(new Translation2d(1, 0)),
-    //                 targetPos.getRotation());
-    //               };
-
+    Pose2d backTrackedPose = targetPos.plus(
+      new Transform2d(
+                    targetID.pose.getX()
+                        + ( distanceToBackTrack
+                            * Math.cos(
+                                Units.radiansToDegrees(targetID.pose.getRotation().getAngle()))),
+                    targetID.pose.getY()
+                        + ( distanceToBackTrack
+                            * Math.cos(
+                                Units.radiansToDegrees(targetID.pose.getRotation().getAngle()))),
+                    Rotation2d.fromRadians(targetID.pose.getRotation().getAngle())));
+           
     algaeIntakeSequence.addCommands(
         // sets back the target pose so that we don't break the algae intake into a thousand pieces
         new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
@@ -387,35 +398,55 @@ public class PathfindingV2 extends Command {
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+            new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootCycle(
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 1.0,
                 desiredHeight.L4,
                 1.2),
-            new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
-                AutoWaypoints.BlueAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
+              AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTags().get(21),
                 0.7,
                 desiredHeight.ALGAEL2),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4));
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
+            driveAndIntakeAlgae(
+              AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTags().get(20),
+                0.7,
+                desiredHeight.ALGAEL2),
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
+            driveAndIntakeAlgae(
+              AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTags().get(22),
+                0.7,
+                desiredHeight.ALGAEL2),
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4)
+);
 
         break;
 
       case Red:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+            new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootCycle(
-                AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
+                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 1.0,
                 desiredHeight.L4,
                 1.2),
-            new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
-                AutoWaypoints.RedAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
+              AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTags().get(7),
                 0.7,
                 desiredHeight.ALGAEL2),
-            driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4));
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
+            driveAndIntakeAlgae(
+              AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTags().get(6),
+                0.7,
+                desiredHeight.ALGAEL2),
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
+            driveAndIntakeAlgae(
+              AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTags().get(8),
+                0.7,
+                desiredHeight.ALGAEL2),
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4)
+);
         break;
 
       default:
