@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.lib.util.Conversions;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +108,13 @@ public class Selection extends Vision {
       } else {
         reefPegTag.clear();
       }
+      System.out.println(
+          Conversions.Pose3dToPose2d(Constants.tagLayout.getTagPose(17).get()).toString());
+      System.out.println(computeNewPoseFromTag(17, direction.left).toString());
+      System.out.println(computeNewPoseFromTag(17, direction.right).toString());
+      lockID = 17;
+      System.out.println(getDesiredposeLeft().toString());
+      System.out.println(getDesiredposeRight().toString());
 
     } catch (NoSuchElementException e) {
       reefPegTag.clear();
@@ -169,7 +178,7 @@ public class Selection extends Vision {
       return Pose2d.kZero;
     }
     var robotTranslationLeft =
-        new Translation2d(robotHalfLength, -distTagToPeg + Units.inchesToMeters(2.5));
+        new Translation2d(robotHalfLength, -distTagToPeg /*+ Units.inchesToMeters(2.5)*/);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationLeft, new Rotation2d(Math.toRadians(-180))));
@@ -186,7 +195,7 @@ public class Selection extends Vision {
       return Pose2d.kZero;
     }
     var robotTranslationRight =
-        new Translation2d(robotHalfLength, distTagToPeg + Units.inchesToMeters(3));
+        new Translation2d(robotHalfLength, distTagToPeg /*+ Units.inchesToMeters(3)*/);
     var robotPoseRelativeToCenter =
         origin.transformBy(
             new Transform2d(robotTranslationRight, new Rotation2d(Math.toRadians(-180))));
@@ -197,6 +206,46 @@ public class Selection extends Vision {
             reefCenter, new Rotation2d(Math.toRadians(angleToRotateBy)));
 
     return desiredPoseRelativeToCenterRotated;
+  }
+
+  private Pose2d computeNewPoseFromTag(int tagID, direction dir) {
+    // 0 deg in front of the robot
+    var tagPose = Conversions.Pose3dToPose2d(Constants.tagLayout.getTagPose(tagID).get());
+    tagPose =
+        new Pose2d(
+            tagPose.getX(),
+            tagPose.getY(),
+            tagPose.getRotation().rotateBy(new Rotation2d(Math.toRadians(180))));
+
+    double translationX = -robotHalfLength;
+    double translationY = 0.0;
+    switch (dir) {
+      case left:
+        translationY += distTagToPeg;
+        break;
+      case right:
+        translationY -= distTagToPeg;
+        break;
+    }
+    var translation =
+        tagPose
+            .getTranslation()
+            .plus(new Translation2d(translationX, translationY).rotateBy(tagPose.getRotation()));
+    return new Pose2d(translation, tagPose.getRotation());
+  }
+
+  public Pose2d newGetDesiredPoseRight() {
+    if (lockID == 0) {
+      return Pose2d.kZero;
+    }
+    return computeNewPoseFromTag(lockID, direction.right);
+  }
+
+  public Pose2d newGetDesiredPoseLeft() {
+    if (lockID == 0) {
+      return Pose2d.kZero;
+    }
+    return computeNewPoseFromTag(lockID, direction.left);
   }
 
   private void setLockTarget() {

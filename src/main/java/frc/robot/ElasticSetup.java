@@ -184,10 +184,10 @@ public class ElasticSetup {
   public void setUpDashboardDebug() {
 
     // selector
-    debugTab.add("desiredPose x (left)", selector.getDesiredposeLeft().getX());
-    debugTab.add("desiredPose y (left)", selector.getDesiredposeLeft().getY());
-    debugTab.add("desiredPose x (right)", selector.getDesiredposeRight().getX());
-    debugTab.add("desiredPose y (right)", selector.getDesiredposeRight().getY());
+    debugTab.add("desiredPose x (left)", selector.newGetDesiredPoseLeft().getX());
+    debugTab.add("desiredPose y (left)", selector.newGetDesiredPoseLeft().getY());
+    debugTab.add("desiredPose x (right)", selector.newGetDesiredPoseRight().getX());
+    debugTab.add("desiredPose y (right)", selector.newGetDesiredPoseRight().getY());
     debugTab.add("desiredPose x center", selector.getDesiredposeAlgae().getX());
     debugTab.add("desiredPose y center", selector.getDesiredposeAlgae().getY());
     debugTab.add("current pos x", swerve.getPose().getX());
