@@ -1,15 +1,13 @@
 package frc.robot.commands;
 
-import java.util.Set;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Auto.Pathfinding;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
@@ -18,32 +16,34 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.swerve.Swerve;
+import java.util.Set;
 
 public class NetAlgaeShootCmd extends SequentialCommandGroup {
 
   public NetAlgaeShootCmd(
-      AlgaeIntake m_algaeIntake, LEDs m_leds, Elevator m_elevator, Swerve m_swerve, PathfindingV2 pathfinding) {
+      AlgaeIntake m_algaeIntake,
+      LEDs m_leds,
+      Elevator m_elevator,
+      Swerve m_swerve,
+      PathfindingV2 m_pathfinding) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
     addCommands(
         new DeferredCommand(
-                () ->
-                    pathfinding.goThere(
-                        () -> new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero)),
-                Set.of())
-            .alongWith(
-                new WaitUntilCommand(
-                        () ->
-                            Pathfinding.isCloseTo(
-                                new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero),
-        1.3))
-                    .andThen(
-                        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-                        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)))),
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.NET)),
+            () ->
+                m_pathfinding.goThere(
+                    () -> new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero)),
+            Set.of(m_swerve)),
+        new ParallelCommandGroup(
+            new WaitUntilCommand(
+                    () ->
+                        m_pathfinding.isCloseTo(
+                            new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero), 1))
+                .andThen(
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+                    Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),
+                    Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.NET)))),
         new WaitCommand(0.9),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),

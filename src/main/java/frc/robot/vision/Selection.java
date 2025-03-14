@@ -154,13 +154,12 @@ public class Selection extends Vision {
               GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredDistFromTag),
               GetTagTranslation().getY() + (Math.sin(tagYaw) * desiredDistFromTag),
               new Rotation2d(desiredRotation));
-              
+
       desiredPoseCloseCenterAlign =
           new Pose2d(
               GetTagTranslation().getX() + (Math.cos(tagYaw) * desiredCloseUpDistFromTag),
               GetTagTranslation().getY() + (Math.sin(tagYaw) * desiredCloseUpDistFromTag),
               new Rotation2d(desiredRotation));
-
 
     } else if (lockID == 0 && isInBoundsForProcessor()) {
       desiredPoseCenterAlign = processorAlignPosition;
@@ -173,7 +172,7 @@ public class Selection extends Vision {
     setDesiredAlignPose();
     return desiredPoseCenterAlign;
   }
-  
+
   public Pose2d getDesiredCloseUpPoseAlgae() {
     setDesiredAlignPose();
     return desiredPoseCloseCenterAlign;
