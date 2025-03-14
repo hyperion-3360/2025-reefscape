@@ -21,6 +21,7 @@ import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.DeepClimbCmd;
+import frc.robot.commands.DriveAndIntakeCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -91,13 +92,15 @@ public class RobotContainer {
   private final IntakeAlgaeCmd intakeAlgaeFloor =
       new IntakeAlgaeCmd(
           m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAELOW, m_driverController);
-  private final IntakeAlgaeCmd intakeAlgaeL2 =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_selector);
-  private final IntakeAlgaeCmd intakeAlgaeL3 =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3, m_swerve, m_selector);
+  private final DriveAndIntakeCmd intakeAlgaeL2 =
+      new DriveAndIntakeCmd(
+          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_selector);
+  private final DriveAndIntakeCmd intakeAlgaeL3 =
+      new DriveAndIntakeCmd(
+          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3, m_swerve, m_selector);
 
   private final IntakeAlgaeCmd intakeAlgaeLollypop =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP, m_swerve, m_selector);
+      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
 
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =
