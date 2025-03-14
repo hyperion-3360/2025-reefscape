@@ -21,6 +21,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
@@ -95,6 +96,26 @@ public class Vision extends SubsystemBase {
     return cameraLml3.isConnected();
   }
 
+  public boolean isValidResult(PhotonPipelineResult result) {
+    var rc = true;
+    do {
+      if (!result.hasTargets()) {
+        rc = false;
+        break;
+      }
+
+      for (var target : result.getTargets()) {
+        if (target.getPoseAmbiguity() > 0.2) {
+          rc = false;
+          break;
+        }
+      }
+
+    } while (false);
+
+    return rc;
+  }
+
   public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml3() {
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
 
@@ -103,8 +124,7 @@ public class Vision extends SubsystemBase {
     var unreadResults = cameraLml3.getAllUnreadResults();
 
     for (var changelml3 : unreadResults) {
-      if (changelml3.hasTargets()) {
-
+      if (isValidResult(changelml3)) {
         visionEst = photonEstimatorLml3.update(changelml3);
         updateEstimationStdDevsLml3(visionEst, changelml3.getTargets());
       }
@@ -121,8 +141,7 @@ public class Vision extends SubsystemBase {
     var unreadResults = cameraLml2Right.getAllUnreadResults();
 
     for (var changelml2R : unreadResults) {
-      if (changelml2R.hasTargets()) {
-
+      if (isValidResult(changelml2R)) {
         visionEst = photonEstimatorLml2Right.update(changelml2R);
         updateEstimationStdDevsLml2(visionEst, changelml2R.getTargets());
       }
@@ -139,7 +158,7 @@ public class Vision extends SubsystemBase {
     var unreadResults = cameraLml2Left.getAllUnreadResults();
 
     for (var changelml2L : unreadResults) {
-      if (changelml2L.hasTargets()) {
+      if (isValidResult(changelml2L)) {
 
         visionEst = photonEstimatorLml2Left.update(changelml2L);
         updateEstimationStdDevsLml2(visionEst, changelml2L.getTargets());
