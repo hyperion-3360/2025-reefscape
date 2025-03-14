@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Constants;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class Selection extends Vision {
   // field units are in meters, so we want to be approx 1 meter from target
   double desiredDistFromTag = 1;
   // we want to be close to the reef to intake an algae but we don't want to slam into the reef
-  double desiredCloseUpDistFromTag = 0.4;
+  double desiredCloseUpDistFromTag = (Constants.Swerve.robotWidth / 2);
   Pose2d desiredPoseCenterAlign = new Pose2d();
   Pose2d desiredPoseCloseCenterAlign = new Pose2d();
   Pose2d origin = new Pose2d();
