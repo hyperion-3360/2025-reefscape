@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -19,6 +21,8 @@ import frc.robot.subsystems.swerve.Swerve;
 import java.util.Set;
 
 public class NetAlgaeShootCmd extends SequentialCommandGroup {
+  double targetX;
+  Rotation2d targetRotation;
 
   public NetAlgaeShootCmd(
       AlgaeIntake m_algaeIntake,
@@ -29,17 +33,34 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
+
+    // if we don't have any alliance assume blue alliance
+    try {
+      targetX = DriverStation.getAlliance().get().equals(Alliance.Blue) ? 7.3 : 10.3;
+    } catch (Exception e) {
+      targetX = 7.3;
+    }
+
+    try {
+      targetRotation =
+          DriverStation.getAlliance().get().equals(Alliance.Blue)
+              ? Rotation2d.kZero
+              : Rotation2d.k180deg;
+    } catch (Exception e) {
+      targetRotation = Rotation2d.kZero;
+    }
+
     addCommands(
         new DeferredCommand(
             () ->
                 m_pathfinding.goThere(
-                    () -> new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero)),
+                    () -> new Pose2d(targetX, m_swerve.getPose().getY(), targetRotation)),
             Set.of(m_swerve)),
         new ParallelCommandGroup(
             new WaitUntilCommand(
                     () ->
                         m_pathfinding.isCloseTo(
-                            new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero), 1))
+                            new Pose2d(targetX, m_swerve.getPose().getY(), targetRotation), 1))
                 .andThen(
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
                     Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),

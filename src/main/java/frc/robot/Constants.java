@@ -35,8 +35,8 @@ public final class Constants {
     public static final double kWheelDiameter = Units.inchesToMeters(3.8774);
     public static final int kGyroCanId = 20;
 
-    public static final double robotLength = Units.inchesToMeters(32.5); // with bumper: 32.5
-    public static final double robotWidth = Units.inchesToMeters(32.5); // with bumper: 32.5
+    public static final double robotLength = Units.inchesToMeters(35.0); // with bumper: 32.5
+    public static final double robotWidth = Units.inchesToMeters(35.0); // with bumper: 32.5
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
