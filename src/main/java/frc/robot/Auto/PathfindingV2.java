@@ -270,7 +270,19 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            new InstantCommand(() -> m_swerve.regularConstraints()));
+            new InstantCommand(() -> m_swerve.regularConstraints()),
+            // TODO: tweak time (last param)
+            driveAndIntakeCycle(
+                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new WaitCommand(0.2), // will be elevatecmd(L4) later
+                    new InstantCommand(() -> m_shooter.stop()))),
+            driveAndShootCycle(
+                AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchB,
+                1.5,
+                desiredHeight.L4,
+                1.2));
         break;
       case Red:
         pathfindingSequence.addCommands(
@@ -303,7 +315,18 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            new InstantCommand(() -> m_swerve.regularConstraints()));
+            new InstantCommand(() -> m_swerve.regularConstraints()),
+            driveAndIntakeCycle(
+                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new WaitCommand(0.2), // will be elevatecmd(L4) later
+                    new InstantCommand(() -> m_shooter.stop()))),
+            driveAndShootCycle(
+                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchA,
+                1.5,
+                desiredHeight.L4,
+                1.2));
         break;
       default:
         break;
@@ -347,7 +370,18 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            new InstantCommand(() -> m_swerve.regularConstraints()));
+            new InstantCommand(() -> m_swerve.regularConstraints()),
+            driveAndIntakeCycle(
+                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new WaitCommand(0.2), // will be elevatecmd(L4) later
+                    new InstantCommand(() -> m_shooter.stop()))),
+            driveAndShootCycle(
+                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchA,
+                1.5,
+                desiredHeight.L4,
+                1.2));
 
         break;
       case Red:
@@ -381,7 +415,18 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            new InstantCommand(() -> m_swerve.regularConstraints()));
+            new InstantCommand(() -> m_swerve.regularConstraints()),
+            driveAndIntakeCycle(
+                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    new WaitCommand(0.2), // will be elevatecmd(L4) later
+                    new InstantCommand(() -> m_shooter.stop()))),
+            driveAndShootCycle(
+                AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchB,
+                1.5,
+                desiredHeight.L4,
+                1.2));
         break;
       default:
         break;

@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.Set;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,11 +16,16 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.swerve.Swerve;
+import java.util.Set;
 
 public class NetAlgaeShootCmd extends SequentialCommandGroup {
 
   public NetAlgaeShootCmd(
-      AlgaeIntake m_algaeIntake, LEDs m_leds, Elevator m_elevator, Swerve m_swerve, PathfindingV2 pathfinding) {
+      AlgaeIntake m_algaeIntake,
+      LEDs m_leds,
+      Elevator m_elevator,
+      Swerve m_swerve,
+      PathfindingV2 pathfinding) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
@@ -36,8 +39,7 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                 new WaitUntilCommand(
                         () ->
                             Pathfinding.isCloseTo(
-                                new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero),
-        1.3))
+                                new Pose2d(7.5, m_swerve.getPose().getY(), Rotation2d.kZero), 1.3))
                     .andThen(
                         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
                         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)))),
