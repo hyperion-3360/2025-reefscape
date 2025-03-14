@@ -36,26 +36,36 @@ public class Vision extends SubsystemBase {
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2;
 
-  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(3.8, 3.8, 7.6);
+  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(4.0, 4.0, 8.0);
   private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
 
-  private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
-  private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
+  private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4.5, 4.5, 9);
+  private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3.5, 3.5, 7);
 
   AprilTagFieldLayout tagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(0), 0.0),
-          new Rotation3d(0, 0, 0));
+          new Translation3d(
+              // Units.inchesToMeters(33.25)
+              Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.42375)),
+          new Rotation3d(0, Units.degreesToRadians(10), 0.0));
   Transform3d robotToCamLml2Right =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(-11.125), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.95)));
+          // Units.inchesToMeters(7.625)
+          new Translation3d(
+              Units.inchesToMeters(12.25),
+              Units.inchesToMeters(-11.125),
+              Units.inchesToMeters(-13.9825)),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.7)));
   Transform3d robotToCamLml2Left =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.125), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.96)));
+          // Units.inchesToMeters(7.625)
+          new Translation3d(
+              Units.inchesToMeters(12.25),
+              Units.inchesToMeters(11.0),
+              Units.inchesToMeters(-13.9825)),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.7)));
 
   /** Creates a new Odometry. */
   public Vision() {

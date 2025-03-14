@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.util.SwerveElevatorSlowDownFunc;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import frc.robot.subsystems.Elevator;
@@ -68,7 +67,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxSpeedRadiansPerSecond = 5.5;
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 6.0;
-  private final double kPRot = 6.2;
+  private final double kPRot = 6;
   private Elevator m_elevator;
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -213,48 +212,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
       if (!DriverStation.isAutonomous()) {
         m_xController.setConstraints(
-            new Constraints(
-                kMaxSpeedMetersPerSecondX
-                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
-                kMaxAccelerationMetersPerSecondSquaredX
-                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+            new Constraints(kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX));
         m_yController.setConstraints(
-            new Constraints(
-                kMaxSpeedMetersPerSecondY
-                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
-                kMaxAccelerationMetersPerSecondSquaredY
-                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
+            new Constraints(kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY));
         m_rotController.setConstraints(
-            new Constraints(
-                kMaxSpeedRadiansPerSecond
-                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()),
-                kMaxAccelerationRadiansPerSecondSquared
-                    * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos())));
-
-        SmartDashboard.putNumber(
-            "max speed x",
-            kMaxSpeedMetersPerSecondX
-                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-        SmartDashboard.putNumber(
-            "max acceleration x",
-            kMaxAccelerationMetersPerSecondSquaredX
-                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-        SmartDashboard.putNumber(
-            "max speed y",
-            kMaxSpeedMetersPerSecondY
-                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-        SmartDashboard.putNumber(
-            "max acceleration y",
-            kMaxAccelerationMetersPerSecondSquaredY
-                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-        SmartDashboard.putNumber(
-            "max speed rotation",
-            kMaxSpeedRadiansPerSecond
-                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
-        SmartDashboard.putNumber(
-            "max acceleration rotation",
-            kMaxAccelerationRadiansPerSecondSquared
-                * SwerveElevatorSlowDownFunc.calculate(() -> m_elevator.getEncoderPos()));
+            new Constraints(kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared));
       }
       var x = m_xController.calculate(poseEstimator.getEstimatedPosition().getX());
       var y = m_yController.calculate(poseEstimator.getEstimatedPosition().getY());
