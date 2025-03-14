@@ -238,11 +238,11 @@ public class RobotContainer {
     m_coDriverController
         .y()
         .onTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
     m_coDriverController
         .x()
         .onTrue(intakeAlgaeL3)
-        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
+        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
     m_coDriverController
         .povDown()
         .onTrue(intakeAlgaeLollypop)
@@ -256,7 +256,7 @@ public class RobotContainer {
     m_driverController
         .leftTrigger(0.3)
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae()))
 
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))

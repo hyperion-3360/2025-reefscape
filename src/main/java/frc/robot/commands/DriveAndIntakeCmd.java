@@ -33,6 +33,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
+    addRequirements(m_swerve);
     addCommands(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(height)),
@@ -40,22 +41,30 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
+        Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae())),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae())),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae())),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)));
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
+        Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
   }
 
-  public Command NoAlgaeCmd(Elevator m_elevator, AlgaeIntake m_algaeIntake, LEDs m_leds) {
+  public Command NoAlgaeCmd(
+      Elevator m_elevator, AlgaeIntake m_algaeIntake, LEDs m_leds, Swerve m_swerve) {
     addRequirements(m_elevator);
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
+    addRequirements(m_swerve);
     return Commands.sequence(
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
