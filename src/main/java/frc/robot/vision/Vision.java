@@ -30,6 +30,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
@@ -93,10 +94,10 @@ public class Vision extends SubsystemBase {
     cameraLml3 = new PhotonCamera("lml3");
     cameraLml2Right = new PhotonCamera("lml2R");
     cameraLml2Left = new PhotonCamera("lml2L");
+    // MULTI_TAG_PNP_ON_COPROCESSOR
     photonEstimatorLml3 =
-        new PhotonPoseEstimator(
-            Constants.tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamLml3);
-    photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        new PhotonPoseEstimator(Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml3);
+    // photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     photonEstimatorLml2Right =
         new PhotonPoseEstimator(
             Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
@@ -165,6 +166,26 @@ public class Vision extends SubsystemBase {
     return m_allowedReefPegTag.contains(target.getFiducialId());
   }
 
+  private boolean isGoodResult(PhotonPipelineResult result) {
+    boolean rc = true;
+    do {
+      if (!result.hasTargets()) {
+        rc = false;
+        break;
+      }
+
+      for (var target : result.getTargets()) {
+        if (target.getPoseAmbiguity() > 0.2) {
+          rc = false;
+          break;
+        }
+      }
+
+    } while (false);
+
+    return rc;
+  }
+
   public void doPeriodic() {
     visionEstLml3 = Optional.empty();
 
@@ -173,8 +194,7 @@ public class Vision extends SubsystemBase {
     var unreadResultsLml3 = cameraLml3.getAllUnreadResults();
 
     for (var changelml3 : unreadResultsLml3) {
-      if (changelml3.hasTargets()) {
-
+      if (isGoodResult(changelml3)) {
         visionEstLml3 = photonEstimatorLml3.update(changelml3);
         updateEstimationStdDevsLml3(visionEstLml3, changelml3.getTargets());
       }
@@ -186,7 +206,7 @@ public class Vision extends SubsystemBase {
     var unreadResultsLml2Right = cameraLml2Right.getAllUnreadResults();
 
     for (var changelml2R : unreadResultsLml2Right) {
-      if (changelml2R.hasTargets()) {
+      if (isGoodResult(changelml2R)) {
 
         visionEstLml2Right = photonEstimatorLml2Right.update(changelml2R);
         updateEstimationStdDevsLml2(visionEstLml2Right, changelml2R.getTargets(), CameraSide.Right);
@@ -200,8 +220,7 @@ public class Vision extends SubsystemBase {
     var unreadResultsLml2Left = cameraLml2Left.getAllUnreadResults();
 
     for (var changelml2L : unreadResultsLml2Left) {
-      if (changelml2L.hasTargets()) {
-
+      if (isGoodResult(changelml2L)) {
         visionEstLml2Left = photonEstimatorLml2Left.update(changelml2L);
         updateEstimationStdDevsLml2(visionEstLml2Left, changelml2L.getTargets(), CameraSide.Left);
       }
