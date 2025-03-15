@@ -8,6 +8,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +16,6 @@ import java.util.NoSuchElementException;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Selection extends Vision {
-
-  public enum HeightOfAlgae {
-    L2,
-    L3,
-    NULL
-  }
 
   Swerve swerve;
   List<Integer> reefPegTag = new ArrayList<Integer>();
@@ -54,7 +49,7 @@ public class Selection extends Vision {
   boolean lml2LNoTarget = true;
   boolean lml2RNoTarget = true;
 
-  HeightOfAlgae currentAlgaeHeight = HeightOfAlgae.NULL;
+  desiredHeight currentAlgaeHeight = desiredHeight.LOW;
 
   public enum direction {
     left,
@@ -293,24 +288,26 @@ public class Selection extends Vision {
     return new Translation2d();
   }
 
-  public HeightOfAlgae getAlgaeHeight() {
-
-    if (reefPegTag.indexOf(lockID) == 0 || reefPegTag.indexOf(lockID) == 2 || reefPegTag.indexOf(lockID) == 4) {
-      currentAlgaeHeight = HeightOfAlgae.L3;
-
-    } else if (reefPegTag.indexOf(lockID) == 1 || reefPegTag.indexOf(lockID) == 3 || reefPegTag.indexOf(lockID) == 5) {
-      currentAlgaeHeight = HeightOfAlgae.L2;
-
-    } else {
-      currentAlgaeHeight = HeightOfAlgae.NULL;
-    }
-
-
-    return currentAlgaeHeight;
-
-  }
-
   public Pose2d LastTarget() {
     return currentPose;
+  }
+
+  public desiredHeight getAlgaeHeight() {
+
+    if (reefPegTag.indexOf(lockID) == 0
+        || reefPegTag.indexOf(lockID) == 2
+        || reefPegTag.indexOf(lockID) == 4) {
+      currentAlgaeHeight = desiredHeight.ALGAEL3;
+
+    } else if (reefPegTag.indexOf(lockID) == 1
+        || reefPegTag.indexOf(lockID) == 3
+        || reefPegTag.indexOf(lockID) == 5) {
+      currentAlgaeHeight = desiredHeight.ALGAEL2;
+
+    } else {
+      currentAlgaeHeight = desiredHeight.LOW;
+    }
+
+    return currentAlgaeHeight;
   }
 }
