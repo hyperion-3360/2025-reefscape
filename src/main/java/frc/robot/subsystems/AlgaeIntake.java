@@ -42,7 +42,7 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     STORED // this is resting speed or 0
   }
 
-  private static final double kP = 0.020;
+  private static final double kP = 0.0205;
   private static final double kI = 0.006;
   private static final double kD = 0.0;
   private PIDController m_pid = new PIDController(kP, kI, kD);
@@ -133,7 +133,7 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
         break;
 
       case STORED:
-        this.m_SpeedTarget = 0.0;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoredSpeed;
         break;
     }
   }

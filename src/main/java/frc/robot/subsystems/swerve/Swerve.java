@@ -333,10 +333,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void stopSwerve() {
-    for (SwerveModule swerveModule : mSwerveMods) {
-      swerveModule.getDriveMotor().set(0);
-      swerveModule.getRotationMotor().set(0);
-    }
+    _drive(new Translation2d(0, 0), 0, true, true);
   }
 
   public boolean targetDriveDisabled() {
