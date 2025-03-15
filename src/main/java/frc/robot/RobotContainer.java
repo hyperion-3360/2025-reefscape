@@ -242,7 +242,7 @@ public class RobotContainer {
     m_driverController.b().onTrue(shootAlgae);
 
     m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.y().onTrue(shootAlgaeNet);
+    m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(cancelAuto);
 
     m_coDriverController
         .povDown()
@@ -289,7 +289,7 @@ public class RobotContainer {
 
     m_coDriverController.rightBumper().onTrue(intakeCoral);
 
-    m_driverController.rightTrigger(0.3).whileTrue(cycleToFeeder).onFalse(cancelAuto);
+    m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
   }
 
   public void teleopInit() {
