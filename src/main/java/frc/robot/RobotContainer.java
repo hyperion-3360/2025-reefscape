@@ -21,7 +21,6 @@ import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.DeepClimbCmd;
-import frc.robot.commands.DriveAndIntakeCmd;
 import frc.robot.commands.DriveToSomeTargetCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
