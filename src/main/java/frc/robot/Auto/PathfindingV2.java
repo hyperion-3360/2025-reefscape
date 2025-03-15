@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.lib.util.Conversions;
+import frc.robot.Constants;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.AlgaeIntake.shooting;
@@ -245,8 +245,7 @@ public class PathfindingV2 extends Command {
                 1.5,
                 desiredHeight.L4,
                 1.2),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(12).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -258,8 +257,7 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(12).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(12).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
@@ -280,8 +278,7 @@ public class PathfindingV2 extends Command {
                 1.5,
                 desiredHeight.L4,
                 1.2),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(2).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(2).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -292,8 +289,7 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(2).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(2).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
@@ -324,8 +320,7 @@ public class PathfindingV2 extends Command {
                 1.5,
                 desiredHeight.L4,
                 1.2),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(13).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(13).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -336,8 +331,7 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(13).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(13).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
@@ -358,8 +352,7 @@ public class PathfindingV2 extends Command {
                 1.5,
                 desiredHeight.L4,
                 1.2),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(1).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(1).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -370,8 +363,7 @@ public class PathfindingV2 extends Command {
                     1.5,
                     desiredHeight.L4,
                     1.2)),
-            driveAndIntakeCycle(
-                Conversions.Pose3dToPose2d(AutoWaypoints.tagLayout.getTagPose(1).get())),
+            driveAndIntakeCycle(Constants.tagLayout.getTagPose(1).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new WaitCommand(0.2), // will be elevatecmd(L4) later

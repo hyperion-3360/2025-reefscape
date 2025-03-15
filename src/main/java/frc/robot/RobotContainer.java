@@ -41,7 +41,6 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
 
 public class RobotContainer {
@@ -61,7 +60,6 @@ public class RobotContainer {
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
-  public static final Selection m_selector = new Selection(m_swerve);
   public static final PathfindingV2 m_pathfinding =
       new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake);
 
@@ -70,7 +68,6 @@ public class RobotContainer {
           m_swerve,
           m_shooter,
           m_climber,
-          m_selector,
           m_algaeIntake,
           m_elevator,
           m_coDriverController,
@@ -253,7 +250,8 @@ public class RobotContainer {
     m_driverController
         .leftTrigger(0.3)
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae()))
+            Commands.runOnce(
+                () -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(m_swerve.getPose())))
 
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
@@ -270,7 +268,7 @@ public class RobotContainer {
     m_driverController
         .leftBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeLeft()))
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseLeft()))
                 .unless(m_climber::isClimberActivated)
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
@@ -282,7 +280,7 @@ public class RobotContainer {
     m_driverController
         .rightBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
+            Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseRight()))
 
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))

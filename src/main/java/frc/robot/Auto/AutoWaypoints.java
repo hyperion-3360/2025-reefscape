@@ -1,18 +1,15 @@
 package frc.robot.Auto;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 
 public class AutoWaypoints {
 
   // everything is in meters and degrees
-  static AprilTagFieldLayout tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   static double distanceTagToPeg = Units.inchesToMeters(-6.5);
   static double robotHalfLength = Units.inchesToMeters(19);
 
@@ -27,9 +24,9 @@ public class AutoWaypoints {
 
     static Pose2d origin =
         new Pose2d(
-            tagLayout.getTagPose(18).get().getX(),
-            tagLayout.getTagPose(18).get().getY(),
-            tagLayout.getTagPose(18).get().getRotation().toRotation2d());
+            Constants.tagLayout.getTagPose(18).get().getX(),
+            Constants.tagLayout.getTagPose(18).get().getY(),
+            Constants.tagLayout.getTagPose(18).get().getRotation().toRotation2d());
 
     // #region Left
     public static class LeftSide {
@@ -199,9 +196,9 @@ public class AutoWaypoints {
 
     static Pose2d origin =
         new Pose2d(
-            tagLayout.getTagPose(7).get().getX(),
-            tagLayout.getTagPose(7).get().getY(),
-            tagLayout.getTagPose(7).get().getRotation().toRotation2d());
+            Constants.tagLayout.getTagPose(7).get().getX(),
+            Constants.tagLayout.getTagPose(7).get().getY(),
+            Constants.tagLayout.getTagPose(7).get().getRotation().toRotation2d());
 
     // #region Left
     public static class LeftSide {

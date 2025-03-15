@@ -189,6 +189,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
+    vision.doPeriodic();
     visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
     visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
     visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
@@ -293,14 +294,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     visionEstLml2R.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml2();
+          var estStdDevs = vision.getEstimationStdDevsLml2Right();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
 
     visionEstLml2L.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml2();
+          var estStdDevs = vision.getEstimationStdDevsLml2Left();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
