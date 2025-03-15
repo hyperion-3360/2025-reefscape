@@ -16,6 +16,12 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Selection extends Vision {
 
+  public enum HeightOfAlgae {
+    L2,
+    L3,
+    NULL
+  }
+
   Swerve swerve;
   List<Integer> reefPegTag = new ArrayList<Integer>();
   int lockID = 0;
@@ -46,6 +52,8 @@ public class Selection extends Vision {
   boolean lml3NoTarget = true;
   boolean lml2LNoTarget = true;
   boolean lml2RNoTarget = true;
+
+  HeightOfAlgae currentAlgaeHeight = HeightOfAlgae.NULL;
 
   public enum direction {
     left,
@@ -281,5 +289,22 @@ public class Selection extends Vision {
     }
 
     return new Translation2d();
+  }
+
+  public HeightOfAlgae getAlgaeHeight() {
+
+    if (reefPegTag.indexOf(lockID) == 0 || reefPegTag.indexOf(lockID) == 2 || reefPegTag.indexOf(lockID) == 4) {
+      currentAlgaeHeight = HeightOfAlgae.L3;
+
+    } else if (reefPegTag.indexOf(lockID) == 1 || reefPegTag.indexOf(lockID) == 3 || reefPegTag.indexOf(lockID) == 5) {
+      currentAlgaeHeight = HeightOfAlgae.L2;
+
+    } else {
+      currentAlgaeHeight = HeightOfAlgae.NULL;
+    }
+
+
+    return currentAlgaeHeight;
+
   }
 }
