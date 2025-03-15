@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.AlgaeIntake;
@@ -38,7 +39,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae())),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
-        Commands.runOnce(() -> m_elevator.SetHeight(height)),
+        Commands.runOnce(() -> m_elevator.SetHeight(m_selector.getAlgaeHeight())),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
         Commands.runOnce(
@@ -49,11 +50,10 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         backTrack,
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        new WaitCommand(0.4),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)));
   }
 
   public Command NoAlgaeCmd(
@@ -63,9 +63,13 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     return Commands.sequence(
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new InstantCommand(() -> m_swerve.stopSwerve()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED))
+            .unless(() -> m_algaeIntake.sensorTriggered()),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING))
+            .unless(() -> !m_algaeIntake.sensorTriggered()),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
   }
