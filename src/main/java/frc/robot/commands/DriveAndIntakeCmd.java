@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
@@ -14,7 +15,6 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
 
 public class DriveAndIntakeCmd extends SequentialCommandGroup {
-
   /**
    * constructor to construct a algae intake command for the reef
    *
@@ -30,25 +30,24 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
       desiredHeight height,
       Swerve m_swerve,
       Selection m_selector) {
+    MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 0.5, 0.8, OffsetDir.BACK);
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
     addRequirements(m_elevator);
     addRequirements(m_swerve);
     addCommands(
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae())),
+        new WaitUntilCommand(() -> m_swerve.targetReached()),
         Commands.runOnce(() -> m_elevator.SetHeight(height)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
-        Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae())),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae())),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae())),
-        new WaitUntilCommand(() -> m_swerve.targetReached()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        backTrack,
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
@@ -62,7 +61,6 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addRequirements(m_elevator);
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
-    addRequirements(m_swerve);
     return Commands.sequence(
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),

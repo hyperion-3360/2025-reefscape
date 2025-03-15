@@ -244,15 +244,7 @@ public class RobotContainer {
     m_coDriverController.a().onTrue(shootCoral);
     m_driverController.y().onTrue(shootAlgaeNet);
 
-    m_coDriverController
-        .y()
-        .onTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
-    m_coDriverController
-        .x()
-        .onTrue(intakeAlgaeL3)
-        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
-    m_coDriverController
+        m_coDriverController
         .povDown()
         .onTrue(intakeAlgaeLollypop)
         .onFalse(intakeAlgaeLollypop.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
@@ -264,15 +256,9 @@ public class RobotContainer {
 
     m_driverController
         .leftTrigger(0.3)
-        .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae()))
+        .onTrue(intakeAlgaeL2)
+        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
 
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
