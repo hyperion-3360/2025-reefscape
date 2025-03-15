@@ -27,6 +27,7 @@ public class Selection extends Vision {
   double desiredCloseUpDistFromTag = (Constants.Swerve.robotWidth / 2);
   Pose2d desiredPoseCenterAlign = new Pose2d();
   Pose2d desiredPoseCloseCenterAlign = new Pose2d();
+  Pose2d currentPose = new Pose2d();
   Pose2d origin = new Pose2d();
 
   double robotHalfLength = Units.inchesToMeters(18);
@@ -167,6 +168,7 @@ public class Selection extends Vision {
     } else {
       desiredPoseCenterAlign = Pose2d.kZero;
     }
+    currentPose = desiredPoseCenterAlign;
   }
 
   public Pose2d getDesiredposeAlgae() {
@@ -281,5 +283,9 @@ public class Selection extends Vision {
     }
 
     return new Translation2d();
+  }
+
+  public Pose2d LastTarget() {
+    return currentPose;
   }
 }
