@@ -51,7 +51,7 @@ public class Vision extends SubsystemBase {
   protected Matrix<N3, N1> curStdDevsLml2Right;
   protected Matrix<N3, N1> curStdDevsLml2Left;
 
-  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(3.8, 3.8, 7.6);
+  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(4, 4, 8);
   private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
 
   private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
