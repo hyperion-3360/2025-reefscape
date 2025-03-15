@@ -244,7 +244,7 @@ public class RobotContainer {
     m_coDriverController.a().onTrue(shootCoral);
     m_driverController.y().onTrue(shootAlgaeNet);
 
-        m_coDriverController
+    m_coDriverController
         .povDown()
         .onTrue(intakeAlgaeLollypop)
         .onFalse(intakeAlgaeLollypop.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
@@ -253,12 +253,10 @@ public class RobotContainer {
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
-
     m_driverController
         .leftTrigger(0.3)
         .onTrue(intakeAlgaeL2)
         .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
-
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
