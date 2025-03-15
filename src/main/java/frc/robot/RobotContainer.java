@@ -10,6 +10,8 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,6 +24,7 @@ import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.DeepClimbCmd;
 import frc.robot.commands.DriveAndIntakeCmd;
+import frc.robot.commands.DriveToSomeTargetCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -52,6 +55,7 @@ public class RobotContainer {
   // controller declarations
   public static final CommandXboxController m_driverController = new CommandXboxController(0);
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
+  public static final CommandXboxController m_testController = new CommandXboxController(2);
 
   // subsystem declarations
   public static final Shooter m_shooter = new Shooter();
@@ -135,6 +139,12 @@ public class RobotContainer {
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
+  private final DriveToSomeTargetCmd backPose =
+      new DriveToSomeTargetCmd(() -> new Pose2d(7.33, 1.78, Rotation2d.fromDegrees(270)), m_swerve);
+  private final DriveToSomeTargetCmd leftPose =
+      new DriveToSomeTargetCmd(() -> new Pose2d(6.55, 3.9, Rotation2d.fromDegrees(270)), m_swerve);
+  private final DriveToSomeTargetCmd frontPose =
+      new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
 
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;
@@ -242,7 +252,7 @@ public class RobotContainer {
     m_driverController.b().onTrue(shootAlgae);
 
     m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(cancelAuto);
+    m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet);
 
     m_coDriverController
         .povDown()
@@ -290,6 +300,10 @@ public class RobotContainer {
     m_coDriverController.rightBumper().onTrue(intakeCoral);
 
     m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
+
+    m_testController.povUp().onTrue(frontPose);
+    m_testController.povDown().onTrue(backPose);
+    m_testController.povLeft().onTrue(leftPose);
   }
 
   public void teleopInit() {
