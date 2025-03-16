@@ -63,7 +63,6 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addRequirements(m_leds);
     return Commands.sequence(
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new InstantCommand(() -> m_swerve.stopSwerve()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED))

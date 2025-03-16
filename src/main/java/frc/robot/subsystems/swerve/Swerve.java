@@ -76,8 +76,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   // vision estimation of robot pose
   Optional<EstimatedRobotPose> visionEstLml3;
-  Optional<EstimatedRobotPose> visionEstLml2R;
-  Optional<EstimatedRobotPose> visionEstLml2L;
+
+  // Optional<EstimatedRobotPose> visionEstLml2R;
+  // Optional<EstimatedRobotPose> visionEstLml2L;
 
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
@@ -197,8 +198,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
     SmartDashboard.putNumber("gyro z", getGyroZ());
 
     if (visionEstLml3.isPresent()
-        || visionEstLml2R.isPresent()
-        || visionEstLml2L.isPresent() && !hasStartedEstimation) {
+    // || visionEstLml2R.isPresent()
+    // || visionEstLml2L.isPresent() && !hasStartedEstimation) {
+    ) {
       hasStartedEstimation = true;
       estimatePose();
     }

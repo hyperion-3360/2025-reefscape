@@ -40,12 +40,12 @@ public class Vision extends SubsystemBase {
   }
 
   protected final PhotonCamera cameraLml3;
-  protected final PhotonCamera cameraLml2Right;
-  protected final PhotonCamera cameraLml2Left;
+  // protected final PhotonCamera cameraLml2Right;
+  // protected final PhotonCamera cameraLml2Left;
 
   protected final PhotonPoseEstimator photonEstimatorLml3;
-  protected final PhotonPoseEstimator photonEstimatorLml2Right;
-  protected final PhotonPoseEstimator photonEstimatorLml2Left;
+  // protected final PhotonPoseEstimator photonEstimatorLml2Right;
+  // protected final PhotonPoseEstimator photonEstimatorLml2Left;
 
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2Right;
@@ -159,13 +159,13 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public boolean limelight2LeftActive() {
-    return cameraLml2Left.isConnected();
-  }
+  // public boolean limelight2LeftActive() {
+  //   return cameraLml2Left.isConnected();
+  // }
 
-  public boolean limelight2RightActive() {
-    return cameraLml2Right.isConnected();
-  }
+  // public boolean limelight2RightActive() {
+  //   return cameraLml2Right.isConnected();
+  // }
 
   public boolean limelight3Active() {
     return cameraLml3.isConnected();
