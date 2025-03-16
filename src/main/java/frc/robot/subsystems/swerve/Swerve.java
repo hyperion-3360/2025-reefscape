@@ -37,12 +37,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.SwerveElevatorSlowDownFunc;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.Elevator;
 import frc.robot.vision.Vision;
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
 
 public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
@@ -53,7 +52,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
   Thread thread = new Thread();
-  private boolean hasStartedEstimation = false;
   private Orchestra m_orchestra = new Orchestra();
   private boolean m_targetModeEnabled = false;
   private ProfiledPIDController m_xController;
@@ -76,9 +74,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
   // vision estimation of robot pose
-  Optional<EstimatedRobotPose> visionEstLml3;
-  Optional<EstimatedRobotPose> visionEstLml2R;
-  Optional<EstimatedRobotPose> visionEstLml2L;
+  LimelightHelpers.PoseEstimate visionEstLml3;
+  LimelightHelpers.PoseEstimate visionEstLml2R;
+  LimelightHelpers.PoseEstimate visionEstLml2L;
 
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
@@ -197,12 +195,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     SmartDashboard.putNumber("gyro z", getGyroZ());
 
-    if (visionEstLml3.isPresent()
-        || visionEstLml2R.isPresent()
-        || visionEstLml2L.isPresent() && !hasStartedEstimation) {
-      hasStartedEstimation = true;
-      estimatePose();
-    }
+    estimatePose();
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
 
@@ -286,28 +279,15 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
     var estStdDevs = VecBuilder.fill(.5, .5, 9999999);
-    visionEstLml3.ifPresent(
-        est -> {
-          // var estStdDevs = vision.getEstimationStdDevsLml3();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
+    // declare a static array of vision estimators
+    LimelightHelpers.PoseEstimate[] visionEstimators = {visionEstLml3, visionEstLml2R, visionEstLml2L};
 
-    visionEstLml2R.ifPresent(
-        est -> {
-          // var estStdDevs = vision.getEstimationStdDevsLml2Right();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
-
-    visionEstLml2L.ifPresent(
-        est -> {
-          // var estStdDevs = vision.getEstimationStdDevsLml2Left();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
-
-    hasStartedEstimation = false;
+    for( var visionEstimator : visionEstimators) {
+      if (visionEstimator != null) {
+        poseEstimator.addVisionMeasurement(
+            visionEstimator.pose, visionEstimator.timestampSeconds, estStdDevs);
+      }
+    }
   }
 
   /* drive related things */

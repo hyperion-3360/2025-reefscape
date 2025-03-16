@@ -5,7 +5,6 @@
 package frc.robot.vision;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -22,10 +21,9 @@ import frc.lib.util.Conversions;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
 
 public class Vision extends SubsystemBase {
   public enum CameraSide {
@@ -33,15 +31,11 @@ public class Vision extends SubsystemBase {
     Right
   }
 
+  public final double kTagAmbiguityThreshold = 0.2;
+
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2Right;
   protected Matrix<N3, N1> curStdDevsLml2Left;
-
-  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(4, 4, 8);
-  private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
-
-  private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
-  private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
 
   // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
@@ -59,9 +53,6 @@ public class Vision extends SubsystemBase {
 
   private int m_lockID = 0;
   private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
-  private Optional<EstimatedRobotPose> visionEstLml3;
-  private Optional<EstimatedRobotPose> visionEstLml2Left;
-  private Optional<EstimatedRobotPose> visionEstLml2Right;
   private final double robotHalfLength = Units.inchesToMeters(18);
   private final double distTagToPeg = Units.inchesToMeters(6.25);
   private final double desiredDistFromTag = 1;
@@ -143,56 +134,96 @@ public class Vision extends SubsystemBase {
     return true;
   }
 
+  private LimelightHelpers.PoseEstimate filterAmbiguousMeasurement(
+      LimelightHelpers.PoseEstimate pose) {
+    if (pose == null) return null;
+
+    // compute the average ambiguity of the pose by looping through all the ambiguite of the
+    // rawfiducial
+    // poses and averaging them
+    double avgAmbiguity = 0;
+    for (var fiducial : pose.rawFiducials) {
+      avgAmbiguity += fiducial.ambiguity;
+    }
+
+    avgAmbiguity /= pose.rawFiducials.length;
+
+    if (avgAmbiguity > kTagAmbiguityThreshold) {
+      // if the average ambiguity is greater than 0.2, then we will return the pose as null
+      return null;
+    }
+
+    return pose;
+  }
+
+  private boolean allowedTarget(LimelightHelpers.RawFiducial target) {
+    return m_allowedReefPegTag.contains(target.id);
+  }
+
+  private void selectLockID() {
+    ArrayList<LimelightHelpers.RawFiducial> allTags = new ArrayList<LimelightHelpers.RawFiducial>();
+    if (lml3Measurement != null) allTags.addAll(Arrays.asList(lml3Measurement.rawFiducials));
+    if (lml2LMeasurement != null) allTags.addAll(Arrays.asList(lml2LMeasurement.rawFiducials));
+    if (lml2RMeasurement != null) allTags.addAll(Arrays.asList(lml2RMeasurement.rawFiducials));
+
+    // initialize variables to large or impossible values
+    double targetAmbibuity = 10.0;
+    double targetDistance = 10.0;
+    // PhotonTrackedTarget bestTarget = null;
+    int bestID = 0;
+
+    // iterate through all results and find
+    // the best target that is allowed
+    for (var tag : allTags) {
+      if ((allowedTarget(tag))
+          && (tag.distToCamera < targetDistance)
+          && (tag.ambiguity < targetAmbibuity)) {
+        targetDistance = tag.distToCamera;
+        targetAmbibuity = tag.ambiguity;
+        bestID = tag.id;
+      }
+    }
+    m_lockID = bestID;
+  }
+
   public void doPeriodic(double robotYaw) {
     // First, tell Limelight your robot's current orientation
     LimelightHelpers.SetRobotOrientation("", robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     // Get the pose estimate
     if (currentAlliance == Alliance.Blue) {
-      lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml3");
-      lml2LMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2L");
-      lml2RMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2R");
+      lml3Measurement =
+          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml3"));
+      lml2LMeasurement =
+          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2L"));
+      lml2RMeasurement =
+          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2R"));
     } else {
-      lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml3");
-      lml2LMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2L");
-      lml2RMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2R");
+      lml3Measurement =
+          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml3"));
+      lml2LMeasurement =
+          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2L"));
+      lml2RMeasurement =
+          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2R"));
     }
+
+    selectLockID();
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml3() {
-    return visionEstLml3;
+  public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml3() {
+    return lml3Measurement;
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Right() {
-    return visionEstLml2Right;
+  public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml2Right() {
+    return lml2RMeasurement;
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Left() {
-    return visionEstLml2Left;
+  public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml2Left() {
+    return lml2LMeasurement;
   }
 
   public double getLockID() {
     return m_lockID;
-  }
-
-  private double GetTagYaw() {
-    if (m_lockID != 0) {
-      return Constants.tagLayout.getTagPose(m_lockID).get().getRotation().getZ();
-    }
-    return 0.0;
-  }
-
-  private Translation2d GetTagTranslation() {
-
-    if (m_lockID != 0) {
-
-      var x = Constants.tagLayout.getTagPose(m_lockID).get().getX();
-      var y = Constants.tagLayout.getTagPose(m_lockID).get().getY();
-
-      return new Translation2d(x, y);
-    }
-
-    return new Translation2d();
   }
 
   public boolean isInBoundsForProcessor(Pose2d currentPose) {
