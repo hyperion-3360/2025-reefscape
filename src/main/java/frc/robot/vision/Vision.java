@@ -5,7 +5,6 @@
 package frc.robot.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -43,8 +42,10 @@ public class Vision extends SubsystemBase {
   private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4.5, 4.5, 9);
   private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3.5, 3.5, 7);
 
-  AprilTagFieldLayout tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+  private AprilTagMap mapGenerator = new AprilTagMap();
+
+  AprilTagFieldLayout tagLayout = mapGenerator.field;
+  // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(
           new Translation3d(
