@@ -37,8 +37,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.SwerveElevatorSlowDownFunc;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
-import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.Elevator;
+import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.Vision;
 import java.io.File;
 import java.util.List;
@@ -198,6 +198,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     estimatePose();
 
     m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+    System.out.println(poseEstimator.getEstimatedPosition());
 
     if (DriverStation.isDisabled()) {
       m_targetModeEnabled = false;
@@ -278,7 +279,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // if vision estimation is present, create method est to add vision measurment
     // to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
-    var estStdDevs = VecBuilder.fill(.5, .5, 9999999);
+    var estStdDevs = VecBuilder.fill(10, 10, 9999999);
     // declare a static array of vision estimators
     LimelightHelpers.PoseEstimate[] visionEstimators = {
       visionEstLml3, visionEstLml2R, visionEstLml2L

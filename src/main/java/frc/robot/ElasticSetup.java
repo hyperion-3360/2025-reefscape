@@ -110,7 +110,7 @@ public class ElasticSetup {
 
     // driver tab
     driverTab
-        .addCamera("limelight", "limelight", "mjpg:http://10.33.60.11:1182/?action=stream")
+        .addCamera("limelightblej", "limelightbleh", "mjpg:http://10.33.60.11:1182/?action=stream")
         .withPosition(6, 0)
         .withSize(6, 4);
     driverTab

@@ -1,6 +1,6 @@
 // LimelightHelpers v1.11 (REQUIRES LLOS 2025.0 OR LATER)
 
-package frc.robot;
+package frc.robot.vision;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -691,6 +691,7 @@ public class LimelightHelpers {
 
     if (poseArray.length == 0) {
       // Handle the case where no data is available
+      // System.out.println("this happens ###############################");
       return null; // or some default PoseEstimate
     }
 

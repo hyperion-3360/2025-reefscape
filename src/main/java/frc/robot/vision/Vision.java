@@ -5,6 +5,7 @@
 package frc.robot.vision;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Conversions;
 import frc.robot.Constants;
-import frc.robot.LimelightHelpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ public class Vision extends SubsystemBase {
     Right
   }
 
-  public final double kTagAmbiguityThreshold = 0.2;
+  public final double kTagAmbiguityThreshold = 1;
 
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2Right;
@@ -40,16 +40,19 @@ public class Vision extends SubsystemBase {
   // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(0), 0.0),
+          new Translation3d(
+              Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.5)),
           new Rotation3d(0, 0, 0));
   Transform3d robotToCamLml2Right =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(-11.125), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.95)));
+          new Translation3d(
+              Units.inchesToMeters(12.25), Units.inchesToMeters(-11.125), Units.inchesToMeters(-9)),
+          new Rotation3d(0, -15, 19.95));
   Transform3d robotToCamLml2Left =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.125), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.96)));
+          new Translation3d(
+              Units.inchesToMeters(12.25), Units.inchesToMeters(11.125), Units.inchesToMeters(-9)),
+          new Rotation3d(0, -15, -19.96));
 
   private int m_lockID = 0;
   private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
@@ -62,6 +65,11 @@ public class Vision extends SubsystemBase {
   LimelightHelpers.PoseEstimate lml3Measurement;
   LimelightHelpers.PoseEstimate lml2RMeasurement;
   LimelightHelpers.PoseEstimate lml2LMeasurement;
+
+  private String limelight3 = "limelight";
+  private String limelight2R = "limelight-right";
+  private String limelight2L = "limelight-left";
+
   Alliance currentAlliance;
 
   private enum direction {
@@ -117,6 +125,31 @@ public class Vision extends SubsystemBase {
       currentAlliance = Alliance.Blue;
       m_allowedReefPegTag.clear();
     }
+
+    LimelightHelpers.setCameraPose_RobotSpace(
+        limelight3,
+        robotToCamLml3.getX(),
+        robotToCamLml3.getY(),
+        robotToCamLml3.getZ(),
+        robotToCamLml3.getRotation().getX(),
+        robotToCamLml3.getRotation().getY(),
+        robotToCamLml3.getRotation().getZ());
+    LimelightHelpers.setCameraPose_RobotSpace(
+        limelight2L,
+        robotToCamLml2Left.getX(),
+        robotToCamLml2Left.getY(),
+        robotToCamLml2Left.getZ(),
+        robotToCamLml2Left.getRotation().getX(),
+        robotToCamLml2Left.getRotation().getY(),
+        robotToCamLml2Left.getRotation().getZ());
+    LimelightHelpers.setCameraPose_RobotSpace(
+        limelight2R,
+        robotToCamLml2Right.getX(),
+        robotToCamLml2Right.getY(),
+        robotToCamLml2Right.getZ(),
+        robotToCamLml2Right.getRotation().getX(),
+        robotToCamLml2Right.getRotation().getY(),
+        robotToCamLml2Right.getRotation().getZ());
   }
 
   public boolean limelight2LeftActive() {
@@ -191,21 +224,21 @@ public class Vision extends SubsystemBase {
     LimelightHelpers.SetRobotOrientation("", robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     // Get the pose estimate
-    if (currentAlliance == Alliance.Blue) {
-      lml3Measurement =
-          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml3"));
-      lml2LMeasurement =
-          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2L"));
-      lml2RMeasurement =
-          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2R"));
-    } else {
-      lml3Measurement =
-          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml3"));
-      lml2LMeasurement =
-          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2L"));
-      lml2RMeasurement =
-          filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2R"));
-    }
+    // if (currentAlliance == Alliance.Blue) {
+    lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+    lml2LMeasurement =
+        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left"));
+    lml2RMeasurement =
+        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-right "));
+    // } else {
+    //   lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
+    //   // lml2LMeasurement =
+    //   //     filterAmbiguousMeasurement(
+    //   //         LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left"));
+    //   // lml2RMeasurement =
+    //   //     filterAmbiguousMeasurement(
+    //   //         LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-right"));
+    // }
 
     selectLockID();
   }
@@ -295,5 +328,25 @@ public class Vision extends SubsystemBase {
       return Pose2d.kZero;
     }
   }
-  // #endregion
+
+  public void getEstimatedStdDevs(LimelightHelpers.PoseEstimate estimate) {
+
+    var b = 0.5;
+    var xDevs = 4.0;
+    var yDevs = 4.0;
+    var rotDevs = 9999999;
+    var dist = estimate.avgTagDist;
+    var stdDevs = VecBuilder.fill(xDevs, yDevs, rotDevs);
+
+    xDevs = xDevs / dist * b;
+    if (estimate == lml2LMeasurement) {
+
+    } else if (estimate == lml2RMeasurement) {
+
+    } else if (estimate == lml3Measurement) {
+
+    } else {
+
+    }
+  }
 }
