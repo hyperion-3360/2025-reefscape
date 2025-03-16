@@ -20,32 +20,18 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Conversions;
 import frc.robot.Constants;
+import frc.robot.LimelightHelpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
   public enum CameraSide {
     Left,
     Right
   }
-
-  protected final PhotonCamera cameraLml3;
-  protected final PhotonCamera cameraLml2Right;
-  protected final PhotonCamera cameraLml2Left;
-
-  protected final PhotonPoseEstimator photonEstimatorLml3;
-  protected final PhotonPoseEstimator photonEstimatorLml2Right;
-  protected final PhotonPoseEstimator photonEstimatorLml2Left;
 
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2Right;
@@ -57,6 +43,7 @@ public class Vision extends SubsystemBase {
   private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
   private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
 
+  // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(
           new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(0), 0.0),
@@ -81,6 +68,10 @@ public class Vision extends SubsystemBase {
   private Translation2d minimumTranslationProcessor = new Translation2d();
   private Translation2d maximumTranslationProcessor = new Translation2d();
   private Pose2d processorAlignPosition = new Pose2d();
+  LimelightHelpers.PoseEstimate lml3Measurement;
+  LimelightHelpers.PoseEstimate lml2RMeasurement;
+  LimelightHelpers.PoseEstimate lml2LMeasurement;
+  Alliance currentAlliance;
 
   private enum direction {
     left,
@@ -91,23 +82,9 @@ public class Vision extends SubsystemBase {
   /** Creates a new Odometry. */
   public Vision() {
 
-    cameraLml3 = new PhotonCamera("lml3");
-    cameraLml2Right = new PhotonCamera("lml2R");
-    cameraLml2Left = new PhotonCamera("lml2L");
-    // MULTI_TAG_PNP_ON_COPROCESSOR
-    photonEstimatorLml3 =
-        new PhotonPoseEstimator(Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml3);
-    // photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    photonEstimatorLml2Right =
-        new PhotonPoseEstimator(
-            Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
-    photonEstimatorLml2Left =
-        new PhotonPoseEstimator(
-            Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Left);
-
     try {
-      var alliance = DriverStation.getAlliance().get();
-      if (alliance == Alliance.Blue) {
+      currentAlliance = DriverStation.getAlliance().get();
+      if (currentAlliance == Alliance.Blue) {
         minimumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(200.0), Units.inchesToMeters(0.0));
         maximumTranslationProcessor =
@@ -124,7 +101,7 @@ public class Vision extends SubsystemBase {
         m_allowedReefPegTag.add(21);
         m_allowedReefPegTag.add(20);
         m_allowedReefPegTag.add(19);
-      } else if (alliance == Alliance.Red) {
+      } else if (currentAlliance == Alliance.Red) {
         minimumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(420.0), Units.inchesToMeters(217.0));
         maximumTranslationProcessor =
@@ -146,124 +123,40 @@ public class Vision extends SubsystemBase {
       }
 
     } catch (NoSuchElementException e) {
+      currentAlliance = Alliance.Blue;
       m_allowedReefPegTag.clear();
     }
   }
 
   public boolean limelight2LeftActive() {
-    return cameraLml2Left.isConnected();
+    // return cameraLml2Left.isConnected();
+    return true;
   }
 
   public boolean limelight2RightActive() {
-    return cameraLml2Right.isConnected();
+    // return cameraLml2Right.isConnected();
+    return true;
   }
 
   public boolean limelight3Active() {
-    return cameraLml3.isConnected();
+    // return cameraLml3.isConnected();
+    return true;
   }
 
-  private boolean allowedTarget(PhotonTrackedTarget target) {
-    return m_allowedReefPegTag.contains(target.getFiducialId());
-  }
+  public void doPeriodic(double robotYaw) {
+    // First, tell Limelight your robot's current orientation
+    LimelightHelpers.SetRobotOrientation("", robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-  private boolean isGoodResult(PhotonPipelineResult result) {
-    boolean rc = true;
-    do {
-      if (!result.hasTargets()) {
-        rc = false;
-        break;
-      }
-
-      for (var target : result.getTargets()) {
-        if (target.getPoseAmbiguity() > 0.2) {
-          rc = false;
-          break;
-        }
-      }
-
-    } while (false);
-
-    return rc;
-  }
-
-  public void doPeriodic() {
-    visionEstLml3 = Optional.empty();
-
-    // for a change in target (latest result), estimation.update with latest
-    // update estimation standard deviations with new estimation and new target
-    var unreadResultsLml3 = cameraLml3.getAllUnreadResults();
-
-    for (var changelml3 : unreadResultsLml3) {
-      if (isGoodResult(changelml3)) {
-        visionEstLml3 = photonEstimatorLml3.update(changelml3);
-        updateEstimationStdDevsLml3(visionEstLml3, changelml3.getTargets());
-      }
+    // Get the pose estimate
+    if (currentAlliance == Alliance.Blue) {
+      lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml3");
+      lml2LMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2L");
+      lml2RMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("lml2R");
+    } else {
+      lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml3");
+      lml2LMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2L");
+      lml2RMeasurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("lml2R");
     }
-    visionEstLml2Right = Optional.empty();
-
-    // for a change in target (latest result), estimation.update with latest
-    // update estimation standard deviations with new estimation and new target
-    var unreadResultsLml2Right = cameraLml2Right.getAllUnreadResults();
-
-    for (var changelml2R : unreadResultsLml2Right) {
-      if (isGoodResult(changelml2R)) {
-
-        visionEstLml2Right = photonEstimatorLml2Right.update(changelml2R);
-        updateEstimationStdDevsLml2(visionEstLml2Right, changelml2R.getTargets(), CameraSide.Right);
-      }
-    }
-
-    visionEstLml2Left = Optional.empty();
-
-    // for a change in target (latest result), estimation.update with latest
-    // update estimation standard deviations with new estimation and new target
-    var unreadResultsLml2Left = cameraLml2Left.getAllUnreadResults();
-
-    for (var changelml2L : unreadResultsLml2Left) {
-      if (isGoodResult(changelml2L)) {
-        visionEstLml2Left = photonEstimatorLml2Left.update(changelml2L);
-        updateEstimationStdDevsLml2(visionEstLml2Left, changelml2L.getTargets(), CameraSide.Left);
-      }
-    }
-
-    // setLockTargetfsa
-    // get all results from all cameras
-    var allResults =
-        Stream.of(
-                unreadResultsLml3.stream(),
-                unreadResultsLml2Right.stream(),
-                unreadResultsLml2Left.stream())
-            .flatMap(i -> i)
-            .collect(Collectors.toList());
-
-    // initialize variables to large or impossible values
-    double targetAmbibuity = 10.0;
-    double targetDistance = 10.0;
-    // PhotonTrackedTarget bestTarget = null;
-    int bestID = 0;
-
-    // iterate through all results and find
-    // the best target that is allowed
-    for (var result : allResults) {
-      if (result.hasTargets()) {
-        var currentTarget = result.getBestTarget();
-        var distance = currentTarget.getBestCameraToTarget().getTranslation().getNorm();
-
-        // if the target is allowed, closer than the current target
-        if (allowedTarget(currentTarget)
-            && (distance < targetDistance)
-            && (currentTarget.getPoseAmbiguity() < targetAmbibuity)) {
-          targetDistance = distance;
-          targetAmbibuity = currentTarget.getPoseAmbiguity();
-          bestID = currentTarget.getFiducialId();
-          // bestTarget = currentTarget;
-        }
-      }
-    }
-    // if a target is found, set the lockID and trackedTarget
-    // if (bestID != 0) {
-    m_lockID = bestID;
-    // }
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml3() {
@@ -277,138 +170,6 @@ public class Vision extends SubsystemBase {
   public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Left() {
     return visionEstLml2Left;
   }
-
-  protected void updateEstimationStdDevsLml3(
-      Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
-
-    if (estimatedPose.isEmpty()) {
-      curStdDevsLml3 = singleTagStdDevsLml3;
-    } else {
-
-      // pose preswnt, start running heuristic
-      var estStdDevs = singleTagStdDevsLml3;
-      int numTags = 0;
-      double avgDist = 0;
-
-      // precalc (how mny tags, avg dist metric)
-      for (var tgt : targets) {
-        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty()) continue;
-        numTags++;
-        avgDist +=
-            tagPose
-                .get()
-                .toPose2d()
-                .getTranslation()
-                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-      }
-
-      if (numTags == 0) {
-        // no visiblw tags default to single tag
-        curStdDevsLml3 = singleTagStdDevsLml3;
-      } else {
-        // more tags, run full heuristic
-        avgDist /= numTags;
-
-        // decrase std devs if multiple visible
-        if (numTags > 1) {
-          estStdDevs = multiTagStdDevsLml3;
-        }
-
-        // increase std devs based on "avg" dist
-        if (numTags == 1 && avgDist > 4) {
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
-
-        curStdDevsLml3 = estStdDevs;
-      }
-    }
-  }
-
-  protected void updateEstimationStdDevsLml2(
-      Optional<EstimatedRobotPose> estimatedPose,
-      List<PhotonTrackedTarget> targets,
-      CameraSide side) {
-
-    if (estimatedPose.isEmpty()) {
-      if (side == CameraSide.Left) {
-        curStdDevsLml2Left = singleTagStdDevsLml2;
-      } else {
-        curStdDevsLml2Right = singleTagStdDevsLml2;
-      }
-    } else {
-
-      // pose preswnt, start running heuristic
-      var estStdDevs = singleTagStdDevsLml2;
-      int numTags = 0;
-      double avgDist = 0;
-
-      // precalc (how mny tags, avg dist metric)
-      for (var tgt : targets) {
-        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty()) continue;
-        numTags++;
-        avgDist +=
-            tagPose
-                .get()
-                .toPose2d()
-                .getTranslation()
-                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-      }
-
-      if (numTags == 0) {
-        // no visiblw tags default to single tag
-        if (side == CameraSide.Left) {
-          curStdDevsLml2Left = singleTagStdDevsLml2;
-        } else {
-          curStdDevsLml2Right = singleTagStdDevsLml2;
-        }
-      } else {
-        // more tags, run full heuristic
-        avgDist /= numTags;
-
-        // decrase std devs if multiple visible
-        if (numTags > 1) {
-          estStdDevs = multiTagStdDevsLml2;
-        }
-
-        // increase std devs based on "avg" dist
-        if (numTags == 1 && avgDist > 4) {
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
-
-        if (side == CameraSide.Left) {
-          curStdDevsLml2Left = estStdDevs;
-        } else {
-          curStdDevsLml2Right = estStdDevs;
-        }
-      }
-    }
-  }
-
-  public Matrix<N3, N1> getEstimationStdDevsLml3() {
-    return curStdDevsLml3;
-  }
-
-  public Matrix<N3, N1> getEstimationStdDevsLml2Left() {
-    return curStdDevsLml2Left;
-  }
-
-  public Matrix<N3, N1> getEstimationStdDevsLml2Right() {
-    return curStdDevsLml2Right;
-  }
-
-  // #region lockID
-
-  // public void periodic() {
-  // setLockTarget(); //done in doPeriodic()
-  // isInBoundsForProcessor(); //TBD
-  // System.out.println(lockID);
-  // }
 
   public double getLockID() {
     return m_lockID;

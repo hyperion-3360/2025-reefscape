@@ -5,6 +5,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -189,7 +190,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
-    vision.doPeriodic();
+    vision.doPeriodic(m_gyro.getRotation2d().getDegrees());
     visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
     visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
     visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
@@ -284,24 +285,24 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // if vision estimation is present, create method est to add vision measurment
     // to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
-
+    var estStdDevs = VecBuilder.fill(.5, .5, 9999999);
     visionEstLml3.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml3();
+          // var estStdDevs = vision.getEstimationStdDevsLml3();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
 
     visionEstLml2R.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml2Right();
+          // var estStdDevs = vision.getEstimationStdDevsLml2Right();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
 
     visionEstLml2L.ifPresent(
         est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml2Left();
+          // var estStdDevs = vision.getEstimationStdDevsLml2Left();
           poseEstimator.addVisionMeasurement(
               est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
         });
