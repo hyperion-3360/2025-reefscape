@@ -157,8 +157,6 @@ public class RobotContainer {
   private PegDetect m_pegDetect;
 
   public RobotContainer() {
-    // warms up the pathfinding so that the first path calculation is faster
-    PathfindingCommand.warmupCommand();
 
     m_camera = CameraServer.startAutomaticCapture();
     m_camera.setFPS(45);
@@ -217,6 +215,10 @@ public class RobotContainer {
   }
 
   public void configureAutos() {
+
+    // warms up the pathfinding so that the first path calculation is faster
+    PathfindingCommand.warmupCommand();
+
     m_autoThreeCoralLeftAuto = m_pathfinding.ThreeCoralLeft();
     m_autoThreeCoralRightAuto = m_pathfinding.ThreeCoralRight();
     m_autoOneCoralThenAlgae = m_pathfinding.coralAndAlgae();
@@ -247,12 +249,7 @@ public class RobotContainer {
         .and(() -> m_climber.isClimberActivated())
         .onTrue(unguckClimb);
 
-    m_driverController.x().onTrue(intakeAlgaeFloor);
-
-    m_driverController.b().onTrue(shootAlgae);
-
     m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet);
 
     m_coDriverController
         .povDown()
@@ -263,6 +260,18 @@ public class RobotContainer {
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
+    m_coDriverController.rightBumper().onTrue(intakeCoral);
+
+    m_driverController.x().onTrue(intakeAlgaeFloor);
+
+    m_driverController.b().onTrue(shootAlgae);
+
+    m_driverController
+        .rightTrigger(0.3)
+        .onTrue(shootAlgaeNet)
+        .onFalse(
+            shootAlgaeNet.cancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding));
+
     m_driverController
         .leftTrigger(0.3)
         .onTrue(intakeAlgaeL2)
@@ -296,9 +305,6 @@ public class RobotContainer {
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
-
-    m_coDriverController.rightBumper().onTrue(intakeCoral);
-
     m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
 
     m_testController.povUp().onTrue(frontPose);
