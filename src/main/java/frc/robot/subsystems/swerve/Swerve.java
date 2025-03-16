@@ -191,8 +191,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     vision.doPeriodic();
     visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
-    visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
-    visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
+    // visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
+    // visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
 
     SmartDashboard.putNumber("gyro z", getGyroZ());
 

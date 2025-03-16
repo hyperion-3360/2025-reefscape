@@ -349,23 +349,23 @@ public class Vision extends SubsystemBase {
       }
     } else {
 
-      // pose preswnt, start running heuristic
-      var estStdDevs = singleTagStdDevsLml2;
-      int numTags = 0;
-      double avgDist = 0;
+  //     // pose preswnt, start running heuristic
+  //     var estStdDevs = singleTagStdDevsLml2;
+  //     int numTags = 0;
+  //     double avgDist = 0;
 
-      // precalc (how mny tags, avg dist metric)
-      for (var tgt : targets) {
-        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty()) continue;
-        numTags++;
-        avgDist +=
-            tagPose
-                .get()
-                .toPose2d()
-                .getTranslation()
-                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-      }
+  //     // precalc (how mny tags, avg dist metric)
+  //     for (var tgt : targets) {
+  //       var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
+  //       if (tagPose.isEmpty()) continue;
+  //       numTags++;
+  //       avgDist +=
+  //           tagPose
+  //               .get()
+  //               .toPose2d()
+  //               .getTranslation()
+  //               .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+  //     }
 
       if (numTags == 0) {
         // no visiblw tags default to single tag
@@ -378,17 +378,17 @@ public class Vision extends SubsystemBase {
         // more tags, run full heuristic
         avgDist /= numTags;
 
-        // decrase std devs if multiple visible
-        if (numTags > 1) {
-          estStdDevs = multiTagStdDevsLml2;
-        }
+  //       // decrase std devs if multiple visible
+  //       if (numTags > 1) {
+  //         estStdDevs = multiTagStdDevsLml2;
+  //       }
 
-        // increase std devs based on "avg" dist
-        if (numTags == 1 && avgDist > 4) {
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
+  //       // increase std devs based on "avg" dist
+  //       if (numTags == 1 && avgDist > 4) {
+  //         estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+  //       } else {
+  //         estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+  //       }
 
         if (side == CameraSide.Left) {
           curStdDevsLml2Left = estStdDevs;

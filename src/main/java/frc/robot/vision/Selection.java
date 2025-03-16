@@ -46,8 +46,8 @@ public class Selection extends Vision {
   Pose2d processorAlignPosition = new Pose2d();
   boolean isInBounds = false;
   boolean lml3NoTarget = true;
-  boolean lml2LNoTarget = true;
-  boolean lml2RNoTarget = true;
+  // boolean lml2LNoTarget = true;
+  // boolean lml2RNoTarget = true;
 
   desiredHeight currentAlgaeHeight = desiredHeight.LOW;
 
@@ -235,35 +235,35 @@ public class Selection extends Vision {
       }
     }
 
-    for (var change : cameraLml2Left.getAllUnreadResults()) {
+    // for (var change : cameraLml2Left.getAllUnreadResults()) {
 
-      if (change.hasTargets()) {
-        lml2LNoTarget = false;
-        trackedTarget = change.getBestTarget();
-        lockID = trackedTarget.fiducialId;
-        if (reefPegTag.indexOf(lockID) == -1) {
-          lml2LNoTarget = true;
-        }
-      } else {
-        lml2LNoTarget = true;
-      }
-    }
+    //   if (change.hasTargets()) {
+    //     lml2LNoTarget = false;
+    //     trackedTarget = change.getBestTarget();
+    //     lockID = trackedTarget.fiducialId;
+    //     if (reefPegTag.indexOf(lockID) == -1) {
+    //       lml2LNoTarget = true;
+    //     }
+    //   } else {
+    //     lml2LNoTarget = true;
+    //   }
+    // }
 
-    for (var change : cameraLml2Right.getAllUnreadResults()) {
+    // for (var change : cameraLml2Right.getAllUnreadResults()) {
 
-      if (change.hasTargets()) {
-        lml2RNoTarget = false;
-        trackedTarget = change.getBestTarget();
-        lockID = trackedTarget.fiducialId;
-        if (reefPegTag.indexOf(lockID) == -1) {
-          lml2RNoTarget = true;
-        }
-      } else {
-        lml2RNoTarget = true;
-      }
-    }
+    //   if (change.hasTargets()) {
+    //     lml2RNoTarget = false;
+    //     trackedTarget = change.getBestTarget();
+    //     lockID = trackedTarget.fiducialId;
+    //     if (reefPegTag.indexOf(lockID) == -1) {
+    //       lml2RNoTarget = true;
+    //     }
+    //   } else {
+    //     lml2RNoTarget = true;
+    //   }
+    // }
 
-    if (lml3NoTarget && lml2LNoTarget && lml2RNoTarget) {
+    if (lml3NoTarget) { // && lml2LNoTarget && lml2RNoTarget) {
       lockID = 0;
     }
   }
