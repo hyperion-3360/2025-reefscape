@@ -275,7 +275,7 @@ public class RobotContainer {
     m_driverController
         .leftTrigger(0.3)
         .onTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds, m_swerve));
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()).andThen(elevateLOW));
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
