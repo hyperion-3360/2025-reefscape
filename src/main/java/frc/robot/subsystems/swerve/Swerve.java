@@ -280,9 +280,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
     var estStdDevs = VecBuilder.fill(.5, .5, 9999999);
     // declare a static array of vision estimators
-    LimelightHelpers.PoseEstimate[] visionEstimators = {visionEstLml3, visionEstLml2R, visionEstLml2L};
+    LimelightHelpers.PoseEstimate[] visionEstimators = {
+      visionEstLml3, visionEstLml2R, visionEstLml2L
+    };
 
-    for( var visionEstimator : visionEstimators) {
+    for (var visionEstimator : visionEstimators) {
       if (visionEstimator != null) {
         poseEstimator.addVisionMeasurement(
             visionEstimator.pose, visionEstimator.timestampSeconds, estStdDevs);
