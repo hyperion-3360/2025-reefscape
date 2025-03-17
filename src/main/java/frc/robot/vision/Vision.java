@@ -38,16 +38,19 @@ public class Vision extends SubsystemBase {
   protected Matrix<N3, N1> curStdDevsLml2Left;
 
   // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-  Transform3d robotToCamLml3 =
-      new Transform3d(
-          new Translation3d(
-              Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.5)),
-          new Rotation3d(0, 0, 0));
+  // -0,06985, 0, 0,2794, 0,0,0
+  // Transform3d robotToCamLml3 =
+  //     new Transform3d(
+  //         new Translation3d(
+  //             Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.5)),
+  //         new Rotation3d(0, 0, 0));
+  // 0,3048, -0,282575, -0,2286, 0, -15, 19.95
   Transform3d robotToCamLml2Right =
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(12.25), Units.inchesToMeters(-11.125), Units.inchesToMeters(-9)),
           new Rotation3d(0, -15, 19.95));
+  // 0,3048, 0,282575, -0,2286, 0, -15, -19.96
   Transform3d robotToCamLml2Left =
       new Transform3d(
           new Translation3d(
@@ -62,11 +65,11 @@ public class Vision extends SubsystemBase {
   private Translation2d minimumTranslationProcessor = new Translation2d();
   private Translation2d maximumTranslationProcessor = new Translation2d();
   private Pose2d processorAlignPosition = new Pose2d();
-  LimelightHelpers.PoseEstimate lml3Measurement;
+  // LimelightHelpers.PoseEstimate lml3Measurement;
   LimelightHelpers.PoseEstimate lml2RMeasurement;
   LimelightHelpers.PoseEstimate lml2LMeasurement;
 
-  private String limelight3 = "limelight";
+  // private String limelight3 = "limelight";
   private String limelight2R = "limelight-right";
   private String limelight2L = "limelight-left";
 
@@ -126,14 +129,14 @@ public class Vision extends SubsystemBase {
       m_allowedReefPegTag.clear();
     }
 
-    LimelightHelpers.setCameraPose_RobotSpace(
-        limelight3,
-        robotToCamLml3.getX(),
-        robotToCamLml3.getY(),
-        robotToCamLml3.getZ(),
-        robotToCamLml3.getRotation().getX(),
-        robotToCamLml3.getRotation().getY(),
-        robotToCamLml3.getRotation().getZ());
+    // LimelightHelpers.setCameraPose_RobotSpace(
+    //     limelight3,
+    //     robotToCamLml3.getX(),
+    //     robotToCamLml3.getY(),
+    //     robotToCamLml3.getZ(),
+    //     robotToCamLml3.getRotation().getX(),
+    //     robotToCamLml3.getRotation().getY(),
+    //     robotToCamLml3.getRotation().getZ());
     LimelightHelpers.setCameraPose_RobotSpace(
         limelight2L,
         robotToCamLml2Left.getX(),
@@ -195,7 +198,7 @@ public class Vision extends SubsystemBase {
 
   private void selectLockID() {
     ArrayList<LimelightHelpers.RawFiducial> allTags = new ArrayList<LimelightHelpers.RawFiducial>();
-    if (lml3Measurement != null) allTags.addAll(Arrays.asList(lml3Measurement.rawFiducials));
+    // if (lml3Measurement != null) allTags.addAll(Arrays.asList(lml3Measurement.rawFiducials));
     if (lml2LMeasurement != null) allTags.addAll(Arrays.asList(lml2LMeasurement.rawFiducials));
     if (lml2RMeasurement != null) allTags.addAll(Arrays.asList(lml2RMeasurement.rawFiducials));
 
@@ -221,15 +224,17 @@ public class Vision extends SubsystemBase {
 
   public void doPeriodic(double robotYaw) {
     // First, tell Limelight your robot's current orientation
-    LimelightHelpers.SetRobotOrientation("", robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+    // LimelightHelpers.SetRobotOrientation(limelight3, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+    LimelightHelpers.SetRobotOrientation(limelight2L, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+    LimelightHelpers.SetRobotOrientation(limelight2R, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     // Get the pose estimate
     // if (currentAlliance == Alliance.Blue) {
-    lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+    // lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight3);
     lml2LMeasurement =
-        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-left"));
+        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight2L));
     lml2RMeasurement =
-        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-right "));
+        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight2R));
     // } else {
     //   lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
     //   // lml2LMeasurement =
@@ -243,9 +248,9 @@ public class Vision extends SubsystemBase {
     selectLockID();
   }
 
-  public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml3() {
-    return lml3Measurement;
-  }
+  // public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml3() {
+  //   return lml3Measurement;
+  // }
 
   public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml2Right() {
     return lml2RMeasurement;
@@ -343,9 +348,9 @@ public class Vision extends SubsystemBase {
 
     } else if (estimate == lml2RMeasurement) {
 
-    } else if (estimate == lml3Measurement) {
+      // } else if (estimate == lml3Measurement) {
 
-    } else {
+      // } else {
 
     }
   }

@@ -74,7 +74,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
   // vision estimation of robot pose
-  LimelightHelpers.PoseEstimate visionEstLml3;
+  // LimelightHelpers.PoseEstimate visionEstLml3;
   LimelightHelpers.PoseEstimate visionEstLml2R;
   LimelightHelpers.PoseEstimate visionEstLml2L;
 
@@ -189,7 +189,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
     vision.doPeriodic(m_gyro.getRotation2d().getDegrees());
-    visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
+    // visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
     visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
     visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
 
@@ -282,7 +282,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var estStdDevs = VecBuilder.fill(10, 10, 9999999);
     // declare a static array of vision estimators
     LimelightHelpers.PoseEstimate[] visionEstimators = {
-      visionEstLml3, visionEstLml2R, visionEstLml2L
+      /* visionEstLml3, */ visionEstLml2R, visionEstLml2L
     };
 
     for (var visionEstimator : visionEstimators) {
