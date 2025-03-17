@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AutoCmd.AutoCancel;
+import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
@@ -112,6 +113,9 @@ public class RobotContainer {
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
+
+  private final AutoCancelNet netCancel =
+      new AutoCancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
 
   private final ElevateCmd elevateL2 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
@@ -266,11 +270,7 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(shootAlgae);
 
-    m_driverController
-        .rightTrigger(0.3)
-        .onTrue(shootAlgaeNet)
-        .onFalse(
-            shootAlgaeNet.cancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding));
+    m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(netCancel);
 
     m_driverController
         .leftTrigger(0.3)
