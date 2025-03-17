@@ -124,7 +124,6 @@ public class Selection extends Vision {
   public void periodic() {
     setLockTarget();
     isInBoundsForProcessor();
-    System.out.println(lockID);
   }
 
   public boolean isInBoundsForProcessor() {
