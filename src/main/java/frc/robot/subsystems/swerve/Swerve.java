@@ -38,7 +38,6 @@ import frc.lib.util.SwerveElevatorSlowDownFunc;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
 import frc.robot.subsystems.Elevator;
-import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.Vision;
 import java.io.File;
 import java.util.List;
@@ -73,16 +72,11 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
 
-  // vision estimation of robot pose
-  // LimelightHelpers.PoseEstimate visionEstLml3;
-  LimelightHelpers.PoseEstimate visionEstLml2R;
-  LimelightHelpers.PoseEstimate visionEstLml2L;
-
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
     m_gyro = new Pigeon2(Constants.Swerve.kGyroCanId);
 
-    m_gyro.reset();
+    m_gyro.setYaw((DriverStation.getAlliance().get() == DriverStation.Alliance.Red) ? 0 : 180);
     m_gyro.getAccumGyroZ(true);
     this.vision = vision;
     mSwerveMods =
@@ -188,11 +182,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
     // updates the odometry positon
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
-    vision.doPeriodic(m_gyro.getRotation2d().getDegrees());
-    // visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
-    visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
-    visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
-
     SmartDashboard.putNumber("gyro z", getGyroZ());
 
     estimatePose();
@@ -276,20 +265,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public void estimatePose() {
 
+    vision.doPeriodic(m_gyro.getRotation2d().getDegrees());
+    // visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
+    // var visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
+    // var visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
+
     // if vision estimation is present, create method est to add vision measurment
     // to
     // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
-    var estStdDevs = VecBuilder.fill(10, 10, 9999999);
+    var estStdDevs = VecBuilder.fill(1, 1, 9999999);
     // declare a static array of vision estimators
-    LimelightHelpers.PoseEstimate[] visionEstimators = {
-      /* visionEstLml3, */ visionEstLml2R, visionEstLml2L
-    };
 
-    for (var visionEstimator : visionEstimators) {
-      if (visionEstimator != null) {
-        poseEstimator.addVisionMeasurement(
-            visionEstimator.pose, visionEstimator.timestampSeconds, estStdDevs);
-      }
+    var visionEstimator = vision.getBestPose();
+
+    if (visionEstimator != null) {
+      poseEstimator.addVisionMeasurement(
+          visionEstimator.pose, visionEstimator.timestampSeconds, estStdDevs);
     }
   }
 

@@ -174,6 +174,8 @@ public class Vision extends SubsystemBase {
       LimelightHelpers.PoseEstimate pose) {
     if (pose == null) return null;
 
+    if (pose.tagCount == 0) return null;
+
     // compute the average ambiguity of the pose by looping through all the ambiguite of the
     // rawfiducial
     // poses and averaging them
@@ -223,27 +225,15 @@ public class Vision extends SubsystemBase {
   }
 
   public void doPeriodic(double robotYaw) {
-    // First, tell Limelight your robot's current orientation
-    // LimelightHelpers.SetRobotOrientation(limelight3, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
     LimelightHelpers.SetRobotOrientation(limelight2L, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
     LimelightHelpers.SetRobotOrientation(limelight2R, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-    // Get the pose estimate
-    // if (currentAlliance == Alliance.Blue) {
-    // lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight3);
     lml2LMeasurement =
-        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight2L));
+        filterAmbiguousMeasurement(
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight2L));
     lml2RMeasurement =
-        filterAmbiguousMeasurement(LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight2R));
-    // } else {
-    //   lml3Measurement = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
-    //   // lml2LMeasurement =
-    //   //     filterAmbiguousMeasurement(
-    //   //         LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-left"));
-    //   // lml2RMeasurement =
-    //   //     filterAmbiguousMeasurement(
-    //   //         LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight-right"));
-    // }
+        filterAmbiguousMeasurement(
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight2R));
 
     selectLockID();
   }
@@ -251,6 +241,17 @@ public class Vision extends SubsystemBase {
   // public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml3() {
   //   return lml3Measurement;
   // }
+
+  public LimelightHelpers.PoseEstimate getBestPose() {
+    if ((lml2LMeasurement == null) && (lml2RMeasurement == null)) return null;
+
+    if (lml2LMeasurement == null) return lml2RMeasurement;
+
+    if (lml2RMeasurement == null) return lml2LMeasurement;
+
+    if (lml2LMeasurement.avgTagArea > lml2RMeasurement.avgTagArea) return lml2LMeasurement;
+    else return lml2RMeasurement;
+  }
 
   public LimelightHelpers.PoseEstimate getEstimatedGlobalPoseLml2Right() {
     return lml2RMeasurement;
