@@ -19,6 +19,7 @@ import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.DeepClimbCmd;
+import frc.robot.commands.DriveAndShootCoralCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dumper;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
+import frc.robot.subsystems.Elevator.desiredState;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
@@ -132,6 +134,8 @@ public class RobotContainer {
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
+  private final DriveAndShootCoralCmd LeftDriveAndShoot = new DriveAndShootCoralCmd(m_shooter,m_leds, m_elevator,m_swerve, m_selector, m_selector.getDesiredposeLeft());
+  private final DriveAndShootCoralCmd RightDriveAndShoot = new DriveAndShootCoralCmd(m_shooter,m_leds, m_elevator,m_swerve, m_selector, m_selector.getDesiredposeRight());
 
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;
@@ -245,9 +249,15 @@ public class RobotContainer {
         .onTrue(intakeAlgaeLollypop)
         .onFalse(intakeAlgaeLollypop.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
 
-    m_coDriverController.povUp().onTrue(elevateL4);
-    m_coDriverController.povLeft().onTrue(elevateL3);
-    m_coDriverController.povRight().onTrue(elevateL2);
+    m_coDriverController
+        .povUp()
+        .onTrue(Commands.runOnce(() -> m_elevator.setHeightState(desiredState.L4STATE)));
+    m_coDriverController
+        .povLeft()
+        .onTrue(Commands.runOnce(() -> m_elevator.setHeightState(desiredState.L3STATE)));
+    m_coDriverController
+        .povRight()
+        .onTrue(Commands.runOnce(() -> m_elevator.setHeightState(desiredState.L2STATE)));
     m_coDriverController.b().onTrue(elevateLOW);
 
     m_driverController
@@ -260,7 +270,7 @@ public class RobotContainer {
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()).andThen(elevateLOW));
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
@@ -270,19 +280,19 @@ public class RobotContainer {
     m_driverController
         .leftBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeLeft()))
+            LeftDriveAndShoot
                 .unless(m_climber::isClimberActivated)
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()).andThen(elevateLOW));
 
     m_driverController
         .rightBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeRight()))
+            RightDriveAndShoot
 
             //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
             // m_leds.SetPattern(LEDs.Pattern.READY)))
