@@ -99,10 +99,10 @@ public class RobotContainer {
           m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAELOW, m_driverController);
   private final DriveAndIntakeCmd intakeAlgaeL2 =
       new DriveAndIntakeCmd(
-          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_selector);
+          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_vision);
   private final DriveAndIntakeCmd intakeAlgaeL3 =
       new DriveAndIntakeCmd(
-          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3, m_swerve, m_selector);
+          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3, m_swerve, m_vision);
 
   private final IntakeAlgaeCmd intakeAlgaeLollypop =
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
