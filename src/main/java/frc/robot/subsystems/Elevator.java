@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,13 +34,21 @@ public class Elevator extends SubsystemBase implements TestBindings {
     FEEDER,
     ALGAELOW,
     LOW,
+    ALGAEL2,
+    ALGAEL3,
+    LOLLYPOP,
     L1,
     L2,
     L3,
-    L4,
-    ALGAEL2,
-    ALGAEL3,
-    LOLLYPOP
+    L4
+  }
+
+  public enum desiredState {
+    L1STATE,
+    L2STATE,
+    L3STATE,
+    L4STATE,
+    NULL
   }
 
   // private static double kP = 20.0;
@@ -99,6 +108,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private double elevatorVelocity;
   private double elevatorSetpoint;
   private desiredHeight heightEnum = desiredHeight.LOW;
+  private desiredState currentState = desiredState.NULL;
 
   public Elevator() {
     // motor configs
@@ -288,6 +298,45 @@ public class Elevator extends SubsystemBase implements TestBindings {
     m_controller.setGoal(heightTarget);
     chronoStarted = true;
     chronoStartTime = Timer.getFPGATimestamp();
+  }
+
+  public Command ElevateAutomatic() {
+
+    var elevate = Commands.none();
+
+    switch (currentState) {
+      case L1STATE:
+        elevate = Commands.runOnce(() -> SetHeight(desiredHeight.L1));
+
+        break;
+
+      case L2STATE:
+        elevate = Commands.runOnce(() -> SetHeight(desiredHeight.L2));
+
+        break;
+
+      case L3STATE:
+        elevate = Commands.runOnce(() -> SetHeight(desiredHeight.L3));
+
+        break;
+
+      case L4STATE:
+        elevate = Commands.runOnce(() -> SetHeight(desiredHeight.L4));
+
+        break;
+
+      case NULL:
+        elevate = Commands.runOnce(() -> SetHeight(desiredHeight.LOW));
+
+        break;
+    }
+
+    return elevate;
+  }
+
+  public void setHeightState(desiredState state) {
+
+    currentState = state;
   }
 
   public double getElevatorPos() {
