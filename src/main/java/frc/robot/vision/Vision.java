@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Conversions;
 import frc.robot.Constants;
+import frc.robot.subsystems.Elevator.desiredHeight;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -40,12 +42,12 @@ public class Vision extends SubsystemBase {
   }
 
   protected final PhotonCamera cameraLml3;
-  // protected final PhotonCamera cameraLml2Right;
-  // protected final PhotonCamera cameraLml2Left;
+  protected final PhotonCamera cameraLml2Right;
+  protected final PhotonCamera cameraLml2Left;
 
   protected final PhotonPoseEstimator photonEstimatorLml3;
-  // protected final PhotonPoseEstimator photonEstimatorLml2Right;
-  // protected final PhotonPoseEstimator photonEstimatorLml2Left;
+  protected final PhotonPoseEstimator photonEstimatorLml2Right;
+  protected final PhotonPoseEstimator photonEstimatorLml2Left;
 
   protected Matrix<N3, N1> curStdDevsLml3;
   protected Matrix<N3, N1> curStdDevsLml2Right;
@@ -56,6 +58,8 @@ public class Vision extends SubsystemBase {
 
   private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
   private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
+
+  desiredHeight currentAlgaeHeight = desiredHeight.LOW;
   Transform3d robotToCamLml3 =
       new Transform3d(
           new Translation3d(
@@ -89,12 +93,15 @@ public class Vision extends SubsystemBase {
   private final double desiredDistFromTag = 1;
   private Translation2d minimumTranslationProcessor = new Translation2d();
   private Translation2d maximumTranslationProcessor = new Translation2d();
-  private Pose2d processorAlignPosition = new Pose2d();
+  private Pose2d processorAlignPosition = new Pose2d(); 
+  // we want to be close to the reef to intake an algae but we don't want to slam into the reef
+  private double desiredCloseUpDistFromTag = 0.4;
 
   private enum direction {
     left,
     right,
-    back
+    back,
+    close
   }
 
   /** Creates a new Odometry. */
@@ -159,13 +166,13 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  // public boolean limelight2LeftActive() {
-  //   return cameraLml2Left.isConnected();
-  // }
+  public boolean limelight2LeftActive() {
+    return cameraLml2Left.isConnected();
+  }
 
-  // public boolean limelight2RightActive() {
-  //   return cameraLml2Right.isConnected();
-  // }
+  public boolean limelight2RightActive() {
+    return cameraLml2Right.isConnected();
+  }
 
   public boolean limelight3Active() {
     return cameraLml3.isConnected();
@@ -349,23 +356,23 @@ public class Vision extends SubsystemBase {
       }
     } else {
 
-  //     // pose preswnt, start running heuristic
-  //     var estStdDevs = singleTagStdDevsLml2;
-  //     int numTags = 0;
-  //     double avgDist = 0;
+      // pose preswnt, start running heuristic
+      var estStdDevs = singleTagStdDevsLml2;
+      int numTags = 0;
+      double avgDist = 0;
 
-  //     // precalc (how mny tags, avg dist metric)
-  //     for (var tgt : targets) {
-  //       var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
-  //       if (tagPose.isEmpty()) continue;
-  //       numTags++;
-  //       avgDist +=
-  //           tagPose
-  //               .get()
-  //               .toPose2d()
-  //               .getTranslation()
-  //               .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-  //     }
+      // precalc (how mny tags, avg dist metric)
+      for (var tgt : targets) {
+        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
+        if (tagPose.isEmpty()) continue;
+        numTags++;
+        avgDist +=
+            tagPose
+                .get()
+                .toPose2d()
+                .getTranslation()
+                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
 
       if (numTags == 0) {
         // no visiblw tags default to single tag
@@ -378,17 +385,17 @@ public class Vision extends SubsystemBase {
         // more tags, run full heuristic
         avgDist /= numTags;
 
-  //       // decrase std devs if multiple visible
-  //       if (numTags > 1) {
-  //         estStdDevs = multiTagStdDevsLml2;
-  //       }
+        // decrase std devs if multiple visible
+        if (numTags > 1) {
+          estStdDevs = multiTagStdDevsLml2;
+        }
 
-  //       // increase std devs based on "avg" dist
-  //       if (numTags == 1 && avgDist > 4) {
-  //         estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-  //       } else {
-  //         estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-  //       }
+        // increase std devs based on "avg" dist
+        if (numTags == 1 && avgDist > 4) {
+          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        } else {
+          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        }
 
         if (side == CameraSide.Left) {
           curStdDevsLml2Left = estStdDevs;
@@ -481,6 +488,9 @@ public class Vision extends SubsystemBase {
       case back:
         translationX -= desiredDistFromTag;
         break;
+      case close:
+        translationX -= desiredCloseUpDistFromTag;
+        break;
     }
     var translation =
         tagPose
@@ -512,5 +522,30 @@ public class Vision extends SubsystemBase {
       return Pose2d.kZero;
     }
   }
+  public Pose2d getDesiredCloseUpPoseAlgae(Pose2d currentPose) {
+    if (m_lockID != 0) {
+      return computeNewPoseFromTag(m_lockID, direction.close);
+    } else {
+      return Pose2d.kZero;
+    }
+  }
   // #endregion
+  public desiredHeight getAlgaeHeight() {
+
+    if (m_allowedReefPegTag.indexOf(m_lockID) == 0
+        || m_allowedReefPegTag.indexOf(m_lockID) == 2
+        || m_allowedReefPegTag.indexOf(m_lockID) == 4) {
+      currentAlgaeHeight = desiredHeight.ALGAEL3;
+
+    } else if (m_allowedReefPegTag.indexOf(m_lockID) == 1
+        || m_allowedReefPegTag.indexOf(m_lockID) == 3
+        || m_allowedReefPegTag.indexOf(m_lockID) == 5) {
+      currentAlgaeHeight = desiredHeight.ALGAEL2;
+
+    } else {
+      currentAlgaeHeight = desiredHeight.LOW;
+    }
+
+    return currentAlgaeHeight;
+  }
 }

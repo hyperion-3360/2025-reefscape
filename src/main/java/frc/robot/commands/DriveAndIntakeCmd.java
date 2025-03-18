@@ -14,6 +14,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Selection;
+import frc.robot.vision.Vision;
 
 public class DriveAndIntakeCmd extends SequentialCommandGroup {
   /**
@@ -30,7 +31,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
       Elevator m_elevator,
       desiredHeight height,
       Swerve m_swerve,
-      Selection m_selector) {
+      Vision m_vision) {
     MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 0.5, 0.8, OffsetDir.BACK);
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
@@ -38,17 +39,17 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addRequirements(m_swerve);
     addCommands(
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
-        new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredposeAlgae())),
+        new InstantCommand(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(m_swerve.getPose()))),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
-        Commands.runOnce(() -> m_elevator.SetHeight(m_selector.getAlgaeHeight())),
+        Commands.runOnce(() -> m_elevator.SetHeight(m_vision.getAlgaeHeight())),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
         Commands.runOnce(
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new WaitCommand(0.3)
-            .unless(() -> m_selector.getAlgaeHeight().equals(desiredHeight.ALGAEL2)),
-        new InstantCommand(() -> m_swerve.drivetoTarget(m_selector.getDesiredCloseUpPoseAlgae())),
+            .unless(() -> m_vision.getAlgaeHeight().equals(desiredHeight.ALGAEL2)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae())),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         backTrack,
