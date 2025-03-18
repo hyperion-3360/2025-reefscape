@@ -46,14 +46,12 @@ public class Conversions {
   }
 
   /**
-   * @brief Converts a Pose3d to a Pose2d by removing the Z component
+   * @brief DEPRECATED: Use the toPose2d() function in Pose3d. Converts a Pose3d to a Pose2d by
+   *     removing the Z component
    * @param pose Pose3d
    * @return Pose2d
    */
   public static Pose2d Pose3dToPose2d(Pose3d pose) {
-    return new Pose2d(
-        pose.getTranslation().getX(),
-        pose.getTranslation().getY(),
-        pose.getRotation().toRotation2d());
+    return pose.toPose2d();
   }
 }

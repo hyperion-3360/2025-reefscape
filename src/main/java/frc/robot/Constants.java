@@ -12,6 +12,8 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,6 +26,9 @@ import frc.lib.util.SwerveModuleConstants;
 public final class Constants {
 
   public static final double stickDeadband = 0.03;
+
+  public static final AprilTagFieldLayout tagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
   public static final class Swerve {
 
@@ -120,7 +125,7 @@ public final class Constants {
       public static final int driveMotorID = 7;
       public static final int angleMotorID = 8;
       public static final int magEncoderID = 3; // g
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(90.53); // 89.20 // -4.3
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(89.20); // 89.20 // -4.3
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, magEncoderID, angleOffset);
     }
@@ -130,7 +135,7 @@ public final class Constants {
       public static final int driveMotorID = 5;
       public static final int angleMotorID = 6;
       public static final int magEncoderID = 8; // g
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(183.25); // 187.33// 0
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(187.33); // 187.33// 0
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, magEncoderID, angleOffset);
     }
@@ -141,7 +146,7 @@ public final class Constants {
       public static final int angleMotorID = 2;
       public static final int magEncoderID = 2; // g
       public static final Rotation2d angleOffset =
-          Rotation2d.fromDegrees(309.38); // 310.42// -24.39
+          Rotation2d.fromDegrees(310.42); // 310.42// -24.39
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, magEncoderID, angleOffset);
     }
@@ -152,7 +157,7 @@ public final class Constants {
       public static final int angleMotorID = 4;
       public static final int magEncoderID = 5; // g
       public static final Rotation2d angleOffset =
-          Rotation2d.fromDegrees(162.51); // 166.43// -83.38
+          Rotation2d.fromDegrees(166.43); // 166.43// -83.38
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(driveMotorID, angleMotorID, magEncoderID, angleOffset);
     }

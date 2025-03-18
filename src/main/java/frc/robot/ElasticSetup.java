@@ -18,7 +18,6 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
 import java.util.function.BooleanSupplier;
 
@@ -70,7 +69,6 @@ public class ElasticSetup {
   private Swerve swerve;
   private Shooter shooter;
   private Climber climber;
-  private Selection selector;
   private AlgaeIntake algaeIntake;
   private Elevator elevator;
   private CommandXboxController codriver;
@@ -85,7 +83,6 @@ public class ElasticSetup {
       Swerve swerve,
       Shooter shooter,
       Climber climber,
-      Selection selector,
       AlgaeIntake algaeIntake,
       Elevator elevator,
       CommandXboxController codriver,
@@ -95,7 +92,6 @@ public class ElasticSetup {
     this.swerve = swerve;
     this.shooter = shooter;
     this.climber = climber;
-    this.selector = selector;
     this.algaeIntake = algaeIntake;
     this.elevator = elevator;
     this.codriver = codriver;
@@ -135,13 +131,11 @@ public class ElasticSetup {
         .withSize(1, 1);
     driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(3, 4).withSize(1, 1);
     driverTab
-        .addBoolean("is in bounds for processor", () -> selector.isInBoundsForProcessor())
+        .addBoolean(
+            "is in bounds for processor", () -> vision.isInBoundsForProcessor(swerve.getPose()))
         .withPosition(4, 4)
         .withSize(1, 1);
-    driverTab
-        .addNumber("lock Tag id", () -> selector.getLockID())
-        .withPosition(5, 4)
-        .withSize(1, 1);
+    driverTab.addNumber("lock Tag id", () -> vision.getLockID()).withPosition(5, 4).withSize(1, 1);
 
     // technician tab
     //     - Autonomous mode (chooser)
@@ -184,12 +178,12 @@ public class ElasticSetup {
   public void setUpDashboardDebug() {
 
     // selector
-    debugTab.add("desiredPose x (left)", selector.getDesiredposeLeft().getX());
-    debugTab.add("desiredPose y (left)", selector.getDesiredposeLeft().getY());
-    debugTab.add("desiredPose x (right)", selector.getDesiredposeRight().getX());
-    debugTab.add("desiredPose y (right)", selector.getDesiredposeRight().getY());
-    debugTab.add("desiredPose x center", selector.getDesiredposeAlgae().getX());
-    debugTab.add("desiredPose y center", selector.getDesiredposeAlgae().getY());
+    debugTab.add("desiredPose x (left)", vision.getDesiredPoseLeft().getX());
+    debugTab.add("desiredPose y (left)", vision.getDesiredPoseLeft().getY());
+    debugTab.add("desiredPose x (right)", vision.getDesiredPoseRight().getX());
+    debugTab.add("desiredPose y (right)", vision.getDesiredPoseRight().getY());
+    debugTab.add("desiredPose x center", vision.getDesiredPoseAlgae(swerve.getPose()).getX());
+    debugTab.add("desiredPose y center", vision.getDesiredPoseAlgae(swerve.getPose()).getY());
     debugTab.add("current pos x", swerve.getPose().getX());
     debugTab.add("current pos y", swerve.getPose().getY());
     debugTab.add("gyro rotation", swerve.getRotation2d().getDegrees());
