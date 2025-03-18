@@ -13,7 +13,6 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.vision.Selection;
 import frc.robot.vision.Vision;
 
 public class DriveAndIntakeCmd extends SequentialCommandGroup {
@@ -49,7 +48,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new WaitCommand(0.3)
             .unless(() -> m_vision.getAlgaeHeight().equals(desiredHeight.ALGAEL2)),
-        new InstantCommand(() -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae())),
+        new InstantCommand(() -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae(m_swerve.getPose()))),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         backTrack,
