@@ -7,6 +7,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,6 +43,7 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.vision.PegDetect;
 import frc.robot.vision.Vision;
 
 public class RobotContainer {
@@ -136,10 +139,19 @@ public class RobotContainer {
   private Command m_autoLine;
 
   private boolean m_debug = false;
+  private UsbCamera m_camera;
+
+  private PegDetect m_pegDetect;
 
   public RobotContainer() {
     // warms up the pathfinding so that the first path calculation is faster
     PathfindingCommand.warmupCommand();
+
+    m_camera = CameraServer.startAutomaticCapture();
+    m_camera.setFPS(45);
+    m_camera.setResolution(160, 100);
+
+    m_pegDetect = new PegDetect(CameraServer.getVideo(m_camera));
 
     setup.setUpDashboardComp();
     if (m_debug) {
