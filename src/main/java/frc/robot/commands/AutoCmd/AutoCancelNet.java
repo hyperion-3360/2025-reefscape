@@ -30,7 +30,6 @@ public class AutoCancelNet extends SequentialCommandGroup {
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORING))
             .unless(() -> !m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.LOW)),
-        new InstantCommand(() -> m_swerve.stopSwerve()),
         new InstantCommand(() -> m_leds.SetPattern(Pattern.IDLE))
             .unless(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_leds.SetPattern(Pattern.READY))
