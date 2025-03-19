@@ -61,28 +61,27 @@ public class Vision extends SubsystemBase {
 
   desiredHeight currentAlgaeHeight = desiredHeight.LOW;
   Transform3d robotToCamLml3 =
-  new Transform3d(
-      new Translation3d(
-          // Units.inchesToMeters(33.25)
-          Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.42375)),
-      new Rotation3d(0, Units.degreesToRadians(10), 0.0));
-Transform3d robotToCamLml2Right =
-  new Transform3d(
-      // Units.inchesToMeters(7.625)
-      new Translation3d(
-          Units.inchesToMeters(12.25),
-          Units.inchesToMeters(-11.125),
-          Units.inchesToMeters(-13.9825)),
-      new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.7)));
-Transform3d robotToCamLml2Left =
-  new Transform3d(
-      // Units.inchesToMeters(7.625)
-      new Translation3d(
-          Units.inchesToMeters(12.25),
-          Units.inchesToMeters(11.0),
-          Units.inchesToMeters(-13.9825)),
-      new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.7)));
-
+      new Transform3d(
+          new Translation3d(
+              // Units.inchesToMeters(33.25)
+              Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.42375)),
+          new Rotation3d(0, Units.degreesToRadians(10), 0.0));
+  Transform3d robotToCamLml2Right =
+      new Transform3d(
+          // Units.inchesToMeters(7.625)
+          new Translation3d(
+              Units.inchesToMeters(12.25),
+              Units.inchesToMeters(-11.125),
+              Units.inchesToMeters(-13.9825)),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.7)));
+  Transform3d robotToCamLml2Left =
+      new Transform3d(
+          // Units.inchesToMeters(7.625)
+          new Translation3d(
+              Units.inchesToMeters(12.25),
+              Units.inchesToMeters(11.0),
+              Units.inchesToMeters(-13.9825)),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.7)));
 
   private int m_lockID = 0;
   private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
