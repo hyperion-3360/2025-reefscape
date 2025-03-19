@@ -39,7 +39,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addCommands(
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
         new InstantCommand(
-            () -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(m_swerve.getPose()))),
+            () -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(() -> m_swerve.getPose()))),
         new WaitUntilCommand(() -> m_swerve.targetReached()),
         Commands.runOnce(() -> m_elevator.SetHeight(m_vision.getAlgaeHeight())),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
@@ -48,16 +48,17 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new WaitCommand(0.3).unless(() -> m_vision.getAlgaeHeight().equals(desiredHeight.ALGAEL2)),
-        new InstantCommand(
-            () -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae(m_swerve.getPose()))),
+        new InstantCommand(() -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae())),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         backTrack,
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
         new WaitCommand(0.4),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)));
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
+        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
+        new WaitCommand(0.2),
+        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)));
   }
 
   public Command NoAlgaeCmd(

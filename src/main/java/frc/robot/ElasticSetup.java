@@ -182,8 +182,8 @@ public class ElasticSetup {
     debugTab.add("desiredPose y (left)", vision.getDesiredPoseLeft().getY());
     debugTab.add("desiredPose x (right)", vision.getDesiredPoseRight().getX());
     debugTab.add("desiredPose y (right)", vision.getDesiredPoseRight().getY());
-    debugTab.add("desiredPose x center", vision.getDesiredPoseAlgae(swerve.getPose()).getX());
-    debugTab.add("desiredPose y center", vision.getDesiredPoseAlgae(swerve.getPose()).getY());
+    debugTab.add("desiredPose x center", vision.getDesiredPoseAlgae(() -> swerve.getPose()).getX());
+    debugTab.add("desiredPose y center", vision.getDesiredPoseAlgae(() -> swerve.getPose()).getY());
     debugTab.add("current pos x", swerve.getPose().getX());
     debugTab.add("current pos y", swerve.getPose().getY());
     debugTab.add("gyro rotation", swerve.getRotation2d().getDegrees());

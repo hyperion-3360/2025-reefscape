@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
@@ -94,7 +95,7 @@ public class Vision extends SubsystemBase {
   private Translation2d maximumTranslationProcessor = new Translation2d();
   private Pose2d processorAlignPosition = new Pose2d();
   // we want to be close to the reef to intake an algae but we don't want to slam into the reef
-  private double desiredCloseUpDistFromTag = 0.4;
+  private double desiredCloseUpDistFromTag = robotHalfLength;
 
   private enum direction {
     left,
@@ -512,17 +513,17 @@ public class Vision extends SubsystemBase {
     return computeNewPoseFromTag(m_lockID, direction.left);
   }
 
-  public Pose2d getDesiredPoseAlgae(Pose2d currentPose) {
+  public Pose2d getDesiredPoseAlgae(Supplier<Pose2d> currentPose) {
     if (m_lockID != 0) {
       return computeNewPoseFromTag(m_lockID, direction.back);
-    } else if (m_lockID == 0 && isInBoundsForProcessor(currentPose)) {
+    } else if (m_lockID == 0 && isInBoundsForProcessor(currentPose.get())) {
       return processorAlignPosition;
     } else {
       return Pose2d.kZero;
     }
   }
 
-  public Pose2d getDesiredCloseUpPoseAlgae(Pose2d currentPose) {
+  public Pose2d getDesiredCloseUpPoseAlgae() {
     if (m_lockID != 0) {
       return computeNewPoseFromTag(m_lockID, direction.close);
     } else {

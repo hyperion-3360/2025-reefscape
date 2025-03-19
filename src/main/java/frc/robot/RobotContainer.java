@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
@@ -50,6 +51,7 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 import frc.robot.vision.Vision;
+import java.util.Set;
 
 public class RobotContainer {
 
@@ -97,12 +99,9 @@ public class RobotContainer {
   private final IntakeAlgaeCmd intakeAlgaeFloor =
       new IntakeAlgaeCmd(
           m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAELOW, m_driverController);
-  private final DriveAndIntakeCmd intakeAlgaeL2 =
+  private final DriveAndIntakeCmd intakeReef =
       new DriveAndIntakeCmd(
           m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_vision);
-  private final DriveAndIntakeCmd intakeAlgaeL3 =
-      new DriveAndIntakeCmd(
-          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3, m_swerve, m_vision);
 
   private final IntakeAlgaeCmd intakeAlgaeLollypop =
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
@@ -124,6 +123,8 @@ public class RobotContainer {
   private final ElevateCmd elevateL4 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
   private final LowerElevatorCmd elevateLOW =
+      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
+  private final LowerElevatorCmd stopIntakeAlgaeReef =
       new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
   private final ReadyClimbCmd readyclimb = new ReadyClimbCmd(m_climber, m_leds, m_algaeIntake);
 
@@ -272,10 +273,7 @@ public class RobotContainer {
 
     m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(netCancel);
 
-    m_driverController
-        .leftTrigger(0.3)
-        .onTrue(intakeAlgaeL2)
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()).andThen(elevateLOW));
+    m_driverController.leftTrigger(0.3).onTrue(intakeReef).onFalse(stopIntakeAlgaeReef);
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
@@ -305,6 +303,16 @@ public class RobotContainer {
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+    m_driverController
+        .povUp()
+        .onTrue(
+            new DeferredCommand(
+                () ->
+                    Commands.runOnce(
+                        () ->
+                            m_swerve.drivetoTarget(
+                                m_vision.getDesiredPoseAlgae(() -> m_swerve.getPose()))),
+                Set.of(m_swerve)));
     m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
 
     m_testController.povUp().onTrue(frontPose);
