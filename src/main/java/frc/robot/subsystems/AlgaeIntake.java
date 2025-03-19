@@ -163,6 +163,10 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     return m_intakeLeft.getForwardLimitSwitch().isPressed();
   }
 
+  public boolean pegBeamBreak() {
+    return m_pivotMotor.getForwardLimitSwitch().isPressed();
+  }
+
   /**
    * checks if the angle of the algae intake is close enough
    *
