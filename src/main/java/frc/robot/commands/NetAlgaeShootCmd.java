@@ -58,7 +58,8 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
 
     addCommands(
         new ParallelCommandGroup(
-            // we need to put the ternary operators inside the deffered command so that the position actually changes
+            // we need to put the ternary operators inside the deffered command so that the position
+            // actually changes
             new DeferredCommand(
                 () ->
                     m_pathfinding.goThere(

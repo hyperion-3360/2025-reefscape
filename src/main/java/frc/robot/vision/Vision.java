@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Conversions;
 import frc.robot.Constants;
 import frc.robot.subsystems.Elevator.desiredHeight;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -94,7 +93,7 @@ Transform3d robotToCamLml2Left =
   private final double desiredDistFromTag = 1;
   private Translation2d minimumTranslationProcessor = new Translation2d();
   private Translation2d maximumTranslationProcessor = new Translation2d();
-  private Pose2d processorAlignPosition = new Pose2d(); 
+  private Pose2d processorAlignPosition = new Pose2d();
   // we want to be close to the reef to intake an algae but we don't want to slam into the reef
   private double desiredCloseUpDistFromTag = 0.4;
 
@@ -523,6 +522,7 @@ Transform3d robotToCamLml2Left =
       return Pose2d.kZero;
     }
   }
+
   public Pose2d getDesiredCloseUpPoseAlgae(Pose2d currentPose) {
     if (m_lockID != 0) {
       return computeNewPoseFromTag(m_lockID, direction.close);
@@ -530,6 +530,7 @@ Transform3d robotToCamLml2Left =
       return Pose2d.kZero;
     }
   }
+
   // #endregion
   public desiredHeight getAlgaeHeight() {
 

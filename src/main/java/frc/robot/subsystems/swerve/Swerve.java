@@ -191,15 +191,14 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
     vision.doPeriodic();
     visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
-    // visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
-    // visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
+    visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
+    visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
 
     SmartDashboard.putNumber("gyro z", getGyroZ());
 
     if (visionEstLml3.isPresent()
-    // || visionEstLml2R.isPresent()
-    // || visionEstLml2L.isPresent() && !hasStartedEstimation) {
-    ) {
+        || visionEstLml2R.isPresent()
+        || visionEstLml2L.isPresent() && !hasStartedEstimation) {
       hasStartedEstimation = true;
       estimatePose();
     }
@@ -331,10 +330,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public void disableDriveToTarget() {
     m_targetModeEnabled = false;
-  }
-
-  public void stopSwerve() {
-    _drive(new Translation2d(0, 0), 0, true, true);
   }
 
   public boolean targetDriveDisabled() {
