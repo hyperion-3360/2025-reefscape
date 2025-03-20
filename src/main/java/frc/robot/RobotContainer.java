@@ -274,6 +274,8 @@ public class RobotContainer {
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
+    m_driverController.povLeft().onTrue(MinutieMoveLeft);
+    m_driverController.povRight().onTrue(MinutieMoveRight);
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
 
@@ -302,7 +304,7 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
     m_coDriverController.rightBumper().onTrue(intakeCoral);
-
+ 
     m_driverController.rightTrigger(0.3).whileTrue(cycleToFeeder).onFalse(cancelAuto);
   }
 

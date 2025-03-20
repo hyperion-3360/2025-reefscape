@@ -46,16 +46,44 @@ public class Vision extends SubsystemBase {
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   Transform3d robotToCamLml3 =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-2.75), Units.inchesToMeters(0), 0.0),
-          new Rotation3d(0, 0, 0));
+          new Translation3d(
+              // Units.inchesToMeters(33.25)
+              Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(11.42375)),
+          new Rotation3d(0, Units.degreesToRadians(10), 0.0));
   Transform3d robotToCamLml2Right =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(-11.125), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.95)));
+          // Units.inchesToMeters(7.625)
+          new Translation3d(
+              Units.inchesToMeters(12.25),
+              Units.inchesToMeters(-11.125),
+              Units.inchesToMeters(-13.9825)),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(19.7)));
   Transform3d robotToCamLml2Left =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(12.25), Units.inchesToMeters(11.125), 0.0),
-          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.96)));
+          // Units.inchesToMeters(7.625)
+          new Translation3d(
+              Units.inchesToMeters(12.25),
+              Units.inchesToMeters(11.0),
+              Units.inchesToMeters(-13.9825)),
+          new Rotation3d(0, Units.degreesToRadians(-15), Units.degreesToRadians(-19.7)));
+
+  private int m_lockID = 0;
+  private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
+  private Optional<EstimatedRobotPose> visionEstLml3;
+  private Optional<EstimatedRobotPose> visionEstLml2Left;
+  private Optional<EstimatedRobotPose> visionEstLml2Right;
+  private final double robotHalfLength = Units.inchesToMeters(18);
+  private final double distTagToPeg = Units.inchesToMeters(6.25);
+  private final double desiredDistFromTag = 1;
+  private Translation2d minimumTranslationProcessor = new Translation2d();
+  private Translation2d maximumTranslationProcessor = new Translation2d();
+  private Pose2d processorAlignPosition = new Pose2d();
+
+  private enum direction {
+    left,
+    right,
+    back
+  }
 
   /** Creates a new Odometry. */
   public Vision() {

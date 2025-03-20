@@ -59,4 +59,17 @@ public class MinuteMoveCmd extends SequentialCommandGroup {
             new WaitUntilCommand(() -> swerve.targetReached())),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()));
   }
+
+  public MinuteMoveCmd(Swerve swerve, OffsetDir dir, AlgaeIntake algaeIntake) {
+    m_swerve = swerve;
+    addRequirements(m_swerve);
+    addCommands(
+        new DeferredCommand(
+            () -> new InstantCommand(() -> m_swerve.drivetoTarget(computeNewPose(0.1, dir))),
+            getRequirements()),
+        new ParallelDeadlineGroup(
+            new WaitUntilCommand(() -> algaeIntake.pegBeamBreak()), // Deadline command
+            new WaitUntilCommand(() -> swerve.targetReached())),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()));
+  }
 }
