@@ -46,36 +46,49 @@ public class PegDetect {
    * @return a Detection object
    */
   public boolean processImage() {
-    if (m_sink.grabFrame(mat1) != 0) {
-      Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
-      Imgproc.GaussianBlur(mat2, mat1, new Size(3, 3), 0);
+    try {
+      if (m_sink.grabFrame(mat1) != 0) {
+        System.out.println("Frame acquired");
+        Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
+        System.out.println("Color conversion to HSV done");
+        Imgproc.GaussianBlur(mat2, mat1, new Size(3, 3), 0);
+        System.out.println("Gaussian blur done");
 
-      // mask to overlay
-      Core.inRange(mat1, lower_violet, upper_violet, mat2);
+        // mask to overlay
+        Core.inRange(mat1, lower_violet, upper_violet, mat2);
+        System.out.println("In range performed");
 
-      contours.clear();
+        contours.clear();
 
-      Imgproc.findContours(mat2, contours, mat1, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        Imgproc.findContours(
+            mat2, contours, mat1, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        System.out.println("Find countours completed");
 
-      double maxArea = 0;
-      int maxValId = 0;
+        double maxArea = 0;
+        int maxValId = 0;
 
-      for (var c : contours) {
-        double contourArea = Imgproc.contourArea(c);
-        if (maxArea < contourArea) {
-          maxArea = contourArea;
-          maxValId = contours.indexOf(c);
+        for (var c : contours) {
+          double contourArea = Imgproc.contourArea(c);
+          if (maxArea < contourArea) {
+            maxArea = contourArea;
+            maxValId = contours.indexOf(c);
+          }
         }
+        System.out.println("Finding largest area completed");
+
+        var boundingRect = Imgproc.boundingRect(contours.get(maxValId));
+
+        // image is vertical so left right is along the x axis
+        var width_center = boundingRect.x + boundingRect.width / 2;
+        width_center -= mat1.width() / 2;
+
+        System.out.println("offset from center: " + width_center);
+
+        m_offset = width_center * kPixToMeasureRatio;
+        m_validDetection = true;
       }
-
-      var boundingRect = Imgproc.boundingRect(contours.get(maxValId));
-
-      // image is vertical so left right is along the x axis
-      var width_center = boundingRect.x + boundingRect.width / 2;
-      width_center -= mat1.width() / 2;
-
-      m_offset = width_center * kPixToMeasureRatio;
-      m_validDetection = true;
+    } catch (Exception e) {
+      m_validDetection = false;
     }
 
     return m_validDetection;
