@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.AlgaeIntake;
@@ -11,15 +12,21 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class LowerElevatorCmd extends SequentialCommandGroup {
   public LowerElevatorCmd(
-      Elevator m_elevator, LEDs m_leds, Shooter m_shooter, AlgaeIntake m_algaeIntake) {
+      Elevator m_elevator,
+      LEDs m_leds,
+      Shooter m_shooter,
+      AlgaeIntake m_algaeIntake,
+      Swerve m_swerve) {
     addRequirements(m_elevator);
     addRequirements(m_leds);
     addRequirements(m_shooter);
     addRequirements(m_algaeIntake);
     addCommands(
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
