@@ -35,8 +35,8 @@ public final class Constants {
     public static final double kWheelDiameter = Units.inchesToMeters(3.8774);
     public static final int kGyroCanId = 20;
 
-    public static final double robotLength = Units.inchesToMeters(32.5); // with bumper: 32.5
-    public static final double robotWidth = Units.inchesToMeters(32.5); // with bumper: 32.5
+    public static final double robotLength = Units.inchesToMeters(35.0); // with bumper: 32.5
+    public static final double robotWidth = Units.inchesToMeters(35.0); // with bumper: 32.5
 
     public static final COTSTalonFXSwerveConstants chosenModule =
         COTSTalonFXSwerveConstants.WCP.SwerveXFlipped.Falcon500(
@@ -264,9 +264,10 @@ public final class Constants {
     // wheel speeds
     public static final double kIntakeSpeed = 0.5;
     public static final double kStoringSpeed = 0.08;
+    public static final double kStoredSpeed = 0.0;
     public static final double kProcessorSpeed = -1.0;
     public static final double kStopSpeed = 0.0;
-    public static final double kNetSpeed = -0.8;
+    public static final double kNetSpeed = -0.7;
   }
 
   public static class CoralShooterVariables {
@@ -336,7 +337,7 @@ public final class Constants {
     public static final double kElevatorL2 = 1.19;
     public static final double kElevatorL3 = 1.82;
     public static final double kElevatorL4 = 2.80;
-    public static final double kElevatorNet = 2.86;
+    public static final double kElevatorNet = 2.90;
     public static final double kElevatorProcessor = 0.36;
     public static final double kElevatorAlgaeLow = 0.05;
     public static final double kElevatorLollypop = 0.50;

@@ -15,7 +15,6 @@ public class AutoCancel extends SequentialCommandGroup {
     addCommands(
         // Commands.runOnce(() -> m_shooter.setShoot(shootSpeed.STOP)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
         // Commands.runOnce(() -> m_shooter.closeBlocker()),
         // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));

@@ -62,6 +62,14 @@ public class IntakeAlgaeCmd extends SequentialCommandGroup {
             () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING), m_algaeIntake));
   }
 
+  /**
+   * constructor to construct a algae intake command for the reef
+   *
+   * @param m_algaeIntake
+   * @param m_leds
+   * @param m_elevator
+   * @param height
+   */
   public IntakeAlgaeCmd(
       AlgaeIntake m_algaeIntake, LEDs m_leds, Elevator m_elevator, desiredHeight height) {
     addRequirements(m_algaeIntake);

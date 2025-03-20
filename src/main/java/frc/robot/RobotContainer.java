@@ -10,17 +10,23 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AutoCmd.AutoCancel;
+import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.DeepClimbCmd;
+import frc.robot.commands.DriveAndIntakeCmd;
+import frc.robot.commands.DriveToSomeTargetCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -45,12 +51,14 @@ import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 import frc.robot.vision.Vision;
+import java.util.Set;
 
 public class RobotContainer {
 
   // controller declarations
   public static final CommandXboxController m_driverController = new CommandXboxController(0);
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
+  public static final CommandXboxController m_testController = new CommandXboxController(2);
 
   // subsystem declarations
   public static final Shooter m_shooter = new Shooter();
@@ -91,20 +99,22 @@ public class RobotContainer {
   private final IntakeAlgaeCmd intakeAlgaeFloor =
       new IntakeAlgaeCmd(
           m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAELOW, m_driverController);
-  private final IntakeAlgaeCmd intakeAlgaeL2 =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2);
-  private final IntakeAlgaeCmd intakeAlgaeL3 =
-      new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL3);
+  private final DriveAndIntakeCmd intakeReef =
+      new DriveAndIntakeCmd(
+          m_algaeIntake, m_leds, m_elevator, desiredHeight.ALGAEL2, m_swerve, m_vision);
 
   private final IntakeAlgaeCmd intakeAlgaeLollypop =
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
 
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
   private final NetAlgaeShootCmd shootAlgaeNet =
-      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve);
+      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
+
+  private final AutoCancelNet netCancel =
+      new AutoCancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
 
   private final ElevateCmd elevateL2 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
@@ -113,7 +123,9 @@ public class RobotContainer {
   private final ElevateCmd elevateL4 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
   private final LowerElevatorCmd elevateLOW =
-      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
+      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake, m_swerve);
+  private final LowerElevatorCmd stopIntakeAlgaeReef =
+      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake, m_swerve);
   private final ReadyClimbCmd readyclimb = new ReadyClimbCmd(m_climber, m_leds, m_algaeIntake);
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
@@ -132,6 +144,12 @@ public class RobotContainer {
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
+  private final DriveToSomeTargetCmd backPose =
+      new DriveToSomeTargetCmd(() -> new Pose2d(7.33, 1.78, Rotation2d.fromDegrees(270)), m_swerve);
+  private final DriveToSomeTargetCmd leftPose =
+      new DriveToSomeTargetCmd(() -> new Pose2d(6.55, 3.9, Rotation2d.fromDegrees(270)), m_swerve);
+  private final DriveToSomeTargetCmd frontPose =
+      new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
 
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;
@@ -144,8 +162,6 @@ public class RobotContainer {
   private PegDetect m_pegDetect;
 
   public RobotContainer() {
-    // warms up the pathfinding so that the first path calculation is faster
-    PathfindingCommand.warmupCommand();
 
     m_camera = CameraServer.startAutomaticCapture();
     m_camera.setFPS(45);
@@ -204,6 +220,10 @@ public class RobotContainer {
   }
 
   public void configureAutos() {
+
+    // warms up the pathfinding so that the first path calculation is faster
+    PathfindingCommand.warmupCommand();
+
     m_autoThreeCoralLeftAuto = m_pathfinding.ThreeCoralLeft();
     m_autoThreeCoralRightAuto = m_pathfinding.ThreeCoralRight();
     m_autoOneCoralThenAlgae = m_pathfinding.coralAndAlgae();
@@ -234,21 +254,8 @@ public class RobotContainer {
         .and(() -> m_climber.isClimberActivated())
         .onTrue(unguckClimb);
 
-    m_driverController.x().onTrue(intakeAlgaeFloor);
-
-    m_driverController.b().onTrue(shootAlgae);
-
     m_coDriverController.a().onTrue(shootCoral);
-    m_driverController.y().onTrue(shootAlgaeNet);
 
-    m_coDriverController
-        .y()
-        .onTrue(intakeAlgaeL2)
-        .onFalse(intakeAlgaeL2.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
-    m_coDriverController
-        .x()
-        .onTrue(intakeAlgaeL3)
-        .onFalse(intakeAlgaeL3.NoAlgaeCmd(m_elevator, m_algaeIntake, m_leds));
     m_coDriverController
         .povDown()
         .onTrue(intakeAlgaeLollypop)
@@ -258,19 +265,15 @@ public class RobotContainer {
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
+    m_coDriverController.rightBumper().onTrue(intakeCoral);
 
-    m_driverController
-        .leftTrigger(0.3)
-        .onTrue(
-            Commands.runOnce(
-                () -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(m_swerve.getPose())))
+    m_driverController.x().onTrue(intakeAlgaeFloor);
 
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+    m_driverController.b().onTrue(shootAlgae);
+
+    m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(netCancel);
+
+    m_driverController.leftTrigger(0.3).onTrue(intakeReef).onFalse(stopIntakeAlgaeReef);
 
     m_driverController.povLeft().onTrue(MinutieMoveLeft);
     m_driverController.povRight().onTrue(MinutieMoveRight);
@@ -300,10 +303,21 @@ public class RobotContainer {
             // m_leds.SetPattern(LEDs.Pattern.READY)))
             )
         .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+    m_driverController
+        .povUp()
+        .onTrue(
+            new DeferredCommand(
+                () ->
+                    Commands.runOnce(
+                        () ->
+                            m_swerve.drivetoTarget(
+                                m_vision.getDesiredPoseAlgae(() -> m_swerve.getPose()))),
+                Set.of(m_swerve)));
+    m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
 
-    m_coDriverController.rightBumper().onTrue(intakeCoral);
-
-    m_driverController.rightTrigger(0.3).whileTrue(cycleToFeeder).onFalse(cancelAuto);
+    m_testController.povUp().onTrue(frontPose);
+    m_testController.povDown().onTrue(backPose);
+    m_testController.povLeft().onTrue(leftPose);
   }
 
   public void teleopInit() {

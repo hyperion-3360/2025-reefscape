@@ -140,14 +140,14 @@ public class ElasticSetup {
     // technician tab
     //     - Autonomous mode (chooser)
     techTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
-    techTab
-        .addBoolean("limelight 2 active", () -> vision.limelight2RightActive())
-        .withPosition(0, 0)
-        .withSize(1, 1);
-    techTab
-        .addBoolean("limelight 3 active", () -> vision.limelight3Active())
-        .withPosition(1, 0)
-        .withSize(1, 1);
+    // techTab
+    //     .addBoolean("limelight 2 active", () -> vision.limelight2RightActive())
+    //     .withPosition(0, 0)
+    //     .withSize(1, 1);
+    // techTab
+    //     .addBoolean("limelight 3 active", () -> vision.limelight3Active())
+    //     .withPosition(1, 0)
+    //     .withSize(1, 1);
 
     techTab.add("auto chooser", autoChooser).withPosition(0, 1).withSize(3, 1);
   }
@@ -182,8 +182,8 @@ public class ElasticSetup {
     debugTab.add("desiredPose y (left)", vision.getDesiredPoseLeft().getY());
     debugTab.add("desiredPose x (right)", vision.getDesiredPoseRight().getX());
     debugTab.add("desiredPose y (right)", vision.getDesiredPoseRight().getY());
-    debugTab.add("desiredPose x center", vision.getDesiredPoseAlgae(swerve.getPose()).getX());
-    debugTab.add("desiredPose y center", vision.getDesiredPoseAlgae(swerve.getPose()).getY());
+    debugTab.add("desiredPose x center", vision.getDesiredPoseAlgae(() -> swerve.getPose()).getX());
+    debugTab.add("desiredPose y center", vision.getDesiredPoseAlgae(() -> swerve.getPose()).getY());
     debugTab.add("current pos x", swerve.getPose().getX());
     debugTab.add("current pos y", swerve.getPose().getY());
     debugTab.add("gyro rotation", swerve.getRotation2d().getDegrees());

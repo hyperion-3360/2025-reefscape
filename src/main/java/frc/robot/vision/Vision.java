@@ -20,10 +20,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.Conversions;
 import frc.robot.Constants;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
@@ -56,6 +58,8 @@ public class Vision extends SubsystemBase {
 
   private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
   private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
+
+  desiredHeight currentAlgaeHeight = desiredHeight.LOW;
   Transform3d robotToCamLml3 =
       new Transform3d(
           new Translation3d(
@@ -90,11 +94,14 @@ public class Vision extends SubsystemBase {
   private Translation2d minimumTranslationProcessor = new Translation2d();
   private Translation2d maximumTranslationProcessor = new Translation2d();
   private Pose2d processorAlignPosition = new Pose2d();
+  // we want to be close to the reef to intake an algae but we don't want to slam into the reef
+  private double desiredCloseUpDistFromTag = robotHalfLength;
 
   private enum direction {
     left,
     right,
-    back
+    back,
+    close
   }
 
   /** Creates a new Odometry. */
@@ -481,6 +488,9 @@ public class Vision extends SubsystemBase {
       case back:
         translationX -= desiredDistFromTag;
         break;
+      case close:
+        translationX -= desiredCloseUpDistFromTag;
+        break;
     }
     var translation =
         tagPose
@@ -503,14 +513,41 @@ public class Vision extends SubsystemBase {
     return computeNewPoseFromTag(m_lockID, direction.left);
   }
 
-  public Pose2d getDesiredPoseAlgae(Pose2d currentPose) {
+  public Pose2d getDesiredPoseAlgae(Supplier<Pose2d> currentPose) {
     if (m_lockID != 0) {
       return computeNewPoseFromTag(m_lockID, direction.back);
-    } else if (m_lockID == 0 && isInBoundsForProcessor(currentPose)) {
+    } else if (m_lockID == 0 && isInBoundsForProcessor(currentPose.get())) {
       return processorAlignPosition;
     } else {
       return Pose2d.kZero;
     }
   }
+
+  public Pose2d getDesiredCloseUpPoseAlgae() {
+    if (m_lockID != 0) {
+      return computeNewPoseFromTag(m_lockID, direction.close);
+    } else {
+      return Pose2d.kZero;
+    }
+  }
+
   // #endregion
+  public desiredHeight getAlgaeHeight() {
+
+    if (m_allowedReefPegTag.indexOf(m_lockID) == 0
+        || m_allowedReefPegTag.indexOf(m_lockID) == 2
+        || m_allowedReefPegTag.indexOf(m_lockID) == 4) {
+      currentAlgaeHeight = desiredHeight.ALGAEL3;
+
+    } else if (m_allowedReefPegTag.indexOf(m_lockID) == 1
+        || m_allowedReefPegTag.indexOf(m_lockID) == 3
+        || m_allowedReefPegTag.indexOf(m_lockID) == 5) {
+      currentAlgaeHeight = desiredHeight.ALGAEL2;
+
+    } else {
+      currentAlgaeHeight = desiredHeight.LOW;
+    }
+
+    return currentAlgaeHeight;
+  }
 }
