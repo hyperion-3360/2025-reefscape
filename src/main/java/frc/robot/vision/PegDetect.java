@@ -17,6 +17,9 @@ import org.opencv.imgproc.Imgproc;
 /** Add your docs here. */
 public class PegDetect {
 
+  // TODO: determine me!!!
+  private final double kPixToMeasureRatio = 0.1;
+
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
   // lighting and reef of the actual field
@@ -24,6 +27,8 @@ public class PegDetect {
   final Scalar upper_violet = new Scalar(175, 165, 130);
 
   private CvSink m_sink;
+  private double m_offset = 0;
+  private boolean m_validDetection = false;
   Mat mat1 = new Mat();
   Mat mat2 = new Mat();
   List<MatOfPoint> contours = new ArrayList<>();
@@ -38,9 +43,9 @@ public class PegDetect {
    * finding the largest contour. The offset is then calculated by finding the center of the
    * bounding rectangle of the largest contour.
    *
-   * @return the offset of the peg from the center of the image
+   * @return a Detection object
    */
-  public double getOffset() {
+  public boolean processImage() {
     if (m_sink.grabFrame(mat1) != 0) {
       Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
       Imgproc.GaussianBlur(mat2, mat1, new Size(3, 3), 0);
@@ -67,11 +72,20 @@ public class PegDetect {
 
       // image is vertical so left right is along the x axis
       var width_center = boundingRect.x + boundingRect.width / 2;
+      width_center -= mat1.width() / 2;
 
-      return width_center;
+      m_offset = width_center * kPixToMeasureRatio;
+      m_validDetection = true;
     }
 
-    // if we can't grab a frame return -1
-    return -1;
+    return m_validDetection;
+  }
+
+  public double getOffset() {
+    return m_offset;
+  }
+
+  public boolean isValidDetection() {
+    return m_validDetection;
   }
 }
