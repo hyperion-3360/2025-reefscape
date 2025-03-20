@@ -61,7 +61,7 @@ public class MinuteMoveCmd extends SequentialCommandGroup {
         new InstantCommand(() -> m_swerve.disableDriveToTarget()));
   }
 
-  public MinuteMoveCmd(Swerve swerve,OffsetDir dir, AlgaeIntake algaeIntake) {
+  public MinuteMoveCmd(Swerve swerve, OffsetDir dir, AlgaeIntake algaeIntake) {
     m_swerve = swerve;
     addRequirements(m_swerve);
     addCommands(
