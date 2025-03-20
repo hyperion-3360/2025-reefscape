@@ -69,7 +69,10 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
   public AlgaeIntake() {
 
     m_intakeLeftConfig.limitSwitch.forwardLimitSwitchEnabled(false);
+    m_intakeLeftConfig.limitSwitch.reverseLimitSwitchEnabled(false);
     m_intakeLeftConfig.follow(m_intakeRight, true);
+    m_directionConfig.limitSwitch.forwardLimitSwitchEnabled(false);
+    m_directionConfig.limitSwitch.reverseLimitSwitchEnabled(false);
 
     // set current limit
     m_intakeLeftConfig.smartCurrentLimit(20);
