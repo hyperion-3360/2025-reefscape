@@ -123,9 +123,9 @@ public class RobotContainer {
   private final ElevateCmd elevateL4 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L4);
   private final LowerElevatorCmd elevateLOW =
-      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
+      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake, m_swerve);
   private final LowerElevatorCmd stopIntakeAlgaeReef =
-      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake);
+      new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake, m_swerve);
   private final ReadyClimbCmd readyclimb = new ReadyClimbCmd(m_climber, m_leds, m_algaeIntake);
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
