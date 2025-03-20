@@ -135,20 +135,16 @@ public class PathfindingV2 extends Command {
     // adjusts tag pose for robot length so that robot doesn't smash into the reef
     Pose2d targetPos =
         new Pose2d(
-            pose.getX()
-                + (robotLength * Math.cos(Units.radiansToDegrees(pose.getRotation().getAngle()))),
-            pose.getY()
-                + (robotLength * Math.cos(Units.radiansToDegrees(pose.getRotation().getAngle()))),
+            pose.getX() + (robotLength / 2 * Math.cos(pose.getRotation().getAngle())),
+            pose.getY() + (robotLength / 2 * Math.sin(pose.getRotation().getAngle())),
             Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees()));
 
     SequentialCommandGroup algaeIntakeSequence = new SequentialCommandGroup(Commands.none());
 
     Pose2d backTrackedPose =
         new Pose2d(
-            targetPos.getX()
-                + (robotLength * Math.cos(Units.radiansToDegrees(pose.getRotation().getAngle()))),
-            targetPos.getY()
-                + (robotLength * Math.cos(Units.radiansToDegrees(pose.getRotation().getAngle()))),
+            targetPos.getX() + (1 * Math.cos(pose.getRotation().getAngle())),
+            targetPos.getY() + (1 * Math.sin(pose.getRotation().getAngle())),
             Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees()));
 
     algaeIntakeSequence.addCommands(
@@ -408,7 +404,6 @@ public class PathfindingV2 extends Command {
                 0.7,
                 desiredHeight.ALGAEL3),
             driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
-
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
                     .getTagPose(19)
@@ -422,8 +417,7 @@ public class PathfindingV2 extends Command {
                     .get(),
                 0.7,
                 desiredHeight.ALGAEL3),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4)
-);
+            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4));
         break;
 
       case Red:
@@ -441,23 +435,27 @@ public class PathfindingV2 extends Command {
                 0.7,
                 desiredHeight.ALGAEL2),
             driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4),
-        driveAndIntakeAlgae(
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTagPose(11).get(),
-            0.7,
-            desiredHeight.ALGAEL3),
-        driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4),
-        driveAndIntakeAlgae(
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTagPose(6).get(),
-            0.7,
-            desiredHeight.ALGAEL2),
-        driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4),
-        driveAndIntakeAlgae(
+            driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-                    .getTagPose(9)
+                    .getTagPose(11)
                     .get(),
                 0.7,
                 desiredHeight.ALGAEL3),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4));
+            driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4)
+            // driveAndIntakeAlgae(
+            //
+            // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTagPose(6).get(),
+            //     0.7,
+            //     desiredHeight.ALGAEL2),
+            // driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4),
+            // driveAndIntakeAlgae(
+            //         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+            //             .getTagPose(9)
+            //             .get(),
+            //         0.7,
+            //         desiredHeight.ALGAEL3),
+            //     driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4));
+            );
         break;
 
       default:
