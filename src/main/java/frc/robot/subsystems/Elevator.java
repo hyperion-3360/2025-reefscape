@@ -112,6 +112,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private double elevatorVelocity;
   private double elevatorSetpoint;
   private desiredHeight heightEnum = desiredHeight.LOW;
+  private desiredState currentHeightState = desiredState.NULL;
 
   public Elevator() {
     // motor configs
@@ -378,14 +379,50 @@ public class Elevator extends SubsystemBase implements TestBindings {
     return m_sensor.get() >= 0.3;
   }
 
-  public desiredHeight increaseHeightState() {
+  public desiredState increaseHeightState() {
 
-    stateArray.get(heightArrayIndex);
+    heightArrayIndex++;
 
+    if (heightArrayIndex > stateArray.size() - 1) {
+      heightArrayIndex = stateArray.size() - 1;
+    }
 
-    return null;
-
+    return stateArray.get(heightArrayIndex);
   }
-  public void decreaseHeightState() {}
 
+  public desiredState decreaseHeightState() {
+
+    heightArrayIndex--;
+
+    if (heightArrayIndex < 0) {
+      heightArrayIndex = 0;
+    }
+
+    return stateArray.get(heightArrayIndex);
+  }
+
+  public void AutoElevate() {
+
+    switch (currentHeightState) {
+      case L1:
+        SetHeight(desiredHeight.L1);
+        break;
+      case L2:
+        SetHeight(desiredHeight.L2);
+
+        break;
+      case L3:
+        SetHeight(desiredHeight.L3);
+
+        break;
+      case L4:
+        SetHeight(desiredHeight.L4);
+
+        break;
+      case NULL:
+        break;
+      default:
+        break;
+    }
+  }
 }

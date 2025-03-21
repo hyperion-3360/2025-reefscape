@@ -9,10 +9,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 
@@ -33,11 +37,18 @@ public class AlignPeg extends SequentialCommandGroup {
     m_elevator = elevator;
 
     addRequirements(m_driveTrain);
+    addRequirements(m_elevator);
 
     addCommands(
-        Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
+        // new PrintCommand("this has started Yayyyyyyyyyyyyyyyyyyyyyyyyy"),
+        new ParallelDeadlineGroup(
+            new WaitCommand(2),
+            Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
+            new WaitUntilCommand(() -> m_driveTrain.targetReached())),
         new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
-        // Commands.runOnce(m_elevator),
+        Commands.runOnce(() -> m_elevator.SetHeight (desiredHeight.L4)),
+        new WaitCommand(3),
+        // Commands.runOnce(() -> m_elevator.AutoElevate()),
         // this is one command
         new ConditionalCommand(
             new DeferredCommand(
