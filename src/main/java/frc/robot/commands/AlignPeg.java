@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 
@@ -30,13 +31,11 @@ public class AlignPeg extends SequentialCommandGroup {
         new ConditionalCommand(
             new DeferredCommand(
                 () ->
-                    //                    new MinuteMoveCmd(
-                    //                        m_driveTrain,
-                    //                        kMaxWaitAlignTime,
-                    //                        Math.abs(m_pegDetection.getOffset()),
-                    //                        (m_pegDetection.getOffset() < 0) ? OffsetDir.LEFT :
-                    // OffsetDir.RIGHT),
-                    new PrintCommand(Double.toString(m_pegDetection.getOffset())),
+                    new MinuteMoveCmd(
+                        m_driveTrain,
+                        kMaxWaitAlignTime,
+                        Math.abs(m_pegDetection.getOffset()),
+                        (m_pegDetection.getOffset() < 0) ? OffsetDir.LEFT : OffsetDir.RIGHT),
                 getRequirements()),
             new PrintCommand("Can't locate peg!!! "),
             () -> m_pegDetection.processImage()));

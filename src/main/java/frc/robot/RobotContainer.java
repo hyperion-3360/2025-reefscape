@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
+import frc.robot.commands.AlignPeg;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
@@ -315,9 +316,11 @@ public class RobotContainer {
                 Set.of(m_swerve)));
     m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
 
-    m_testController.povUp().onTrue(frontPose);
-    m_testController.povDown().onTrue(backPose);
-    m_testController.povLeft().onTrue(leftPose);
+    m_testController.povLeft().onTrue(MinutieMoveLeft);
+    m_testController.povRight().onTrue(MinutieMoveRight);
+    m_testController.povUp().onTrue(elevateL4);
+    m_testController.a().onTrue(new AlignPeg(m_swerve, m_pegDetect));
+    m_testController.b().onTrue(shootCoral);
   }
 
   public void teleopInit() {

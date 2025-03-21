@@ -5,6 +5,7 @@
 package frc.robot.vision;
 
 import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.Core;
@@ -17,14 +18,14 @@ import org.opencv.imgproc.Imgproc;
 /** Add your docs here. */
 public class PegDetect {
 
-  // TODO: determine me!!!
-  private final double kPixToMeasureRatio = 0.1;
+  // TODO: determine me!!! 7 3/4 to 21
+  private final double kHFOV = 13.25; // inches
 
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
   // lighting and reef of the actual field
-  final Scalar lower_violet = new Scalar(150, 60, 70);
-  final Scalar upper_violet = new Scalar(175, 165, 130);
+  final Scalar lower_violet = new Scalar(149, 68, 55);
+  final Scalar upper_violet = new Scalar(165, 143, 71);
 
   private CvSink m_sink;
   private double m_offset = 0;
@@ -48,6 +49,7 @@ public class PegDetect {
   public boolean processImage() {
     try {
       if (m_sink.grabFrame(mat1) != 0) {
+        double imageWidth = mat1.width();
         System.out.println("Frame acquired");
         Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
         System.out.println("Color conversion to HSV done");
@@ -78,13 +80,19 @@ public class PegDetect {
 
         var boundingRect = Imgproc.boundingRect(contours.get(maxValId));
 
+        System.out.println("Bounding rect: " + boundingRect.toString());
+
         // image is vertical so left right is along the x axis
-        var width_center = boundingRect.x + boundingRect.width / 2;
-        width_center -= mat1.width() / 2;
+        var bbox_center = boundingRect.x + boundingRect.width / 2;
+        bbox_center -= imageWidth / 2;
 
-        System.out.println("offset from center: " + width_center);
+        System.out.println("offset from center: " + bbox_center + " max width: " + imageWidth);
 
-        m_offset = width_center * kPixToMeasureRatio;
+        double pixToMeasureRatio = kHFOV / imageWidth;
+
+        m_offset = Units.inchesToMeters(bbox_center * pixToMeasureRatio);
+
+        System.out.println("offset in meters: " + m_offset);
         m_validDetection = true;
       }
     } catch (Exception e) {
