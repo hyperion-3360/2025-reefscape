@@ -4,11 +4,15 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 
@@ -19,15 +23,21 @@ public class AlignPeg extends SequentialCommandGroup {
 
   Swerve m_driveTrain;
   PegDetect m_pegDetection;
+  Elevator m_elevator;
 
   /** Creates a new VisionAlignPeg. */
-  public AlignPeg(Swerve driveTrain, PegDetect pegDetection) {
+  public AlignPeg(Swerve driveTrain, Elevator elevator, PegDetect pegDetection, Pose2d desiredPose) {
     m_driveTrain = driveTrain;
     m_pegDetection = pegDetection;
+    m_elevator = elevator;
 
     addRequirements(m_driveTrain);
 
     addCommands(
+      Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
+       new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
+      // Commands.runOnce(m_elevator),
+      // this is one command
         new ConditionalCommand(
             new DeferredCommand(
                 () ->
@@ -39,5 +49,6 @@ public class AlignPeg extends SequentialCommandGroup {
                 getRequirements()),
             new PrintCommand("Can't locate peg!!! "),
             () -> m_pegDetection.processImage()));
+            // ends command for peg correction
   }
 }

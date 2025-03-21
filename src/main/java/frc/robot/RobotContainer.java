@@ -319,7 +319,7 @@ public class RobotContainer {
     m_testController.povLeft().onTrue(MinutieMoveLeft);
     m_testController.povRight().onTrue(MinutieMoveRight);
     m_testController.povUp().onTrue(elevateL4);
-    m_testController.a().onTrue(new AlignPeg(m_swerve, m_pegDetect));
+    m_testController.a().onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, new Pose2d()));
     m_testController.b().onTrue(shootCoral);
   }
 
