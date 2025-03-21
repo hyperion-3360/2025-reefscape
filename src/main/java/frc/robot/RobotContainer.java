@@ -152,6 +152,10 @@ public class RobotContainer {
   private final DriveToSomeTargetCmd frontPose =
       new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
 
+    private final MinuteMoveCmd MinutieMoveLeftPeg = new MinuteMoveCmd(m_swerve, OffsetDir.LEFT, m_algaeIntake);
+    private final MinuteMoveCmd MinutieMoveRightPeg = new MinuteMoveCmd(m_swerve, OffsetDir.RIGHT, m_algaeIntake);
+
+
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;
   private Command m_autoOneCoralThenAlgae;
@@ -276,8 +280,8 @@ public class RobotContainer {
 
     m_driverController.leftTrigger(0.3).onTrue(intakeReef).onFalse(stopIntakeAlgaeReef);
 
-    m_driverController.povLeft().onTrue(MinutieMoveLeft);
-    m_driverController.povRight().onTrue(MinutieMoveRight);
+    m_driverController.povLeft().onTrue(MinutieMoveLeftPeg);
+    m_driverController.povRight().onTrue(MinutieMoveRightPeg);
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
 
