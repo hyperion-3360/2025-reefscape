@@ -7,6 +7,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -85,7 +86,13 @@ public class PathfindingV2 extends Command {
     return AutoBuilder.pathfindToPose(pose, constraints, goalEndVelocity);
   }
 
-  public Pose2d offsetPose(Pose2d originalPose, double offset) {
+  /**
+   * @param originalPose
+   * @param offset
+   * @param angleToSubtract angle to subtract in degrees
+   * @return
+   */
+  public Pose2d offsetPose(Pose2d originalPose, double offset, double angleToSubtract) {
     // Offset by 0.05 meters in the direction of the current angle
     double offsetX =
         originalPose.getTranslation().getX()
@@ -98,7 +105,9 @@ public class PathfindingV2 extends Command {
     Translation2d offsetTranslation = new Translation2d(offsetX, offsetY);
     Rotation2d sameRotation = originalPose.getRotation();
 
-    return new Pose2d(offsetTranslation, sameRotation);
+    return new Pose2d(
+        offsetTranslation,
+        sameRotation.minus(new Rotation2d(Units.degreesToRadians((angleToSubtract)))));
   }
 
   public boolean isCloseTo(Pose2d pose, double distance) {
@@ -131,31 +140,32 @@ public class PathfindingV2 extends Command {
 
   private Command driveAndIntakeAlgae(
       Pose3d pose, double elevatorRaiseDistance, desiredHeight algaeHeight) {
-    System.out.println(pose.toString());
     // adjusts tag pose for robot length so that robot doesn't smash into the reef
     Pose2d targetPos =
         new Pose2d(
             pose.getX() + (robotLength / 2 * Math.cos(pose.getRotation().getAngle())),
             pose.getY() + (robotLength / 2 * Math.sin(pose.getRotation().getAngle())),
-            Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees()));
+            Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees() - 180));
 
     SequentialCommandGroup algaeIntakeSequence = new SequentialCommandGroup(Commands.none());
 
     Pose2d backTrackedPose =
         new Pose2d(
-            targetPos.getX() + (1 * Math.cos(pose.getRotation().getAngle())),
-            targetPos.getY() + (1 * Math.sin(pose.getRotation().getAngle())),
-            Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees()));
+            targetPos.getX() + (0.4 * Math.cos(pose.getRotation().getAngle())),
+            targetPos.getY() + (0.4 * Math.sin(pose.getRotation().getAngle())),
+            Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees() - 180));
 
     algaeIntakeSequence.addCommands(
         // sets back the target pose so that we don't break the algae intake into a thousand pieces
         new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
-        new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance)),
-        new InstantCommand(() -> m_elevator.SetHeight(algaeHeight)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.INTAKE)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
         new ParallelDeadlineGroup(
-            new WaitCommand(0.5), new WaitUntilCommand(() -> m_swerve.targetReached())),
+            new WaitCommand(0.8),
+            new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance))),
+        new InstantCommand(() -> m_elevator.SetHeight(algaeHeight)),
+        new ParallelDeadlineGroup(
+            new WaitCommand(0.3), new WaitUntilCommand(() -> m_swerve.targetReached())),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
@@ -170,7 +180,8 @@ public class PathfindingV2 extends Command {
     return algaeIntakeSequence;
   }
 
-  private Command driveAndShootNet(Pose2d targetPos, double elevatorRaiseDistance) {
+  private Command driveAndShootNet(
+      Pose2d targetPos, double elevatorRaiseDistance, desiredHeight nextAlgaeHeight) {
     SequentialCommandGroup shootNetSequence = new SequentialCommandGroup(Commands.none());
     shootNetSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
@@ -178,13 +189,13 @@ public class PathfindingV2 extends Command {
         new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.NET)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET)),
         new ParallelDeadlineGroup(
-            new WaitCommand(0.5), new WaitUntilCommand(() -> m_swerve.targetReached())),
+            new WaitCommand(0.6), new WaitUntilCommand(() -> m_swerve.targetReached())),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.INTAKE)),
-        new WaitCommand(0.9),
+        new WaitCommand(0.15),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.NET)),
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
-        new WaitCommand(0.4),
-        new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+        new WaitCommand(0.05),
+        new InstantCommand(() -> m_elevator.SetHeight(nextAlgaeHeight)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.STORED)));
     return shootNetSequence;
@@ -215,8 +226,33 @@ public class PathfindingV2 extends Command {
     return shootSequence;
   }
 
+  private Command driveAndShootAndAlgae(
+      Pose2d targetPos,
+      double elevatorRaiseDistance,
+      desiredHeight elevatorHeight,
+      double waitTimeToReach) {
+    SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
+
+    shootSequence.addCommands(
+        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+        new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance)),
+        new InstantCommand(() -> m_elevator.SetHeight(elevatorHeight)),
+        new InstantCommand(() -> m_shooter.openBlocker()),
+        new ParallelDeadlineGroup(
+            new WaitCommand(waitTimeToReach), // will be elevatecmd(L4) later
+            new WaitUntilCommand(() -> m_swerve.targetReached())),
+        // new WaitCommand(1.0), // will be elevatecmd(L4) later
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
+        new WaitCommand(0.4),
+        new InstantCommand(() -> m_shooter.stop()),
+        new InstantCommand(() -> m_shooter.closeBlocker()),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.ALGAEL2)));
+    return shootSequence;
+  }
+
   private Command driveAndIntakeCycle(Pose2d targetPos) {
-    var approachPose = offsetPose(targetPos, (robotLength / 2) - 0.12);
+    var approachPose = offsetPose(targetPos, (robotLength / 2) - 0.12, 0);
     SequentialCommandGroup intakeSequence = new SequentialCommandGroup(Commands.none());
     intakeSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(approachPose)),
@@ -385,45 +421,71 @@ public class PathfindingV2 extends Command {
       case Blue:
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.regularConstraints()),
-            driveAndShootCycle(
+            driveAndShootAndAlgae(
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
-                1.0,
+                1.4,
                 desiredHeight.L4,
                 1.2),
+            new InstantCommand(() -> m_swerve.boostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(21)
                     .get(),
-                0.7,
+                0.9,
                 desiredHeight.ALGAEL2),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
+            new InstantCommand(() -> m_swerve.regularConstraints()),
+            driveAndShootNet(
+                AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.ALGAEL2),
             driveAndIntakeAlgae(
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-                    .getTagPose(20)
-                    .get(),
-                0.7,
-                desiredHeight.ALGAEL3),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
-            driveAndIntakeAlgae(
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-                    .getTagPose(19)
-                    .get(),
-                0.7,
-                desiredHeight.ALGAEL2),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4),
+                    AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+                        .getTagPose(20)
+                        .get(),
+                    0.01,
+                    desiredHeight.ALGAEL3)
+                .alongWith(
+                    new WaitCommand(0.3)
+                        .andThen(
+                            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+                            new WaitCommand(2.5),
+                            new InstantCommand(() -> m_swerve.regularConstraints()))),
+            driveAndShootNet(
+                AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.3, desiredHeight.FEEDER),
+            new InstantCommand(() -> m_swerve.boostedConstraints()),
+            new InstantCommand(
+                () ->
+                    m_swerve.drivetoTarget(
+                        offsetPose(
+                                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+                                    .getTagPose(22)
+                                    .get()
+                                    .toPose2d(),
+                                1.5,
+                                180)
+                            )),
+            new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
                     .getTagPose(22)
                     .get(),
-                0.7,
+                0.1,
                 desiredHeight.ALGAEL3),
-            driveAndShootNet(AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4));
+            driveAndShootNet(
+                AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.LOW)
+            // driveAndIntakeAlgae(
+            //     AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+            //         .getTagPose(22)
+            //         .get(),
+            //     0.7,
+            //     desiredHeight.ALGAEL3),
+            // driveAndShootNet(
+            //     AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.LOW)
+            );
         break;
 
       case Red:
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.regularConstraints()),
-            driveAndShootCycle(
+            driveAndShootAndAlgae(
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 1.0,
                 desiredHeight.L4,
@@ -432,16 +494,18 @@ public class PathfindingV2 extends Command {
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
                     .getTagPose(10)
                     .get(),
-                0.7,
+                0.8,
                 desiredHeight.ALGAEL2),
-            driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4),
+            driveAndShootNet(
+                AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.L2),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
                     .getTagPose(11)
                     .get(),
-                0.7,
+                0.4,
                 desiredHeight.ALGAEL3),
-            driveAndShootNet(AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4)
+            driveAndShootNet(
+                AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.3, desiredHeight.LOW)
             // driveAndIntakeAlgae(
             //
             // AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark).getTagPose(6).get(),
