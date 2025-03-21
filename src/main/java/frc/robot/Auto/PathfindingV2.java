@@ -7,7 +7,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -417,6 +416,14 @@ public class PathfindingV2 extends Command {
 
   public Command coralAndAlgae() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
+    Pose2d offsetedPositionRed =
+        offsetPose(
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+                .getTagPose(22)
+                .get()
+                .toPose2d(),
+            1.5,
+            180);
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
@@ -454,14 +461,10 @@ public class PathfindingV2 extends Command {
             new InstantCommand(
                 () ->
                     m_swerve.drivetoTarget(
-                        offsetPose(
-                                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-                                    .getTagPose(22)
-                                    .get()
-                                    .toPose2d(),
-                                1.5,
-                                180)
-                            .plus(new Transform2d(2, 0, Rotation2d.kZero)))),
+                        new Pose2d(
+                            offsetedPositionRed.getX() + 2,
+                            offsetedPositionRed.getY(),
+                            offsetedPositionRed.getRotation()))),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
