@@ -152,9 +152,10 @@ public class RobotContainer {
   private final DriveToSomeTargetCmd frontPose =
       new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
 
-    private final MinuteMoveCmd MinutieMoveLeftPeg = new MinuteMoveCmd(m_swerve, OffsetDir.LEFT, m_algaeIntake);
-    private final MinuteMoveCmd MinutieMoveRightPeg = new MinuteMoveCmd(m_swerve, OffsetDir.RIGHT, m_algaeIntake);
-
+  private final MinuteMoveCmd MinutieMoveLeftPeg =
+      new MinuteMoveCmd(m_swerve, OffsetDir.LEFT, m_algaeIntake);
+  private final MinuteMoveCmd MinutieMoveRightPeg =
+      new MinuteMoveCmd(m_swerve, OffsetDir.RIGHT, m_algaeIntake);
 
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;

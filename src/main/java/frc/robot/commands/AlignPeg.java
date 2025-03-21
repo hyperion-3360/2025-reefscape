@@ -26,7 +26,8 @@ public class AlignPeg extends SequentialCommandGroup {
   Elevator m_elevator;
 
   /** Creates a new VisionAlignPeg. */
-  public AlignPeg(Swerve driveTrain, Elevator elevator, PegDetect pegDetection, Pose2d desiredPose) {
+  public AlignPeg(
+      Swerve driveTrain, Elevator elevator, PegDetect pegDetection, Pose2d desiredPose) {
     m_driveTrain = driveTrain;
     m_pegDetection = pegDetection;
     m_elevator = elevator;
@@ -34,10 +35,10 @@ public class AlignPeg extends SequentialCommandGroup {
     addRequirements(m_driveTrain);
 
     addCommands(
-      Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
-       new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
-      // Commands.runOnce(m_elevator),
-      // this is one command
+        Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
+        new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
+        // Commands.runOnce(m_elevator),
+        // this is one command
         new ConditionalCommand(
             new DeferredCommand(
                 () ->
@@ -49,6 +50,6 @@ public class AlignPeg extends SequentialCommandGroup {
                 getRequirements()),
             new PrintCommand("Can't locate peg!!! "),
             () -> m_pegDetection.processImage()));
-            // ends command for peg correction
+    // ends command for peg correction
   }
 }
