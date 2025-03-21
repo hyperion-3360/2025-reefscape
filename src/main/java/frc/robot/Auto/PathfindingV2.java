@@ -461,7 +461,7 @@ public class PathfindingV2 extends Command {
                                     .toPose2d(),
                                 1.5,
                                 180)
-                            )),
+                            .plus(new Transform2d(2, 0, Rotation2d.kZero)))),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
