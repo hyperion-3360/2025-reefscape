@@ -42,12 +42,12 @@ public class AlignPeg extends SequentialCommandGroup {
     addCommands(
         // new PrintCommand("this has started Yayyyyyyyyyyyyyyyyyyyyyyyyy"),
         new ParallelDeadlineGroup(
-            new WaitCommand(2),
+            new WaitCommand(1.5),
             Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
             new WaitUntilCommand(() -> m_driveTrain.targetReached())),
         new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
-        Commands.runOnce(() -> m_elevator.SetHeight (desiredHeight.L4)),
-        new WaitCommand(3),
+        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
+        new WaitCommand(1.5),
         // Commands.runOnce(() -> m_elevator.AutoElevate()),
         // this is one command
         new ConditionalCommand(
