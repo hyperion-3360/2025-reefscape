@@ -148,7 +148,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   @Override
   public void periodic() {
 
-    System.out.println(currentHeightState);
+    // System.out.println(currentHeightState);
 
     if (isElevatorAtBottom()) {
       elevatorSlack =

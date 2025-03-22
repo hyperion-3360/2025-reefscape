@@ -279,6 +279,8 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(Commands.runOnce(() -> m_elevator.increaseHeightState()));
 
+    m_coDriverController.y().onTrue(intakeCoral);
+
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
     m_driverController.b().onTrue(shootAlgae);
@@ -292,29 +294,39 @@ public class RobotContainer {
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
 
+    // m_driverController
+    //     .leftBumper()
+    //     .onTrue(
+    //         Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseLeft()))
+    //             .unless(m_climber::isClimberActivated)
+    //         //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(()
+    // ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         )
+    //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+
+    // m_driverController
+    //     .rightBumper()
+    //     .onTrue(
+    //         Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseRight()))
+
+    //         //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(()
+    // ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         )
+    //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+
     m_driverController
         .leftBumper()
-        .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseLeft()))
-                .unless(m_climber::isClimberActivated)
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
-
+        .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
     m_driverController
         .rightBumper()
-        .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseRight()))
+        .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseRight()));
 
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
     m_driverController
         .povUp()
         .onTrue(
