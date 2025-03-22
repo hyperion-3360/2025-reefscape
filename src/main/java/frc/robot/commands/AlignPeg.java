@@ -18,6 +18,7 @@ import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredState;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 
@@ -29,32 +30,37 @@ public class AlignPeg extends SequentialCommandGroup {
   Swerve m_driveTrain;
   PegDetect m_pegDetection;
   Elevator m_elevator;
+  Shooter m_shooter;
 
   /** Creates a new VisionAlignPeg. */
   public AlignPeg(
       Swerve driveTrain,
       Elevator elevator,
+      Shooter shooter,
       AlgaeIntake beambreak,
       PegDetect pegDetection,
       Pose2d desiredPose) {
     m_driveTrain = driveTrain;
     m_pegDetection = pegDetection;
     m_elevator = elevator;
+    m_shooter = shooter;
 
     addRequirements(m_driveTrain);
     addRequirements(m_elevator);
+    addRequirements(m_shooter);
 
     addCommands(
         // new PrintCommand("this has started Yayyyyyyyyyyyyyyyyyyyyyyyyy"),
         new ParallelDeadlineGroup(
             new WaitCommand(1.5),
             Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
+            Commands.runOnce(() -> m_elevator.AutoElevate()),
+            Commands.runOnce(() -> m_shooter.openBlocker()),
             new WaitUntilCommand(() -> m_driveTrain.targetReached())),
         new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
         // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
 
-        Commands.runOnce(() -> m_elevator.AutoElevate()),
-        new WaitCommand(1.6),
+        new WaitCommand(1),
         // this is one command
         new ConditionalCommand(
             new DeferredCommand(

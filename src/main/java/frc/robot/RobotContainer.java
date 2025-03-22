@@ -324,12 +324,22 @@ public class RobotContainer {
         .leftBumper()
         .onTrue(
             new AlignPeg(
-                m_swerve, m_elevator, m_algaeIntake, m_pegDetect, m_vision.getDesiredPoseLeft()));
+                m_swerve,
+                m_elevator,
+                m_shooter,
+                m_algaeIntake,
+                m_pegDetect,
+                m_vision.getDesiredPoseLeft()));
     m_driverController
         .rightBumper()
         .onTrue(
             new AlignPeg(
-                m_swerve, m_elevator, m_algaeIntake, m_pegDetect, m_vision.getDesiredPoseRight()));
+                m_swerve,
+                m_elevator,
+                m_shooter,
+                m_algaeIntake,
+                m_pegDetect,
+                m_vision.getDesiredPoseRight()));
 
     m_driverController
         .povUp()
