@@ -47,7 +47,7 @@ public class Vision extends SubsystemBase {
   private double m_AprilTagsScore[] = new double[kNumAprilTagReefScape + 1];
   private final double kTagDistanceFactor = 1.0;
   private final double kTagAmbiguityFactor = 1.0;
-  private final double kNoTagFoundValue = 0.2;
+  private final double kNoTagFoundValue = 0.1;
   // initial score completely vanishes after 25 x 20ms = 0.5s
   private final double kDecimationFator = 1.0 / 1.15;
 

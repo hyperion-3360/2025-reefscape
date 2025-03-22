@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AlignPeg;
+import frc.robot.commands.AlignPeg.Direction;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
@@ -162,6 +163,11 @@ public class RobotContainer {
   private Command m_autoThreeCoralRightAuto;
   private Command m_autoOneCoralThenAlgae;
   private Command m_autoLine;
+  private PegDetect m_pegDetect;
+
+  private final AlignPeg alignPegLeft;
+
+  private final AlignPeg alignPegRight;
 
   private boolean m_debug = false;
   private UsbCamera m_camera;
@@ -176,6 +182,13 @@ public class RobotContainer {
 
     m_pathfinding =
         new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect);
+    alignPegLeft =
+        new AlignPeg(
+            m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetect, m_vision, Direction.left);
+    alignPegRight =
+        new AlignPeg(
+            m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetect, m_vision, Direction.right);
+
     setup.setUpDashboardComp();
     if (m_debug) {
       setup.setUpDashboardDebug();
@@ -321,26 +334,8 @@ public class RobotContainer {
     //         )
     //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_driverController
-        .leftBumper()
-        .onTrue(
-            new AlignPeg(
-                m_swerve,
-                m_elevator,
-                m_shooter,
-                m_algaeIntake,
-                m_pegDetect,
-                m_vision.getDesiredPoseLeft()));
-    m_driverController
-        .rightBumper()
-        .onTrue(
-            new AlignPeg(
-                m_swerve,
-                m_elevator,
-                m_shooter,
-                m_algaeIntake,
-                m_pegDetect,
-                m_vision.getDesiredPoseRight()));
+    m_driverController.leftBumper().onTrue(alignPegLeft);
+    m_driverController.rightBumper().onTrue(alignPegRight);
 
     m_driverController
         .povUp()
