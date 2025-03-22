@@ -24,8 +24,10 @@ public class PegDetect {
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
   // lighting and reef of the actual field
-  final Scalar lower_violet = new Scalar(149, 68, 55);
-  final Scalar upper_violet = new Scalar(165, 143, 71);
+  // final Scalar lower_violet = new Scalar(149, 68, 55);
+  // final Scalar upper_violet = new Scalar(165, 143, 71);
+  final Scalar lower_violet = new Scalar(156, 72, 162);
+  final Scalar upper_violet = new Scalar(166, 121, 241);
 
   private CvSink m_sink;
   private double m_offset = 0;

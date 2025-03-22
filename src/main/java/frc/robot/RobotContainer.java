@@ -152,6 +152,11 @@ public class RobotContainer {
   private final DriveToSomeTargetCmd frontPose =
       new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
 
+  private final MinuteMoveCmd MinutieMoveLeftPeg =
+      new MinuteMoveCmd(m_swerve, OffsetDir.LEFT, m_algaeIntake);
+  private final MinuteMoveCmd MinutieMoveRightPeg =
+      new MinuteMoveCmd(m_swerve, OffsetDir.RIGHT, m_algaeIntake);
+
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;
   private Command m_autoOneCoralThenAlgae;
@@ -266,7 +271,15 @@ public class RobotContainer {
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
-    m_coDriverController.rightBumper().onTrue(intakeCoral);
+    // m_coDriverController.rightBumper().onTrue(intakeCoral);
+    m_coDriverController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_elevator.decreaseHeightState()));
+    m_coDriverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_elevator.increaseHeightState()));
+
+    m_coDriverController.y().onTrue(intakeCoral);
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
@@ -276,34 +289,58 @@ public class RobotContainer {
 
     m_driverController.leftTrigger(0.3).onTrue(intakeReef).onFalse(stopIntakeAlgaeReef);
 
-    m_driverController.povLeft().onTrue(MinutieMoveLeft);
-    m_driverController.povRight().onTrue(MinutieMoveRight);
+    m_driverController.povLeft().onTrue(MinutieMoveLeftPeg);
+    m_driverController.povRight().onTrue(MinutieMoveRightPeg);
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
+
+    // m_driverController
+    //     .leftBumper()
+    //     .onTrue(
+    //         Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseLeft()))
+    //             .unless(m_climber::isClimberActivated)
+    //         //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(()
+    // ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         )
+    //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
+
+    // m_driverController
+    //     .rightBumper()
+    //     .onTrue(
+    //         Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseRight()))
+
+    //         //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(()
+    // ->
+    //         // m_leds.SetPattern(LEDs.Pattern.READY)))
+    //         )
+    //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
     m_driverController
         .leftBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseLeft()))
-                .unless(m_climber::isClimberActivated)
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
-
+            new AlignPeg(
+                m_swerve,
+                m_elevator,
+                m_shooter,
+                m_algaeIntake,
+                m_pegDetect,
+                m_vision.getDesiredPoseLeft()));
     m_driverController
         .rightBumper()
         .onTrue(
-            Commands.runOnce(() -> m_swerve.drivetoTarget(m_vision.getDesiredPoseRight()))
+            new AlignPeg(
+                m_swerve,
+                m_elevator,
+                m_shooter,
+                m_algaeIntake,
+                m_pegDetect,
+                m_vision.getDesiredPoseRight()));
 
-            //          .andThen(new WaitUntilCommand(m_swerve::targetReached).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            //         .raceWith(new WaitUntilCommand(m_swerve::targetDriveDisabled).andThen(() ->
-            // m_leds.SetPattern(LEDs.Pattern.READY)))
-            )
-        .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
     m_driverController
         .povUp()
         .onTrue(
@@ -319,7 +356,9 @@ public class RobotContainer {
     m_testController.povLeft().onTrue(MinutieMoveLeft);
     m_testController.povRight().onTrue(MinutieMoveRight);
     m_testController.povUp().onTrue(elevateL4);
-    m_testController.a().onTrue(new AlignPeg(m_swerve, m_pegDetect));
+    // m_testController
+    //     .a()
+    //     .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
     m_testController.b().onTrue(shootCoral);
   }
 

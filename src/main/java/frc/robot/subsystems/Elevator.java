@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.Joysticks;
 import frc.lib.util.TestBindings;
 import frc.robot.Constants;
+import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
 
 public class Elevator extends SubsystemBase implements TestBindings {
@@ -40,6 +41,14 @@ public class Elevator extends SubsystemBase implements TestBindings {
     ALGAEL2,
     ALGAEL3,
     LOLLYPOP
+  }
+
+  public enum desiredState {
+    NULL,
+    L1,
+    L2,
+    L3,
+    L4
   }
 
   // private static double kP = 20.0;
@@ -68,6 +77,10 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double toRotations = 1 / (2 * Math.PI);
   private static double gearRatio = 9.0;
   private static double elevatorSlack = 0.0;
+
+  private static int heightArrayIndex = 0;
+
+  public ArrayList<desiredState> stateArray = new ArrayList<>();
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
@@ -99,6 +112,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private double elevatorVelocity;
   private double elevatorSetpoint;
   private desiredHeight heightEnum = desiredHeight.LOW;
+  private desiredState currentHeightState = desiredState.NULL;
 
   public Elevator() {
     // motor configs
@@ -123,10 +137,18 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
     m_controller.setGoal(0.0);
     // test_heightIndex = 0;
+
+    stateArray.add(desiredState.NULL);
+    stateArray.add(desiredState.L1);
+    stateArray.add(desiredState.L2);
+    stateArray.add(desiredState.L3);
+    stateArray.add(desiredState.L4);
   }
 
   @Override
   public void periodic() {
+
+    // System.out.println(currentHeightState);
 
     if (isElevatorAtBottom()) {
       elevatorSlack =
@@ -357,5 +379,59 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
   public boolean isElevatorAtBottom() {
     return m_sensor.get() >= 0.3;
+  }
+
+  public desiredState increaseHeightState() {
+
+    heightArrayIndex++;
+
+    if (heightArrayIndex > stateArray.size() - 1) {
+      heightArrayIndex = stateArray.size() - 1;
+    }
+
+    currentHeightState = stateArray.get(heightArrayIndex);
+
+    return currentHeightState;
+  }
+
+  public desiredState decreaseHeightState() {
+
+    heightArrayIndex--;
+
+    if (heightArrayIndex < 0) {
+      heightArrayIndex = 0;
+    }
+    currentHeightState = stateArray.get(heightArrayIndex);
+
+    return currentHeightState;
+  }
+
+  public void AutoElevate() {
+
+    switch (currentHeightState) {
+      case L1:
+        SetHeight(desiredHeight.L1);
+        break;
+      case L2:
+        SetHeight(desiredHeight.L2);
+
+        break;
+      case L3:
+        SetHeight(desiredHeight.L3);
+
+        break;
+      case L4:
+        SetHeight(desiredHeight.L4);
+
+        break;
+      case NULL:
+        break;
+      default:
+        break;
+    }
+  }
+
+  public desiredState getElevatorState() {
+    return currentHeightState;
   }
 }

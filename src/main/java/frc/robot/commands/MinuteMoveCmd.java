@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.swerve.Swerve;
 
 public class MinuteMoveCmd extends SequentialCommandGroup {
@@ -56,6 +57,19 @@ public class MinuteMoveCmd extends SequentialCommandGroup {
             getRequirements()),
         new ParallelDeadlineGroup(
             new WaitCommand(waitTime), // Deadline command
+            new WaitUntilCommand(() -> swerve.targetReached())),
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()));
+  }
+
+  public MinuteMoveCmd(Swerve swerve, OffsetDir dir, AlgaeIntake algaeIntake) {
+    m_swerve = swerve;
+    addRequirements(m_swerve);
+    addCommands(
+        new DeferredCommand(
+            () -> new InstantCommand(() -> m_swerve.drivetoTarget(computeNewPose(0.1, dir))),
+            getRequirements()),
+        new ParallelDeadlineGroup(
+            new WaitUntilCommand(() -> algaeIntake.pegBeamBreak()), // Deadline command
             new WaitUntilCommand(() -> swerve.targetReached())),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()));
   }
