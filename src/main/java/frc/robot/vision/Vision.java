@@ -41,6 +41,16 @@ public class Vision extends SubsystemBase {
     Right
   }
 
+  private final int kNumAprilTagReefScape = 22;
+
+  // tags from 1.. N + 0 for special case where no tag is detected
+  private double m_AprilTagsScore[] = new double[kNumAprilTagReefScape + 1];
+  private final double kTagDistanceFactor = 1.0;
+  private final double kTagAmbiguityFactor = 1.0;
+  private final double kNoTagFoundValue = 0.2;
+  // initial score completely vanishes after 25 x 20ms = 0.5s
+  private final double kDecimationFator = 1.0 / 1.15;
+
   protected final PhotonCamera cameraLml3;
   protected final PhotonCamera cameraLml2Right;
   protected final PhotonCamera cameraLml2Left;
@@ -258,37 +268,60 @@ public class Vision extends SubsystemBase {
             .flatMap(i -> i)
             .collect(Collectors.toList());
 
-    // initialize variables to large or impossible values
-    double targetAmbibuity = 10.0;
-    double targetDistance = 10.0;
-    // PhotonTrackedTarget bestTarget = null;
-    int bestID = -1;
+    boolean noTagFound = true;
 
-    // iterate through all results and find
-    // the best target that is allowed
+    /*
+     * loop through all peg valid peg values and time decimate the score
+     */
+    for (var tag : m_allowedReefPegTag) m_AprilTagsScore[tag] *= kDecimationFator;
+    // don't forget the no tag score!!!
+    m_AprilTagsScore[0] *= kDecimationFator;
+
+    /*
+     * 1. Loop through all results
+     * 2. If a result has targets, get the best target
+     * 3. If the target is allowed, calculate the score
+     * 4. If no tag is found, set the score to a default value
+     */
     for (var result : allResults) {
       if (result.hasTargets()) {
         var currentTarget = result.getBestTarget();
-        var distance = currentTarget.getBestCameraToTarget().getTranslation().getNorm();
-
-        // if the target is allowed, closer than the current target
-        if (allowedTarget(currentTarget)
-            && (distance < targetDistance)
-            && (currentTarget.getPoseAmbiguity() < targetAmbibuity)) {
-          targetDistance = distance;
-          targetAmbibuity = currentTarget.getPoseAmbiguity();
-          bestID = currentTarget.getFiducialId();
-          // bestTarget = currentTarget;
-        } else if (bestID == -1) {
-          bestID = 0;
+        if (allowedTarget(currentTarget)) {
+          noTagFound = false;
+          var distance = currentTarget.getBestCameraToTarget().getTranslation().getNorm();
+          var ambiguity = currentTarget.getPoseAmbiguity();
+          var distanceContribution = Math.exp(-0.5 * distance) * kTagDistanceFactor;
+          var ambiguityContribution = Math.exp(-4 * ambiguity) * kTagAmbiguityFactor;
+          var tagId = currentTarget.getFiducialId();
+          m_AprilTagsScore[tagId] = (distanceContribution * ambiguityContribution);
         }
-      } else if (bestID == -1) {
-        bestID = 0;
       }
     }
-    // if a target is found, set the lockID and trackedTarget
-    if (bestID >= 0) {
-      m_lockID = bestID;
+    // handle the case where no tag is found
+    if (noTagFound == true) {
+      m_AprilTagsScore[0] += kNoTagFoundValue;
+    } else { // if a tag is found, set the no tag score to 0
+      m_AprilTagsScore[0] = 0;
+    }
+
+    // find the tag with the highest score
+    double maxScore = 0;
+    int maxScoreTag = 0;
+    //    System.out.println("Tag: 0 Score: " + m_AprilTagsScore[0]);
+    for (var tag : m_allowedReefPegTag) {
+      if (m_AprilTagsScore[tag] > maxScore) {
+        maxScore = m_AprilTagsScore[tag];
+        maxScoreTag = tag;
+      }
+    }
+
+    //   System.out.println("Max Score: " + maxScore + " Max Score Tag: " + maxScoreTag);
+
+    // if the max score is 0, no tag was found
+    if (m_AprilTagsScore[0] > maxScore) {
+      m_lockID = 0;
+    } else {
+      m_lockID = maxScoreTag;
     }
   }
 
