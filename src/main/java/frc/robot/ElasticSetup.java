@@ -5,7 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -39,16 +41,13 @@ public class ElasticSetup {
   private Climber climber;
   private AlgaeIntake algaeIntake;
   private Elevator elevator;
-  private CommandXboxController codriver;
+  // private CommandXboxController codriver;
   private Vision vision;
 
   ShuffleboardTab driverTab = Shuffleboard.getTab("driverTab");
   ShuffleboardTab techTab = Shuffleboard.getTab("techTab");
   ShuffleboardTab TestSubsystemTab = Shuffleboard.getTab("testSubsystemTab");
   ShuffleboardTab debugTab = Shuffleboard.getTab("debugTab");
-
-  NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  NetworkTable table = inst.getTable("temporary tab");
 
   public ElasticSetup(
       Swerve swerve,
@@ -65,7 +64,7 @@ public class ElasticSetup {
     this.climber = climber;
     this.algaeIntake = algaeIntake;
     this.elevator = elevator;
-    this.codriver = codriver;
+    // this.codriver = codriver;
     this.vision = vision;
 
     autoChooser.setDefaultOption("null", null);
