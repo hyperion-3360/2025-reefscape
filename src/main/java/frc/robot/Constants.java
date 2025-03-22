@@ -272,7 +272,7 @@ public final class Constants {
 
   public static class CoralShooterVariables {
     public static final double kShootNo = 0.0;
-    public static final double kShootL1 = -0.3;
+    public static final double kShootL1 = -0.4;
     public static final double kShootL2 = -0.80;
     public static final double kShootL3 = -0.85;
     public static final double kShootL4 = -0.6;
@@ -280,7 +280,7 @@ public final class Constants {
     public static final double kShootL4Teleop = -0.85;
     public static final double kIntakeSpeed = -0.6;
 
-    public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
+    public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Coast;
     public static final int kCoralShooterCurrentLimit = 30;
     public static final double kCoralShooterRamprate = 0.5;
 
@@ -333,7 +333,7 @@ public final class Constants {
 
     // elevator heights
     public static final double kElevatorDown = 0.0;
-    public static final double kElevatorL1 = 0.58;
+    public static final double kElevatorL1 = 0.82;
     public static final double kElevatorL2 = 1.19;
     public static final double kElevatorL3 = 1.82;
     public static final double kElevatorL4 = 2.80;

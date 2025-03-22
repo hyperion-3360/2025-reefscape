@@ -39,6 +39,7 @@ import frc.robot.commands.ReReadyClimbCmd;
 import frc.robot.commands.ReadyClimbCmd;
 import frc.robot.commands.ShootAlgaeCmd;
 import frc.robot.commands.ShootCoralCmd;
+import frc.robot.commands.ShootCoralL1Cmd;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
@@ -117,6 +118,8 @@ public class RobotContainer {
   private final AutoCancelNet netCancel =
       new AutoCancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
 
+  private final ElevateCmd elevateL1 =
+      new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L1);
   private final ElevateCmd elevateL2 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
   private final ElevateCmd elevateL3 =
@@ -151,6 +154,8 @@ public class RobotContainer {
       new DriveToSomeTargetCmd(() -> new Pose2d(6.55, 3.9, Rotation2d.fromDegrees(270)), m_swerve);
   private final DriveToSomeTargetCmd frontPose =
       new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
+  private final ShootCoralL1Cmd shootL1 =
+      new ShootCoralL1Cmd(m_shooter, m_leds, m_elevator, m_swerve);
 
   private Command m_autoThreeCoralLeftAuto;
   private Command m_autoThreeCoralRightAuto;
@@ -321,6 +326,8 @@ public class RobotContainer {
     m_testController.povUp().onTrue(elevateL4);
     m_testController.a().onTrue(new AlignPeg(m_swerve, m_pegDetect));
     m_testController.b().onTrue(shootCoral);
+    m_testController.a().onTrue(shootL1);
+    m_testController.povDown().onTrue(elevateL1);
   }
 
   public void teleopInit() {
