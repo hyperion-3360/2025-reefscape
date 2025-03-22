@@ -262,7 +262,7 @@ public class Vision extends SubsystemBase {
     double targetAmbibuity = 10.0;
     double targetDistance = 10.0;
     // PhotonTrackedTarget bestTarget = null;
-    int bestID = 0;
+    int bestID = -1;
 
     // iterate through all results and find
     // the best target that is allowed
@@ -279,13 +279,17 @@ public class Vision extends SubsystemBase {
           targetAmbibuity = currentTarget.getPoseAmbiguity();
           bestID = currentTarget.getFiducialId();
           // bestTarget = currentTarget;
+        } else if (bestID == -1) {
+          bestID = 0;
         }
+      } else if (bestID == -1) {
+        bestID = 0;
       }
     }
     // if a target is found, set the lockID and trackedTarget
-    // if (bestID != 0) {
-    m_lockID = bestID;
-    // }
+    if (bestID >= 0) {
+      m_lockID = bestID;
+    }
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml3() {
