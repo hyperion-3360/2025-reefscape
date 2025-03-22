@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.desiredHeight;
+import frc.robot.subsystems.Elevator.desiredState;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
 
@@ -46,9 +46,10 @@ public class AlignPeg extends SequentialCommandGroup {
             Commands.runOnce(() -> m_driveTrain.drivetoTarget(desiredPose)),
             new WaitUntilCommand(() -> m_driveTrain.targetReached())),
         new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
+        // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
+
+        Commands.runOnce(() -> m_elevator.AutoElevate()),
         new WaitCommand(1.5),
-        // Commands.runOnce(() -> m_elevator.AutoElevate()),
         // this is one command
         new ConditionalCommand(
             new DeferredCommand(
@@ -60,7 +61,11 @@ public class AlignPeg extends SequentialCommandGroup {
                         (m_pegDetection.getOffset() < 0) ? OffsetDir.LEFT : OffsetDir.RIGHT),
                 getRequirements()),
             new PrintCommand("Can't locate peg!!! "),
-            () -> m_pegDetection.processImage()));
+            () -> {
+              if (m_pegDetection.processImage() && m_elevator.getElevatorState() == desiredState.L4)
+                return true;
+              else return false;
+            }));
     // ends command for peg correction
   }
 }

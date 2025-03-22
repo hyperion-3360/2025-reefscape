@@ -4,14 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
@@ -19,7 +17,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Vision;
-import java.util.function.BooleanSupplier;
 
 /** Add your docs here. */
 public class ElasticSetup {
@@ -36,35 +33,6 @@ public class ElasticSetup {
 
   private static SendableChooser<Constants.AutoConstants.Sequence> autoChooser =
       new SendableChooser<>();
-  private TestModes m_testMode = TestModes.NONE;
-
-  private Command setElevatorMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.ELEVATOR);
-  }
-
-  private Command setClimberMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.CLIMBER);
-  }
-
-  private Command setCoralShooterMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.CORAL_SHOOTER);
-  }
-
-  private Command setAlgaeIntakeMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.ALGAE_INTAKE);
-  }
-
-  private Command setSwerveMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.SWERVE);
-  }
-
-  private Command setDumperMode() {
-    return Commands.runOnce(() -> m_testMode = TestModes.DUMPER);
-  }
-
-  private BooleanSupplier isMode(TestModes mode) {
-    return () -> m_testMode == mode;
-  }
 
   private Swerve swerve;
   private Shooter shooter;
@@ -78,6 +46,9 @@ public class ElasticSetup {
   ShuffleboardTab techTab = Shuffleboard.getTab("techTab");
   ShuffleboardTab TestSubsystemTab = Shuffleboard.getTab("testSubsystemTab");
   ShuffleboardTab debugTab = Shuffleboard.getTab("debugTab");
+
+  NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  NetworkTable table = inst.getTable("temporary tab");
 
   public ElasticSetup(
       Swerve swerve,
@@ -137,6 +108,8 @@ public class ElasticSetup {
         .withSize(1, 1);
     driverTab.addNumber("lock Tag id", () -> vision.getLockID()).withPosition(5, 4).withSize(1, 1);
 
+    driverTab.addString("elevator state", () -> elevator.getElevatorState().toString());
+
     // technician tab
     //     - Autonomous mode (chooser)
     techTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);
@@ -154,25 +127,25 @@ public class ElasticSetup {
 
   public void setUpDashboardSubsystemTest() {
 
-    TestSubsystemTab.add(CommandScheduler.getInstance());
-    TestSubsystemTab.add("climber", setClimberMode());
-    TestSubsystemTab.add("elevator", setElevatorMode());
-    TestSubsystemTab.add("coral shooter", setCoralShooterMode());
-    TestSubsystemTab.add("algae intake", setAlgaeIntakeMode());
-    TestSubsystemTab.add("swerve", setSwerveMode());
-    TestSubsystemTab.add("dumper", setDumperMode());
+    // TestSubsystemTab.add(CommandScheduler.getInstance());
+    // TestSubsystemTab.add("climber", setClimberMode());
+    // TestSubsystemTab.add("elevator", setElevatorMode());
+    // TestSubsystemTab.add("coral shooter", setCoralShooterMode());
+    // TestSubsystemTab.add("algae intake", setAlgaeIntakeMode());
+    // TestSubsystemTab.add("swerve", setSwerveMode());
+    // TestSubsystemTab.add("dumper", setDumperMode());
 
-    shooter.setupTestBindings(new Trigger(isMode(TestModes.CORAL_SHOOTER)), codriver);
+    // shooter.setupTestBindings(new Trigger(isMode(TestModes.CORAL_SHOOTER)), codriver);
 
-    elevator.setupTestBindings(new Trigger(isMode(TestModes.ELEVATOR)), codriver);
+    // elevator.setupTestBindings(new Trigger(isMode(TestModes.ELEVATOR)), codriver);
 
-    climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), codriver);
+    // climber.setupTestBindings(new Trigger(isMode(TestModes.CLIMBER)), codriver);
 
     // dumper.setupTestBindings(new Trigger(isMode(TestModes.DUMPER)), codriver);
 
-    algaeIntake.setupTestBindings(new Trigger(isMode(TestModes.ALGAE_INTAKE)), codriver);
+    // algaeIntake.setupTestBindings(new Trigger(isMode(TestModes.ALGAE_INTAKE)), codriver);
 
-    swerve.setupTestBindings(new Trigger(isMode(TestModes.SWERVE)), codriver);
+    // swerve.setupTestBindings(new Trigger(isMode(TestModes.SWERVE)), codriver);
   }
 
   public void setUpDashboardDebug() {

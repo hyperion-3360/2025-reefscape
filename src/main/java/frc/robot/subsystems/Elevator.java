@@ -430,4 +430,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
         break;
     }
   }
+
+  public desiredState getElevatorState() {
+    return currentHeightState;
+  }
 }
