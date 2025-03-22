@@ -383,46 +383,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
     heightArrayIndex++;
 
-    if (heightArrayIndex > stateArray.size() - 1) {
-      heightArrayIndex = stateArray.size() - 1;
-    }
-
-    return stateArray.get(heightArrayIndex);
+    return null;
   }
 
-  public desiredState decreaseHeightState() {
-
-    heightArrayIndex--;
-
-    if (heightArrayIndex < 0) {
-      heightArrayIndex = 0;
-    }
-
-    return stateArray.get(heightArrayIndex);
-  }
-
-  public void AutoElevate() {
-
-    switch (currentHeightState) {
-      case L1:
-        SetHeight(desiredHeight.L1);
-        break;
-      case L2:
-        SetHeight(desiredHeight.L2);
-
-        break;
-      case L3:
-        SetHeight(desiredHeight.L3);
-
-        break;
-      case L4:
-        SetHeight(desiredHeight.L4);
-
-        break;
-      case NULL:
-        break;
-      default:
-        break;
-    }
-  }
+  public void decreaseHeightState() {}
 }

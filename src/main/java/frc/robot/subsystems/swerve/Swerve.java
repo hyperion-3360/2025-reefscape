@@ -203,7 +203,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
       estimatePose();
     }
 
-    m_field2d.setRobotPose(poseEstimator.getEstimatedPosition());
+    m_field2d.setRobotPose(getPose());
 
     if (DriverStation.isDisabled()) {
       m_targetModeEnabled = false;
@@ -280,10 +280,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   /* thread */
 
   public void estimatePose() {
-
-    // if vision estimation is present, create method est to add vision measurment
-    // to
-    // pose estimator with estimated pose, estimated timestamp and estimated stdDevs
 
     visionEstLml3.ifPresent(
         est -> {
