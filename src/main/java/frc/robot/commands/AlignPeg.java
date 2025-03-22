@@ -71,8 +71,8 @@ public class AlignPeg extends SequentialCommandGroup {
                     new WaitUntilCommand(() -> m_driveTrain.targetReached())),
                 new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
                 // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
-
-                new WaitCommand(1),
+                new WaitUntilCommand(() -> m_driveTrain.targetReached()),
+                // new WaitCommand(1),
                 // this is one command
                 new ConditionalCommand(
                     new DeferredCommand(
