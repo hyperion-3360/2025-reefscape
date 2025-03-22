@@ -13,6 +13,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 /** Add your docs here. */
@@ -20,6 +21,7 @@ public class PegDetect {
 
   // TODO: determine me!!! 7 3/4 to 21
   private final double kHFOV = 13.25; // inches
+  private final String path = "/media/sda/images/"; // path to save images
 
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
@@ -51,6 +53,7 @@ public class PegDetect {
   public boolean processImage() {
     try {
       if (m_sink.grabFrame(mat1) != 0) {
+        Imgcodecs.imwrite(String.format("%s/%ld.jpg", path, System.currentTimeMillis()), mat1);
         double imageWidth = mat1.width();
         System.out.println("Frame acquired");
         Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
