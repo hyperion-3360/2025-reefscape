@@ -322,10 +322,14 @@ public class RobotContainer {
 
     m_driverController
         .leftBumper()
-        .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
+        .onTrue(
+            new AlignPeg(
+                m_swerve, m_elevator, m_algaeIntake, m_pegDetect, m_vision.getDesiredPoseLeft()));
     m_driverController
         .rightBumper()
-        .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseRight()));
+        .onTrue(
+            new AlignPeg(
+                m_swerve, m_elevator, m_algaeIntake, m_pegDetect, m_vision.getDesiredPoseRight()));
 
     m_driverController
         .povUp()
@@ -342,9 +346,9 @@ public class RobotContainer {
     m_testController.povLeft().onTrue(MinutieMoveLeft);
     m_testController.povRight().onTrue(MinutieMoveRight);
     m_testController.povUp().onTrue(elevateL4);
-    m_testController
-        .a()
-        .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
+    // m_testController
+    //     .a()
+    //     .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
     m_testController.b().onTrue(shootCoral);
   }
 

@@ -110,6 +110,8 @@ public class ElasticSetup {
 
     driverTab.addString("elevator state", () -> elevator.getElevatorState().toString());
 
+    driverTab.addBoolean("peg beambreak", () -> algaeIntake.pegBeamBreak());
+
     // technician tab
     //     - Autonomous mode (chooser)
     techTab.add(swerve.m_field2d).withPosition(6, 0).withSize(6, 4);

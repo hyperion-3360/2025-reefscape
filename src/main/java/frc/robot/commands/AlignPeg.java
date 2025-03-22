@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
+import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredState;
 import frc.robot.subsystems.swerve.Swerve;
@@ -31,7 +32,11 @@ public class AlignPeg extends SequentialCommandGroup {
 
   /** Creates a new VisionAlignPeg. */
   public AlignPeg(
-      Swerve driveTrain, Elevator elevator, PegDetect pegDetection, Pose2d desiredPose) {
+      Swerve driveTrain,
+      Elevator elevator,
+      AlgaeIntake beambreak,
+      PegDetect pegDetection,
+      Pose2d desiredPose) {
     m_driveTrain = driveTrain;
     m_pegDetection = pegDetection;
     m_elevator = elevator;
@@ -49,7 +54,7 @@ public class AlignPeg extends SequentialCommandGroup {
         // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
 
         Commands.runOnce(() -> m_elevator.AutoElevate()),
-        new WaitCommand(1.5),
+        new WaitCommand(1.6),
         // this is one command
         new ConditionalCommand(
             new DeferredCommand(
@@ -62,8 +67,9 @@ public class AlignPeg extends SequentialCommandGroup {
                 getRequirements()),
             new PrintCommand("Can't locate peg!!! "),
             () -> {
-              if (m_pegDetection.processImage() && m_elevator.getElevatorState() == desiredState.L4)
-                return true;
+              if (m_pegDetection.processImage()
+                  && m_elevator.getElevatorState() == desiredState.L4
+                  && !beambreak.pegBeamBreak()) return true;
               else return false;
             }));
     // ends command for peg correction
