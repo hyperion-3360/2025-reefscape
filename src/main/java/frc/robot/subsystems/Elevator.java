@@ -148,6 +148,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
   @Override
   public void periodic() {
 
+    System.out.println(currentHeightState);
+
     if (isElevatorAtBottom()) {
       elevatorSlack =
           (((m_leftElevatorMotor.getPosition().getValueAsDouble() * toRotations)
@@ -383,8 +385,49 @@ public class Elevator extends SubsystemBase implements TestBindings {
 
     heightArrayIndex++;
 
-    return null;
+    if (heightArrayIndex > stateArray.size() - 1) {
+      heightArrayIndex = stateArray.size() - 1;
+    }
+
+    currentHeightState = stateArray.get(heightArrayIndex);
+
+    return currentHeightState;
   }
 
-  public void decreaseHeightState() {}
+  public desiredState decreaseHeightState() {
+
+    heightArrayIndex--;
+
+    if (heightArrayIndex < 0) {
+      heightArrayIndex = 0;
+    }
+    currentHeightState = stateArray.get(heightArrayIndex);
+
+    return currentHeightState;
+  }
+
+  public void AutoElevate() {
+
+    switch (currentHeightState) {
+      case L1:
+        SetHeight(desiredHeight.L1);
+        break;
+      case L2:
+        SetHeight(desiredHeight.L2);
+
+        break;
+      case L3:
+        SetHeight(desiredHeight.L3);
+
+        break;
+      case L4:
+        SetHeight(desiredHeight.L4);
+
+        break;
+      case NULL:
+        break;
+      default:
+        break;
+    }
+  }
 }

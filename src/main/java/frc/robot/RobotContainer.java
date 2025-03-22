@@ -271,7 +271,13 @@ public class RobotContainer {
     m_coDriverController.povLeft().onTrue(elevateL3);
     m_coDriverController.povRight().onTrue(elevateL2);
     m_coDriverController.b().onTrue(elevateLOW);
-    m_coDriverController.rightBumper().onTrue(intakeCoral);
+    // m_coDriverController.rightBumper().onTrue(intakeCoral);
+    m_coDriverController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_elevator.decreaseHeightState()));
+    m_coDriverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_elevator.increaseHeightState()));
 
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
