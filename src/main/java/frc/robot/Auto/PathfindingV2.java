@@ -56,7 +56,7 @@ public class PathfindingV2 extends Command {
 
   private Alliance currentAlliance = Alliance.Blue;
 
-  PathConstraints constraints = new PathConstraints(6.0, 7.0, 1.5, 2.5);
+  PathConstraints constraints = new PathConstraints(5.5, 7.0, 1.5, 2.5);
 
   public PathfindingV2(
       Shooter shooter,
