@@ -64,7 +64,7 @@ public class AlignPeg extends SequentialCommandGroup {
         new ConditionalCommand(
             new SequentialCommandGroup(
                 new ParallelDeadlineGroup(
-                    new WaitCommand(1.5),
+                    new WaitCommand(2.5),
                     Commands.runOnce(() -> m_driveTrain.drivetoTarget(direction())),
                     Commands.runOnce(() -> m_elevator.AutoElevate()),
                     Commands.runOnce(() -> m_shooter.openBlocker()),
