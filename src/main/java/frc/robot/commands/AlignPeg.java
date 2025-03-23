@@ -26,7 +26,7 @@ import frc.robot.vision.Vision;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignPeg extends SequentialCommandGroup {
 
-  private final double kMaxWaitAlignTime = 0.5;
+  private final double kMaxWaitAlignTime = 1;
 
   Swerve m_driveTrain;
   PegDetect m_pegDetection;
@@ -71,7 +71,7 @@ public class AlignPeg extends SequentialCommandGroup {
                     new WaitUntilCommand(() -> m_driveTrain.targetReached())),
                 new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
                 // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
-                new WaitUntilCommand(() -> m_driveTrain.targetReached()),
+                // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
                 // new WaitCommand(1),
                 // this is one command
                 new ConditionalCommand(
@@ -89,7 +89,8 @@ public class AlignPeg extends SequentialCommandGroup {
                     () -> {
                       if (m_pegDetection.processImage()
                           && m_elevator.getElevatorState() == desiredState.L4
-                          && !beambreak.pegBeamBreak()) return true;
+                      //                          && !beambreak.pegBeamBreak()
+                      ) return true;
                       else return false;
                     })),
             new PrintCommand("hehe"),

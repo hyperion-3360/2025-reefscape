@@ -297,6 +297,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public void disableDriveToTarget() {
     m_targetModeEnabled = false;
+    _drive(new Translation2d(0, 0), 0, true, true);
   }
 
   public boolean targetDriveDisabled() {
@@ -304,6 +305,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   }
 
   public void drivetoTarget(Pose2d target) {
+    System.out.println("Requested pose: " + target);
     if (target == Pose2d.kZero) {
       m_targetModeEnabled = false;
     } else {
