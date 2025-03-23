@@ -18,13 +18,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AlignPeg;
-import frc.robot.commands.CancelAlignPeg;
 import frc.robot.commands.AlignPeg.Direction;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
+import frc.robot.commands.CancelAlignPeg;
 import frc.robot.commands.DeepClimbCmd;
 import frc.robot.commands.DriveAndIntakeCmd;
 import frc.robot.commands.ElevateCmd;
@@ -133,7 +133,7 @@ public class RobotContainer {
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
 
-private final CancelAlignPeg cancelAlignPeg = new CancelAlignPeg(m_swerve, m_shooter, m_elevator);
+  private final CancelAlignPeg cancelAlignPeg = new CancelAlignPeg(m_swerve, m_shooter, m_elevator);
   //   private final DriveToSomeTargetCmd backPose =
   //       new DriveToSomeTargetCmd(() -> new Pose2d(7.33, 1.78, Rotation2d.fromDegrees(270)),
   // m_swerve);
