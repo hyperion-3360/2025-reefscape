@@ -31,12 +31,10 @@ public class AutoWaypoints {
     // #region Left
     public static class LeftSide {
 
-      public static class AlgaeWaypoint {
-        static Pose2d AlgaeHG = new Pose2d(5.242, 4, new Rotation2d(Math.toRadians(180)));
-      }
-
       public static class NetWaypoint {
         static Pose2d net = new Pose2d(7.000, 5.157, new Rotation2d(Math.toRadians(0)));
+        static Pose2d netSecondAlgae = new Pose2d(7.000, 5.157, new Rotation2d(Math.toRadians(0)));
+        static Pose2d netAngled = new Pose2d(7.453, 4.0, new Rotation2d(Math.toRadians(45.821)));
       }
 
       public static class pegWaypoints {
@@ -77,6 +75,10 @@ public class AutoWaypoints {
                     new Transform2d(
                         robotHalfLength, -distanceTagToPeg, new Rotation2d(Math.toRadians(-180))))
                 .rotateAround(reefCenter, new Rotation2d(Math.toRadians(180)));
+      }
+
+      public static class AlgaeWaypoint {
+        static Pose2d AlgaeHG = new Pose2d(5.242, 4, new Rotation2d(Math.toRadians(180)));
       }
 
       public static class feederWaypoints {
@@ -208,7 +210,11 @@ public class AutoWaypoints {
       }
 
       public static class NetWaypoint {
-        static Pose2d net = new Pose2d(10.220, 3.157, new Rotation2d(Math.toRadians(180)));
+        static Pose2d net = new Pose2d(10.320, 3.057, new Rotation2d(Math.toRadians(180)));
+        static Pose2d netSecondAlgae =
+            new Pose2d(10.320, 1.847, new Rotation2d(Math.toRadians(180)));
+        static Pose2d netAngled =
+            new Pose2d(10.010, 3.884, new Rotation2d(Math.toRadians(-138.905)));
       }
 
       public class pegWaypoints {

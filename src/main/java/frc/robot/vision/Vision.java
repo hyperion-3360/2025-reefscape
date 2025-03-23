@@ -262,9 +262,10 @@ public class Vision extends SubsystemBase {
     // get all results from all cameras
     var allResults =
         Stream.of(
-                unreadResultsLml3.stream(),
-                unreadResultsLml2Right.stream(),
-                unreadResultsLml2Left.stream())
+                unreadResultsLml3.stream()
+                // unreadResultsLml2Right.stream(),
+                // unreadResultsLml2Left.stream()
+                )
             .flatMap(i -> i)
             .collect(Collectors.toList());
 
