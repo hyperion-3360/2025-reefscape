@@ -24,6 +24,7 @@ public class AutoCancelNet extends SequentialCommandGroup {
     addRequirements(m_elevator);
     addRequirements(m_swerve);
     addCommands(
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.STORED)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORED))
             .unless(() -> m_algaeIntake.sensorTriggered()),
