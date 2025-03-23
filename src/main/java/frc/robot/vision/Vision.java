@@ -240,6 +240,10 @@ public class Vision extends SubsystemBase {
     return m_lockID;
   }
 
+  public double getLockIDIndex() {
+    return m_allowedReefPegTag.indexOf(m_lockID) + 1;
+  }
+
   public boolean isInBoundsForProcessor(Pose2d currentPose) {
     if (m_lockID == 0) {
       if (currentPose.getX() < m_maximumTranslationProcessor.getX()

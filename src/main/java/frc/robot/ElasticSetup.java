@@ -101,7 +101,10 @@ public class ElasticSetup {
             "is in bounds for processor", () -> vision.isInBoundsForProcessor(swerve.getPose()))
         .withPosition(4, 4)
         .withSize(1, 1);
-    driverTab.addNumber("lock Tag id", () -> vision.getLockID()).withPosition(5, 4).withSize(1, 1);
+    driverTab
+        .addNumber("reef side", () -> vision.getLockIDIndex())
+        .withPosition(5, 4)
+        .withSize(1, 1);
 
     driverTab
         .addString("elevator state", () -> elevator.getElevatorState().toString())
