@@ -6,6 +6,7 @@ package frc.robot.vision;
 
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.math.util.Units;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.Core;
@@ -55,9 +56,13 @@ public class PegDetect {
   public boolean processImage() {
     try {
       if (m_sink.grabFrame(mat1) != 0) {
-        var imgName = String.format("%s/%d.png", path, System.currentTimeMillis());
-        System.out.println("Saving image to : " + imgName);
-        Imgcodecs.imwrite(imgName, mat1);
+        File f = new File(path);
+        if (f.isDirectory()) {
+          var imgName = String.format("%s/%d.png", path, System.currentTimeMillis());
+          System.out.println("Saving image to : " + imgName);
+          Imgcodecs.imwrite(imgName, mat1);
+        }
+
         double imageWidth = mat1.width();
         System.out.println("Frame acquired");
         Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
