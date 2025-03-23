@@ -634,8 +634,8 @@ public class PathfindingV2 extends Command {
                 () ->
                     m_swerve.drivetoTarget(
                         new Pose2d(
-                            offsetedPositionRed.getX() - 0.5,
-                            offsetedPositionRed.getY() - 1,
+                            offsetedPositionRed.getX() - 1.0,
+                            offsetedPositionRed.getY() - 2.0,
                             offsetedPositionRed.getRotation()))),
             new WaitUntilCommand(() -> m_swerve.AutoTargetReached()),
             new InstantCommand(() -> m_swerve.regularConstraints()),
