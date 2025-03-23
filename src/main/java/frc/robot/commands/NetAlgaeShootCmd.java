@@ -41,7 +41,7 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
 
     // if we don't have any alliance assume blue alliance
     try {
-      targetX = DriverStation.getAlliance().get().equals(Alliance.Blue) ? 7.3 : 10.3;
+      targetX = DriverStation.getAlliance().get().equals(Alliance.Blue) ? 7.0 : 10.6;
       targetRotation =
           DriverStation.getAlliance().get().equals(Alliance.Blue)
               ? Rotation2d.kZero

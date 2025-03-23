@@ -212,7 +212,7 @@ public class AutoWaypoints {
       public static class NetWaypoint {
         static Pose2d net = new Pose2d(10.320, 3.057, new Rotation2d(Math.toRadians(180)));
         static Pose2d netSecondAlgae =
-            new Pose2d(10.365, 1.847, new Rotation2d(Math.toRadians(180)));
+            new Pose2d(10.320, 1.847, new Rotation2d(Math.toRadians(180)));
         static Pose2d netAngled =
             new Pose2d(10.010, 3.884, new Rotation2d(Math.toRadians(-138.905)));
       }

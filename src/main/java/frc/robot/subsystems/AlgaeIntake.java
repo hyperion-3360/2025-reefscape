@@ -141,7 +141,7 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
         this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoredSpeed;
         break;
       case AUTONET:
-        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoredSpeed;
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kAutoNetSpeed;
         break;
     }
   }
