@@ -40,8 +40,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.vision.Vision;
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
-import org.photonvision.EstimatedRobotPose;
 
 public class Swerve extends SubsystemBase implements TestBindings {
   public SwerveModule[] mSwerveMods;
@@ -51,8 +49,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   // public SwerveDriveOdometry m_odometry;
   private Vision vision;
   private final SwerveDrivePoseEstimator poseEstimator;
-  Thread thread = new Thread();
-  private boolean hasStartedEstimation = false;
   private Orchestra m_orchestra = new Orchestra();
   private boolean m_targetModeEnabled = false;
   private ProfiledPIDController m_xController;
@@ -73,11 +69,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
       new TrapezoidProfile.Constraints(Math.PI, Math.PI);
-
-  // vision estimation of robot pose
-  Optional<EstimatedRobotPose> visionEstLml3;
-  Optional<EstimatedRobotPose> visionEstLml2R;
-  Optional<EstimatedRobotPose> visionEstLml2L;
 
   public Swerve(Vision vision, Elevator elevator) {
     m_elevator = elevator;
@@ -190,18 +181,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
     poseEstimator.update(m_gyro.getRotation2d(), getModulePositions());
 
     vision.doPeriodic();
-    visionEstLml3 = vision.getEstimatedGlobalPoseLml3();
-    visionEstLml2L = vision.getEstimatedGlobalPoseLml2Left();
-    visionEstLml2R = vision.getEstimatedGlobalPoseLml2Right();
+    estimatePose();
 
     SmartDashboard.putNumber("gyro z", getGyroZ());
-
-    if (visionEstLml3.isPresent()
-        || visionEstLml2R.isPresent()
-        || visionEstLml2L.isPresent() && !hasStartedEstimation) {
-      hasStartedEstimation = true;
-      estimatePose();
-    }
 
     m_field2d.setRobotPose(getPose());
 
@@ -281,28 +263,17 @@ public class Swerve extends SubsystemBase implements TestBindings {
 
   public void estimatePose() {
 
-    visionEstLml3.ifPresent(
-        est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml3();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
-
-    visionEstLml2R.ifPresent(
-        est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml2Right();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
-
-    visionEstLml2L.ifPresent(
-        est -> {
-          var estStdDevs = vision.getEstimationStdDevsLml2Left();
-          poseEstimator.addVisionMeasurement(
-              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-        });
-
-    hasStartedEstimation = false;
+    for (var camera : vision.cameras()) {
+      camera
+          .getVisionEstimatePose()
+          .ifPresent(
+              pose -> {
+                poseEstimator.addVisionMeasurement(
+                    pose.estimatedPose.toPose2d(),
+                    camera.getTimestampSeconds(),
+                    camera.getEstimationStdDevs());
+              });
+    }
   }
 
   /* drive related things */
