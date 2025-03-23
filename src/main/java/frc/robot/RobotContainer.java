@@ -24,6 +24,7 @@ import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
 import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
+import frc.robot.commands.CancelAlignPeg;
 import frc.robot.commands.DeepClimbCmd;
 import frc.robot.commands.DriveAndIntakeCmd;
 import frc.robot.commands.ElevateCmd;
@@ -131,6 +132,8 @@ public class RobotContainer {
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
+
+  private final CancelAlignPeg cancelAlignPeg = new CancelAlignPeg(m_swerve, m_shooter, m_elevator);
   //   private final DriveToSomeTargetCmd backPose =
   //       new DriveToSomeTargetCmd(() -> new Pose2d(7.33, 1.78, Rotation2d.fromDegrees(270)),
   // m_swerve);
@@ -335,8 +338,8 @@ public class RobotContainer {
     //         )
     //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_driverController.leftBumper().onTrue(alignPegLeft);
-    m_driverController.rightBumper().onTrue(alignPegRight);
+    m_driverController.leftBumper().onTrue(alignPegLeft).onFalse(cancelAlignPeg);
+    m_driverController.rightBumper().onTrue(alignPegRight).onFalse(cancelAlignPeg);
 
     m_driverController
         .povUp()
