@@ -135,7 +135,20 @@ public class VisionCamera extends SubsystemBase {
                 m_visionEstimatePose = m_cameraPoseEstimator.update(result);
                 updateEstimationStdDevs(m_visionEstimatePose, result.getTargets());
                 if (result.hasTargets()) {
-                  m_target = Optional.of(result.getBestTarget());
+                  var targets = result.getTargets();
+                  double bestAmbiguity = 2.0;
+                  for (var target : targets) {
+                    if ((target.poseAmbiguity < bestAmbiguity)
+                        && Math.abs(target.poseAmbiguity - bestAmbiguity) > 0.05) {
+                      bestAmbiguity = target.poseAmbiguity;
+                      m_target = Optional.of(target);
+                    } else if (Math.abs(target.poseAmbiguity - bestAmbiguity) < 0.05) {
+                      if (target.getBestCameraToTarget().getTranslation().getNorm()
+                          < m_target.get().getBestCameraToTarget().getTranslation().getNorm()) {
+                        m_target = Optional.of(target);
+                      }
+                    }
+                  }
                 }
               }
             },
