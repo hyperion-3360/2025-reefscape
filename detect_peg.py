@@ -2,6 +2,7 @@
 import cv2 
 import numpy as np 
 import argparse
+from glob import glob
 
 # x1, y1 of the ROI
 x1, y1, x2, y2 = -1, -1, -1, -1
@@ -103,13 +104,17 @@ def process_peg_image(image_File_name, lower_violet_hsv, upper_violet_hsv):
 if __name__ == "__main__":
 # using argparse to get the image file name
     parser = argparse.ArgumentParser()
-    parser.add_argument("image_file", help="The image file to process") 
+    parser.add_argument("file_names", nargs='*', help="The image file to process") 
     args = parser.parse_args()
-    image_File_name = args.image_file
+    file_names =[]
 
     # Threshold of blue in HSV space 
-    lower_violet = np.array([158, 72, 168]) 
-    upper_violet = np.array([166, 122, 247]) 
+    lower_violet = np.array([137, 48, 38]) 
+    upper_violet = np.array([165, 143, 134]) 
 
-    process_peg_image(image_File_name, lower_violet, upper_violet)
+    for arg in args.file_names:  
+        file_names += glob(arg)  
+
+    for image_File_name in file_names:
+        process_peg_image(image_File_name, lower_violet, upper_violet)
     
