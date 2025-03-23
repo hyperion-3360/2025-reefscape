@@ -4,16 +4,12 @@
 
 package frc.robot.vision;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -24,54 +20,29 @@ import frc.robot.subsystems.Elevator.desiredHeight;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
-  public enum CameraSide {
-    Left,
-    Right
-  }
 
   private final int kNumAprilTagReefScape = 22;
 
   // tags from 1.. N + 0 for special case where no tag is detected
   private double m_AprilTagsScore[] = new double[kNumAprilTagReefScape + 1];
-  private final double kTagDistanceFactor = 1.0;
-  private final double kTagAmbiguityFactor = 1.0;
-  private final double kNoTagFoundValue = 0.1;
+  private final double kPrimaryTagDistanceFactor = 2.0;
+  private final double kPrimaryTagAmbiguityFactor = 2.0;
+  private final double kSecondaryTagDistanceFactor = 0.5;
+  private final double kSecondaryTagAmbiguityFactor = 0.5;
+  private final double kNoTagFoundValue = 0.5;
   // initial score completely vanishes after 25 x 20ms = 0.5s
   private final double kDecimationFator = 1.0 / 1.15;
 
-  protected final PhotonCamera cameraLml3;
-  protected final PhotonCamera cameraLml2Right;
-  protected final PhotonCamera cameraLml2Left;
-
-  protected final PhotonPoseEstimator photonEstimatorLml3;
-  protected final PhotonPoseEstimator photonEstimatorLml2Right;
-  protected final PhotonPoseEstimator photonEstimatorLml2Left;
-
-  protected Matrix<N3, N1> curStdDevsLml3;
-  protected Matrix<N3, N1> curStdDevsLml2Right;
-  protected Matrix<N3, N1> curStdDevsLml2Left;
-
-  private Matrix<N3, N1> singleTagStdDevsLml3 = VecBuilder.fill(4, 4, 8);
-  private Matrix<N3, N1> multiTagStdDevsLml3 = VecBuilder.fill(3, 3, 6);
-
-  private Matrix<N3, N1> singleTagStdDevsLml2 = VecBuilder.fill(4, 4, 8);
-  private Matrix<N3, N1> multiTagStdDevsLml2 = VecBuilder.fill(3, 3, 6);
+  private VisionCamera m_cameras[] = new VisionCamera[3];
+  private boolean m_tagFound = true;
 
   desiredHeight currentAlgaeHeight = desiredHeight.LOW;
 
-  Transform3d robotToCamLml2Right =
+  Transform3d m_LL2_Right =
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(12.25),
@@ -82,7 +53,7 @@ public class Vision extends SubsystemBase {
               Units.degreesToRadians(-15),
               Units.degreesToRadians(19.7)));
 
-  Transform3d robotToCamLml2Left =
+  Transform3d m_LL2_Left =
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(12.25),
@@ -93,7 +64,7 @@ public class Vision extends SubsystemBase {
               Units.degreesToRadians(-15),
               Units.degreesToRadians(-19.7)));
 
-  Transform3d robotToCamLml3 =
+  Transform3d m_LL3 =
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(-2.75), Units.inchesToMeters(0), Units.inchesToMeters(34)),
@@ -101,17 +72,15 @@ public class Vision extends SubsystemBase {
 
   private int m_lockID = 0;
   private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
-  private Optional<EstimatedRobotPose> visionEstLml3;
-  private Optional<EstimatedRobotPose> visionEstLml2Left;
-  private Optional<EstimatedRobotPose> visionEstLml2Right;
-  private final double robotHalfLength = Units.inchesToMeters(18);
-  private final double distTagToPeg = Units.inchesToMeters(6.25);
-  private final double desiredDistFromTag = 1;
-  private Translation2d minimumTranslationProcessor = new Translation2d();
-  private Translation2d maximumTranslationProcessor = new Translation2d();
-  private Pose2d processorAlignPosition = new Pose2d();
+
+  private final double krobotHalfLength = Units.inchesToMeters(18);
+  private final double kdistTagToPeg = Units.inchesToMeters(6.25);
+  private final double kdesiredDistFromTag = 1;
+  private Translation2d m_minimumTranslationProcessor = new Translation2d();
+  private Translation2d m_maximumTranslationProcessor = new Translation2d();
+  private Pose2d m_processorAlignPosition = new Pose2d();
   // we want to be close to the reef to intake an algae but we don't want to slam into the reef
-  private double desiredCloseUpDistFromTag = robotHalfLength;
+  private double desiredCloseUpDistFromTag = krobotHalfLength;
 
   private enum direction {
     left,
@@ -123,28 +92,23 @@ public class Vision extends SubsystemBase {
   /** Creates a new Odometry. */
   public Vision() {
 
-    cameraLml3 = new PhotonCamera("lml3");
-    cameraLml2Right = new PhotonCamera("lml2R");
-    cameraLml2Left = new PhotonCamera("lml2L");
-    // MULTI_TAG_PNP_ON_COPROCESSOR
-    photonEstimatorLml3 =
-        new PhotonPoseEstimator(Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml3);
-    // photonEstimatorLml3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    photonEstimatorLml2Right =
-        new PhotonPoseEstimator(
-            Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Right);
-    photonEstimatorLml2Left =
-        new PhotonPoseEstimator(
-            Constants.tagLayout, PoseStrategy.LOWEST_AMBIGUITY, robotToCamLml2Left);
+    m_cameras[0] =
+        new VisionCamera("lml3", m_LL3, kPrimaryTagDistanceFactor, kPrimaryTagAmbiguityFactor);
+    m_cameras[1] =
+        new VisionCamera(
+            "lml2R", m_LL2_Right, kSecondaryTagDistanceFactor, kSecondaryTagAmbiguityFactor);
+    m_cameras[2] =
+        new VisionCamera(
+            "lml2L", m_LL2_Left, kSecondaryTagDistanceFactor, kSecondaryTagAmbiguityFactor);
 
     try {
       var alliance = DriverStation.getAlliance().get();
       if (alliance == Alliance.Blue) {
-        minimumTranslationProcessor =
+        m_minimumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(200.0), Units.inchesToMeters(0.0));
-        maximumTranslationProcessor =
+        m_maximumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(300.0), Units.inchesToMeters(100.0));
-        processorAlignPosition =
+        m_processorAlignPosition =
             new Pose2d(
                 Units.inchesToMeters(240),
                 Units.inchesToMeters(30),
@@ -157,11 +121,11 @@ public class Vision extends SubsystemBase {
         m_allowedReefPegTag.add(20);
         m_allowedReefPegTag.add(19);
       } else if (alliance == Alliance.Red) {
-        minimumTranslationProcessor =
+        m_minimumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(420.0), Units.inchesToMeters(217.0));
-        maximumTranslationProcessor =
+        m_maximumTranslationProcessor =
             new Translation2d(Units.inchesToMeters(490.0), Units.inchesToMeters(500));
-        processorAlignPosition =
+        m_processorAlignPosition =
             new Pose2d(
                 Units.inchesToMeters(455.15),
                 Units.inchesToMeters(299.455),
@@ -182,94 +146,18 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public boolean limelight2LeftActive() {
-    return cameraLml2Left.isConnected();
-  }
-
-  public boolean limelight2RightActive() {
-    return cameraLml2Right.isConnected();
-  }
-
-  public boolean limelight3Active() {
-    return cameraLml3.isConnected();
-  }
-
   private boolean allowedTarget(PhotonTrackedTarget target) {
     return m_allowedReefPegTag.contains(target.getFiducialId());
   }
 
-  private boolean isGoodResult(PhotonPipelineResult result) {
-    boolean rc = true;
-    do {
-      if (!result.hasTargets()) {
-        rc = false;
-        break;
-      }
-
-      for (var target : result.getTargets()) {
-        if (target.getPoseAmbiguity() > 0.2) {
-          rc = false;
-          break;
-        }
-      }
-
-    } while (false);
-
-    return rc;
-  }
-
   public void doPeriodic() {
-    visionEstLml3 = Optional.empty();
+    //    visionEstLml3 = Optional.empty();
 
-    // for a change in target (latest result), estimation.update with latest
-    // update estimation standard deviations with new estimation and new target
-    var unreadResultsLml3 = cameraLml3.getAllUnreadResults();
-
-    for (var changelml3 : unreadResultsLml3) {
-      if (isGoodResult(changelml3)) {
-        visionEstLml3 = photonEstimatorLml3.update(changelml3);
-        updateEstimationStdDevsLml3(visionEstLml3, changelml3.getTargets());
-      }
-    }
-    visionEstLml2Right = Optional.empty();
-
-    // for a change in target (latest result), estimation.update with latest
-    // update estimation standard deviations with new estimation and new target
-    var unreadResultsLml2Right = cameraLml2Right.getAllUnreadResults();
-
-    for (var changelml2R : unreadResultsLml2Right) {
-      if (isGoodResult(changelml2R)) {
-
-        visionEstLml2Right = photonEstimatorLml2Right.update(changelml2R);
-        updateEstimationStdDevsLml2(visionEstLml2Right, changelml2R.getTargets(), CameraSide.Right);
-      }
+    for (var camera : m_cameras) {
+      camera.updateEstimatedPose();
     }
 
-    visionEstLml2Left = Optional.empty();
-
-    // for a change in target (latest result), estimation.update with latest
-    // update estimation standard deviations with new estimation and new target
-    var unreadResultsLml2Left = cameraLml2Left.getAllUnreadResults();
-
-    for (var changelml2L : unreadResultsLml2Left) {
-      if (isGoodResult(changelml2L)) {
-        visionEstLml2Left = photonEstimatorLml2Left.update(changelml2L);
-        updateEstimationStdDevsLml2(visionEstLml2Left, changelml2L.getTargets(), CameraSide.Left);
-      }
-    }
-
-    // setLockTargetfsa
-    // get all results from all cameras
-    var allResults =
-        Stream.of(
-                unreadResultsLml3.stream()
-                // unreadResultsLml2Right.stream(),
-                // unreadResultsLml2Left.stream()
-                )
-            .flatMap(i -> i)
-            .collect(Collectors.toList());
-
-    boolean noTagFound = true;
+    m_tagFound = false;
 
     /*
      * loop through all peg valid peg values and time decimate the score
@@ -279,29 +167,40 @@ public class Vision extends SubsystemBase {
     m_AprilTagsScore[0] *= kDecimationFator;
 
     /*
-     * 1. Loop through all results
-     * 2. If a result has targets, get the best target
-     * 3. If the target is allowed, calculate the score
-     * 4. If no tag is found, set the score to a default value
+     * 1. Loop through all camera poses
+     * 2. If the target is allowed, calculate the score
+     * 3. If at least one target has been found, reset the no tag score
      */
-    for (var result : allResults) {
-      if (result.hasTargets()) {
-        var currentTarget = result.getBestTarget();
-        if (allowedTarget(currentTarget)) {
-          noTagFound = false;
-          var distance = currentTarget.getBestCameraToTarget().getTranslation().getNorm();
-          var ambiguity = currentTarget.getPoseAmbiguity();
-          var distanceContribution = Math.exp(-0.5 * distance) * kTagDistanceFactor;
-          var ambiguityContribution = Math.exp(-4 * ambiguity) * kTagAmbiguityFactor;
-          var tagId = currentTarget.getFiducialId();
-          m_AprilTagsScore[tagId] = (distanceContribution * ambiguityContribution);
-        }
-      }
+
+    for (var camera : m_cameras) {
+      camera
+          .getVisionEstimatePose()
+          .ifPresent(
+              pose -> {
+                if (camera.bestTarget().isPresent()) {
+                  var target = camera.bestTarget().get();
+                  if (allowedTarget(target)) {
+                    m_tagFound = true;
+                    var distance = target.getBestCameraToTarget().getTranslation().getNorm();
+                    var ambiguity = target.getPoseAmbiguity();
+                    var distanceContribution = Math.exp(-0.5 * distance) * camera.distanceFactor;
+                    var ambiguityContribution = Math.exp(-4 * ambiguity) * camera.ambiguityFactor;
+                    var tagId = target.getFiducialId();
+                    m_AprilTagsScore[tagId] = (distanceContribution * ambiguityContribution);
+                  }
+                  // there were results from the cameras but the target seen is not allowed
+                  else {
+                    m_AprilTagsScore[0] += kNoTagFoundValue;
+                  }
+                  // we have results from the camera but no target was found
+                } else {
+                  m_AprilTagsScore[0] += kNoTagFoundValue;
+                }
+              });
     }
+
     // handle the case where no tag is found
-    if (noTagFound == true) {
-      m_AprilTagsScore[0] += kNoTagFoundValue;
-    } else { // if a tag is found, set the no tag score to 0
+    if (m_tagFound == true) {
       m_AprilTagsScore[0] = 0;
     }
 
@@ -326,180 +225,16 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml3() {
-    return visionEstLml3;
-  }
-
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Right() {
-    return visionEstLml2Right;
-  }
-
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPoseLml2Left() {
-    return visionEstLml2Left;
-  }
-
-  protected void updateEstimationStdDevsLml3(
-      Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
-
-    if (estimatedPose.isEmpty()) {
-      curStdDevsLml3 = singleTagStdDevsLml3;
-    } else {
-
-      // pose preswnt, start running heuristic
-      var estStdDevs = singleTagStdDevsLml3;
-      int numTags = 0;
-      double avgDist = 0;
-
-      // precalc (how mny tags, avg dist metric)
-      for (var tgt : targets) {
-        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty()) continue;
-        numTags++;
-        avgDist +=
-            tagPose
-                .get()
-                .toPose2d()
-                .getTranslation()
-                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-      }
-
-      if (numTags == 0) {
-        // no visiblw tags default to single tag
-        curStdDevsLml3 = singleTagStdDevsLml3;
-      } else {
-        // more tags, run full heuristic
-        avgDist /= numTags;
-
-        // decrase std devs if multiple visible
-        if (numTags > 1) {
-          estStdDevs = multiTagStdDevsLml3;
-        }
-
-        // increase std devs based on "avg" dist
-        if (numTags == 1 && avgDist > 4) {
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
-
-        curStdDevsLml3 = estStdDevs;
-      }
-    }
-  }
-
-  protected void updateEstimationStdDevsLml2(
-      Optional<EstimatedRobotPose> estimatedPose,
-      List<PhotonTrackedTarget> targets,
-      CameraSide side) {
-
-    if (estimatedPose.isEmpty()) {
-      if (side == CameraSide.Left) {
-        curStdDevsLml2Left = singleTagStdDevsLml2;
-      } else {
-        curStdDevsLml2Right = singleTagStdDevsLml2;
-      }
-    } else {
-
-      // pose preswnt, start running heuristic
-      var estStdDevs = singleTagStdDevsLml2;
-      int numTags = 0;
-      double avgDist = 0;
-
-      // precalc (how mny tags, avg dist metric)
-      for (var tgt : targets) {
-        var tagPose = photonEstimatorLml3.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty()) continue;
-        numTags++;
-        avgDist +=
-            tagPose
-                .get()
-                .toPose2d()
-                .getTranslation()
-                .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-      }
-
-      if (numTags == 0) {
-        // no visiblw tags default to single tag
-        if (side == CameraSide.Left) {
-          curStdDevsLml2Left = singleTagStdDevsLml2;
-        } else {
-          curStdDevsLml2Right = singleTagStdDevsLml2;
-        }
-      } else {
-        // more tags, run full heuristic
-        avgDist /= numTags;
-
-        // decrase std devs if multiple visible
-        if (numTags > 1) {
-          estStdDevs = multiTagStdDevsLml2;
-        }
-
-        // increase std devs based on "avg" dist
-        if (numTags == 1 && avgDist > 4) {
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
-
-        if (side == CameraSide.Left) {
-          curStdDevsLml2Left = estStdDevs;
-        } else {
-          curStdDevsLml2Right = estStdDevs;
-        }
-      }
-    }
-  }
-
-  public Matrix<N3, N1> getEstimationStdDevsLml3() {
-    return curStdDevsLml3;
-  }
-
-  public Matrix<N3, N1> getEstimationStdDevsLml2Left() {
-    return curStdDevsLml2Left;
-  }
-
-  public Matrix<N3, N1> getEstimationStdDevsLml2Right() {
-    return curStdDevsLml2Right;
-  }
-
-  // #region lockID
-
-  // public void periodic() {
-  // setLockTarget(); //done in doPeriodic()
-  // isInBoundsForProcessor(); //TBD
-  // System.out.println(lockID);
-  // }
-
   public double getLockID() {
     return m_lockID;
   }
 
-  private double GetTagYaw() {
-    if (m_lockID != 0) {
-      return Constants.tagLayout.getTagPose(m_lockID).get().getRotation().getZ();
-    }
-    return 0.0;
-  }
-
-  private Translation2d GetTagTranslation() {
-
-    if (m_lockID != 0) {
-
-      var x = Constants.tagLayout.getTagPose(m_lockID).get().getX();
-      var y = Constants.tagLayout.getTagPose(m_lockID).get().getY();
-
-      return new Translation2d(x, y);
-    }
-
-    return new Translation2d();
-  }
-
   public boolean isInBoundsForProcessor(Pose2d currentPose) {
     if (m_lockID == 0) {
-      if (currentPose.getX() < maximumTranslationProcessor.getX()
-          && currentPose.getX() > minimumTranslationProcessor.getX()
-          && currentPose.getY() < maximumTranslationProcessor.getY()
-          && currentPose.getY() > minimumTranslationProcessor.getY()) {
+      if (currentPose.getX() < m_maximumTranslationProcessor.getX()
+          && currentPose.getX() > m_minimumTranslationProcessor.getX()
+          && currentPose.getY() < m_maximumTranslationProcessor.getY()
+          && currentPose.getY() > m_minimumTranslationProcessor.getY()) {
         return true;
       } else {
         return false;
@@ -522,15 +257,15 @@ public class Vision extends SubsystemBase {
     double translationY = 0.0;
     switch (dir) {
       case left:
-        translationX -= robotHalfLength;
-        translationY += distTagToPeg;
+        translationX -= krobotHalfLength;
+        translationY += kdistTagToPeg;
         break;
       case right:
-        translationX -= robotHalfLength;
-        translationY -= distTagToPeg;
+        translationX -= krobotHalfLength;
+        translationY -= kdistTagToPeg;
         break;
       case back:
-        translationX -= desiredDistFromTag;
+        translationX -= kdesiredDistFromTag;
         break;
       case close:
         translationX -= desiredCloseUpDistFromTag;
@@ -561,7 +296,7 @@ public class Vision extends SubsystemBase {
     if (m_lockID != 0) {
       return computeNewPoseFromTag(m_lockID, direction.back);
     } else if (m_lockID == 0 && isInBoundsForProcessor(currentPose.get())) {
-      return processorAlignPosition;
+      return m_processorAlignPosition;
     } else {
       return Pose2d.kZero;
     }
@@ -593,5 +328,9 @@ public class Vision extends SubsystemBase {
     }
 
     return currentAlgaeHeight;
+  }
+
+  public VisionCamera[] cameras() {
+    return m_cameras;
   }
 }
