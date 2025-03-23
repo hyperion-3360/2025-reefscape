@@ -71,6 +71,7 @@ public class Vision extends SubsystemBase {
           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(+15), 0.0));
 
   private int m_lockID = 0;
+  private int m_printCounter = 0;
   private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
 
   private final double krobotHalfLength = Units.inchesToMeters(18);
@@ -202,6 +203,14 @@ public class Vision extends SubsystemBase {
     // handle the case where no tag is found
     if (m_tagFound == true) {
       m_AprilTagsScore[0] = 0;
+    }
+
+    // print scores every 50 cycles or so
+    if (m_printCounter++ % 50 == 0) {
+      System.out.println("Tag: 0 Score: " + m_AprilTagsScore[0]);
+      for (var tag : m_allowedReefPegTag) {
+        System.out.println("Tag: " + tag + " Score: " + m_AprilTagsScore[tag]);
+      }
     }
 
     // find the tag with the highest score
