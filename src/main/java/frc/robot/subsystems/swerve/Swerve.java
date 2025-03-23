@@ -121,10 +121,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
             kMaxSpeedRadiansPerSecond + 1.0, kMaxAccelerationRadiansPerSecondSquared + 2.0);
     m_yConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondY + 2.5, kMaxAccelerationMetersPerSecondSquaredY + 3.5);
+            kMaxSpeedMetersPerSecondY + 2.8, kMaxAccelerationMetersPerSecondSquaredY + 3.8);
     m_xConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondX + 2.5, kMaxAccelerationMetersPerSecondSquaredX + 3.5);
+            kMaxSpeedMetersPerSecondX + 2.8, kMaxAccelerationMetersPerSecondSquaredX + 3.8);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -141,6 +141,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_xConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedMetersPerSecondX + 0.5, kMaxAccelerationMetersPerSecondSquaredX + 1);
+
+    m_xController.setConstraints(m_xConstraints);
+    m_yController.setConstraints(m_yConstraints);
+    m_rotController.setConstraints(m_rotConstraints);
+  }
+
+  public void slightlyBoostedConstraints() {
+    m_rotConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedRadiansPerSecond + 1.0, kMaxAccelerationRadiansPerSecondSquared + 2.0);
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY + 1.5, kMaxAccelerationMetersPerSecondSquaredY + 2.5);
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX + 1.5, kMaxAccelerationMetersPerSecondSquaredX + 2.5);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -338,8 +354,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
     System.out.println("swerve pose: " + posX + " " + posY);
     System.out.println("goal pose: " + goalX + " " + goalY);
 
-    return isAlmostEqual(posX, goalX, 0.20)
-        && isAlmostEqual(posY, goalY, 0.20)
+    return isAlmostEqual(posX, goalX, 0.30)
+        && isAlmostEqual(posY, goalY, 0.30)
         && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
   }
 

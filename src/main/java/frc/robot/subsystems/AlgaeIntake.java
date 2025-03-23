@@ -39,7 +39,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     PROCESSOR,
     NET,
     STORING, // this is the intake speed / 2
-    STORED // this is resting speed or 0
+    STORED, // this is resting speed or 0
+    AUTONET
   }
 
   private static final double kP = 0.0205;
@@ -137,6 +138,9 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
         break;
 
       case STORED:
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoredSpeed;
+        break;
+      case AUTONET:
         this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoredSpeed;
         break;
     }
