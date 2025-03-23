@@ -6,6 +6,7 @@ package frc.robot.vision;
 
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.math.util.Units;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.Core;
@@ -13,6 +14,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 /** Add your docs here. */
@@ -20,14 +22,17 @@ public class PegDetect {
 
   // TODO: determine me!!! 7 3/4 to 21
   private final double kHFOV = 13.25; // inches
+  private final String path = "/media/sda/images/"; // path to save images
 
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
   // lighting and reef of the actual field
-  // final Scalar lower_violet = new Scalar(149, 68, 55);
-  // final Scalar upper_violet = new Scalar(165, 143, 71);
-  final Scalar lower_violet = new Scalar(156, 72, 162);
-  final Scalar upper_violet = new Scalar(166, 121, 241);
+  final Scalar lower_violet = new Scalar(137, 48, 38);
+  final Scalar upper_violet = new Scalar(165, 143, 134);
+
+  // lighting and reef of workshop field
+  //  final Scalar lower_violet = new Scalar(156, 72, 162);
+  // final Scalar upper_violet = new Scalar(166, 121, 241);
 
   private CvSink m_sink;
   private double m_offset = 0;
@@ -51,6 +56,13 @@ public class PegDetect {
   public boolean processImage() {
     try {
       if (m_sink.grabFrame(mat1) != 0) {
+        File f = new File(path);
+        if (f.isDirectory()) {
+          var imgName = String.format("%s/%d.png", path, System.currentTimeMillis());
+          System.out.println("Saving image to : " + imgName);
+          Imgcodecs.imwrite(imgName, mat1);
+        }
+
         double imageWidth = mat1.width();
         System.out.println("Frame acquired");
         Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
@@ -96,8 +108,11 @@ public class PegDetect {
 
         System.out.println("offset in meters: " + m_offset);
         m_validDetection = true;
+      } else {
+        System.out.println("ERROR ---> Can't acquire image!!!!");
       }
     } catch (Exception e) {
+      System.out.println("Caught exception : " + e);
       m_validDetection = false;
     }
 

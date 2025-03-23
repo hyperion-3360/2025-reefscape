@@ -10,8 +10,6 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
 import frc.robot.commands.AlignPeg;
+import frc.robot.commands.AlignPeg.Direction;
 import frc.robot.commands.AutoCmd.AutoCancel;
 import frc.robot.commands.AutoCmd.AutoCancelNet;
 import frc.robot.commands.AutoCmd.AutoDump;
@@ -27,7 +26,6 @@ import frc.robot.commands.AutoCmd.AutoFeast;
 import frc.robot.commands.AutoCmd.AutoFeeder;
 import frc.robot.commands.DeepClimbCmd;
 import frc.robot.commands.DriveAndIntakeCmd;
-import frc.robot.commands.DriveToSomeTargetCmd;
 import frc.robot.commands.ElevateCmd;
 import frc.robot.commands.IntakeAlgaeCmd;
 import frc.robot.commands.IntakeCoralCmd;
@@ -59,7 +57,7 @@ public class RobotContainer {
   // controller declarations
   public static final CommandXboxController m_driverController = new CommandXboxController(0);
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
-  public static final CommandXboxController m_testController = new CommandXboxController(2);
+  //  public static final CommandXboxController m_testController = new CommandXboxController(2);
 
   // subsystem declarations
   public static final Shooter m_shooter = new Shooter();
@@ -72,20 +70,10 @@ public class RobotContainer {
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
-  static PegDetect m_pegDetect;
-  public PathfindingV2 m_pathfinding =
-      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect);
+  public PathfindingV2 m_pathfinding;
 
-  public ElasticSetup setup =
-      new ElasticSetup(
-          m_swerve,
-          m_shooter,
-          m_climber,
-          m_algaeIntake,
-          m_elevator,
-          m_coDriverController,
-          m_vision,
-          m_pathfinding);
+  public static ElasticSetup m_ElasticSetup;
+
   // Joystick axis declarations
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -109,14 +97,12 @@ public class RobotContainer {
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
 
   private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
-  private final NetAlgaeShootCmd shootAlgaeNet =
-      new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
+  private final NetAlgaeShootCmd shootAlgaeNet;
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
   private final IntakeCoralCmd intakeCoral = new IntakeCoralCmd(m_shooter, m_elevator, m_leds);
 
-  private final AutoCancelNet netCancel =
-      new AutoCancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
+  private final AutoCancelNet netCancel;
 
   private final ElevateCmd elevateL2 =
       new ElevateCmd(m_elevator, m_shooter, m_algaeIntake, m_leds, desiredHeight.L2);
@@ -132,26 +118,28 @@ public class RobotContainer {
 
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
   private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
-  private final AutoFeast cycleToFeeder =
-      new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds, m_pathfinding);
+  private final AutoFeast cycleToFeeder;
   private final AutoCancel cancelAuto =
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
-  private final MinuteMoveCmd MinutieMoveLeft =
-      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.LEFT);
-  private final MinuteMoveCmd MinutieMoveRight =
-      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.RIGHT);
+  //   private final MinuteMoveCmd MinutieMoveLeft =
+  //       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.LEFT);
+  //   private final MinuteMoveCmd MinutieMoveRight =
+  //       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.RIGHT);
   private final MinuteMoveCmd MinutieMoveFront =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.BACK);
-  private final DriveToSomeTargetCmd backPose =
-      new DriveToSomeTargetCmd(() -> new Pose2d(7.33, 1.78, Rotation2d.fromDegrees(270)), m_swerve);
-  private final DriveToSomeTargetCmd leftPose =
-      new DriveToSomeTargetCmd(() -> new Pose2d(6.55, 3.9, Rotation2d.fromDegrees(270)), m_swerve);
-  private final DriveToSomeTargetCmd frontPose =
-      new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)), m_swerve);
+  //   private final DriveToSomeTargetCmd backPose =
+  //       new DriveToSomeTargetCmd(() -> new Pose2d(7.33, 1.78, Rotation2d.fromDegrees(270)),
+  // m_swerve);
+  //   private final DriveToSomeTargetCmd leftPose =
+  //       new DriveToSomeTargetCmd(() -> new Pose2d(6.55, 3.9, Rotation2d.fromDegrees(270)),
+  // m_swerve);
+  //   private final DriveToSomeTargetCmd frontPose =
+  //       new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)),
+  // m_swerve);
 
   private final MinuteMoveCmd MinutieMoveLeftPeg =
       new MinuteMoveCmd(m_swerve, OffsetDir.LEFT, m_algaeIntake);
@@ -162,6 +150,11 @@ public class RobotContainer {
   private Command m_autoThreeCoralRightAuto;
   private Command m_autoOneCoralThenAlgae;
   private Command m_autoLine;
+  private PegDetect m_pegDetect;
+
+  private final AlignPeg alignPegLeft;
+
+  private final AlignPeg alignPegRight;
 
   private boolean m_debug = false;
   private UsbCamera m_camera;
@@ -176,9 +169,30 @@ public class RobotContainer {
 
     m_pathfinding =
         new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect);
-    setup.setUpDashboardComp();
+    alignPegLeft =
+        new AlignPeg(
+            m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetect, m_vision, Direction.left);
+    alignPegRight =
+        new AlignPeg(
+            m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetect, m_vision, Direction.right);
+    shootAlgaeNet =
+        new NetAlgaeShootCmd(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
+    netCancel = new AutoCancelNet(m_algaeIntake, m_leds, m_elevator, m_swerve, m_pathfinding);
+    cycleToFeeder = new AutoFeast(m_swerve, m_elevator, m_shooter, m_leds, m_pathfinding);
+    m_ElasticSetup =
+        new ElasticSetup(
+            m_swerve,
+            m_shooter,
+            m_climber,
+            m_algaeIntake,
+            m_elevator,
+            m_coDriverController,
+            m_vision,
+            m_pathfinding);
+
+    m_ElasticSetup.setUpDashboardComp();
     if (m_debug) {
-      setup.setUpDashboardDebug();
+      m_ElasticSetup.setUpDashboardDebug();
     }
 
     NamedCommands.registerCommand("dumper", dumpAuto);
@@ -239,7 +253,7 @@ public class RobotContainer {
 
   public void configureBindingsTest() {
     if (m_debug) {
-      setup.setUpDashboardSubsystemTest();
+      m_ElasticSetup.setUpDashboardSubsystemTest();
     }
   }
 
@@ -321,26 +335,8 @@ public class RobotContainer {
     //         )
     //     .onFalse(Commands.runOnce(() -> m_swerve.disableDriveToTarget()));
 
-    m_driverController
-        .leftBumper()
-        .onTrue(
-            new AlignPeg(
-                m_swerve,
-                m_elevator,
-                m_shooter,
-                m_algaeIntake,
-                m_pegDetect,
-                m_vision.getDesiredPoseLeft()));
-    m_driverController
-        .rightBumper()
-        .onTrue(
-            new AlignPeg(
-                m_swerve,
-                m_elevator,
-                m_shooter,
-                m_algaeIntake,
-                m_pegDetect,
-                m_vision.getDesiredPoseRight()));
+    m_driverController.leftBumper().onTrue(alignPegLeft);
+    m_driverController.rightBumper().onTrue(alignPegRight);
 
     m_driverController
         .povUp()
@@ -354,13 +350,13 @@ public class RobotContainer {
                 Set.of(m_swerve)));
     m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
 
-    m_testController.povLeft().onTrue(MinutieMoveLeft);
-    m_testController.povRight().onTrue(MinutieMoveRight);
-    m_testController.povUp().onTrue(elevateL4);
+    //    m_testController.povLeft().onTrue(MinutieMoveLeft);
+    //   m_testController.povRight().onTrue(MinutieMoveRight);
+    //  m_testController.povUp().onTrue(elevateL4);
     // m_testController
     //     .a()
     //     .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
-    m_testController.b().onTrue(shootCoral);
+    // m_testController.b().onTrue(shootCoral);
   }
 
   public void teleopInit() {
