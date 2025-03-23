@@ -109,13 +109,13 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public void boostedConstraints() {
     m_rotConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedRadiansPerSecond, kMaxAccelerationRadiansPerSecondSquared);
+            kMaxSpeedRadiansPerSecond + 1.0, kMaxAccelerationRadiansPerSecondSquared + 2.0);
     m_yConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondY, kMaxAccelerationMetersPerSecondSquaredY);
+            kMaxSpeedMetersPerSecondY + 2.8, kMaxAccelerationMetersPerSecondSquaredY + 3.8);
     m_xConstraints =
         new TrapezoidProfile.Constraints(
-            kMaxSpeedMetersPerSecondX, kMaxAccelerationMetersPerSecondSquaredX);
+            kMaxSpeedMetersPerSecondX + 2.8, kMaxAccelerationMetersPerSecondSquaredX + 3.8);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -132,6 +132,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_xConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedMetersPerSecondX + 0.5, kMaxAccelerationMetersPerSecondSquaredX + 1);
+
+    m_xController.setConstraints(m_xConstraints);
+    m_yController.setConstraints(m_yConstraints);
+    m_rotController.setConstraints(m_rotConstraints);
+  }
+
+  public void slightlyBoostedConstraints() {
+    m_rotConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedRadiansPerSecond + 1.0, kMaxAccelerationRadiansPerSecondSquared + 2.0);
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY + 1.5, kMaxAccelerationMetersPerSecondSquaredY + 2.5);
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX + 1.5, kMaxAccelerationMetersPerSecondSquaredX + 2.5);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -290,8 +306,27 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
 
+    // System.out.println("swerve pose: " + posX + " " + posY);
+    // System.out.println("goal pose: " + goalX + " " + goalY);
+
     return isAlmostEqual(posX, goalX, 0.01)
         && isAlmostEqual(posY, goalY, 0.01)
+        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
+  }
+
+  public boolean AutoTargetReached() {
+    var posX = getPose().getX();
+    var posY = getPose().getY();
+    var rot = getPose().getRotation().getRadians();
+    var goalX = m_xController.getGoal().position;
+    var goalY = m_yController.getGoal().position;
+    var goalRot = m_rotController.getGoal().position;
+
+    System.out.println("swerve pose: " + posX + " " + posY);
+    System.out.println("goal pose: " + goalX + " " + goalY);
+
+    return isAlmostEqual(posX, goalX, 0.30)
+        && isAlmostEqual(posY, goalY, 0.30)
         && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
   }
 

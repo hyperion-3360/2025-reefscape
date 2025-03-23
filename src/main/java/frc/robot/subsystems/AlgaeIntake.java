@@ -39,7 +39,8 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
     PROCESSOR,
     NET,
     STORING, // this is the intake speed / 2
-    STORED // this is resting speed or 0
+    STORED, // this is resting speed or 0
+    AUTONET
   }
 
   private static final double kP = 0.0205;
@@ -68,6 +69,7 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
 
   public AlgaeIntake() {
 
+    m_intakeLeftConfig.limitSwitch.reverseLimitSwitchEnabled(false);
     m_intakeLeftConfig.limitSwitch.forwardLimitSwitchEnabled(false);
     m_intakeLeftConfig.limitSwitch.reverseLimitSwitchEnabled(false);
     m_intakeLeftConfig.follow(m_intakeRight, true);
@@ -137,6 +139,9 @@ public class AlgaeIntake extends SubsystemBase implements TestBindings {
 
       case STORED:
         this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kStoredSpeed;
+        break;
+      case AUTONET:
+        this.m_SpeedTarget = Constants.AlgaeIntakeVariables.kAutoNetSpeed;
         break;
     }
   }

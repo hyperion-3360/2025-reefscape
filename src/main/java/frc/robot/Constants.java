@@ -265,6 +265,7 @@ public final class Constants {
     public static final double kIntakeSpeed = 0.5;
     public static final double kStoringSpeed = 0.08;
     public static final double kStoredSpeed = 0.0;
+    public static final double kAutoNetSpeed = -0.9;
     public static final double kProcessorSpeed = -1.0;
     public static final double kStopSpeed = 0.0;
     public static final double kNetSpeed = -0.7;
