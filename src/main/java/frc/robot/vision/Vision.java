@@ -36,6 +36,7 @@ public class Vision extends SubsystemBase {
   private final double kNoTagFoundValue = 0.5;
   // initial score completely vanishes after 25 x 20ms = 0.5s
   private final double kDecimationFator = 1.0 / 1.15;
+  private final double kMinimumValidScore = 0.01;
 
   private VisionCamera m_cameras[] = new VisionCamera[3];
   private boolean m_tagFound = true;
@@ -77,6 +78,7 @@ public class Vision extends SubsystemBase {
   private final double krobotHalfLength = Units.inchesToMeters(18);
   private final double kdistTagToPeg = Units.inchesToMeters(6.25);
   private final double kdesiredDistFromTag = 1;
+
   private Translation2d m_minimumTranslationProcessor = new Translation2d();
   private Translation2d m_maximumTranslationProcessor = new Translation2d();
   private Pose2d m_processorAlignPosition = new Pose2d();
@@ -218,7 +220,7 @@ public class Vision extends SubsystemBase {
     int maxScoreTag = 0;
     //    System.out.println("Tag: 0 Score: " + m_AprilTagsScore[0]);
     for (var tag : m_allowedReefPegTag) {
-      if (m_AprilTagsScore[tag] > maxScore) {
+      if (m_AprilTagsScore[tag] > kMinimumValidScore && m_AprilTagsScore[tag] > maxScore) {
         maxScore = m_AprilTagsScore[tag];
         maxScoreTag = tag;
       }

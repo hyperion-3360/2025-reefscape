@@ -306,8 +306,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
 
-    System.out.println("swerve pose: " + posX + " " + posY);
-    System.out.println("goal pose: " + goalX + " " + goalY);
+    // System.out.println("swerve pose: " + posX + " " + posY);
+    // System.out.println("goal pose: " + goalX + " " + goalY);
 
     return isAlmostEqual(posX, goalX, 0.01)
         && isAlmostEqual(posY, goalY, 0.01)
