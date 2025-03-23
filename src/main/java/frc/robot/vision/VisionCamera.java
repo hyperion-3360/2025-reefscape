@@ -29,7 +29,7 @@ public class VisionCamera extends SubsystemBase {
 
   private double m_latestTimestamp = 0;
 
-  private Optional<EstimatedRobotPose> m_visionEstimatePose;
+  private Optional<EstimatedRobotPose> m_visionEstimatePose = Optional.empty();
   private Optional<PhotonTrackedTarget> m_target = Optional.empty();
 
   public double distanceFactor = 0;
@@ -106,8 +106,8 @@ public class VisionCamera extends SubsystemBase {
     var bestTimestamp = m_latestTimestamp;
 
     for (var result : m_cameraInstance.getAllUnreadResults()) {
-      if (result.getTimestampSeconds() > m_latestTimestamp) {
-        m_latestTimestamp = result.getTimestampSeconds();
+      if (result.getTimestampSeconds() > bestTimestamp) {
+        bestTimestamp = result.getTimestampSeconds();
         latestResult = Optional.of(result);
       }
     }

@@ -186,7 +186,7 @@ public class Vision extends SubsystemBase {
                     var distanceContribution = Math.exp(-0.5 * distance) * camera.distanceFactor;
                     var ambiguityContribution = Math.exp(-4 * ambiguity) * camera.ambiguityFactor;
                     var tagId = target.getFiducialId();
-                    m_AprilTagsScore[tagId] = (distanceContribution * ambiguityContribution);
+                    m_AprilTagsScore[tagId] += (distanceContribution * ambiguityContribution);
                   }
                   // there were results from the cameras but the target seen is not allowed
                   else {
