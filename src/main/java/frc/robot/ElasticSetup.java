@@ -103,10 +103,12 @@ public class ElasticSetup {
         .withSize(1, 1);
     driverTab.addNumber("lock Tag id", () -> vision.getLockID()).withPosition(5, 4).withSize(1, 1);
 
-    driverTab.addString("elevator state", () -> elevator.getElevatorState().toString());
+    driverTab
+        .addString("elevator state", () -> elevator.getElevatorState().toString())
+        .withPosition(6, 4);
 
-    driverTab.addBoolean("peg beambreak", () -> algaeIntake.pegBeamBreak());
-    driverTab.addBoolean("target reached", () -> swerve.targetReached());
+    driverTab.addBoolean("peg beambreak", () -> algaeIntake.pegBeamBreak()).withPosition(7, 4);
+    driverTab.addBoolean("target reached", () -> swerve.targetReached()).withPosition(8, 4);
 
     // technician tab
     //     - Autonomous mode (chooser)
