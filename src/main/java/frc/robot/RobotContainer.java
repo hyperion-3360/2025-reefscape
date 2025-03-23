@@ -60,7 +60,7 @@ public class RobotContainer {
   // controller declarations
   public static final CommandXboxController m_driverController = new CommandXboxController(0);
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
-  public static final CommandXboxController m_testController = new CommandXboxController(2);
+  //  public static final CommandXboxController m_testController = new CommandXboxController(2);
 
   // subsystem declarations
   public static final Shooter m_shooter = new Shooter();
@@ -349,13 +349,13 @@ public class RobotContainer {
                 Set.of(m_swerve)));
     m_driverController.y().whileTrue(cycleToFeeder).onFalse(cancelAuto);
 
-    m_testController.povLeft().onTrue(MinutieMoveLeft);
-    m_testController.povRight().onTrue(MinutieMoveRight);
-    m_testController.povUp().onTrue(elevateL4);
+    //    m_testController.povLeft().onTrue(MinutieMoveLeft);
+    //   m_testController.povRight().onTrue(MinutieMoveRight);
+    //  m_testController.povUp().onTrue(elevateL4);
     // m_testController
     //     .a()
     //     .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
-    m_testController.b().onTrue(shootCoral);
+    // m_testController.b().onTrue(shootCoral);
   }
 
   public void teleopInit() {
