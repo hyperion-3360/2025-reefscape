@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.commands.AlignPeg;
+import frc.robot.commands.AlignPeg.Direction;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.AlgaeIntake.elevation;
 import frc.robot.subsystems.AlgaeIntake.shooting;
@@ -25,6 +27,8 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.shootSpeed;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.vision.PegDetect;
+import frc.robot.vision.Vision;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
@@ -40,6 +44,8 @@ public class PathfindingV2 extends Command {
   LEDs m_leds;
   Swerve m_swerve;
   AlgaeIntake m_algaeIntake;
+  PegDetect m_pegDetection;
+  Vision m_vision;
   public static final double robotLength = Units.inchesToMeters(35.0); // with bumper: 32.5
   public static final double robotWidth = Units.inchesToMeters(35.0); // with bumper: 32.5
 
@@ -48,12 +54,20 @@ public class PathfindingV2 extends Command {
   PathConstraints constraints = new PathConstraints(5.0, 4.0, 1, 2);
 
   public PathfindingV2(
-      Shooter shooter, Elevator elevator, LEDs leds, Swerve swerve, AlgaeIntake algaeIntake) {
+      Shooter shooter,
+      Elevator elevator,
+      LEDs leds,
+      Swerve swerve,
+      AlgaeIntake algaeIntake,
+      PegDetect PegDetect,
+      Vision vision) {
     m_shooter = shooter;
     m_elevator = elevator;
     m_leds = leds;
     m_swerve = swerve;
     m_algaeIntake = algaeIntake;
+    m_pegDetection = PegDetect;
+    m_vision = vision;
 
     addRequirements(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake);
 
@@ -197,11 +211,12 @@ public class PathfindingV2 extends Command {
       Pose2d targetPos,
       double elevatorRaiseDistance,
       desiredHeight elevatorHeight,
-      double waitTimeToReach) {
+      double waitTimeToReach,
+      Direction direction) {
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
 
     shootSequence.addCommands(
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(offsetPose(targetPos, 1.5))),
         new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance)),
         new InstantCommand(() -> m_elevator.SetHeight(elevatorHeight)),
         new InstantCommand(() -> m_shooter.openBlocker()),
@@ -210,6 +225,9 @@ public class PathfindingV2 extends Command {
             new WaitUntilCommand(() -> m_swerve.targetReached())),
         // new WaitCommand(1.0), // will be elevatecmd(L4) later
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new AlignPeg(
+            m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetection, m_vision, direction),
+        new WaitCommand(5),
         new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
         new WaitCommand(0.4),
         new InstantCommand(() -> m_shooter.stop()),
@@ -239,12 +257,13 @@ public class PathfindingV2 extends Command {
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.regularConstraints()),
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootCycle(
                 AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE,
-                1.5,
+                1.0,
                 desiredHeight.L4,
-                1.2),
+                1.2,
+                Direction.left),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(12).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
@@ -254,9 +273,10 @@ public class PathfindingV2 extends Command {
                 // TODO: tweak time (last param)
                 driveAndShootCycle(
                     AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD,
-                    1.5,
+                    0.2,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.right)),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(12).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -265,9 +285,10 @@ public class PathfindingV2 extends Command {
                 // TODO: tweak time (last param)
                 driveAndShootCycle(
                     AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC,
-                    1.5,
+                    0.2,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.left)),
             new InstantCommand(() -> m_swerve.regularConstraints()));
         break;
       case Red:
@@ -277,7 +298,8 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchJ,
                 1.5,
                 desiredHeight.L4,
-                1.2),
+                1.2,
+                Direction.left),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(2).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
@@ -288,7 +310,8 @@ public class PathfindingV2 extends Command {
                     AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchK,
                     1.5,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.right)),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(2).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -298,7 +321,8 @@ public class PathfindingV2 extends Command {
                     AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchL,
                     1.5,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.left)),
             new InstantCommand(() -> m_swerve.regularConstraints()));
         break;
       default:
@@ -314,14 +338,15 @@ public class PathfindingV2 extends Command {
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.regularConstraints()),
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootCycle(
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchJ,
                 1.5,
                 desiredHeight.L4,
-                1.2),
+                1.2,
+                Direction.left),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(13).get().toPose2d()),
-            new InstantCommand(() -> m_swerve.boostedConstraints()),
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     new WaitCommand(0.2), // will be elevatecmd(L4) later
@@ -330,7 +355,8 @@ public class PathfindingV2 extends Command {
                     AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchK,
                     1.5,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.right)),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(13).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -340,18 +366,20 @@ public class PathfindingV2 extends Command {
                     AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchL,
                     1.5,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.left)),
             new InstantCommand(() -> m_swerve.regularConstraints()));
 
         break;
       case Red:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.regularConstraints()),
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootCycle(
                 AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchE,
                 1.5,
                 desiredHeight.L4,
-                1.2),
+                1.2,
+                Direction.left),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(1).get().toPose2d()),
             new InstantCommand(() -> m_swerve.boostedConstraints()),
             new ParallelCommandGroup(
@@ -362,7 +390,8 @@ public class PathfindingV2 extends Command {
                     AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchD,
                     1.5,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.right)),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(1).get().toPose2d()),
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
@@ -372,7 +401,8 @@ public class PathfindingV2 extends Command {
                     AutoWaypoints.RedAlliance.RightSide.pegWaypoints.branchC,
                     1.5,
                     desiredHeight.L4,
-                    1.2)),
+                    1.2,
+                    Direction.left)),
             new InstantCommand(() -> m_swerve.regularConstraints()));
         break;
       default:
@@ -392,7 +422,8 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 1.0,
                 desiredHeight.L4,
-                1.2),
+                1.2,
+                Direction.left),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AutoWaypoints.BlueAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,
@@ -409,7 +440,8 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 1.0,
                 desiredHeight.L4,
-                1.2),
+                1.2,
+                Direction.left),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AutoWaypoints.RedAlliance.LeftSide.AlgaeWaypoint.AlgaeHG,

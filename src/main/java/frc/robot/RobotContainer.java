@@ -73,8 +73,10 @@ public class RobotContainer {
   public static final LEDs m_leds = new LEDs();
   public static final Patterns m_patterns = new Patterns();
   public static final Dumper m_dumper = new Dumper();
-  public static final PathfindingV2 m_pathfinding =
-      new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake);
+  private PegDetect m_pegDetect;
+  public PathfindingV2 m_pathfinding =
+      new PathfindingV2(
+          m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect, m_vision);
 
   public ElasticSetup setup =
       new ElasticSetup(
@@ -162,7 +164,6 @@ public class RobotContainer {
   private Command m_autoThreeCoralRightAuto;
   private Command m_autoOneCoralThenAlgae;
   private Command m_autoLine;
-  private PegDetect m_pegDetect;
 
   private final AlignPeg alignPegLeft;
 
@@ -178,6 +179,9 @@ public class RobotContainer {
     m_camera.setResolution(160, 100);
 
     m_pegDetect = new PegDetect(CameraServer.getVideo(m_camera));
+    m_pathfinding =
+        new PathfindingV2(
+            m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect, m_vision);
 
     alignPegLeft =
         new AlignPeg(
