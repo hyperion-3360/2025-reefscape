@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.desiredState;
+import frc.robot.subsystems.Elevator.*;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
@@ -111,5 +111,63 @@ public class AlignPeg extends SequentialCommandGroup {
     }
 
     return desiredPose;
+  }
+
+  public AlignPeg(
+      Swerve driveTrain,
+      Elevator elevator,
+      Shooter shooter,
+      AlgaeIntake beambreak,
+      PegDetect pegDetection,
+      Vision vision,
+      Pose2d pose,
+      desiredHeight elevatorHeight) {
+    m_driveTrain = driveTrain;
+    m_pegDetection = pegDetection;
+    m_elevator = elevator;
+    m_shooter = shooter;
+    m_vision = vision;
+
+    addRequirements(m_driveTrain);
+    addRequirements(m_elevator);
+    addRequirements(m_shooter);
+
+    addCommands(
+        new ConditionalCommand(
+            new SequentialCommandGroup(
+                new ParallelDeadlineGroup(
+                    new WaitCommand(2.5),
+                    Commands.runOnce(() -> m_driveTrain.drivetoTarget(pose)),
+                    Commands.runOnce(() -> m_elevator.SetHeight(elevatorHeight)),
+                    Commands.runOnce(() -> m_shooter.openBlocker()),
+                    new WaitUntilCommand(() -> m_driveTrain.targetReached())),
+                new InstantCommand(() -> m_driveTrain.disableDriveToTarget()),
+                // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
+                // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
+                // new WaitCommand(1),
+                // this is one command
+                new ConditionalCommand(
+                    new DeferredCommand(
+                        () ->
+                            new MinuteMoveCmd(
+                                m_driveTrain,
+                                kMaxWaitAlignTime,
+                                Math.abs(m_pegDetection.getOffset()),
+                                (m_pegDetection.getOffset() < 0)
+                                    ? OffsetDir.LEFT
+                                    : OffsetDir.RIGHT),
+                        getRequirements()),
+                    new PrintCommand("Can't locate peg!!! "),
+                    () -> {
+                      if (m_pegDetection.processImage()
+                          && m_elevator.getElevatorState() == desiredState.L4
+                      //                          && !beambreak.pegBeamBreak()
+                      ) return true;
+                      else return false;
+                    })),
+            new PrintCommand("hehe"),
+            () -> m_vision.getLockID() != 0));
+
+    // ends command for peg correction
   }
 }

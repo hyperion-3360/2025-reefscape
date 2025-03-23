@@ -171,7 +171,8 @@ public class RobotContainer {
             m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect, m_vision);
 
     m_pathfinding =
-        new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect);
+        new PathfindingV2(
+            m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect, m_vision);
     alignPegLeft =
         new AlignPeg(
             m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetect, m_vision, Direction.left);
