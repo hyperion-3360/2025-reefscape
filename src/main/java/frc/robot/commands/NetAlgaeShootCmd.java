@@ -30,6 +30,10 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
   private Rotation2d targetRotation;
   private BooleanSupplier forbidenZone;
   private DoubleSupplier targetY;
+  private double forbiddenZoneRed = 3.43;
+  private double forbiddenZoneBlue = 4.62;
+  private double closeZoneRed = 3.08;
+  private double closeZoneBlue = 4.90;
 
   private MinuteMoveCmd deadStop;
 
@@ -53,8 +57,8 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
               : Rotation2d.k180deg;
       forbidenZone =
           DriverStation.getAlliance().get().equals(Alliance.Blue)
-              ? () -> 4.62 < m_swerve.getPose().getY()
-              : () -> 3.43 > m_swerve.getPose().getY();
+              ? () -> forbiddenZoneBlue < m_swerve.getPose().getY()
+              : () -> forbiddenZoneRed > m_swerve.getPose().getY();
     } catch (Exception e) {
       targetX = 7.3;
       targetRotation = Rotation2d.kZero;
@@ -74,8 +78,8 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                                 forbidenZone.getAsBoolean()
                                     ? m_swerve.getPose().getY()
                                     : DriverStation.getAlliance().get().equals(Alliance.Blue)
-                                        ? 4.7
-                                        : 3.2,
+                                        ? closeZoneBlue 
+                                        : closeZoneRed,
                                 targetRotation)),
                 Set.of(m_swerve)),
             // same thing for the wait until
@@ -87,10 +91,10 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                                 forbidenZone.getAsBoolean()
                                     ? m_swerve.getPose().getY()
                                     : DriverStation.getAlliance().get().equals(Alliance.Blue)
-                                        ? 4.7
-                                        : 3.2,
+                                        ? closeZoneBlue 
+                                        : closeZoneRed,
                                 targetRotation),
-                            1))
+                            1.4))
                 .andThen(
                     Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
                     Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.NET)),
@@ -105,16 +109,16 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                         targetX,
                         forbidenZone.getAsBoolean()
                             ? m_swerve.getPose().getY()
-                            : DriverStation.getAlliance().get().equals(Alliance.Blue) ? 4.7 : 3.2,
+                            : DriverStation.getAlliance().get().equals(Alliance.Blue) ? closeZoneBlue : closeZoneRed,
                         targetRotation))),
-        new WaitCommand(1.3),
+        new WaitCommand(1.2),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
         new WaitCommand(0.3),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.NET)),
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
-        new WaitCommand(0.3),
+        new WaitCommand(0.1),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
