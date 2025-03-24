@@ -82,8 +82,8 @@ public class AutoWaypoints {
       }
 
       public static class feederWaypoints {
-        public static Pose2d feederRight = new Pose2d(1.450, 7.400, Rotation2d.fromDegrees(306));
-        public static Pose2d feederLeft = new Pose2d(0.666, 6.839, Rotation2d.fromDegrees(306));
+        public static Pose2d feederRight = new Pose2d(1.626, 7.375, Rotation2d.fromDegrees(306));
+        public static Pose2d feederLeft = new Pose2d(0.666, 6.676, Rotation2d.fromDegrees(306));
       }
     }
 
@@ -131,8 +131,8 @@ public class AutoWaypoints {
       }
 
       public static class feederWaypoints {
-        public static Pose2d feederRight = new Pose2d(1.450, 0.614, Rotation2d.fromDegrees(54));
-        public static Pose2d feederLeft = new Pose2d(0.666, 1.192, Rotation2d.fromDegrees(54));
+        public static Pose2d feederRight = new Pose2d(1.529, 0.737, Rotation2d.fromDegrees(54));
+        public static Pose2d feederLeft = new Pose2d(0.666, 1.370, Rotation2d.fromDegrees(54));
       }
     }
 
@@ -258,8 +258,8 @@ public class AutoWaypoints {
       }
 
       public static class feederWaypoints {
-        public static Pose2d feederRight = new Pose2d(16.835, 6.716, Rotation2d.fromDegrees(234));
-        public static Pose2d feederLeft = new Pose2d(15.970, 7.354, Rotation2d.fromDegrees(234));
+        public static Pose2d feederRight = new Pose2d(15.840, 7.405, Rotation2d.fromDegrees(234));
+        public static Pose2d feederLeft = new Pose2d(16.892, 6.660, Rotation2d.fromDegrees(234));
       }
     }
 
@@ -307,8 +307,8 @@ public class AutoWaypoints {
       }
 
       public static class feederWaypoints {
-        public static Pose2d feederRight = new Pose2d(15.959, 0.666, Rotation2d.fromDegrees(126));
-        public static Pose2d feederLeft = new Pose2d(16.873, 1.365, Rotation2d.fromDegrees(126));
+        public static Pose2d feederRight = new Pose2d(15.876, 0.646, Rotation2d.fromDegrees(126));
+        public static Pose2d feederLeft = new Pose2d(16.857, 1.392, Rotation2d.fromDegrees(126));
       }
     }
 
