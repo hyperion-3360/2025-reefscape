@@ -118,10 +118,10 @@ public class PathfindingV2 extends Command {
     // Offset by 0.05 meters in the direction of the current angle
     double offsetX =
         originalPose.getTranslation().getX()
-            + offset * Math.cos(originalPose.getRotation().getRadians());
+            + (offset * Math.cos(originalPose.getRotation().getRadians()));
     double offsetY =
         originalPose.getTranslation().getY()
-            + offset * Math.sin(originalPose.getRotation().getRadians());
+            + (offset * Math.sin(originalPose.getRotation().getRadians()));
     var offsetRot = 0.0;
     if (flip) {
       offsetRot = originalPose.getRotation().getDegrees() - 180;
@@ -267,31 +267,27 @@ public class PathfindingV2 extends Command {
   //     return shootSequence;
   //   }
 
-  private Command driveAndShootCycle(Pose2d desiredpPose, desiredHeight elevatorHeight) {
+  private Command driveAndShootCycleFirst(Pose2d desiredpPose, desiredHeight elevatorHeight) {
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
     shootSequence.addCommands(
-        new InstantCommand(() -> m_swerve.drivetoTarget(offsetPose(desiredpPose, 1.5, false))),
-        new WaitUntilCommand(() -> m_swerve.AutoTargetReached()),
+        new InstantCommand(() -> m_swerve.regularConstraints()),
         new ConditionalCommand(
             new SequentialCommandGroup(
                 new ParallelDeadlineGroup(
-                    new WaitCommand(2.5),
-                    Commands.runOnce(() -> m_swerve.drivetoTarget(desiredpPose)),
-                    new WaitCommand(1),
-                    Commands.runOnce(() -> m_elevator.SetHeight(elevatorHeight)),
-                    Commands.runOnce(() -> m_shooter.openBlocker()),
-                    new WaitUntilCommand(() -> m_swerve.targetReached())),
+                    new WaitCommand(2.7),
+                    new SequentialCommandGroup(
+                        Commands.runOnce(() -> m_swerve.drivetoTarget(desiredpPose)),
+                        new WaitCommand(1),
+                        Commands.runOnce(() -> m_elevator.SetHeight(elevatorHeight)),
+                        Commands.runOnce(() -> m_shooter.openBlocker()),
+                        new WaitUntilCommand(() -> m_swerve.targetReached()))),
                 new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-                // Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.L4)),
-                // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
-                // new WaitCommand(1),
-                // this is one command
                 new ConditionalCommand(
                     new DeferredCommand(
                         () ->
                             new MinuteMoveCmd(
                                 m_swerve,
-                                1,
+                                0.5,
                                 Math.abs(m_pegDetection.getOffset()),
                                 (m_pegDetection.getOffset() < 0)
                                     ? OffsetDir.LEFT
@@ -299,14 +295,63 @@ public class PathfindingV2 extends Command {
                         getRequirements()),
                     new PrintCommand("Can't locate peg!!! "),
                     () -> {
-                      if (m_pegDetection.processImage()
-
-                      //                          && !beambreak.pegBeamBreak()
-                      ) return true;
+                      if (m_pegDetection.processImage()) return true;
                       else return false;
                     })),
             new PrintCommand("hehe"),
-            () -> m_vision.getLockID() != 0));
+            () -> m_vision.getLockID() != 0),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
+        new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
+        new WaitCommand(0.3),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.STOP)),
+        new InstantCommand(() -> m_shooter.closeBlocker()),
+        new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.FEEDER)));
+
+    // ends command for peg correction
+
+    return shootSequence;
+  }
+
+  private Command driveAndShootCycle(Pose2d desiredpPose, desiredHeight elevatorHeight) {
+    SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
+    shootSequence.addCommands(
+        new InstantCommand(() -> m_swerve.boostedConstraints()),
+        new InstantCommand(() -> m_swerve.drivetoTarget(offsetPose(desiredpPose, -0.5, false))),
+        new WaitUntilCommand(() -> m_swerve.AutoTargetReached()),
+        new InstantCommand(() -> m_swerve.lessenedConstraints()),
+        new ConditionalCommand(
+            new SequentialCommandGroup(
+                new ParallelDeadlineGroup(
+                    new WaitCommand(1.3),
+                    Commands.runOnce(() -> m_swerve.drivetoTarget(desiredpPose)),
+                    Commands.runOnce(() -> m_elevator.SetHeight(elevatorHeight)),
+                    Commands.runOnce(() -> m_shooter.openBlocker()),
+                    new WaitUntilCommand(() -> m_swerve.targetReached())),
+                new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+                new ConditionalCommand(
+                    new DeferredCommand(
+                        () ->
+                            new MinuteMoveCmd(
+                                m_swerve,
+                                0.5,
+                                Math.abs(m_pegDetection.getOffset()),
+                                (m_pegDetection.getOffset() < 0)
+                                    ? OffsetDir.LEFT
+                                    : OffsetDir.RIGHT),
+                        getRequirements()),
+                    new PrintCommand("Can't locate peg!!! "),
+                    () -> {
+                      if (m_pegDetection.processImage()) return true;
+                      else return false;
+                    })),
+            new PrintCommand("hehe"),
+            () -> m_vision.getLockID() != 0),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
+        new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
+        new WaitCommand(0.2),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.STOP)),
+        new InstantCommand(() -> m_shooter.closeBlocker()),
+        new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.FEEDER)));
 
     // ends command for peg correction
 
@@ -314,7 +359,7 @@ public class PathfindingV2 extends Command {
   }
 
   private Command driveAndIntakeCycle(Pose2d targetPos) {
-    var approachPose = offsetPose(targetPos, (robotLength / 2) - 0.12);
+    var approachPose = offsetPose(targetPos, (robotLength / 2));
     SequentialCommandGroup intakeSequence = new SequentialCommandGroup(Commands.none());
     intakeSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(approachPose)),
@@ -323,7 +368,8 @@ public class PathfindingV2 extends Command {
         new ParallelDeadlineGroup(
             new WaitUntilCommand(() -> m_shooter.isCoralIn()),
             new WaitUntilCommand(() -> m_swerve.targetReached())),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()));
+        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        new InstantCommand(() -> m_shooter.setShoot(shootSpeed.STOP)));
 
     return intakeSequence;
   }
@@ -334,27 +380,18 @@ public class PathfindingV2 extends Command {
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.lessenedConstraints()),
-            driveAndShootCycle(
+            driveAndShootCycleFirst(
                 AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchE, desiredHeight.L4),
+            new InstantCommand(() -> m_swerve.ExtraBoostedConstraints()),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(12).get().toPose2d()),
-            new InstantCommand(() -> m_swerve.boostedConstraints()),
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    new WaitCommand(0.2), // will be elevatecmd(L4) later
-                    new InstantCommand(() -> m_shooter.stop())),
-                // TODO: tweak time (last param)
-                driveAndShootCycle(
-                    AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD, desiredHeight.L4)),
+            new InstantCommand(() -> m_swerve.ExtraBoostedConstraints()),
+            driveAndShootCycle(
+                AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchD, desiredHeight.L4),
+            new InstantCommand(() -> m_swerve.ExtraBoostedConstraints()),
             driveAndIntakeCycle(Constants.tagLayout.getTagPose(12).get().toPose2d()),
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    new WaitCommand(0.2), // will be elevatecmd(L4) later
-                    new InstantCommand(() -> m_shooter.stop())),
-                // TODO: tweak time (last param)
-                driveAndShootCycle(
-                    AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC, desiredHeight.L4)),
-            new InstantCommand(() -> m_swerve.regularConstraints()));
+            new InstantCommand(() -> m_swerve.ExtraBoostedConstraints()),
+            driveAndShootCycle(
+                AutoWaypoints.BlueAlliance.RightSide.pegWaypoints.branchC, desiredHeight.L4));
         break;
       case Red:
         pathfindingSequence.addCommands(

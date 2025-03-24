@@ -11,7 +11,7 @@ public class AutoWaypoints {
 
   // everything is in meters and degrees
   static double distanceTagToPeg = Units.inchesToMeters(-6.5);
-  static double robotHalfLength = Units.inchesToMeters(19);
+  static double robotHalfLength = Units.inchesToMeters(18);
 
   static double distanceRobotCenterToReef = 1.5;
   static double distanceRotbotCenterTag = 0.0;
