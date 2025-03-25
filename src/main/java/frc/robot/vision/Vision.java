@@ -207,14 +207,6 @@ public class Vision extends SubsystemBase {
       m_AprilTagsScore[0] = 0;
     }
 
-    // print scores every 50 cycles or so
-    if (m_printCounter++ % 50 == 0) {
-      System.out.println("Tag: 0 Score: " + m_AprilTagsScore[0]);
-      for (var tag : m_allowedReefPegTag) {
-        System.out.println("Tag: " + tag + " Score: " + m_AprilTagsScore[tag]);
-      }
-    }
-
     // find the tag with the highest score
     double maxScore = 0;
     int maxScoreTag = 0;

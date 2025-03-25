@@ -11,7 +11,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -164,14 +166,20 @@ public class RobotContainer {
 
   public RobotContainer() {
 
+    SmartDashboard.putData("Main scheduler", CommandScheduler.getInstance());
+
     m_camera = CameraServer.startAutomaticCapture();
     m_camera.setFPS(45);
     m_camera.setResolution(160, 100);
 
     m_pegDetect = new PegDetect(CameraServer.getVideo(m_camera));
+    m_pathfinding =
+        new PathfindingV2(
+            m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect, m_vision);
 
     m_pathfinding =
-        new PathfindingV2(m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect);
+        new PathfindingV2(
+            m_shooter, m_elevator, m_leds, m_swerve, m_algaeIntake, m_pegDetect, m_vision);
     alignPegLeft =
         new AlignPeg(
             m_swerve, m_elevator, m_shooter, m_algaeIntake, m_pegDetect, m_vision, Direction.left);

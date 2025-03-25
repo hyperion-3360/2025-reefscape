@@ -190,13 +190,17 @@ public class Elevator extends SubsystemBase implements TestBindings {
       }
     }
 
-    if (chronoStarted && (Math.abs(elevatorPos - m_controller.getGoal().position) < 0.02)) {
+    if (chronoStarted && isAtGoal()) {
       chronoStarted = false;
       System.out.println(
           "Elevator arrived in " + (Timer.getFPGATimestamp() - chronoStartTime) + " secs");
     }
 
     // System.out.println(elevatorPos);
+  }
+
+  public boolean isAtGoal() {
+    return (Math.abs(elevatorPos - m_controller.getGoal().position) < 0.02);
   }
 
   public void SetHeight(desiredHeight height) {

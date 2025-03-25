@@ -63,7 +63,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private final double kMaxAccelerationMetersPerSecondSquaredY = 2.0;
   private final double kMaxSpeedRadiansPerSecond = 5.5;
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
-  private final double kPTranslation = 6.0;
+  private final double kPTranslation = 8.0;
   private final double kPRot = 6.2;
   private Elevator m_elevator;
 
@@ -116,6 +116,22 @@ public class Swerve extends SubsystemBase implements TestBindings {
     m_xConstraints =
         new TrapezoidProfile.Constraints(
             kMaxSpeedMetersPerSecondX + 2.8, kMaxAccelerationMetersPerSecondSquaredX + 3.8);
+
+    m_xController.setConstraints(m_xConstraints);
+    m_yController.setConstraints(m_yConstraints);
+    m_rotController.setConstraints(m_rotConstraints);
+  }
+
+  public void ExtraBoostedConstraints() {
+    m_rotConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedRadiansPerSecond + 1.5, kMaxAccelerationRadiansPerSecondSquared + 2.5);
+    m_yConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondY + 3.3, kMaxAccelerationMetersPerSecondSquaredY + 4.1);
+    m_xConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxSpeedMetersPerSecondX + 3.3, kMaxAccelerationMetersPerSecondSquaredX + 4.1);
 
     m_xController.setConstraints(m_xConstraints);
     m_yController.setConstraints(m_yConstraints);
@@ -298,20 +314,38 @@ public class Swerve extends SubsystemBase implements TestBindings {
     return Math.abs(a - b) < epsilon;
   }
 
-  public boolean targetReached() {
+  public boolean targetReached(double terminalVelocity) {
     var posX = getPose().getX();
     var posY = getPose().getY();
     var rot = getPose().getRotation().getRadians();
     var goalX = m_xController.getGoal().position;
     var goalY = m_yController.getGoal().position;
     var goalRot = m_rotController.getGoal().position;
+    var xspeed = getSpeeds().vxMetersPerSecond;
+    var yspeed = getSpeeds().vyMetersPerSecond;
+    var speed = Math.sqrt(xspeed * xspeed + yspeed * yspeed);
 
     // System.out.println("swerve pose: " + posX + " " + posY);
     // System.out.println("goal pose: " + goalX + " " + goalY);
 
     return isAlmostEqual(posX, goalX, 0.01)
         && isAlmostEqual(posY, goalY, 0.01)
-        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
+        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2))
+        && isAlmostEqual(terminalVelocity, speed, 0.02);
+  }
+
+  public boolean targetReached() {
+    //    var posX = getPose().getX();
+    //    var posY = getPose().getY();
+    //    var rot = getPose().getRotation().getRadians();
+    //    var goalX = m_xController.getGoal().position;
+    //    var goalY = m_yController.getGoal().position;
+    //    var goalRot = m_rotController.getGoal().position;
+    //
+    //    return isAlmostEqual(posX, goalX, 0.01)
+    //        && isAlmostEqual(posY, goalY, 0.01)
+    //        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
+    return targetReached(0);
   }
 
   public boolean AutoTargetReached() {
