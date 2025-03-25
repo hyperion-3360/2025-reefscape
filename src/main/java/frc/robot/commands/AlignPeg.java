@@ -154,7 +154,11 @@ public class AlignPeg extends SequentialCommandGroup {
                                     : OffsetDir.RIGHT),
                         getRequirements()),
                     new PrintCommand("Can't locate peg!!! "),
-                    () -> m_pegDetection.processImage())),
+                    () -> {
+                      return m_pegDetection.processImage();
+                      //                          && m_elevator.getTargetHeight() !=
+                      // desiredHeight.LOW;
+                    })),
             new PrintCommand("hehe"),
             () -> m_vision.getLockID() != 0));
 

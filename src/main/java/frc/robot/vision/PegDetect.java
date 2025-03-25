@@ -30,6 +30,11 @@ public class PegDetect {
   final Scalar lower_violet = new Scalar(137, 48, 38);
   final Scalar upper_violet = new Scalar(165, 143, 134);
 
+  final double kMinBoungingBoxWidth = 17; // pixels
+  final double kMaxBoungingBoxWidth = 22; // pixels
+
+  final double kMinBoungingBoxHeight = 22; // pixels
+
   // lighting and reef of workshop field
   //  final Scalar lower_violet = new Scalar(156, 72, 162);
   // final Scalar upper_violet = new Scalar(166, 121, 241);
@@ -54,6 +59,7 @@ public class PegDetect {
    * @return a Detection object
    */
   public boolean processImage() {
+    m_validDetection = false;
     try {
       if (m_sink.grabFrame(mat1) != 0) {
         File f = new File(path);
@@ -96,6 +102,13 @@ public class PegDetect {
 
         System.out.println("Bounding rect: " + boundingRect.toString());
 
+        if (boundingRect.width < kMinBoungingBoxWidth
+            || boundingRect.width > kMaxBoungingBoxWidth
+            || boundingRect.height < kMinBoungingBoxHeight) {
+          System.out.println("Bounding box too small or too big");
+          return false;
+        }
+
         // image is vertical so left right is along the x axis
         var bbox_center = boundingRect.x + boundingRect.width / 2;
         bbox_center -= imageWidth / 2;
@@ -113,7 +126,6 @@ public class PegDetect {
       }
     } catch (Exception e) {
       System.out.println("Caught exception : " + e);
-      m_validDetection = false;
     }
 
     return m_validDetection;
