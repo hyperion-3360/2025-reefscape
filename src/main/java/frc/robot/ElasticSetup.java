@@ -102,7 +102,7 @@ public class ElasticSetup {
         .withPosition(4, 4)
         .withSize(1, 1);
     driverTab
-        .addNumber("reef side", () -> vision.getLockIDIndex())
+        .addInteger("reef side", () -> vision.getLockIDIndex())
         .withPosition(5, 4)
         .withSize(1, 1);
 

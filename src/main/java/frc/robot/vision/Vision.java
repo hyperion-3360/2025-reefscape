@@ -232,7 +232,7 @@ public class Vision extends SubsystemBase {
     return m_lockID;
   }
 
-  public double getLockIDIndex() {
+  public int getLockIDIndex() {
     return m_allowedReefPegTag.indexOf(m_lockID) + 1;
   }
 
