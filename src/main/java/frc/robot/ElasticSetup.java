@@ -101,14 +101,12 @@ public class ElasticSetup {
             "is in bounds for processor", () -> vision.isInBoundsForProcessor(swerve.getPose()))
         .withPosition(5, 0)
         .withSize(1, 1);
-    driverTab
-        .addInteger("reef side", () -> vision.getLockID())
-        .withPosition(5, 3)
-        .withSize(2, 1);
+    driverTab.addInteger("reef side", () -> vision.getLockID()).withPosition(5, 2).withSize(2, 1);
 
     driverTab
         .addString("elevator state", () -> elevator.getElevatorState().toString())
-        .withPosition(5, 4).withSize(2, 1);
+        .withPosition(5, 3)
+        .withSize(2, 1);
 
     debugTab.addBoolean("peg beambreak", () -> algaeIntake.pegBeamBreak()).withPosition(7, 4);
     debugTab.addBoolean("target reached", () -> swerve.targetReached()).withPosition(8, 4);
