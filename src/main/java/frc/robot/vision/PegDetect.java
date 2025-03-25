@@ -84,15 +84,28 @@ public class PegDetect {
    */
   public boolean processImage() {
     m_validDetection = false;
+
+    long grabResult = 0;
+
     try {
-      if (m_sink.grabFrame(mat1) != 0) {
+      grabResult = m_sink.grabFrame(mat1);
+    } catch (Exception e) {
+      System.out.println("Caught grab exception : " + e);
+    }
+
+    if (grabResult != 0) {
+      try {
         File f = new File(m_path);
         if (f.isDirectory()) {
           var imgName = String.format("%s/%d.png", m_path, System.currentTimeMillis());
           System.out.println("Saving image to : " + imgName);
           Imgcodecs.imwrite(imgName, mat1);
         }
+      } catch (Exception e) {
+        System.out.println("Caught file exception : " + e);
+      }
 
+      try {
         double imageWidth = mat1.width();
         System.out.println("Frame acquired");
         Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
@@ -145,11 +158,11 @@ public class PegDetect {
 
         System.out.println("offset in meters: " + m_offset);
         m_validDetection = true;
-      } else {
-        System.out.println("ERROR ---> Can't acquire image!!!!");
+      } catch (Exception e) {
+        System.out.println("Caught opencv exception : " + e);
       }
-    } catch (Exception e) {
-      System.out.println("Caught exception : " + e);
+    } else {
+      System.out.println("Grab frame failed");
     }
 
     return m_validDetection;
