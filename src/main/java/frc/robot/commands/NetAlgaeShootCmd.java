@@ -78,7 +78,7 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                                 forbidenZone.getAsBoolean()
                                     ? m_swerve.getPose().getY()
                                     : DriverStation.getAlliance().get().equals(Alliance.Blue)
-                                        ? closeZoneBlue 
+                                        ? closeZoneBlue
                                         : closeZoneRed,
                                 targetRotation)),
                 Set.of(m_swerve)),
@@ -91,7 +91,7 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                                 forbidenZone.getAsBoolean()
                                     ? m_swerve.getPose().getY()
                                     : DriverStation.getAlliance().get().equals(Alliance.Blue)
-                                        ? closeZoneBlue 
+                                        ? closeZoneBlue
                                         : closeZoneRed,
                                 targetRotation),
                             1.4))
@@ -109,13 +109,15 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
                         targetX,
                         forbidenZone.getAsBoolean()
                             ? m_swerve.getPose().getY()
-                            : DriverStation.getAlliance().get().equals(Alliance.Blue) ? closeZoneBlue : closeZoneRed,
+                            : DriverStation.getAlliance().get().equals(Alliance.Blue)
+                                ? closeZoneBlue
+                                : closeZoneRed,
                         targetRotation))),
-        new WaitCommand(1.2),
+        new WaitCommand(0.6),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.SHOOTER)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE)),
-        new WaitCommand(0.3),
+        new WaitCommand(0.2),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.NET)),
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
         new WaitCommand(0.1),
