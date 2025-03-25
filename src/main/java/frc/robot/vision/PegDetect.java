@@ -22,7 +22,7 @@ public class PegDetect {
 
   // TODO: determine me!!! 7 3/4 to 21
   private final double kHFOV = 13.25; // inches
-  private final String path = "/media/sda/images/"; // path to save images
+  private String m_path = "/media/sda/images/"; // path to save images
 
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
@@ -48,6 +48,30 @@ public class PegDetect {
 
   public PegDetect(CvSink sink) {
     m_sink = sink;
+
+    var numDirs = 0;
+
+    File dir = new File(m_path);
+    try {
+      File[] files = dir.listFiles();
+
+      // For-each loop for iteration
+      for (File file : files)
+        // Checking of file inside directory
+        if (file.isDirectory()) numDirs++;
+    } catch (Exception e) {
+      // Printing the exception occurred
+      System.out.println("Exception: " + e);
+    }
+
+    m_path += String.format("/Iteration_%d", numDirs);
+    File theDir = new File(m_path);
+    if (!theDir.exists()) {
+      System.out.print("Creating directory: " + theDir.getName() + "...");
+      System.out.println(theDir.mkdirs() ? "Success" : "Failed");
+    } else {
+      System.out.println("Directory already exists");
+    }
   }
 
   /**
@@ -62,9 +86,9 @@ public class PegDetect {
     m_validDetection = false;
     try {
       if (m_sink.grabFrame(mat1) != 0) {
-        File f = new File(path);
+        File f = new File(m_path);
         if (f.isDirectory()) {
-          var imgName = String.format("%s/%d.png", path, System.currentTimeMillis());
+          var imgName = String.format("%s/%d.png", m_path, System.currentTimeMillis());
           System.out.println("Saving image to : " + imgName);
           Imgcodecs.imwrite(imgName, mat1);
         }
