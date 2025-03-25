@@ -48,6 +48,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.leds.Patterns;
 import frc.robot.subsystems.swerve.CTREConfigs;
 import frc.robot.subsystems.swerve.Swerve;
@@ -319,6 +320,9 @@ public class RobotContainer {
     m_driverController.povRight().onTrue(MinutieMoveRightPeg);
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
+
+    m_coDriverController.x().toggleOnTrue(Commands.run(() -> m_leds.SetPattern(Pattern.RAINBOW)));
+    m_coDriverController.x().toggleOnFalse(Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
 
     // m_driverController
     //     .leftBumper()
