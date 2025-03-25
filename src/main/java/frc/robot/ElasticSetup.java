@@ -77,41 +77,41 @@ public class ElasticSetup {
     // driver tab
     driverTab
         .addCamera("limelight", "limelight", "mjpg:http://10.33.60.11:1182/?action=stream")
-        .withPosition(6, 0)
-        .withSize(6, 4);
+        .withPosition(7, 0)
+        .withSize(5, 4);
     driverTab
         .addCamera("driver cam", "driver cam", "mjpg:http://10.33.60.2:1181/?action=stream")
         .withPosition(0, 0)
-        .withSize(6, 4);
+        .withSize(5, 4);
     driverTab
         .addBoolean("has algae", () -> algaeIntake.sensorTriggered())
-        .withPosition(0, 4)
+        .withPosition(5, 1)
         .withSize(1, 1);
     driverTab
         .addBoolean("climber acivated", () -> climber.isClimberActivated())
-        .withPosition(1, 4)
+        .withPosition(6, 0)
         .withSize(1, 1);
-    driverTab
+    debugTab
         .addBoolean("climbed", () -> climber.SensorDetected())
         .withPosition(2, 4)
         .withSize(1, 1);
-    driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(3, 4).withSize(1, 1);
+    driverTab.addBoolean("has coral", () -> shooter.isCoralIn()).withPosition(6, 1).withSize(1, 1);
     driverTab
         .addBoolean(
             "is in bounds for processor", () -> vision.isInBoundsForProcessor(swerve.getPose()))
-        .withPosition(4, 4)
+        .withPosition(5, 0)
         .withSize(1, 1);
     driverTab
-        .addInteger("reef side", () -> vision.getLockIDIndex())
-        .withPosition(5, 4)
-        .withSize(1, 1);
+        .addInteger("reef side", () -> vision.getLockID())
+        .withPosition(5, 3)
+        .withSize(2, 1);
 
     driverTab
         .addString("elevator state", () -> elevator.getElevatorState().toString())
-        .withPosition(6, 4);
+        .withPosition(5, 4).withSize(2, 1);
 
-    driverTab.addBoolean("peg beambreak", () -> algaeIntake.pegBeamBreak()).withPosition(7, 4);
-    driverTab.addBoolean("target reached", () -> swerve.targetReached()).withPosition(8, 4);
+    debugTab.addBoolean("peg beambreak", () -> algaeIntake.pegBeamBreak()).withPosition(7, 4);
+    debugTab.addBoolean("target reached", () -> swerve.targetReached()).withPosition(8, 4);
 
     // technician tab
     //     - Autonomous mode (chooser)

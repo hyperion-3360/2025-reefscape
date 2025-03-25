@@ -228,7 +228,7 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public double getLockID() {
+  public int getLockID() {
     return m_lockID;
   }
 
