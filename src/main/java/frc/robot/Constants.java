@@ -278,7 +278,8 @@ public final class Constants {
     public static final double kShootL3 = -0.85;
     public static final double kShootL4 = -0.6;
     // we need a different speed for teleop to compensate for angle
-    public static final double kShootL4Teleop = -0.85;
+    //    public static final double kShootL4Teleop = -0.85;
+    public static final double kShootL4Teleop = -0.70;
     public static final double kIntakeSpeed = -0.6;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.*;
+import frc.robot.subsystems.Elevator.desiredHeight;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.PegDetect;
@@ -74,6 +74,7 @@ public class AlignPeg extends SequentialCommandGroup {
                 // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
                 // new WaitCommand(1),
                 // this is one command
+                new WaitUntilCommand(() -> m_elevator.isAtGoal()),
                 new ConditionalCommand(
                     new DeferredCommand(
                         () ->
@@ -86,13 +87,7 @@ public class AlignPeg extends SequentialCommandGroup {
                                     : OffsetDir.RIGHT),
                         getRequirements()),
                     new PrintCommand("Can't locate peg!!! "),
-                    () -> {
-                      if (m_pegDetection.processImage()
-                          && m_elevator.getElevatorState() == desiredState.L4
-                      //                          && !beambreak.pegBeamBreak()
-                      ) return true;
-                      else return false;
-                    })),
+                    () -> m_pegDetection.processImage())),
             new PrintCommand("hehe"),
             () -> m_vision.getLockID() != 0));
 
@@ -146,6 +141,7 @@ public class AlignPeg extends SequentialCommandGroup {
                 // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
                 // new WaitCommand(1),
                 // this is one command
+                new WaitUntilCommand(m_elevator::isAtGoal),
                 new ConditionalCommand(
                     new DeferredCommand(
                         () ->
@@ -158,13 +154,7 @@ public class AlignPeg extends SequentialCommandGroup {
                                     : OffsetDir.RIGHT),
                         getRequirements()),
                     new PrintCommand("Can't locate peg!!! "),
-                    () -> {
-                      if (m_pegDetection.processImage()
-                          && m_elevator.getElevatorState() == desiredState.L4
-                      //                          && !beambreak.pegBeamBreak()
-                      ) return true;
-                      else return false;
-                    })),
+                    () -> m_pegDetection.processImage())),
             new PrintCommand("hehe"),
             () -> m_vision.getLockID() != 0));
 
