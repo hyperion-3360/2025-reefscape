@@ -36,6 +36,7 @@ import frc.robot.commands.LowerElevatorCmd;
 import frc.robot.commands.MinuteMoveCmd;
 import frc.robot.commands.MinuteMoveCmd.OffsetDir;
 import frc.robot.commands.NetAlgaeShootCmd;
+import frc.robot.commands.RainbowLedsCmd;
 import frc.robot.commands.ReReadyClimbCmd;
 import frc.robot.commands.ReadyClimbCmd;
 import frc.robot.commands.ShootAlgaeCmd;
@@ -118,7 +119,7 @@ public class RobotContainer {
   private final LowerElevatorCmd stopIntakeAlgaeReef =
       new LowerElevatorCmd(m_elevator, m_leds, m_shooter, m_algaeIntake, m_swerve);
   private final ReadyClimbCmd readyclimb = new ReadyClimbCmd(m_climber, m_leds, m_algaeIntake);
-
+  private final RainbowLedsCmd rainbow = new RainbowLedsCmd(m_leds);
   private final AutoDump dumpAuto = new AutoDump(m_dumper);
   private final AutoFeeder feed = new AutoFeeder(m_elevator, m_shooter, m_leds);
   private final AutoFeast cycleToFeeder;
@@ -319,6 +320,10 @@ public class RobotContainer {
     m_driverController.povRight().onTrue(MinutieMoveRightPeg);
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
+
+    m_coDriverController.x().toggleOnTrue(rainbow);
+
+    m_coDriverController.x().toggleOnFalse(Commands.runOnce(() -> rainbow.end(true)));
 
     // m_driverController
     //     .leftBumper()

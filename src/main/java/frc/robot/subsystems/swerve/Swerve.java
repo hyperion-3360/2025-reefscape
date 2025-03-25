@@ -537,7 +537,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
         this);
   }
 
-  private Command playThemeMusic() {
+  public Command playThemeMusic() {
     return this.runOnce(
         () -> {
           var musicFilePath =
@@ -546,6 +546,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
           System.out.println(m_orchestra.loadMusic(musicFilePath));
           System.out.println(m_orchestra.play());
         });
+  }
+
+  public Command stopMuMu() {
+    return this.runOnce(() -> m_orchestra.pause());
   }
 
   @Override
