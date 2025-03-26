@@ -107,8 +107,36 @@ public class VisionCamera extends SubsystemBase {
 
     for (var result : m_cameraInstance.getAllUnreadResults()) {
       if (result.getTimestampSeconds() > bestTimestamp) {
-        bestTimestamp = result.getTimestampSeconds();
-        latestResult = Optional.of(result);
+        do {
+          if (!result.hasTargets()) {
+            break;
+          }
+
+          // Go through all the targets found and discard those with an
+          // ambiguity greater than 0.2.
+          var targetsList = result.getTargets();
+          int index = 0;
+          boolean modifiedResult = false;
+          while (index < targetsList.size()) {
+            if (targetsList.get(index).getPoseAmbiguity() > 0.2) {
+              targetsList.remove(index);
+              modifiedResult = true;
+            } else {
+              index++;
+            }
+          }
+          if (modifiedResult && targetsList.size() > 0) {
+            // We removed at least one target from the result. Construct a new
+            // Photon result with the remaining target(s).
+            PhotonPipelineResult filteredResult =
+                new PhotonPipelineResult(result.metadata, targetsList, Optional.empty());
+            bestTimestamp = filteredResult.getTimestampSeconds();
+            latestResult = Optional.of(filteredResult);
+          } else if (!modifiedResult) {
+            bestTimestamp = result.getTimestampSeconds();
+            latestResult = Optional.of(result);
+          }
+        } while (false);
       }
     }
 
@@ -133,22 +161,24 @@ public class VisionCamera extends SubsystemBase {
     getLatestResult()
         .ifPresent(
             result -> {
-              if (isGoodResult(result)) {
-                m_visionEstimatePose = m_cameraPoseEstimator.update(result);
-                updateEstimationStdDevs(m_visionEstimatePose, result.getTargets());
-                if (result.hasTargets()) {
-                  var targets = result.getTargets();
-                  double bestAmbiguity = 2.0;
-                  for (var target : targets) {
-                    if ((target.poseAmbiguity < bestAmbiguity)
-                        && Math.abs(target.poseAmbiguity - bestAmbiguity) > 0.05) {
-                      bestAmbiguity = target.poseAmbiguity;
+              m_visionEstimatePose = m_cameraPoseEstimator.update(result);
+              updateEstimationStdDevs(m_visionEstimatePose, result.getTargets());
+              if (result.hasTargets()) {
+                var targets = result.getTargets();
+                double bestAmbiguity = 2.0;
+                // Go through all targets seen and pick the one with the lowest ambiguity.
+                // If a target has an ambiguity close enough to the best target found so far,
+                // pick the target with the smallest distance from the camera as the selection
+                // criteria.
+                for (var target : targets) {
+                  if ((target.poseAmbiguity < bestAmbiguity)
+                      && Math.abs(target.poseAmbiguity - bestAmbiguity) > 0.05) {
+                    bestAmbiguity = target.poseAmbiguity;
+                    m_target = Optional.of(target);
+                  } else if (Math.abs(target.poseAmbiguity - bestAmbiguity) < 0.05) {
+                    if (target.getBestCameraToTarget().getTranslation().getNorm()
+                        < m_target.get().getBestCameraToTarget().getTranslation().getNorm()) {
                       m_target = Optional.of(target);
-                    } else if (Math.abs(target.poseAmbiguity - bestAmbiguity) < 0.05) {
-                      if (target.getBestCameraToTarget().getTranslation().getNorm()
-                          < m_target.get().getBestCameraToTarget().getTranslation().getNorm()) {
-                        m_target = Optional.of(target);
-                      }
                     }
                   }
                 }
@@ -158,25 +188,5 @@ public class VisionCamera extends SubsystemBase {
 
   public Optional<PhotonTrackedTarget> bestTarget() {
     return m_target;
-  }
-
-  private boolean isGoodResult(PhotonPipelineResult result) {
-    boolean rc = true;
-    do {
-      if (!result.hasTargets()) {
-        rc = false;
-        break;
-      }
-
-      for (var target : result.getTargets()) {
-        if (target.getPoseAmbiguity() > 0.2) {
-          rc = false;
-          break;
-        }
-      }
-
-    } while (false);
-
-    return rc;
   }
 }
