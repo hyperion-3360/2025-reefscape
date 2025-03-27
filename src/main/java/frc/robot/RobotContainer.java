@@ -127,10 +127,10 @@ public class RobotContainer {
       new AutoCancel(m_elevator, m_shooter, m_leds, m_algaeIntake);
   private final DeepClimbCmd deepclimb = new DeepClimbCmd(m_climber, m_leds);
   private final ReReadyClimbCmd unguckClimb = new ReReadyClimbCmd(m_climber);
-  //   private final MinuteMoveCmd MinutieMoveLeft =
-  //       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.LEFT);
-  //   private final MinuteMoveCmd MinutieMoveRight =
-  //       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.RIGHT);
+  private final MinuteMoveCmd MinutieMoveLeft =
+      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.LEFT);
+  private final MinuteMoveCmd MinutieMoveRight =
+      new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.RIGHT);
   private final MinuteMoveCmd MinutieMoveFront =
       new MinuteMoveCmd(m_swerve, 0.5, 0.05, OffsetDir.FRONT);
   private final MinuteMoveCmd MinutieMoveBack =
@@ -316,8 +316,8 @@ public class RobotContainer {
 
     m_driverController.leftTrigger(0.3).onTrue(intakeReef).onFalse(stopIntakeAlgaeReef);
 
-    m_driverController.povLeft().onTrue(MinutieMoveLeftPeg);
-    m_driverController.povRight().onTrue(MinutieMoveRightPeg);
+    m_driverController.povLeft().onTrue(MinutieMoveLeft);
+    m_driverController.povRight().onTrue(MinutieMoveRight);
     m_driverController.povUp().onTrue(MinutieMoveFront);
     m_driverController.povDown().onTrue(MinutieMoveBack);
 
