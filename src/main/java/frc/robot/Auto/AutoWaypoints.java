@@ -82,8 +82,8 @@ public class AutoWaypoints {
       }
 
       public static class feederWaypoints {
-        public static Pose2d feederRight = new Pose2d(1.626, 7.375, Rotation2d.fromDegrees(306));
-        public static Pose2d feederLeft = new Pose2d(0.666, 6.676, Rotation2d.fromDegrees(306));
+        public static Pose2d feederRight = new Pose2d(1.405, 7.246, Rotation2d.fromDegrees(306));
+        public static Pose2d feederLeft = new Pose2d(0.887, 6.828, Rotation2d.fromDegrees(306));
       }
     }
 

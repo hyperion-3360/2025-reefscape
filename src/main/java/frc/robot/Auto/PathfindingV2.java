@@ -472,7 +472,7 @@ public class PathfindingV2 extends Command {
     shootSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance)),
-        new InstantCommand(() -> m_swerve.regularConstraints()),
+        new InstantCommand(() -> m_swerve.lessenedConstraints()),
         new InstantCommand(() -> m_elevator.SetHeight(elevatorHeight)),
         new InstantCommand(() -> m_shooter.openBlocker()),
         new ParallelDeadlineGroup(
@@ -650,27 +650,27 @@ public class PathfindingV2 extends Command {
 
   public Command coralAndAlgae() {
     SequentialCommandGroup pathfindingSequence = new SequentialCommandGroup(Commands.none());
-    Pose2d offsetedPositionBlue =
-        offsetPose(
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-                .getTagPose(22)
-                .get()
-                .toPose2d(),
-            1.0,
-            180);
-    Pose2d offsetedPositionRed =
-        offsetPose(
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
-                .getTagPose(9)
-                .get()
-                .toPose2d(),
-            1.0,
-            180);
-    MinuteMoveCmd shuffleLeft = new MinuteMoveCmd(m_swerve, 0.5, 2.5, OffsetDir.LEFT);
+    // Pose2d offsetedPositionBlue =
+    //     offsetPose(
+    //         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+    //             .getTagPose(22)
+    //             .get()
+    //             .toPose2d(),
+    //         1.0,
+    //         180);
+    // Pose2d offsetedPositionRed =
+    //     offsetPose(
+    //         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+    //             .getTagPose(9)
+    //             .get()
+    //             .toPose2d(),
+    //         1.0,
+    //         180);
+    // MinuteMoveCmd shuffleLeft = new MinuteMoveCmd(m_swerve, 0.5, 2.5, OffsetDir.LEFT);
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootAndAlgae(
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
@@ -736,7 +736,7 @@ public class PathfindingV2 extends Command {
 
       case Red:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
+            new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootAndAlgae(
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
