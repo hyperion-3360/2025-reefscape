@@ -74,8 +74,7 @@ public class AlignPeg extends SequentialCommandGroup {
                 // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
                 // new WaitCommand(1),
                 // this is one command
-                new WaitUntilCommand(() -> m_elevator.isAtGoal())
-                ),
+                new WaitUntilCommand(() -> m_elevator.isAtGoal())),
             new PrintCommand("hehe"),
             () -> m_vision.getLockID() != 0));
 

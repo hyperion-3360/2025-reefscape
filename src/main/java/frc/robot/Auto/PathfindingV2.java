@@ -478,22 +478,6 @@ public class PathfindingV2 extends Command {
         new ParallelDeadlineGroup(
             new WaitCommand(waitTimeToReach), // will be elevatecmd(L4) later
             new WaitUntilCommand(() -> m_swerve.targetReached())),
-        new ConditionalCommand(
-            new DeferredCommand(
-                () ->
-                    new MinuteMoveCmd(
-                        m_swerve,
-                        0.8,
-                        Math.abs(m_pegDetection.getOffset()),
-                        (m_pegDetection.getOffset() < 0) ? OffsetDir.LEFT : OffsetDir.RIGHT),
-                getRequirements()),
-            new PrintCommand("Can't locate peg!!! "),
-            () -> {
-              if (m_pegDetection.processImage()
-                  && m_elevator.getTargetHeight() == desiredHeight.L4
-                  && !m_algaeIntake.pegBeamBreak()) return true;
-              else return false;
-            }),
         // new WaitCommand(1.0), // will be elevatecmd(L4) later
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
@@ -672,10 +656,7 @@ public class PathfindingV2 extends Command {
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootAndAlgae(
-                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
-                2.5,
-                desiredHeight.L4,
-                1.4),
+                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH, 2.5, desiredHeight.L4, 2.5),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -741,7 +722,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4,
-                1.6),
+                2.5),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
@@ -750,7 +731,7 @@ public class PathfindingV2 extends Command {
                 0.4,
                 desiredHeight.ALGAEL2,
                 0.3,
-                0.6),
+                0.8),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootNet(
                 AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.L2),

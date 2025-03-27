@@ -40,7 +40,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
         new InstantCommand(
             () -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(() -> m_swerve.getPose()))),
-        new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.13)),
+        new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.06)),
         Commands.runOnce(() -> m_elevator.SetHeight(m_vision.getAlgaeHeight())),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),

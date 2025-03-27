@@ -118,7 +118,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   private boolean isAtPose() {
-    return m_deepMotor.getPosition().getValueAsDouble() <= -93;
+    return m_deepMotor.getPosition().getValueAsDouble() <= -97;
   }
 
   public Command goForthChild() {
