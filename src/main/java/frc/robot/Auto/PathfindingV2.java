@@ -661,7 +661,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4,
-                3.0),
+                3.5),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -728,7 +728,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4,
-                3.0),
+                3.5),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
