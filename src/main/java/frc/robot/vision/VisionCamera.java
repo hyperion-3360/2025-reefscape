@@ -56,7 +56,7 @@ public class VisionCamera extends SubsystemBase {
     } else {
 
       // pose preswnt, start running heuristic
-      var estStdDevs = m_singleTagStdDevs;
+      //      var estStdDevs = m_singleTagStdDevs;
       int numTags = 0;
       double avgDist = 0;
 
@@ -73,27 +73,28 @@ public class VisionCamera extends SubsystemBase {
                 .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
       }
 
-      if (numTags == 0) {
-        // no visiblw tags default to single tag
-        m_curStdDevs = m_singleTagStdDevs;
-      } else {
-        // more tags, run full heuristic
-        avgDist /= numTags;
+      //     if (numTags == 0) {
+      //       // no visiblw tags default to single tag
+      //       m_curStdDevs = m_singleTagStdDevs;
+      //     } else {
+      //       // more tags, run full heuristic
+      //       avgDist /= numTags;
 
-        // decrase std devs if multiple visible
-        if (numTags > 1) {
-          estStdDevs = m_multiTagStdDevs;
-        }
+      //       // decrase std devs if multiple visible
+      //       if (numTags > 1) {
+      //         estStdDevs = m_multiTagStdDevs;
+      //       }
 
-        // increase std devs based on "avg" dist
-        if (numTags == 1 && avgDist > 4) {
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
+      //       // increase std devs based on "avg" dist
+      //       if (numTags == 1 && avgDist > 4) {
+      //         estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+      //       } else {
+      //         estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+      //       }
 
-        m_curStdDevs = estStdDevs;
-      }
+      //       m_curStdDevs = estStdDevs;
+      avgDist /= numTags;
+      m_curStdDevs = VecBuilder.fill(avgDist / 2, avgDist / 2, 100);
     }
   }
 
