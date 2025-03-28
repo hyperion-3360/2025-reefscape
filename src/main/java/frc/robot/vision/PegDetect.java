@@ -6,14 +6,11 @@ package frc.robot.vision;
 
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -27,24 +24,15 @@ public class PegDetect {
   // Threshold of violet in HSV space
   // Those will most likely need to be recalibrated with the real camera,
   // lighting and reef of the actual field
-  final Scalar lower_violet = new Scalar(137, 48, 38);
-  final Scalar upper_violet = new Scalar(165, 143, 134);
-
-  final double kMinBoungingBoxWidth = 17; // pixels
-  final double kMaxBoungingBoxWidth = 22; // pixels
-
-  final double kMinBoungingBoxHeight = 22; // pixels
-
-  // lighting and reef of workshop field
-  //  final Scalar lower_violet = new Scalar(156, 72, 162);
-  // final Scalar upper_violet = new Scalar(166, 121, 241);
+  final Scalar klower_violet = new Scalar(154, 0, 0);
+  final Scalar kupper_violet = new Scalar(171, 255, 255);
 
   private CvSink m_sink;
   private double m_offset = 0;
   private boolean m_validDetection = false;
   Mat mat1 = new Mat();
   Mat mat2 = new Mat();
-  List<MatOfPoint> contours = new ArrayList<>();
+  Mat m_template = new Mat();
 
   public PegDetect(CvSink sink) {
     m_sink = sink;
@@ -72,6 +60,10 @@ public class PegDetect {
     } else {
       System.out.println("Directory already exists");
     }
+
+    var templateFilePath = Filesystem.getDeployDirectory() + File.separator + "template.png";
+    mat1 = Imgcodecs.imread(templateFilePath);
+    Imgproc.cvtColor(mat1, m_template, Imgproc.COLOR_BGR2GRAY);
   }
 
   /**
@@ -110,50 +102,21 @@ public class PegDetect {
         System.out.println("Frame acquired");
         Imgproc.cvtColor(mat1, mat2, Imgproc.COLOR_BGR2HSV);
         System.out.println("Color conversion to HSV done");
-        Imgproc.GaussianBlur(mat2, mat1, new Size(3, 3), 0);
-        System.out.println("Gaussian blur done");
+        Imgproc.medianBlur(mat2, mat1, 5);
+        System.out.println("Median blur done");
 
         // mask to overlay
-        Core.inRange(mat1, lower_violet, upper_violet, mat2);
+        Core.inRange(mat1, klower_violet, kupper_violet, mat2);
         System.out.println("In range performed");
 
-        contours.clear();
+        Imgproc.matchTemplate(mat1, m_template, mat2, Imgproc.TM_SQDIFF_NORMED);
+        System.out.println("Template matching performed");
 
-        Imgproc.findContours(
-            mat2, contours, mat1, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-        System.out.println("Find countours completed");
+        var result = Core.minMaxLoc(mat2);
+        System.out.println("Minmax location performed");
 
-        double maxArea = 0;
-        int maxValId = 0;
-
-        for (var c : contours) {
-          double contourArea = Imgproc.contourArea(c);
-          if (maxArea < contourArea) {
-            maxArea = contourArea;
-            maxValId = contours.indexOf(c);
-          }
-        }
-        System.out.println("Finding largest area completed");
-
-        var boundingRect = Imgproc.boundingRect(contours.get(maxValId));
-
-        System.out.println("Bounding rect: " + boundingRect.toString());
-
-        if (boundingRect.width < kMinBoungingBoxWidth
-            || boundingRect.width > kMaxBoungingBoxWidth
-            || boundingRect.height < kMinBoungingBoxHeight) {
-          System.out.println("Bounding box too small or too big");
-          return false;
-        }
-
-        // image is vertical so left right is along the x axis
-        var bbox_center = boundingRect.x + boundingRect.width / 2;
-        bbox_center -= imageWidth / 2;
-
-        System.out.println("offset from center: " + bbox_center + " max width: " + imageWidth);
-
+        var bbox_center = result.minLoc.x + m_template.width() / 2;
         double pixToMeasureRatio = kHFOV / imageWidth;
-
         m_offset = Units.inchesToMeters(bbox_center * pixToMeasureRatio);
 
         System.out.println("offset in meters: " + m_offset);
