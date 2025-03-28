@@ -482,7 +482,7 @@ public class PathfindingV2 extends Command {
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
         new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
-        new WaitCommand(0.1),
+        new WaitCommand(0.2),
         new InstantCommand(() -> m_shooter.stop()),
         new InstantCommand(() -> m_swerve.regularConstraints()),
         new InstantCommand(() -> m_shooter.closeBlocker()),
@@ -652,16 +652,16 @@ public class PathfindingV2 extends Command {
     //             .toPose2d(),
     //         1.0,
     //         180);
-    // MinuteMoveCmd shuffleLeft = new MinuteMoveCmd(m_swerve, 0.5, 2.5, OffsetDir.LEFT);
+    MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 0.5, 2.5, OffsetDir.BACK);
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+            new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndShootAndAlgae(
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4,
-                3.5),
+                3.0),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -675,7 +675,7 @@ public class PathfindingV2 extends Command {
             driveAndShootNet(
                 AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.ALGAEL2),
             driveAndIntakeAlgaeAndSmoothNet(
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(20)
                     .get(),
                 0.01,
@@ -686,7 +686,8 @@ public class PathfindingV2 extends Command {
             driveAndShootNet(
                 AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.netSecondAlgae,
                 0.3,
-                desiredHeight.LOW)
+                desiredHeight.LOW),
+            backTrack
             // new InstantCommand(() -> m_swerve.boostedConstraints()),
             // new InstantCommand(
             //     () ->
@@ -722,15 +723,15 @@ public class PathfindingV2 extends Command {
 
       case Red:
         pathfindingSequence.addCommands(
-            new InstantCommand(() -> m_swerve.lessenedConstraints()),
+            new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndShootAndAlgae(
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4,
-                3.5),
+                3.0),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(10)
                     .get(),
                 0.4,
@@ -741,7 +742,7 @@ public class PathfindingV2 extends Command {
             driveAndShootNet(
                 AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.L2),
             driveAndIntakeAlgaeAndSmoothNet(
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark)
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(11)
                     .get(),
                 0.01,
@@ -752,7 +753,8 @@ public class PathfindingV2 extends Command {
             driveAndShootNet(
                 AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.netSecondAlgae,
                 0.3,
-                desiredHeight.LOW)
+                desiredHeight.LOW),
+            backTrack
             // new InstantCommand(() -> m_swerve.boostedConstraints()),
             // new InstantCommand(
             //     () ->

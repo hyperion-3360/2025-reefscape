@@ -75,7 +75,7 @@ public class Vision extends SubsystemBase {
   private int m_printCounter = 0;
   private List<Integer> m_allowedReefPegTag = new ArrayList<Integer>();
 
-  private final double krobotHalfLength = Units.inchesToMeters(18);
+  private final double krobotHalfLength = Units.inchesToMeters(17);
   private final double kdistTagToPeg = Units.inchesToMeters(6.25);
   private final double kdesiredDistFromTag = 1;
 
