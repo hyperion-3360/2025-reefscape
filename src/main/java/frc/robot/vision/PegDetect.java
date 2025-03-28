@@ -26,6 +26,7 @@ public class PegDetect {
   // lighting and reef of the actual field
   final Scalar klower_violet = new Scalar(154, 0, 0);
   final Scalar kupper_violet = new Scalar(171, 255, 255);
+  final double kThreshold = 0.5;
 
   private CvSink m_sink;
   private double m_offset = 0;
@@ -61,18 +62,18 @@ public class PegDetect {
       System.out.println("Directory already exists");
     }
 
-    var templateFilePath = Filesystem.getDeployDirectory() + File.separator + "template.png";
-    mat1 = Imgcodecs.imread(templateFilePath);
-    Imgproc.cvtColor(mat1, m_template, Imgproc.COLOR_BGR2GRAY);
+    var templateFilePath = Filesystem.getDeployDirectory() + File.separator + "template_bw.png";
+    m_template = Imgcodecs.imread(templateFilePath, Imgcodecs.IMREAD_GRAYSCALE);
   }
 
   /**
-   * Get the offset of the peg from the center of the image. This is done by grabbing a frame from
-   * the camera, converting it to HSV, applying a mask to only show the violet color, and then
-   * finding the largest contour. The offset is then calculated by finding the center of the
-   * bounding rectangle of the largest contour.
+   * Process the image to detect the peg Using the template matching algorithm with a pre-defined
+   * template and minimum squared difference. The offset is calculated based on the center of the
+   * bounding box of the detected peg. A validation threshold is used to determine if the peg is
+   * detected.
    *
-   * @return a Detection object
+   * @return true if the peg is detected, false otherwise, use the getOffset() method to get the
+   *     offset
    */
   public boolean processImage() {
     m_validDetection = false;
@@ -115,12 +116,16 @@ public class PegDetect {
         var result = Core.minMaxLoc(mat2);
         System.out.println("Minmax location performed");
 
-        var bbox_center = result.minLoc.x + m_template.width() / 2;
-        double pixToMeasureRatio = kHFOV / imageWidth;
-        m_offset = Units.inchesToMeters(bbox_center * pixToMeasureRatio);
+        if (result.minVal < kThreshold) {
+          var bbox_center = result.minLoc.x + m_template.width() / 2;
+          double pixToMeasureRatio = kHFOV / imageWidth;
+          m_offset = Units.inchesToMeters(bbox_center * pixToMeasureRatio);
 
-        System.out.println("offset in meters: " + m_offset);
-        m_validDetection = true;
+          System.out.println("offset in meters: " + m_offset);
+          m_validDetection = true;
+        } else {
+          System.out.println("No peg detected!");
+        }
       } catch (Exception e) {
         System.out.println("Caught opencv exception : " + e);
       }
