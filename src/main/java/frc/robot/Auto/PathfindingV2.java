@@ -595,8 +595,8 @@ public class PathfindingV2 extends Command {
 
     Pose2d backTrackedPose =
         new Pose2d(
-            targetPos.getX() + (0.45 * Math.cos(pose.getRotation().getAngle())),
-            targetPos.getY() + (0.45 * Math.sin(pose.getRotation().getAngle())),
+            targetPos.getX() + (0.25 * Math.cos(pose.getRotation().getAngle())),
+            targetPos.getY() + (0.25 * Math.sin(pose.getRotation().getAngle())),
             Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees() - 180));
 
     algaeIntakeSequence.addCommands(
@@ -616,6 +616,8 @@ public class PathfindingV2 extends Command {
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
+        new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.06)).withTimeout(0.5),
         new InstantCommand(
             () ->
                 m_swerve.drivetoTarget(
