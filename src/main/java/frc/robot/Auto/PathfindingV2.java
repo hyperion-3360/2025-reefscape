@@ -658,7 +658,10 @@ public class PathfindingV2 extends Command {
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.lessenedConstraints()),
             driveAndShootAndAlgae(
-                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH, 2.5, desiredHeight.L4, 3.5),
+                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
+                2.5,
+                desiredHeight.L4,
+                3.5),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
