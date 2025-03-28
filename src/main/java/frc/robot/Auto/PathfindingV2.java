@@ -468,6 +468,7 @@ public class PathfindingV2 extends Command {
       desiredHeight elevatorHeight,
       double waitTimeToReach) {
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
+    MinuteMoveCmd getToCoral = new MinuteMoveCmd(m_swerve, 0.2, 0.1, OffsetDir.FRONT);
 
     shootSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
@@ -480,6 +481,7 @@ public class PathfindingV2 extends Command {
             new WaitUntilCommand(() -> m_swerve.targetReached())),
         // new WaitCommand(1.0), // will be elevatecmd(L4) later
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+        getToCoral,
         new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
         new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
         new WaitCommand(0.2),
@@ -653,6 +655,7 @@ public class PathfindingV2 extends Command {
     //         1.0,
     //         180);
     MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 0.5, 2.5, OffsetDir.BACK);
+
     switch (currentAlliance) {
       case Blue:
         pathfindingSequence.addCommands(
@@ -660,8 +663,8 @@ public class PathfindingV2 extends Command {
             driveAndShootAndAlgae(
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
-                desiredHeight.L4,
-                3.5),
+                desiredHeight.L4AUTO,
+                3),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -727,8 +730,8 @@ public class PathfindingV2 extends Command {
             driveAndShootAndAlgae(
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
-                desiredHeight.L4,
-                3.5),
+                desiredHeight.L4AUTO,
+                3),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)

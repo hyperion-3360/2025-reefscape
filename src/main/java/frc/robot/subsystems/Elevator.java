@@ -305,7 +305,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
         break;
 
       case L4AUTO:
-        heightTarget = 2.85;
+        heightTarget = Constants.ElevatorConstants.kElevatorAuto;
         heightEnum = desiredHeight.L4AUTO;
         lowElevatorHeight = false;
         midHeight = false;
