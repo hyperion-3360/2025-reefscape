@@ -654,7 +654,7 @@ public class PathfindingV2 extends Command {
     //             .toPose2d(),
     //         1.0,
     //         180);
-    MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 0.5, 2.5, OffsetDir.BACK);
+    MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 1, 2.5, OffsetDir.BACK);
 
     switch (currentAlliance) {
       case Blue:
