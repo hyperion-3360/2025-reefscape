@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -14,8 +15,12 @@ import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDs.Pattern;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.vision.Vision;
+import java.util.function.BooleanSupplier;
 
 public class DriveAndIntakeCmd extends SequentialCommandGroup {
+  private BooleanSupplier isManualMode = () -> false;
+  private BooleanSupplier isAlgaeL2 = () -> true;
+
   /**
    * constructor to construct a algae intake command for the reef
    *
@@ -37,28 +42,65 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     addRequirements(m_elevator);
     addRequirements(m_swerve);
     addCommands(
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
-        new InstantCommand(
-            () -> m_swerve.drivetoTarget(m_vision.getDesiredPoseAlgae(() -> m_swerve.getPose()))),
-        new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.06)),
-        Commands.runOnce(() -> m_elevator.SetHeight(m_vision.getAlgaeHeight())),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
-        Commands.runOnce(
-            () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE), m_algaeIntake),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        new WaitCommand(0.3).unless(() -> m_vision.getAlgaeHeight().equals(desiredHeight.ALGAEL2)),
-        new InstantCommand(() -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae())),
-        new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-        backTrack,
-        Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
-        new WaitCommand(0.4),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
-        Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
-        new WaitCommand(0.2),
-        Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)));
+        new ConditionalCommand(
+            new ConditionalCommand(
+                new SequentialCommandGroup(
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+                    Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.ALGAEL2)),
+                    Commands.runOnce(
+                        () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
+                    Commands.runOnce(
+                        () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE),
+                        m_algaeIntake),
+                    new WaitCommand(1.0),
+                    new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY))),
+                new SequentialCommandGroup(
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
+                    Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.ALGAEL2)),
+                    Commands.runOnce(
+                        () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
+                    Commands.runOnce(
+                        () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE),
+                        m_algaeIntake),
+                    new WaitCommand(1.0),
+                    new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+                    Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY))),
+                isAlgaeL2),
+            new SequentialCommandGroup(
+                Commands.runOnce(
+                    () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING)),
+                new InstantCommand(
+                    () ->
+                        m_swerve.drivetoTarget(
+                            m_vision.getDesiredPoseAlgae(() -> m_swerve.getPose()))),
+                new WaitUntilCommand(() -> m_swerve.targetReached()),
+                Commands.runOnce(() -> m_elevator.SetHeight(m_vision.getAlgaeHeight())),
+                Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.FLOOR)),
+                Commands.runOnce(() -> m_leds.SetPattern(Pattern.INTAKE)),
+                Commands.runOnce(
+                    () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.INTAKE),
+                    m_algaeIntake),
+                new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+                new WaitCommand(0.3)
+                    .unless(() -> m_vision.getAlgaeHeight().equals(desiredHeight.ALGAEL2)),
+                new InstantCommand(
+                    () -> m_swerve.drivetoTarget(m_vision.getDesiredCloseUpPoseAlgae())),
+                new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+                new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+                backTrack,
+                Commands.runOnce(() -> m_leds.SetPattern(Pattern.READY)),
+                Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)),
+                new WaitCommand(0.4),
+                Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORED)),
+                Commands.runOnce(
+                    () -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
+                new WaitCommand(0.2),
+                Commands.runOnce(
+                    () -> m_algaeIntake.setShootingSpeed(AlgaeIntake.shooting.STORING))),
+            isManualMode));
   }
 
   public Command NoAlgaeCmd(
@@ -76,5 +118,18 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
             .unless(() -> !m_algaeIntake.sensorTriggered()),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(AlgaeIntake.elevation.STORED)),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.IDLE)));
+  }
+  public void toggleManualMode() {
+    if (isManualMode.getAsBoolean() == true) {
+       isManualMode = () -> false; 
+    }
+    isManualMode = () -> true;
+  }
+  
+  public void toggleL2() {
+    if (isAlgaeL2.getAsBoolean() == true) {
+       isAlgaeL2 = () -> false; 
+    }
+    isAlgaeL2 = () -> true;
   }
 }

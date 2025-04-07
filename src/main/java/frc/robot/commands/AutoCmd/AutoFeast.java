@@ -3,6 +3,8 @@ package frc.robot.commands.AutoCmd;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Auto.AutoWaypoints;
@@ -14,10 +16,12 @@ import frc.robot.subsystems.swerve.Swerve;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.BooleanSupplier;
 
 public class AutoFeast extends SequentialCommandGroup {
   private List<Pose2d> feederWaypoints = new ArrayList<>();
   private Alliance currentAlliance = Alliance.Blue;
+  private BooleanSupplier isManualMode = () -> false;
 
   public AutoFeast(
       Swerve m_swerve,
@@ -50,9 +54,10 @@ public class AutoFeast extends SequentialCommandGroup {
       feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederRight);
     }
     addCommands(
-        new DeferredCommand(
+      new ConditionalCommand(Commands.none(), new DeferredCommand(
             () -> m_pathfinding.goThere(() -> m_swerve.getPose().nearest(feederWaypoints)),
-            getRequirements()));
+            getRequirements()), isManualMode)
+        );
     // .alongWith(
     //     Commands.sequence(
     //         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
@@ -64,5 +69,12 @@ public class AutoFeast extends SequentialCommandGroup {
     //         new WaitCommand(1.2),
     //         Commands.runOnce(() -> m_shooter.stop()),
     //         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
+  }
+  
+  public void toggleManualMode() {
+    if (isManualMode.getAsBoolean() == true) {
+       isManualMode = () -> false; 
+    }
+    isManualMode = () -> true;
   }
 }
