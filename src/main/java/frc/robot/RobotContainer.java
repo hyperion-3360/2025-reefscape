@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.util.Joysticks;
 import frc.robot.Auto.PathfindingV2;
@@ -312,6 +313,7 @@ public class RobotContainer {
 
     m_driverController.b().onTrue(shootAlgae);
 
+    m_driverController.start().and(m_driverController.back()).onTrue(new InstantCommand(() -> shootAlgaeNet.toggleManualMode()));
     m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(netCancel);
 
     m_driverController.leftTrigger(0.3).onTrue(intakeReef).onFalse(stopIntakeAlgaeReef);
