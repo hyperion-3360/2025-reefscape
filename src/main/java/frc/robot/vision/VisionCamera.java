@@ -124,18 +124,23 @@ public class VisionCamera extends SubsystemBase {
   }
 
   public Optional<EstimatedRobotPose> getVisionEstimatePose() {
+    m_visionEstimatePose.ifPresent(
+        pose -> System.out.println(pose.estimatedPose.toPose2d().toString()));
     return m_visionEstimatePose;
   }
 
   public void updateEstimatedPose() {
+    // TODO fix the cameras possible clues : cameras only work in 2d processing, we have a strong
+    // suspicion that the ambiguity is causing the problems
     getLatestResult()
         .ifPresentOrElse(
             result -> {
+              System.out.println("passed");
               if (isGoodResult(result)) {
-                m_visionEstimatePose = m_cameraPoseEstimator.update(result);
-                updateEstimationStdDevs(m_visionEstimatePose, result.getTargets());
                 if (result.hasTargets()) {
                   var targets = result.getTargets();
+                  m_visionEstimatePose = m_cameraPoseEstimator.update(result);
+                  updateEstimationStdDevs(m_visionEstimatePose, result.getTargets());
                   double bestAmbiguity = 2.0;
                   for (var target : targets) {
                     if ((target.poseAmbiguity < bestAmbiguity)
@@ -166,6 +171,7 @@ public class VisionCamera extends SubsystemBase {
     boolean rc = true;
     do {
       if (!result.hasTargets()) {
+        System.out.println("we do not see anything");
         rc = false;
         break;
       }
