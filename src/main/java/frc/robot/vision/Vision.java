@@ -177,29 +177,24 @@ public class Vision extends SubsystemBase {
 
     for (var camera : m_cameras) {
       camera
-          .getVisionEstimatePose()
-          .ifPresent(
-              pose -> {
-                if (camera.bestTarget().isPresent()) {
-                  var target = camera.bestTarget().get();
-                  if (allowedTarget(target)) {
-                    m_tagFound = true;
-                    var distance = target.getBestCameraToTarget().getTranslation().getNorm();
-                    var ambiguity = target.getPoseAmbiguity();
-                    var distanceContribution = Math.exp(-0.5 * distance) * camera.distanceFactor;
-                    var ambiguityContribution = Math.exp(-4 * ambiguity) * camera.ambiguityFactor;
-                    var tagId = target.getFiducialId();
-                    m_AprilTagsScore[tagId] += (distanceContribution * ambiguityContribution);
-                  }
-                  // there were results from the cameras but the target seen is not allowed
-                  else {
-                    m_AprilTagsScore[0] += kNoTagFoundValue;
-                  }
-                  // we have results from the camera but no target was found
-                } else {
+          .bestTarget()
+          .ifPresentOrElse(
+              target -> {
+                if (allowedTarget(target)) {
+                  m_tagFound = true;
+                  var distance = target.getBestCameraToTarget().getTranslation().getNorm();
+                  var ambiguity = target.getPoseAmbiguity();
+                  var distanceContribution = Math.exp(-0.5 * distance) * camera.distanceFactor;
+                  var ambiguityContribution = Math.exp(-4 * ambiguity) * camera.ambiguityFactor;
+                  var tagId = target.getFiducialId();
+                  m_AprilTagsScore[tagId] += (distanceContribution * ambiguityContribution);
+                }
+                // there were results from the cameras but the target seen is not allowed
+                else {
                   m_AprilTagsScore[0] += kNoTagFoundValue;
                 }
-              });
+              },
+              () -> m_AprilTagsScore[0] += kNoTagFoundValue);
     }
 
     // handle the case where no tag is found

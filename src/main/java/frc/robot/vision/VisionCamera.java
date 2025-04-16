@@ -128,8 +128,10 @@ public class VisionCamera extends SubsystemBase {
   }
 
   public void updateEstimatedPose() {
+    m_visionEstimatePose = Optional.empty();
+    m_target = Optional.empty();
     getLatestResult()
-        .ifPresentOrElse(
+        .ifPresent(
             result -> {
               if (isGoodResult(result)) {
                 m_visionEstimatePose = m_cameraPoseEstimator.update(result);
@@ -151,10 +153,6 @@ public class VisionCamera extends SubsystemBase {
                   }
                 }
               }
-            },
-            () -> {
-              m_visionEstimatePose = Optional.empty();
-              m_target = Optional.empty();
             });
   }
 
