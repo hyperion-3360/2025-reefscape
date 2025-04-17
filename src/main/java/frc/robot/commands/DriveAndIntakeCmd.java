@@ -21,8 +21,9 @@ import java.util.function.BooleanSupplier;
 
 public class DriveAndIntakeCmd extends SequentialCommandGroup {
   private boolean bManualMode = false;
+  private static boolean bAlgaeL2 = false;
   private BooleanSupplier isManualMode = () -> bManualMode;
-  private BooleanSupplier isAlgaeL2 = () -> true;
+  private BooleanSupplier isAlgaeL2 = () -> bAlgaeL2;
 
   /**
    * constructor to construct a algae intake command for the reef
@@ -129,11 +130,7 @@ public class DriveAndIntakeCmd extends SequentialCommandGroup {
     SmartDashboard.putBoolean("intakeAlgaeReef", isManualMode.getAsBoolean());
   }
 
-  public void toggleL2() {
-    if (isAlgaeL2.getAsBoolean() == true) {
-      isAlgaeL2 = () -> false;
-    } else {
-      isAlgaeL2 = () -> true;
-    }
+  public static void toggleL2() {
+    bAlgaeL2 = !bAlgaeL2;
   }
 }

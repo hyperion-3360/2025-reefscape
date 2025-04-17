@@ -323,6 +323,7 @@ public class RobotContainer {
                         () -> {
                           shootAlgaeNet.toggleManualMode();
                           intakeReef.toggleManualMode();
+                          cycleToFeeder.toggleManualMode();
                         }),
                 Set.of()));
     m_driverController.rightTrigger(0.3).onTrue(shootAlgaeNet).onFalse(netCancel);
