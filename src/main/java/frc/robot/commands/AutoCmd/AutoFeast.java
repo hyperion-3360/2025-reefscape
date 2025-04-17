@@ -54,10 +54,12 @@ public class AutoFeast extends SequentialCommandGroup {
       feederWaypoints.add(AutoWaypoints.RedAlliance.LeftSide.feederWaypoints.feederRight);
     }
     addCommands(
-      new ConditionalCommand(Commands.none(), new DeferredCommand(
-            () -> m_pathfinding.goThere(() -> m_swerve.getPose().nearest(feederWaypoints)),
-            getRequirements()), isManualMode)
-        );
+        new ConditionalCommand(
+            Commands.none(),
+            new DeferredCommand(
+                () -> m_pathfinding.goThere(() -> m_swerve.getPose().nearest(feederWaypoints)),
+                getRequirements()),
+            isManualMode));
     // .alongWith(
     //     Commands.sequence(
     //         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
@@ -70,10 +72,10 @@ public class AutoFeast extends SequentialCommandGroup {
     //         Commands.runOnce(() -> m_shooter.stop()),
     //         Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.LOW)))));
   }
-  
+
   public void toggleManualMode() {
     if (isManualMode.getAsBoolean() == true) {
-       isManualMode = () -> false; 
+      isManualMode = () -> false;
     }
     isManualMode = () -> true;
   }

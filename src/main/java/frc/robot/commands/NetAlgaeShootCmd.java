@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
@@ -160,7 +161,9 @@ public class NetAlgaeShootCmd extends SequentialCommandGroup {
   public void toggleManualMode() {
     if (isManualMode.getAsBoolean() == true) {
       isManualMode = () -> false;
+    } else {
+      isManualMode = () -> true;
     }
-    isManualMode = () -> true;
+    SmartDashboard.putBoolean("netManualMode", isManualMode.getAsBoolean());
   }
 }
