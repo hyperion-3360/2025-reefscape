@@ -40,6 +40,7 @@ public class Elevator extends SubsystemBase implements TestBindings {
     L4,
     ALGAEL2,
     ALGAEL3,
+    L4AUTO,
     LOLLYPOP
   }
 
@@ -300,6 +301,13 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorLollypop;
         heightEnum = desiredHeight.ALGAEL3;
         lowElevatorHeight = true;
+        midHeight = false;
+        break;
+
+      case L4AUTO:
+        heightTarget = Constants.ElevatorConstants.kElevatorAuto;
+        heightEnum = desiredHeight.L4AUTO;
+        lowElevatorHeight = false;
         midHeight = false;
         break;
     }

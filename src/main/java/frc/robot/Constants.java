@@ -266,7 +266,7 @@ public final class Constants {
     public static final double kSuperStore = 0.2;
     public static final double kStoringSpeed = 0.08;
     public static final double kStoredSpeed = 0.0;
-    public static final double kAutoNetSpeed = -0.9;
+    public static final double kAutoNetSpeed = -0.7;
     public static final double kProcessorSpeed = -1.0;
     public static final double kStopSpeed = 0.0;
     public static final double kNetSpeed = -0.7;
@@ -275,12 +275,12 @@ public final class Constants {
   public static class CoralShooterVariables {
     public static final double kShootNo = 0.0;
     public static final double kShootL1 = -0.3;
-    public static final double kShootL2 = -0.80;
-    public static final double kShootL3 = -0.85;
+    public static final double kShootL2 = -0.70;
+    public static final double kShootL3 = -0.75;
     public static final double kShootL4 = -0.6;
     // we need a different speed for teleop to compensate for angle
     //    public static final double kShootL4Teleop = -0.85;
-    public static final double kShootL4Teleop = -0.70;
+    public static final double kShootL4Teleop = -0.60;
     public static final double kIntakeSpeed = -0.6;
 
     public static final NeutralMode kCoralShooterNeutralMode = NeutralMode.Brake;
@@ -337,11 +337,12 @@ public final class Constants {
     // elevator heights
     public static final double kElevatorDown = 0.0;
     public static final double kElevatorL1 = 0.58;
-    public static final double kElevatorL2 = 1.19;
+    public static final double kElevatorL2 = 1.15;
     public static final double kElevatorL3 = 1.82;
     // comp : 2.8
     // home :
     public static final double kElevatorL4 = 2.835;
+    public static final double kElevatorAuto = 2.855;
     public static final double kElevatorNet = 2.90;
     public static final double kElevatorProcessor = 0.36;
     public static final double kElevatorAlgaeLow = 0.05;

@@ -10,8 +10,8 @@ import frc.robot.Constants;
 public class AutoWaypoints {
 
   // everything is in meters and degrees
-  static double distanceTagToPeg = Units.inchesToMeters(-6.5);
-  static double robotHalfLength = Units.inchesToMeters(18);
+  static double distanceTagToPeg = Units.inchesToMeters(-7.725);
+  static double robotHalfLength = Units.inchesToMeters(17);
 
   static double distanceRobotCenterToReef = 1.5;
   static double distanceRotbotCenterTag = 0.0;
@@ -32,8 +32,8 @@ public class AutoWaypoints {
     public static class LeftSide {
 
       public static class NetWaypoint {
-        static Pose2d net = new Pose2d(7.000, 5.157, new Rotation2d(Math.toRadians(0)));
-        static Pose2d netSecondAlgae = new Pose2d(7.000, 5.157, new Rotation2d(Math.toRadians(0)));
+        static Pose2d net = new Pose2d(6.900, 5.157, new Rotation2d(Math.toRadians(0)));
+        static Pose2d netSecondAlgae = new Pose2d(6.900, 5.157, new Rotation2d(Math.toRadians(0)));
         static Pose2d netAngled = new Pose2d(7.453, 4.0, new Rotation2d(Math.toRadians(45.821)));
       }
 
@@ -82,8 +82,8 @@ public class AutoWaypoints {
       }
 
       public static class feederWaypoints {
-        public static Pose2d feederRight = new Pose2d(1.626, 7.375, Rotation2d.fromDegrees(306));
-        public static Pose2d feederLeft = new Pose2d(0.666, 6.676, Rotation2d.fromDegrees(306));
+        public static Pose2d feederRight = new Pose2d(1.405, 7.246, Rotation2d.fromDegrees(306));
+        public static Pose2d feederLeft = new Pose2d(0.887, 6.828, Rotation2d.fromDegrees(306));
       }
     }
 
@@ -210,9 +210,9 @@ public class AutoWaypoints {
       }
 
       public static class NetWaypoint {
-        static Pose2d net = new Pose2d(10.320, 3.057, new Rotation2d(Math.toRadians(180)));
+        static Pose2d net = new Pose2d(10.420, 3.057, new Rotation2d(Math.toRadians(180)));
         static Pose2d netSecondAlgae =
-            new Pose2d(10.320, 1.847, new Rotation2d(Math.toRadians(180)));
+            new Pose2d(10.420, 1.847, new Rotation2d(Math.toRadians(180)));
         static Pose2d netAngled =
             new Pose2d(10.010, 3.884, new Rotation2d(Math.toRadians(-138.905)));
       }

@@ -348,6 +348,19 @@ public class Swerve extends SubsystemBase implements TestBindings {
     return targetReached(0);
   }
 
+  public boolean targetReachedWithOffset(double offset) {
+    var posX = getPose().getX();
+    var posY = getPose().getY();
+    var rot = getPose().getRotation().getRadians();
+    var goalX = m_xController.getGoal().position;
+    var goalY = m_yController.getGoal().position;
+    var goalRot = m_rotController.getGoal().position;
+
+    return isAlmostEqual(posX, goalX, offset)
+        && isAlmostEqual(posY, goalY, offset)
+        && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
+  }
+
   public boolean AutoTargetReached() {
     var posX = getPose().getX();
     var posY = getPose().getY();
@@ -537,7 +550,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
         this);
   }
 
-  private Command playThemeMusic() {
+  public Command playThemeMusic() {
     return this.runOnce(
         () -> {
           var musicFilePath =
@@ -546,6 +559,10 @@ public class Swerve extends SubsystemBase implements TestBindings {
           System.out.println(m_orchestra.loadMusic(musicFilePath));
           System.out.println(m_orchestra.play());
         });
+  }
+
+  public Command stopMuMu() {
+    return this.runOnce(() -> m_orchestra.pause());
   }
 
   @Override

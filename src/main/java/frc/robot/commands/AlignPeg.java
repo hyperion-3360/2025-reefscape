@@ -74,20 +74,7 @@ public class AlignPeg extends SequentialCommandGroup {
                 // new WaitUntilCommand(() -> m_driveTrain.targetReached()),
                 // new WaitCommand(1),
                 // this is one command
-                new WaitUntilCommand(() -> m_elevator.isAtGoal()),
-                new ConditionalCommand(
-                    new DeferredCommand(
-                        () ->
-                            new MinuteMoveCmd(
-                                m_driveTrain,
-                                kMaxWaitAlignTime,
-                                Math.abs(m_pegDetection.getOffset()),
-                                (m_pegDetection.getOffset() < 0)
-                                    ? OffsetDir.LEFT
-                                    : OffsetDir.RIGHT),
-                        getRequirements()),
-                    new PrintCommand("Can't locate peg!!! "),
-                    () -> m_pegDetection.processImage())),
+                new WaitUntilCommand(() -> m_elevator.isAtGoal())),
             new PrintCommand("hehe"),
             () -> m_vision.getLockID() != 0));
 

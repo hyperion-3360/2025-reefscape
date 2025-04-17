@@ -27,7 +27,8 @@ public class LEDs extends SubsystemBase {
     SHOOTER,
     ELEVATOR,
     IDLE,
-    DEEPCLIMB
+    DEEPCLIMB,
+    RAINBOW
   }
 
   private AddressableLED m_led = new AddressableLED(Constants.LEDConstants.kLEDPWMPort);
@@ -91,6 +92,12 @@ public class LEDs extends SubsystemBase {
       case DEEPCLIMB:
         m_currentPattern = LEDPattern.solid(Color.kYellow).blink(Second.of(0.5));
         m_isMovingPattern = true;
+      case RAINBOW:
+        m_currentPattern =
+            LEDPattern.rainbow(255, 255).scrollAtAbsoluteSpeed(MetersPerSecond.of(1), LED_SPACING);
+        m_isMovingPattern = true;
+
+        break;
     }
     m_isApplied = false;
   }
