@@ -16,6 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -62,14 +63,14 @@ public class Elevator extends SubsystemBase implements TestBindings {
   private static double kDt = 0.02;
 
   private static double kMaxVelocity = 20;
-  private static double kMaxAcceleration = 4.05;
+  private static double kMaxAcceleration = 5.55;
   private static double kMidVelocity = 8;
   private static double kMidAcceleration = 4;
   private static double kMinVelocity = 2;
   private static double kMinAcceleration = 2;
 
   private static double kG = 0.41; // barely moves up
-  private static double kA = 1.5;
+  private static double kA = 2.0;
   private static double kV = 4.3;
   private static double kS = 0.0;
 
@@ -196,7 +197,9 @@ public class Elevator extends SubsystemBase implements TestBindings {
       System.out.println(
           "Elevator arrived in " + (Timer.getFPGATimestamp() - chronoStartTime) + " secs");
     }
-
+    SmartDashboard.putNumber("elevator position", elevatorPos);
+    SmartDashboard.putNumber("elevator setPoint", elevatorSetpoint);
+    SmartDashboard.putNumber("elevator voltage", elevatorVelocity);
     // System.out.println(elevatorPos);
   }
 
