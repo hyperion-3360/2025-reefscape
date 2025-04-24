@@ -5,6 +5,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -58,9 +59,9 @@ public class Swerve extends SubsystemBase implements TestBindings {
   private ProfiledPIDController m_rotController;
   TrapezoidProfile.Constraints m_rotConstraints;
   private final double kMaxSpeedMetersPerSecondX = 3.5;
-  private final double kMaxAccelerationMetersPerSecondSquaredX = 2.0;
+  private final double kMaxAccelerationMetersPerSecondSquaredX = 5.0;
   private final double kMaxSpeedMetersPerSecondY = 3.5;
-  private final double kMaxAccelerationMetersPerSecondSquaredY = 2.0;
+  private final double kMaxAccelerationMetersPerSecondSquaredY = 5.0;
   private final double kMaxSpeedRadiansPerSecond = 5.5;
   private final double kMaxAccelerationRadiansPerSecondSquared = 5.5;
   private final double kPTranslation = 8.0;
@@ -98,8 +99,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
         new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getRotation2d(), getModulePositions(), new Pose2d());
 
-    m_xController = new ProfiledPIDController(kPTranslation, 0, 0, m_xConstraints);
-    m_yController = new ProfiledPIDController(kPTranslation, 0, 0, m_yConstraints);
+    m_xController = new ProfiledPIDController(kPTranslation, 0, 0.22, m_xConstraints);
+    m_yController = new ProfiledPIDController(kPTranslation, 0, 0.22, m_yConstraints);
     m_rotController = new ProfiledPIDController(kPRot, 0, 0, m_rotConstraints);
     m_rotController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -426,7 +427,7 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
   }
 
-  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+  public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds, DriveFeedforwards feedforward) {
 
     // ChassisSpeeds fieldRelativeSpeed =
     // ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, getHeading());
@@ -574,7 +575,6 @@ public class Swerve extends SubsystemBase implements TestBindings {
   public Command createTrajectoryCommand() {
 
     System.out.println("hello");
-
     // Create config for trajectory
     TrajectoryConfig config =
         new TrajectoryConfig(0.5, 0.5)
@@ -602,8 +602,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
             Constants.Swerve.swerveKinematics,
 
             // Position controllers
-            new PIDController(5.0, 0, 0),
-            new PIDController(5.0, 0, 0),
+            new PIDController(5.0, 0, 0.0),
+            new PIDController(5.0, 0, 0.0),
             thetaController,
             this::setModuleStates,
             this);

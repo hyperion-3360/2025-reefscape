@@ -32,6 +32,8 @@ public final class Constants {
 
   public static final class Swerve {
 
+    public static final double robotWheight = 114.2;
+
     public static final double kWheelDiameter = Units.inchesToMeters(3.8774);
     public static final int kGyroCanId = 20;
 

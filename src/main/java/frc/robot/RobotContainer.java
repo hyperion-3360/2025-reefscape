@@ -61,7 +61,7 @@ public class RobotContainer {
   // controller declarations
   public static final CommandXboxController m_driverController = new CommandXboxController(0);
   public static final CommandXboxController m_coDriverController = new CommandXboxController(1);
-  //  public static final CommandXboxController m_testController = new CommandXboxController(2);
+  public static final CommandXboxController m_testController = new CommandXboxController(2);
 
   // subsystem declarations
   public static final Shooter m_shooter = new Shooter();
@@ -146,6 +146,11 @@ public class RobotContainer {
   //   private final DriveToSomeTargetCmd frontPose =
   //       new DriveToSomeTargetCmd(() -> new Pose2d(5.37, 1.73, Rotation2d.fromDegrees(270)),
   // m_swerve);
+  private final MinuteMoveCmd drive2metersTrajectory =
+      new MinuteMoveCmd(m_swerve, 2.5, 2.0, OffsetDir.FRONT);
+
+  private final MinuteMoveCmd drive2metersTrajectoryBack =
+      new MinuteMoveCmd(m_swerve, 2.5, 2.0, OffsetDir.BACK);
 
   private final MinuteMoveCmd MinutieMoveLeftPeg =
       new MinuteMoveCmd(m_swerve, OffsetDir.LEFT, m_algaeIntake);
@@ -368,7 +373,8 @@ public class RobotContainer {
 
     //    m_testController.povLeft().onTrue(MinutieMoveLeft);
     //   m_testController.povRight().onTrue(MinutieMoveRight);
-    //  m_testController.povUp().onTrue(elevateL4);
+    m_testController.povUp().onTrue(drive2metersTrajectory);
+    m_testController.povDown().onTrue(drive2metersTrajectoryBack);
     // m_testController
     //     .a()
     //     .onTrue(new AlignPeg(m_swerve, m_elevator, m_pegDetect, m_vision.getDesiredPoseLeft()));
@@ -377,7 +383,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     // Running this in case our Auto sequence got cancelled early.
-    m_swerve.regularConstraints();
+    m_swerve.ExtraBoostedConstraints();
   }
 
   public Command getAutonomousCommand() {

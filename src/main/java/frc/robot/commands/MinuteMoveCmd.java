@@ -52,6 +52,7 @@ public class MinuteMoveCmd extends SequentialCommandGroup {
     m_swerve = swerve;
     addRequirements(m_swerve);
     addCommands(
+        new InstantCommand(() -> m_swerve.boostedConstraints()),
         new DeferredCommand(
             () -> new InstantCommand(() -> m_swerve.drivetoTarget(computeNewPose(offset, dir))),
             getRequirements()),
