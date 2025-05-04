@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.AlgaeIntake;
@@ -21,8 +22,8 @@ public class ReadyClimbCmd extends SequentialCommandGroup {
         new WaitCommand(.5),
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.DEEPCLIMB)),
         Commands.runOnce(() -> m_climber.Penis90()),
-        m_climber.goForthChild(),
-        Commands.runOnce(() -> m_climber.stopDeepClimb()),
+        m_climber.readyUpChild(),
+        new InstantCommand(() -> m_climber.stopDeepClimb()),
         Commands.runOnce(() -> m_climber.setClimberActivated()));
   }
 }

@@ -12,7 +12,7 @@ public class ReReadyClimbCmd extends SequentialCommandGroup {
         // we need to winch a bit so that the finger can actually open
         Commands.run(() -> m_climber.winchDeepClimb()).withTimeout(0.2),
         // when the finger is removed we need to come back to the climbing setpoint
-        m_climber.goForthChild(),
+        m_climber.readyUpChild(),
         Commands.runOnce(() -> m_climber.stopDeepClimb()),
         Commands.runOnce(() -> m_climber.setClimberActivated()));
   }
