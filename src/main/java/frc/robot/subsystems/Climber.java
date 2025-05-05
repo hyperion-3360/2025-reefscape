@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
@@ -91,7 +92,7 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public void winchDeepClimb() {
-    m_deepMotor.set(0.2);
+    m_deepMotor.set(0.6);
   }
 
   public void stopDeepClimb() {
@@ -100,6 +101,10 @@ public class Climber extends SubsystemBase implements TestBindings {
 
   public boolean SensorDetected() {
     return m_beamBrake.get();
+  }
+
+  public boolean reachedSafetyPosition() {
+    return MathUtil.isNear(0, Math.abs(-30 - m_deepMotor.getPosition().getValueAsDouble()), 0.5);
   }
 
   @Override
@@ -122,8 +127,26 @@ public class Climber extends SubsystemBase implements TestBindings {
   }
 
   public Command goForthChild() {
-    return Commands.run(() -> m_deepMotor.set(-0.6)) // - dewinch, + winch
+    return Commands.run(() -> m_deepMotor.set(-0.9)) // - dewinch, + winch
         .until(this::isAtPose)
+        .andThen(() -> m_deepMotor.set(0));
+  }
+
+  public Command readyUpChild() {
+    double readyUpPos = -45;
+    return Commands.run(
+            () ->
+                m_deepMotor.set(
+                    0.3
+                        * (Math.signum(
+                            readyUpPos
+                                - m_deepMotor
+                                    .getPosition()
+                                    .getValueAsDouble())))) // - dewinch, + winch
+        .until(
+            () ->
+                MathUtil.isNear(
+                    0, Math.abs(readyUpPos - m_deepMotor.getPosition().getValueAsDouble()), 0.5))
         .andThen(() -> m_deepMotor.set(0));
   }
 
