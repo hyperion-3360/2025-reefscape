@@ -468,7 +468,7 @@ public class PathfindingV2 extends Command {
       desiredHeight elevatorHeight,
       double waitTimeToReach) {
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
-    MinuteMoveCmd getToCoral = new MinuteMoveCmd(m_swerve, 0.2, 0.1, OffsetDir.FRONT);
+    MinuteMoveCmd getToCoral = new MinuteMoveCmd(m_swerve, 0.8, 0.8, OffsetDir.FRONT);
 
     shootSequence.addCommands(
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
@@ -661,22 +661,22 @@ public class PathfindingV2 extends Command {
         pathfindingSequence.addCommands(
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndShootAndAlgae(
-                AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
+                AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4AUTO,
-                3),
-            new InstantCommand(() -> m_swerve.regularConstraints()),
+                2.1),
+            new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-                    .getTagPose(21)
+                    .getTagPose(19)
                     .get(),
-                0.9,
+                0.4,
                 desiredHeight.ALGAEL2,
-                0.5,
+                0.3,
                 0.8),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootNet(
-                AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.ALGAEL2),
+                AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.L2),
             driveAndIntakeAlgaeAndSmoothNet(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(20)
@@ -731,7 +731,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4AUTO,
-                3),
+                2.1),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
