@@ -101,7 +101,10 @@ public class RobotContainer {
   private final IntakeAlgaeCmd intakeAlgaeLollypop =
       new IntakeAlgaeCmd(m_algaeIntake, m_leds, m_elevator, desiredHeight.LOLLYPOP);
 
-  private final ShootAlgaeCmd shootAlgae = new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds);
+  private final ShootAlgaeCmd shootAlgae =
+      new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds, desiredHeight.PROCESSOR);
+  private final ShootAlgaeCmd galaAlgae =
+      new ShootAlgaeCmd(m_algaeIntake, m_elevator, m_leds, desiredHeight.GALAALGAE);
   private final NetAlgaeShootCmd shootAlgaeNet;
 
   private final ShootCoralCmd shootCoral = new ShootCoralCmd(m_shooter, m_leds, m_elevator);
@@ -312,6 +315,8 @@ public class RobotContainer {
     m_driverController.x().onTrue(intakeAlgaeFloor);
 
     m_driverController.b().onTrue(shootAlgae);
+
+    m_driverController.a().onTrue(galaAlgae);
 
     m_driverController
         .start()

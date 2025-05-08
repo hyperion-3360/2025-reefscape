@@ -23,12 +23,14 @@ public class ShootAlgaeCmd extends SequentialCommandGroup {
    * @param m_algaeIntake The subsystem used by this command.
    * @param shootingAngle The angle at which the algae ball will be shot
    */
-  public ShootAlgaeCmd(AlgaeIntake m_algaeIntake, Elevator m_elevator, LEDs m_leds) {
+  public ShootAlgaeCmd(
+      AlgaeIntake m_algaeIntake, Elevator m_elevator, LEDs m_leds, desiredHeight height) {
     addRequirements(m_algaeIntake);
     addRequirements(m_leds);
+    addRequirements(m_elevator);
     addCommands(
         Commands.runOnce(() -> m_leds.SetPattern(Pattern.ELEVATOR)),
-        Commands.runOnce(() -> m_elevator.SetHeight(desiredHeight.PROCESSOR)),
+        Commands.runOnce(() -> m_elevator.SetHeight(height)),
         Commands.runOnce(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
         Commands.runOnce(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
         new WaitCommand(0.3),

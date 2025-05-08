@@ -42,7 +42,8 @@ public class Elevator extends SubsystemBase implements TestBindings {
     ALGAEL2,
     ALGAEL3,
     L4AUTO,
-    LOLLYPOP
+    LOLLYPOP,
+    GALAALGAE
   }
 
   public enum desiredState {
@@ -311,6 +312,13 @@ public class Elevator extends SubsystemBase implements TestBindings {
         heightTarget = Constants.ElevatorConstants.kElevatorAuto;
         heightEnum = desiredHeight.L4AUTO;
         lowElevatorHeight = false;
+        midHeight = false;
+        break;
+
+      case GALAALGAE:
+        heightTarget = Constants.ElevatorConstants.kElevatorGalaAlgae;
+        heightEnum = desiredHeight.GALAALGAE;
+        lowElevatorHeight = true;
         midHeight = false;
         break;
     }
