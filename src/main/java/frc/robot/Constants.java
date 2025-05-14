@@ -348,8 +348,8 @@ public final class Constants {
     public static final double kElevatorAlgaeLow = 0.05;
     public static final double kElevatorLollypop = 0.50;
     public static final double kElevatorFeeder = 0.247;
-    public static final double kElevatorAlgaeL2 = 1.25;
-    public static final double kElevatorAlgaeL3 = 1.87;
+    public static final double kElevatorAlgaeL2 = 1.27;
+    public static final double kElevatorAlgaeL3 = 1.99;
   }
 
   public static class AlgaeIntakeConstants {
