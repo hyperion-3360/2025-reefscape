@@ -597,8 +597,8 @@ public class PathfindingV2 extends Command {
 
     Pose2d backTrackedPose =
         new Pose2d(
-            targetPos.getX() + (0.25 * Math.cos(pose.getRotation().getAngle())),
-            targetPos.getY() + (0.25 * Math.sin(pose.getRotation().getAngle())),
+            targetPos.getX() + (0.40 * Math.cos(pose.getRotation().getAngle())),
+            targetPos.getY() + (0.40 * Math.sin(pose.getRotation().getAngle())),
             Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees() - 180));
 
     algaeIntakeSequence.addCommands(
@@ -618,6 +618,7 @@ public class PathfindingV2 extends Command {
         new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
+        new InstantCommand(() -> m_swerve.regularConstraints()),
         new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
         new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.06)).withTimeout(0.5),
         new InstantCommand(
@@ -629,8 +630,6 @@ public class PathfindingV2 extends Command {
         new ParallelCommandGroup(
             new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
             new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET))),
-        new ParallelDeadlineGroup(
-            new WaitCommand(0.4), new WaitUntilCommand(() -> m_swerve.targetReached())),
         new InstantCommand(() -> m_swerve.disableDriveToTarget()));
 
     return algaeIntakeSequence;
@@ -731,7 +730,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4AUTO,
-                3),
+                2.0),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -756,8 +755,8 @@ public class PathfindingV2 extends Command {
             driveAndShootNet(
                 AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.netSecondAlgae,
                 0.3,
-                desiredHeight.LOW),
-            backTrack
+                desiredHeight.LOW)
+            // backTrack
             // new InstantCommand(() -> m_swerve.boostedConstraints()),
             // new InstantCommand(
             //     () ->
