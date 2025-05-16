@@ -533,7 +533,7 @@ public class PathfindingV2 extends Command {
 
     algaeIntakeSequence.addCommands(
         // sets back the target pose so that we don't break the algae intake into a thousand pieces
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 0, 0.0)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.INTAKE)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
         new ParallelDeadlineGroup(
@@ -543,9 +543,9 @@ public class PathfindingV2 extends Command {
         new ParallelDeadlineGroup(
             new WaitCommand(reachAlgaeWait),
             new WaitUntilCommand(() -> m_swerve.AutoTargetReached())),
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos, 0.0, 0.0)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 2)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 0.0, 0)),
         new ParallelCommandGroup(
             new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
             new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET))),
@@ -559,7 +559,7 @@ public class PathfindingV2 extends Command {
       Pose2d targetPos, double elevatorRaiseDistance, desiredHeight nextAlgaeHeight) {
     SequentialCommandGroup shootNetSequence = new SequentialCommandGroup(Commands.none());
     shootNetSequence.addCommands(
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos, 0.0, 0)),
         new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance)),
         new InstantCommand(() -> m_elevator.SetHeight(desiredHeight.NET)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET)),
@@ -601,21 +601,22 @@ public class PathfindingV2 extends Command {
     algaeIntakeSequence.addCommands(
         // sets back the target pose so that we don't break the algae intake into a thousand pieces
         new InstantCommand(() -> m_swerve.lessenedConstraints()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 2)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 0, 0.0)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.INTAKE)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
-        new ParallelDeadlineGroup(
-            new WaitCommand(reachBackTrackWait),
-            new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance))),
+        new WaitUntilCommand(() -> isCloseTo(targetPos, elevatorRaiseDistance))
+            .withTimeout(elevatorRaiseDistance),
         new InstantCommand(() -> m_elevator.SetHeight(algaeHeight)),
+        new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.10))
+            .withTimeout(reachBackTrackWait),
         new ParallelDeadlineGroup(
             new WaitCommand(reachAlgaeWait),
             new WaitUntilCommand(() -> m_swerve.AutoTargetReached())),
         new InstantCommand(() -> m_swerve.regularConstraints()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(targetPos, 0.0, 0.0)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.regularConstraints()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 2)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 0.0, 0.0)),
         new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.06)).withTimeout(0.5),
         new InstantCommand(
             () ->
@@ -744,7 +745,7 @@ public class PathfindingV2 extends Command {
                     .get(),
                 0.01,
                 desiredHeight.ALGAEL3,
-                1.2,
+                1.8,
                 0.4,
                 Alliance.Red),
             driveAndShootNet(

@@ -20,6 +20,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -401,16 +402,18 @@ public class Swerve extends SubsystemBase implements TestBindings {
     }
   }
 
-  public void drivetoTarget(Pose2d target, double goalEndVelocity) {
+  public void drivetoTarget(Pose2d target, double initalVelocity, double goalEndVelocity) {
+    double xInitalVel = initalVelocity * Math.cos(target.getRotation().getRadians());
+    double yInitalVel = initalVelocity * Math.sin(target.getRotation().getRadians());
     System.out.println("Requested pose: " + target);
     if (target == Pose2d.kZero) {
       m_targetModeEnabled = false;
     } else {
       m_targetModeEnabled = true;
-      m_xController.reset(getPose().getX(), goalEndVelocity);
-      m_xController.setGoal(target.getX());
-      m_yController.reset(getPose().getY(), goalEndVelocity);
-      m_yController.setGoal(target.getY());
+      m_xController.reset(getPose().getX(), initalVelocity);
+      m_xController.setGoal(new State(target.getX(), goalEndVelocity));
+      m_yController.reset(getPose().getY(), initalVelocity);
+      m_yController.setGoal(new State(target.getY(), goalEndVelocity));
       m_rotController.reset(getPose().getRotation().getRadians());
       m_rotController.setGoal(target.getRotation().getRadians());
     }
