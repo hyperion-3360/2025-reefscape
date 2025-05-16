@@ -527,8 +527,8 @@ public class PathfindingV2 extends Command {
 
     Pose2d backTrackedPose =
         new Pose2d(
-            targetPos.getX() + (0.45 * Math.cos(pose.getRotation().getAngle())),
-            targetPos.getY() + (0.45 * Math.sin(pose.getRotation().getAngle())),
+            targetPos.getX() + (0.30 * Math.cos(pose.getRotation().getAngle())),
+            targetPos.getY() + (0.30 * Math.sin(pose.getRotation().getAngle())),
             Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees() - 180));
 
     algaeIntakeSequence.addCommands(
@@ -543,16 +543,14 @@ public class PathfindingV2 extends Command {
         new ParallelDeadlineGroup(
             new WaitCommand(reachAlgaeWait),
             new WaitUntilCommand(() -> m_swerve.AutoTargetReached())),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 2)),
         new ParallelCommandGroup(
             new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
             new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET))),
         new ParallelDeadlineGroup(
-            new WaitCommand(0.4), new WaitUntilCommand(() -> m_swerve.targetReached())),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()));
+            new WaitCommand(0.4), new WaitUntilCommand(() -> m_swerve.targetReached())));
 
     return algaeIntakeSequence;
   }
@@ -573,7 +571,6 @@ public class PathfindingV2 extends Command {
         new WaitUntilCommand(() -> !m_algaeIntake.sensorTriggered()),
         new WaitCommand(0.05),
         new InstantCommand(() -> m_elevator.SetHeight(nextAlgaeHeight)),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORED)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.STORED)));
     return shootNetSequence;
@@ -597,14 +594,14 @@ public class PathfindingV2 extends Command {
 
     Pose2d backTrackedPose =
         new Pose2d(
-            targetPos.getX() + (0.40 * Math.cos(pose.getRotation().getAngle())),
-            targetPos.getY() + (0.40 * Math.sin(pose.getRotation().getAngle())),
+            targetPos.getX() + (0.55 * Math.cos(pose.getRotation().getAngle())),
+            targetPos.getY() + (0.55 * Math.sin(pose.getRotation().getAngle())),
             Rotation2d.fromDegrees(pose.getRotation().toRotation2d().getDegrees() - 180));
 
     algaeIntakeSequence.addCommands(
         // sets back the target pose so that we don't break the algae intake into a thousand pieces
         new InstantCommand(() -> m_swerve.lessenedConstraints()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 2)),
         new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.INTAKE)),
         new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.FLOOR)),
         new ParallelDeadlineGroup(
@@ -615,11 +612,10 @@ public class PathfindingV2 extends Command {
             new WaitCommand(reachAlgaeWait),
             new WaitUntilCommand(() -> m_swerve.AutoTargetReached())),
         new InstantCommand(() -> m_swerve.regularConstraints()),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()),
         new InstantCommand(() -> m_swerve.drivetoTarget(targetPos)),
         new WaitUntilCommand(() -> m_algaeIntake.sensorTriggered()),
         new InstantCommand(() -> m_swerve.regularConstraints()),
-        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose)),
+        new InstantCommand(() -> m_swerve.drivetoTarget(backTrackedPose, 2)),
         new WaitUntilCommand(() -> m_swerve.targetReachedWithOffset(0.06)).withTimeout(0.5),
         new InstantCommand(
             () ->
@@ -629,8 +625,7 @@ public class PathfindingV2 extends Command {
                         : AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.netSecondAlgae)),
         new ParallelCommandGroup(
             new InstantCommand(() -> m_algaeIntake.setShootingSpeed(shooting.STORING)),
-            new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET))),
-        new InstantCommand(() -> m_swerve.disableDriveToTarget()));
+            new InstantCommand(() -> m_algaeIntake.setShootingAngle(elevation.NET))));
 
     return algaeIntakeSequence;
   }
@@ -653,7 +648,7 @@ public class PathfindingV2 extends Command {
     //             .toPose2d(),
     //         1.0,
     //         180);
-    MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 1, 2.5, OffsetDir.BACK);
+    MinuteMoveCmd backTrack = new MinuteMoveCmd(m_swerve, 0.4, 2.5, OffsetDir.BACK);
 
     switch (currentAlliance) {
       case Blue:
@@ -663,7 +658,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.BlueAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4AUTO,
-                3),
+                2.3),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -675,7 +670,7 @@ public class PathfindingV2 extends Command {
                 0.8),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootNet(
-                AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.ALGAEL2),
+                AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.2, desiredHeight.ALGAEL2),
             driveAndIntakeAlgaeAndSmoothNet(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(20)
@@ -687,7 +682,7 @@ public class PathfindingV2 extends Command {
                 Alliance.Red),
             driveAndShootNet(
                 AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.netSecondAlgae,
-                0.3,
+                0.2,
                 desiredHeight.LOW),
             backTrack
             // new InstantCommand(() -> m_swerve.boostedConstraints()),
@@ -730,7 +725,7 @@ public class PathfindingV2 extends Command {
                 AutoWaypoints.RedAlliance.LeftSide.pegWaypoints.branchH,
                 2.5,
                 desiredHeight.L4AUTO,
-                2.0),
+                2.3),
             new InstantCommand(() -> m_swerve.slightlyBoostedConstraints()),
             driveAndIntakeAlgae(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
@@ -738,11 +733,11 @@ public class PathfindingV2 extends Command {
                     .get(),
                 0.4,
                 desiredHeight.ALGAEL2,
-                0.3,
-                0.8),
+                0.15,
+                0.4),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootNet(
-                AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.4, desiredHeight.L2),
+                AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.net, 0.2, desiredHeight.L2),
             driveAndIntakeAlgaeAndSmoothNet(
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(11)
@@ -750,13 +745,14 @@ public class PathfindingV2 extends Command {
                 0.01,
                 desiredHeight.ALGAEL3,
                 1.2,
-                0.8,
+                0.4,
                 Alliance.Red),
             driveAndShootNet(
                 AutoWaypoints.RedAlliance.LeftSide.NetWaypoint.netSecondAlgae,
-                0.3,
-                desiredHeight.LOW)
-            // backTrack
+                0.2,
+                desiredHeight.LOW),
+            backTrack,
+            new InstantCommand(() -> m_swerve.disableDriveToTarget())
             // new InstantCommand(() -> m_swerve.boostedConstraints()),
             // new InstantCommand(
             //     () ->
