@@ -372,8 +372,8 @@ public class Swerve extends SubsystemBase implements TestBindings {
     System.out.println("swerve pose: " + posX + " " + posY);
     System.out.println("goal pose: " + goalX + " " + goalY);
 
-    return isAlmostEqual(posX, goalX, 0.30)
-        && isAlmostEqual(posY, goalY, 0.30)
+    return isAlmostEqual(posX, goalX, 0.10)
+        && isAlmostEqual(posY, goalY, 0.10)
         && isAlmostEqual(rot, goalRot, Units.degreesToRadians(2));
   }
 
@@ -395,6 +395,21 @@ public class Swerve extends SubsystemBase implements TestBindings {
       m_xController.reset(getPose().getX());
       m_xController.setGoal(target.getX());
       m_yController.reset(getPose().getY());
+      m_yController.setGoal(target.getY());
+      m_rotController.reset(getPose().getRotation().getRadians());
+      m_rotController.setGoal(target.getRotation().getRadians());
+    }
+  }
+
+  public void drivetoTarget(Pose2d target, double goalEndVelocity) {
+    System.out.println("Requested pose: " + target);
+    if (target == Pose2d.kZero) {
+      m_targetModeEnabled = false;
+    } else {
+      m_targetModeEnabled = true;
+      m_xController.reset(getPose().getX(), goalEndVelocity);
+      m_xController.setGoal(target.getX());
+      m_yController.reset(getPose().getY(), goalEndVelocity);
       m_yController.setGoal(target.getY());
       m_rotController.reset(getPose().getRotation().getRadians());
       m_rotController.setGoal(target.getRotation().getRadians());
