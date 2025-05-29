@@ -665,10 +665,10 @@ public class PathfindingV2 extends Command {
                 AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
                     .getTagPose(21)
                     .get(),
-                0.9,
+                0.4,
                 desiredHeight.ALGAEL2,
-                0.5,
-                0.8),
+                0.15,
+                0.4),
             new InstantCommand(() -> m_swerve.regularConstraints()),
             driveAndShootNet(
                 AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.net, 0.2, desiredHeight.ALGAEL2),
@@ -678,14 +678,15 @@ public class PathfindingV2 extends Command {
                     .get(),
                 0.01,
                 desiredHeight.ALGAEL3,
-                1.0,
+                1.8,
                 0.8,
                 Alliance.Red),
             driveAndShootNet(
                 AutoWaypoints.BlueAlliance.LeftSide.NetWaypoint.netSecondAlgae,
                 0.2,
                 desiredHeight.LOW),
-            backTrack
+            backTrack,
+            new InstantCommand(() -> m_swerve.disableDriveToTarget())
             // new InstantCommand(() -> m_swerve.boostedConstraints()),
             // new InstantCommand(
             //     () ->
