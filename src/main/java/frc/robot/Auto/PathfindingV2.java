@@ -274,35 +274,33 @@ public class PathfindingV2 extends Command {
     SequentialCommandGroup shootSequence = new SequentialCommandGroup(Commands.none());
     shootSequence.addCommands(
         new InstantCommand(() -> m_swerve.regularConstraints()),
-        new ConditionalCommand(
-            new SequentialCommandGroup(
-                new ParallelDeadlineGroup(
-                    new WaitCommand(2.7),
-                    new SequentialCommandGroup(
-                        Commands.runOnce(() -> m_swerve.drivetoTarget(desiredpPose)),
-                        new WaitCommand(1),
-                        Commands.runOnce(() -> m_elevator.SetHeight(elevatorHeight)),
-                        Commands.runOnce(() -> m_shooter.openBlocker()),
-                        new WaitUntilCommand(() -> m_swerve.targetReached()))),
-                new InstantCommand(() -> m_swerve.disableDriveToTarget()),
-                new ConditionalCommand(
-                    new DeferredCommand(
-                        () ->
-                            new MinuteMoveCmd(
-                                m_swerve,
-                                0.5,
-                                Math.abs(m_pegDetection.getOffset()),
-                                (m_pegDetection.getOffset() < 0)
-                                    ? OffsetDir.LEFT
-                                    : OffsetDir.RIGHT),
-                        getRequirements()),
-                    new PrintCommand("Can't locate peg!!! "),
-                    () -> {
-                      if (m_pegDetection.processImage()) return true;
-                      else return false;
-                    })),
-            new PrintCommand("hehe"),
-            () -> m_vision.getLockID() != 0),
+        // new ConditionalCommand(
+        new SequentialCommandGroup(
+            new ParallelDeadlineGroup(
+                new WaitCommand(2.7),
+                new SequentialCommandGroup(
+                    Commands.runOnce(() -> m_swerve.drivetoTarget(desiredpPose)),
+                    new WaitCommand(1),
+                    Commands.runOnce(() -> m_elevator.SetHeight(elevatorHeight)),
+                    Commands.runOnce(() -> m_shooter.openBlocker()),
+                    new WaitUntilCommand(() -> m_swerve.targetReached()))),
+            new InstantCommand(() -> m_swerve.disableDriveToTarget()),
+            new ConditionalCommand(
+                new DeferredCommand(
+                    () ->
+                        new MinuteMoveCmd(
+                            m_swerve,
+                            0.5,
+                            Math.abs(m_pegDetection.getOffset()),
+                            (m_pegDetection.getOffset() < 0) ? OffsetDir.LEFT : OffsetDir.RIGHT),
+                    getRequirements()),
+                new PrintCommand("Can't locate peg!!! "),
+                () -> {
+                  if (m_pegDetection.processImage()) return true;
+                  else return false;
+                })),
+        // new PrintCommand("hehe"),
+        // () -> m_vision.getLockID() != 0),
         new InstantCommand(() -> m_shooter.setShoot(shootSpeed.L4AUTO)),
         new WaitUntilCommand(() -> !m_shooter.isCoralIn()),
         new WaitCommand(0.3),
